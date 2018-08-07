@@ -1,0 +1,6 @@
+[
+  {"primitive": "lines2d", "tag": "tag", "vertices": [1, 1, 2, 2]},
+  {"primitive": "polygon2d", "tag": "tag", "vertices": [1, 1, 2, 2, 1, 1]},
+  {"primitive": "polygon2d", "tag": "tag", "vertices": [2, 2, 3, 3, 2, 2]},
+  {"primitive": "path2d", "tag": "tag", "vertices": [1, 1, 2, 2]}
+]

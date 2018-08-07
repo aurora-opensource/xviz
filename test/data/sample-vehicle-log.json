@@ -1,0 +1,48 @@
+{
+  "time": 1182734811.95961,
+  "deltaTime": 0,
+  "submapGuidWithDashes": "4cf86582-a95f-49ef-ed63-962090ea0e69",
+  "submapGuid": "4cf86582a95f49efed63962090ea0e69",
+  "mapRelativePose": {
+    "position": [-1.38473705228924, -3.61238627449527, 328.460892639028],
+    "orientation": [0.0393954225995107, 0.0188527411427587, 1.56150515971466, 0]
+  },
+  "continuousPose": {
+    "position": [-1615.12202054897, 2040.00347885288, 79.6217156215455],
+    "orientation": [0.0344203422404031, 0.0192105961037386, -3.0899699114672, 0]
+  },
+  "heading": -3.0899699114672,
+  "worldFromContinuousTransform": [-0.06097099837113637, -0.9981395329624714, -0.00010047430650375958, 0, 0.9981271614838731, -0.06096974076487381, -0.004986002327570925, 0, 0.004970600142170385, -0.00040428767414546485, 0.9999875647655343, 0, -2136.438988612007, -1491.3188521993263, -69.61154167796354, 1],
+  "worldFromMapRelativeTransform": [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, -328.460892639028, 1],
+  "carPosition": {
+    "0": -1615.12202054897,
+    "1": 2040.00347885288,
+    "2": 79.6217156215455
+  },
+  "vehicleBoxPosition": [-1616.621742871274, 2039.925990228609, 79.6217156215455],
+  "ghostCarPosition": {
+    "0": -1615.12202054897,
+    "1": 2040.00347885288,
+    "2": 79.6217156215455
+  },
+  "ghostHeading": -3.0899699114672,
+  "geoJson": [],
+  "lookAheadGeoJson": [],
+  "variables": {
+    "/vehicle/commanded/brake": 0,
+    "/vehicle/autonomy/state": "Autonomous",
+    "/vehicle/steering_angle_deg/command": 3.46908040020616,
+    "/vehicle/propulsive_torque/actual": 0,
+    "/vehicle/velocity/command": 11.9639062339979,
+    "/vehicle/turn_signal/command": "None",
+    "/vehicle/is_faulted": false,
+    "/vehicle/is_autonomous": true,
+    "/trajectory_follower/longitudinal/acceleration/measured": 0.369611985409567,
+    "/trajectory_follower/longitudinal/acceleration/commanded": -0.21702418791534,
+    "/vehicle/is_ready": true,
+    "/trajectory_follower/road_wheel_angle_rad/commanded": 0.00352444342885283,
+    "/trajectory_follower/road_wheel_angle_rad/measured": 0.0036,
+    "/route_follower/kickout/reasons": ""
+  },
+  "labels": []
+}
