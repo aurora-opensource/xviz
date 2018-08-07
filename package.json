@@ -6,15 +6,11 @@
     "type": "git",
     "url": "https://github.com/uber/xviz.git"
   },
-  "main": "dist/es5/index.js",
-  "module": "dist/esm/index.js",
-  "esnext": "dist/es6/index.js",
-  "files": [
-    "dist",
-    "src"
-  ],
+  "main": "es5/index.js",
+  "module": "esm/index.js",
+  "esnext": "es6/index.js",
   "dependencies": {
-    "color": "^2.0.1",
+    "color": "^3.0.0",
     "dotty": "^0.0.2",
     "math.gl": "^2.0.0",
     "probe.gl": "^1.0.0",
