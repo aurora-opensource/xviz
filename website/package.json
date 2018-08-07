@@ -1,0 +1,13 @@
+{
+  "private": true,
+  "license": "private",
+  "main": "index.js",
+  "scripts": {
+    "start": "ocular start open",
+    "build": "ocular build",
+    "lint": "ocular lint"
+  },
+  "dependencies": {
+    "ocular": ">=0.3.3"
+  }
+}
