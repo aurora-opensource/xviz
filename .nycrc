@@ -1,0 +1,17 @@
+{
+  "all": true,
+  "sourceMap": false,
+  "instrument": false,
+  "include": [
+    "src/**/*.js"
+  ],
+  "exclude": [
+    "test/**/*.js"
+  ],
+  "reporter": [
+    "lcov",
+    "html",
+    "text",
+    "cobertura"
+  ]
+}

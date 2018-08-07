@@ -1,0 +1,41 @@
+{
+  "custom_fields": {
+    "AMENDED": "This log was amended from a previously amended index.",
+    "AMENDMENT_SOURCE": "TransmissionTimeIndex",
+    "BLUEPRINT_NAME": "autonomy_opt_planner",
+    "COMMENTS": "Initiated via the Active Logging request system.",
+    "GIT_CHANGESET": "8390c167070e3e4f3ffdd8e32295e479e8b17e93",
+    "GIT_DESCRIPTION": "2017.313.4_CI-0-g8390c16",
+    "MERGED": "This log set has been merged from other log sets.",
+    "OFFLOAD_CLIENT_GIT_DESC": "2017.313.4_CI-0-g8390c16",
+    "OFFLOAD_METHOD": "STREAMING",
+    "OFFLOAD_SERVER_BUILD_USER": "ocheng",
+    "OFFLOAD_SERVER_COLLECTION": "irn1_puppet",
+    "OFFLOAD_SERVER_GIT_DESC": "2017.311.3_CI-12-gf72a98e",
+    "OFFLOAD_SERVER_POOL": "MAUVE",
+    "OS_IMAGE_VERSION": "AVOS_V2017.313.1-0-g7123e2f",
+    "PLATFORM_ALIAS": "KRYPTON0050",
+    "PLATFORM_INSTANCE": "YV4BC0PL4H1123464",
+    "PLATFORM_LAYOUT": "2016-09-krypton.yml",
+    "PLATFORM_TYPE": "xc90.yml",
+    "PREFERRED_OUTPUT_PATH": "%Y.%m/%Y.%m.%d/KRYPTON0050/%X/%H.%M.%S_%N",
+    "SDV_VERSION": "2017.313.4_CI_PHXA",
+    "SESSION_ID": "e71a0fae-bc69-43a4-c879-bb6bdbbf3b4e",
+    "SOURCE": "Production Logger",
+    "TEST_CATEGORY": "RELEASE",
+    "TEST_LOG_TITLE": "CI_PHX_ROAD",
+    "TEST_NAME": "CI_PHX_ROAD",
+    "TEST_RECIPIENTS": "",
+    "TEST_SUBCATEGORY": "ROADCI"
+  },
+  "end_time": 1194278451.6,
+  "index_guid": "da8b1c9c-cbfb-4ddd-c14c-4692b36456ef",
+  "index_path": "/mnt/lustre_yellow/logs/av/2017.11/2017.11.09/KRYPTON0050/15.15.21_CI_PHX_ROAD/vlog_a051d946316f4ca5ffefd6b7f3737f89_1194278442_61_1194278457_61/SnippetIndex00000.hlog",
+  "map": {
+    "entry_point": "6b9d0916d69943c9d88d2703e72021f5",
+    "name": "phx"
+  },
+  "start_time": 1194278450.6,
+  "type": "metadata",
+  "volume_guid": "fe7eaccd-dd85-4461-e72a-11defb877c70"
+}
