@@ -12,6 +12,5 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export function padTo4Bytes(x) {
-  return (x + 3) & ~3;
-}
+import './load-uri.spec';
+import './flatten.spec';

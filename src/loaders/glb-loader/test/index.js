@@ -12,11 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import './utils/parse-data-uri.spec';
-import './utils/flatten.spec';
-
-import './helpers/glb-buffer.spec';
-import './helpers/pack-json-arrays.spec';
-import './helpers/glb-container.spec';
+import './glb-buffer.spec';
+import './pack-json-arrays.spec';
+import './glb-container.spec';
 
 import './glb-encode-parse.spec';

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import assert from '../../../utils/assert';
-import {padTo4Bytes} from '../utils/utils';
+import {padTo4Bytes} from '../loader-utils';
+import assert from '../loader-utils/assert';
 
 export default class GLBBufferPacker {
   constructor() {

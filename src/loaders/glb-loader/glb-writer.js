@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import GLBContainer from './helpers/glb-container';
-import GLBBufferPacker from './helpers/glb-buffer-packer';
-import {packJsonArrays} from './helpers/pack-json-arrays';
+import GLBEncoder from './glb-encoder';
+import GLBBufferPacker from './glb-buffer-packer';
+import {packJsonArrays} from './pack-json-arrays';
+import {toBuffer} from '../loader-utils';
 
 export function encodeGLB(inputJson, options) {
   const bufferPacker = new GLBBufferPacker();
@@ -23,7 +24,7 @@ export function encodeGLB(inputJson, options) {
   const {arrayBuffer, jsonDescriptors} = bufferPacker.packBuffers();
 
   Object.assign(glbJson, jsonDescriptors);
-  return GLBContainer.createGlbBuffer(glbJson, arrayBuffer, options);
+  return GLBEncoder.createGlbBuffer(glbJson, arrayBuffer, options);
 }
 
 export function writeGLBtoFile(filePath, json, options) {
@@ -32,17 +33,4 @@ export function writeGLBtoFile(filePath, json, options) {
   fs.writeFileSync(`${filePath}.glb`, toBuffer(glbFileBuffer), {flag: 'w'});
   // console.log(`Wrote ${filePath}.glb`);
   return glbFileBuffer;
-}
-
-// Helper methods
-
-// Convert (copy) ArrayBuffer to Buffer
-function toBuffer(arrayBuffer) {
-  /* global Buffer */
-  const buffer = new Buffer(arrayBuffer.byteLength);
-  const view = new Uint8Array(arrayBuffer);
-  for (let i = 0; i < buffer.length; ++i) {
-    buffer[i] = view[i];
-  }
-  return buffer;
 }

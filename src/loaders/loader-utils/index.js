@@ -12,11 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {parseGLB} from '../glb-loader/glb-loader';
+export {loadUri} from './load-uri.js';
 
-const MAGIC_XVIZ = 0x5856495a; // XVIZ in Big-Endian ASCII
+// Helper functions and classes, intended for other loaders
 
-export function parseBinaryXVIZ(arrayBuffer) {
-  const json = parseGLB(arrayBuffer, {magic: MAGIC_XVIZ});
-  return json.xviz;
-}
+// TextEncoder/Decoder polyfills for Node.js
+export {TextEncoder, TextDecoder} from './text-encoder-decoder';
+
+// Get MIME type and size from binary image data
+export {getImageSize} from './get-image-size';
+
+export {padTo4Bytes, copyArrayBuffer, toBuffer} from './array-utils';
+
+export {flattenToTypedArray} from './flatten';
+
+// Test utility (TODO - misplaced)
+export {toLowPrecision} from './to-low-precision';

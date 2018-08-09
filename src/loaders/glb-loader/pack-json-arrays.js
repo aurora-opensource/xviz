@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {flattenToTypedArray} from '../utils/flatten';
+import {flattenToTypedArray} from '../loader-utils';
 
 const DEFAULT_TOKENIZE = index => `$$$${index}`;
 
