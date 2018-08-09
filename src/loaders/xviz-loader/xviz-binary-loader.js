@@ -1,4 +1,4 @@
-import {parseGLB} from '../glb-loader/glb-loader';
+import {parseGLB} from '../glb-loader';
 
 const MAGIC_XVIZ = 0x5856495a; // XVIZ in Big-Endian ASCII
 
