@@ -38,7 +38,9 @@ export {default as streamDataWorker} from './workers/stream-data-worker';
 
 // LOADERS
 
-export {parseBinaryXVIZ} from './loaders/xviz-loader/xviz-loader';
+export {loadUri} from './loaders/loader-utils/load-uri.js';
+
+export {parseBinaryXVIZ} from './loaders/xviz-loader/xviz-binary-loader';
 export {encodeBinaryXVIZ} from './loaders/xviz-loader/xviz-binary-writer';
 
 export {parseGLB} from './loaders/glb-loader/glb-loader';
@@ -48,10 +50,11 @@ export {default as PLYParser} from './loaders/ply-loader/ply-parser';
 export {loadBinary, parsePLY, generateNormals, normalizeXYZ} from './loaders/ply-loader/ply-loader';
 
 // Experimental exports, exposes internals
-export {default as _GLBContainer} from './loaders/glb-loader/helpers/glb-container';
-export {default as _GLBBufferPacker} from './loaders/glb-loader/helpers/glb-buffer-packer';
-export {default as _unpackGLBBuffers} from './loaders/glb-loader/helpers/unpack-glb-buffers';
+export {default as _GLBDecoder} from './loaders/glb-loader/glb-decoder';
+export {default as _GLBEncoder} from './loaders/glb-loader/glb-encoder';
+export {default as _GLBBufferPacker} from './loaders/glb-loader/glb-buffer-packer';
+export {default as _unpackGLBBuffers} from './loaders/glb-loader/unpack-glb-buffers';
 export {
   packJsonArrays as _packJsonArrays,
   unpackJsonArrays as _unpackJsonArrays
-} from './loaders/glb-loader/helpers/pack-json-arrays';
+} from './loaders/glb-loader/pack-json-arrays';
