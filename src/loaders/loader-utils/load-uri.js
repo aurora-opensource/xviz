@@ -12,10 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// This code is based on binary-gltf-utils
-// Copyright (c) 2016-17 Karl Cheng, MIT license
+// Based on binary-gltf-utils under MIT license: Copyright (c) 2016-17 Karl Cheng
 
 /* global Buffer */
+import fs from 'fs';
+import path from 'path';
+
+export function loadUri(uri, rootFolder = '.') {
+  if (uri.startsWith('http:') || uri.startsWith('https:')) {
+    return Promise.reject(new Error('request based loading of URIs not implemented'));
+  }
+
+  if (uri.startsWith('data:')) {
+    return Promise.resolve(parseDataUri(uri));
+  }
+
+  const filePath = path.join((rootFolder = '.'), uri);
+  return fs.readFileAsync(filePath).then(buffer => ({buffer}));
+}
 
 /**
  * Parses a data URI into a buffer, as well as retrieving its declared MIME type.
@@ -23,7 +37,7 @@
  * @param {string} uri - a data URI (assumed to be valid)
  * @returns {Object} { buffer, mimeType }
  */
-export default function parseDataUri(uri) {
+export function parseDataUri(uri) {
   const dataIndex = uri.indexOf(',');
 
   let buffer;

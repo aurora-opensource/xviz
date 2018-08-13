@@ -15,7 +15,7 @@
 /* eslint-disable max-len */
 import test from 'tape-catch';
 
-import {_packJsonArrays as packJsonArrays, _GLBBufferPacker as GLBBufferPacker} from '../../index';
+import {_packJsonArrays as packJsonArrays, _GLBBufferPacker as GLBBufferPacker} from '../index';
 
 const inputJSONTypedArraysMixed = {
   slices: [

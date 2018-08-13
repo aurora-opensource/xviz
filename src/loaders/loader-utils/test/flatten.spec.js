@@ -33,7 +33,7 @@
 // THE SOFTWARE.
 
 import test from 'tape-catch';
-import {flattenToTypedArray} from '../../utils/flatten';
+import {flattenToTypedArray} from '../flatten';
 
 const FLATTEN_VERTICES_TEST_CASES = [
   {

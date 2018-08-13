@@ -18,7 +18,7 @@
 /* eslint-disable max-len, max-statements */
 /* global Buffer */
 import test from 'tape-catch';
-import parseDataUri from '../../utils/parse-data-uri.js';
+import {parseDataUri} from '../load-uri.js';
 
 test('parseDataUri', t => {
   let obj;

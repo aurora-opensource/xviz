@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {default as GLBContainer} from '../glb-loader/glb-container';
+import {default as GLBEncoder} from '../glb-loader/glb-encoder';
 import {GLBBufferPacker} from '../glb-loader';
 import {packJsonArrays} from '../glb-loader/pack-json-arrays';
 
@@ -39,7 +39,7 @@ export function packXVIZ(xvizJson, opts) {
   const {json, arrayBuffer} = bufferPacker.packBuffers();
   packedXviz.buffers = json;
 
-  return GLBContainer.createGlbBuffer(packedXviz, arrayBuffer, MAGIC_XVIZ);
+  return GLBEncoder.createGlbBuffer(packedXviz, arrayBuffer, MAGIC_XVIZ);
 }
 
 function packXVIZStateUpdates(stateUpdates, bufferPacker, opts) {

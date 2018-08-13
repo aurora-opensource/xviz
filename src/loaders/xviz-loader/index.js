@@ -13,5 +13,5 @@
 // limitations under the License.
 
 // Public methods
-export {parseBinaryXVIZ} from './xviz-loader';
+export {parseBinaryXVIZ} from './xviz-binary-loader';
 export {encodeBinaryXVIZ} from './xviz-binary-writer';

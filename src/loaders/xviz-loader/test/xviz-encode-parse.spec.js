@@ -14,7 +14,7 @@
 
 /* eslint-disable */
 import test from 'tape-catch';
-import {toLowPrecision} from '../../glb-loader/test/test-utils';
+import {toLowPrecision} from '../../loader-utils';
 
 import {encodeBinaryXVIZ, parseBinaryXVIZ} from '../index';
 
