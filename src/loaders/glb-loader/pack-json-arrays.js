@@ -1,4 +1,4 @@
-import {flattenToTypedArray} from '../utils/flatten';
+import {flattenToTypedArray} from '../loader-utils';
 
 const DEFAULT_TOKENIZE = index => `$$$${index}`;
 

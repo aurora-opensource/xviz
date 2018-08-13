@@ -2,12 +2,13 @@
 import test from 'tape-catch';
 
 import {
-  _GLBContainer as GLBContainer,
+  _GLBEncoder as GLBEncoder,
+  _GLBDecoder as GLBDecoder,
   _GLBBufferPacker as GLBBufferPacker,
   _unpackGLBBuffers as unpackGLBBuffers
-} from '../../index';
+} from '../index';
 
-import TEST_JSON from '../test-data.json';
+import TEST_JSON from './test-data.json';
 
 const BUFFERS = [
   new Int8Array([3, 2, 3]),
@@ -15,16 +16,16 @@ const BUFFERS = [
   new Float32Array([8, 2, 4, 5])
 ];
 
-test('glb-container#create-and-parse', t => {
+test('GLBLoader#encode-and-decode', t => {
   const bufferPacker = new GLBBufferPacker();
   const {arrayBuffer, jsonDescriptors} = bufferPacker.packBuffers(BUFFERS);
   const json = Object.assign({}, TEST_JSON, jsonDescriptors);
 
-  const glbFileBuffer = GLBContainer.createGlbBuffer(json, arrayBuffer);
+  const glbFileBuffer = GLBEncoder.createGlbBuffer(json, arrayBuffer);
 
   t.equal(glbFileBuffer.byteLength, 1584, 'should be equal');
 
-  const parsedData = GLBContainer.parseGlbBuffer(glbFileBuffer);
+  const parsedData = GLBDecoder.parseGlbBuffer(glbFileBuffer);
 
   t.equal(parsedData.binaryByteOffset, 1556);
   t.deepEqual(parsedData.json, json, 'JSON is equal');

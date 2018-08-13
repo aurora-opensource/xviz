@@ -1,6 +1,6 @@
 /* eslint-disable */
 import test from 'tape-catch';
-import {toLowPrecision} from './test-utils';
+import {toLowPrecision} from '../../loader-utils';
 
 import {encodeGLB, parseGLB, _packJsonArrays as packJsonArrays} from '../index';
 
