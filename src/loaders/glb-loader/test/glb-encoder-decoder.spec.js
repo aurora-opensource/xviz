@@ -16,7 +16,7 @@ const BUFFERS = [
   new Float32Array([8, 2, 4, 5])
 ];
 
-test('glb-container#create-and-parse', t => {
+test('GLBLoader#encode-and-decode', t => {
   const bufferPacker = new GLBBufferPacker();
   const {arrayBuffer, jsonDescriptors} = bufferPacker.packBuffers(BUFFERS);
   const json = Object.assign({}, TEST_JSON, jsonDescriptors);
