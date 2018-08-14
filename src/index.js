@@ -42,6 +42,9 @@ export {loadUri} from './loaders/loader-utils/load-uri.js';
 
 export {parseBinaryXVIZ} from './loaders/xviz-loader/xviz-binary-loader';
 export {encodeBinaryXVIZ} from './loaders/xviz-loader/xviz-binary-writer';
+export {default as XVIZWriter} from './loaders/xviz-loader/xviz-writer';
+export {default as XVIZBuilder} from './loaders/xviz-loader/xviz-builder';
+export {default as XVIZMetadataBuilder} from './loaders/xviz-loader/xviz-metadata-builder';
 
 export {parseGLB} from './loaders/glb-loader/glb-loader';
 export {encodeGLB} from './loaders/glb-loader/glb-writer';
