@@ -12,9 +12,8 @@
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta",
     "@babel/core": "^7.0.0-beta",
+    "@babel/plugin-proposal-class-properties": "^7.0.0-beta",
     "@babel/preset-env": "^7.0.0-beta",
-    "@babel/preset-es2015": "^7.0.0-beta",
-    "@babel/preset-stage-2": "^7.0.0-beta",
     "@babel/register": "^7.0.0-beta",
     "babel-eslint": "^7.1.1",
     "babel-loader": "^8.0.0-beta",
@@ -42,8 +41,9 @@
     "webworkify-webpack": "^2.0.0"
   },
   "scripts": {
+    "bootstrap": "scripts/bootstrap.sh",
     "bench": "NODE_ENV=test node test/start bench",
-    "build": "scripts/build.sh",
+    "build": "lerna run build",
     "flow": "flow check",
     "cover": "nyc npm run test",
     "lint": "scripts/lint.sh",
