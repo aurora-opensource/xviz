@@ -1,21 +1,14 @@
 {
-  "name": "@xviz/client",
+  "name": "xviz",
   "description": "Utility library for handling XVIZ protocol",
-  "version": "2.0.7",
+  "version": "0.0.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/uber/xviz.git"
   },
-  "main": "es5/index.js",
-  "module": "esm/index.js",
-  "esnext": "es6/index.js",
-  "dependencies": {
-    "color": "^3.0.0",
-    "dotty": "^0.0.2",
-    "math.gl": "^2.0.0",
-    "probe.gl": "^1.0.0",
-    "webworkify": "^1.5.0"
-  },
+  "workspaces": [
+    "modules/*"
+  ],
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta",
     "@babel/core": "^7.0.0-beta",
@@ -33,6 +26,7 @@
     "eslint-config-prettier": "^2.9.0",
     "eslint-config-uber-es2015": "^3.1.2",
     "html-webpack-plugin": "^3.2.0",
+    "lerna": "^2.9.1",
     "module-alias": "^2.0.0",
     "nyc": "^10.2.0",
     "pre-commit": "^1.2.2",
