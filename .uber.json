@@ -1,0 +1,8 @@
+{
+  "unpm": {
+    "publish": true,
+    "script": [
+      "./scripts/unpm-publish.sh"
+    ]
+  }
+}
