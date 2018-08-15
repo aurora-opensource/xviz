@@ -25,7 +25,8 @@ const TEST_BROWSER_CONFIG = {
     alias: {
       webworkify$: resolve(__dirname, '../node_modules/webworkify-webpack'),
       'test-data': resolve(TEST_DIR, 'data'),
-      xviz: resolve(TEST_DIR, '../src')
+      '@xviz/builder': resolve(TEST_DIR, '../modules/builder/src'),
+      '@xviz/parser': resolve(TEST_DIR, '../modules/parser/src')
     }
   },
 

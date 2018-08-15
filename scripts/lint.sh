@@ -27,7 +27,7 @@ case $MODE in
 
   *)
     echo "Checking prettier code styles..."
-    prettier-check "{src,test}/**/*.js" || echo "Running prettier." && prettier --write "{src,test}/**/*.js" --loglevel warn
+    prettier-check "{modules,test}/**/*.js" || echo "Running prettier." && prettier --write "{modules,test}/**/*.js" --loglevel warn
 
     echo "Running eslint..."
     eslint src test
