@@ -44,7 +44,7 @@
     "bootstrap": "scripts/bootstrap.sh",
     "bench": "NODE_ENV=test node test/start bench",
     "build": "lerna run build",
-    "bump": "lerna publish --skip-npm --skip-git && npm version patch --force",
+    "bump": "lerna publish --force-publish=* --skip-npm --skip-git && npm version patch --force",
     "flow": "flow check",
     "cover": "nyc npm run test",
     "lint": "scripts/lint.sh",
