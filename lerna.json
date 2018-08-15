@@ -4,6 +4,7 @@
   "commands": {
     "publish": {
       "ignore": [
+        "@xviz/builder",
         "test",
         "*.md"
       ]
