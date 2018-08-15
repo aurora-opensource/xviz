@@ -1,5 +1,7 @@
 /* global process */
-require('@babel/register');
+require('@babel/register')({
+  presets: [['@babel/env', {modules: 'commonjs'}]]
+});
 
 const {resolve} = require('path');
 
@@ -10,7 +12,14 @@ require('source-map-support').install();
 const moduleAlias = require('module-alias');
 moduleAlias.addAliases({
   'test-data': resolve(__dirname, 'data'),
-  xviz: mode === 'dist' ? resolve(__dirname, '../dist/es5') : resolve(__dirname, '../src')
+  '@xviz/builder':
+    mode === 'dist'
+      ? resolve(__dirname, '../modules/builder/dist/es5')
+      : resolve(__dirname, '../modules/builder/src'),
+  '@xviz/parser':
+    mode === 'dist'
+      ? resolve(__dirname, '../modules/parser/dist/es5')
+      : resolve(__dirname, '../modules/parser/src')
 });
 
 switch (mode) {

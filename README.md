@@ -18,7 +18,7 @@ To install dependencies, run:
 ```bash
 $ git clone https://github.com/uber/xviz.git
 $ cd xviz
-$ yarn
+$ yarn bootstrap
 ```
 
 ### Test
