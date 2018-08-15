@@ -44,17 +44,20 @@
     "bootstrap": "scripts/bootstrap.sh",
     "bench": "NODE_ENV=test node test/start bench",
     "build": "lerna run build",
+    "bump": "lerna publish --skip-npm --skip-git && npm version patch --force",
     "flow": "flow check",
     "cover": "nyc npm run test",
     "lint": "scripts/lint.sh",
     "publish": "scripts/publish.sh",
     "test": "npm run lint && NODE_ENV=test node test/start test",
-    "test-browser": "webpack-dev-server --config test/webpack.config.js --hot --open"
+    "test-browser": "webpack-dev-server --config test/webpack.config.js --hot --open",
+    "version": "git add .",
+    "postversion": "git push && git push --tags"
   },
   "engines": {
     "node": ">= 8",
     "npm": ">= 5",
-    "yarn": ">= 1.7.0"
+    "yarn": "1.7.0"
   },
   "pre-commit": [
     "test"
