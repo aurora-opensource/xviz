@@ -12,6 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Set up a configuration (TODO/OSS - this should be a neutral config)
-import './modules/builder';
-import './modules/parser';
+import './glb-loader';
+import './xviz-loader';
+// import './loader-utils';
