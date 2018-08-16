@@ -1,28 +1,62 @@
 import {XvizStyleParser, Stylesheet} from '@xviz/parser';
 import tape from 'tape-catch';
 
-const TEST_STYLESHEET = {
-  '*': {
-    extruded: true,
-    height: 1.5,
-    strokeWidth: 1,
-    opacity: 0.5,
-    fillColor: '#808080'
+const TEST_STYLESHEETS = [
+  {
+    title: 'Key-value map style (to be deprecated)',
+    stylesheet: {
+      '*': {
+        extruded: true,
+        height: 1.5,
+        strokeWidth: 1,
+        opacity: 0.5,
+        fillColor: '#808080'
+      },
+      'type=bike': {
+        fillColor: '#0000FF',
+        opacity: 1
+      },
+      'type=car tracked': {
+        strokeWidth: 3
+      },
+      tracked: {
+        fillColor: '#FFFF00'
+      },
+      fancy: {
+        fillColor: '#101010'
+      }
+    }
   },
-  'type=bike': {
-    fillColor: '#0000FF',
-    opacity: 1
-  },
-  'type=car tracked': {
-    strokeWidth: 3
-  },
-  tracked: {
-    fillColor: '#FFFF00'
-  },
-  fancy: {
-    fillColor: '#101010'
+  {
+    title: 'Array style',
+    stylesheet: [
+      {
+        extruded: true,
+        height: 1.5,
+        strokeWidth: 1,
+        opacity: 0.5,
+        fillColor: '#808080'
+      },
+      {
+        class: 'type=bike',
+        fillColor: '#0000FF',
+        opacity: 1
+      },
+      {
+        class: 'type=car tracked',
+        strokeWidth: 3
+      },
+      {
+        class: 'tracked',
+        fillColor: '#FFFF00'
+      },
+      {
+        class: 'fancy',
+        fillColor: '#101010'
+      }
+    ]
   }
-};
+];
 
 const BIKE = {type: 'bike'};
 const CAR = {type: 'car'};
@@ -104,26 +138,29 @@ tape('XvizStyleParser', t => {
 });
 
 tape('XvizStyleParser#Stylesheet', t => {
-  const stylesheet = new Stylesheet(TEST_STYLESHEET);
+  for (const testData of TEST_STYLESHEETS) {
+    t.comment(testData.title);
+    const stylesheet = new Stylesheet(testData.stylesheet);
 
-  t.ok(stylesheet, 'Stylesheet constructor does not throw error');
-  t.is(stylesheet.getPropertyDefault('opacity'), 1, 'returns default property value');
+    t.ok(stylesheet, 'Stylesheet constructor does not throw error');
+    t.is(stylesheet.getPropertyDefault('opacity'), 1, 'returns default property value');
 
-  GET_PROPERTY_TEST_CASES.forEach(testCase => {
-    t.deepEquals(
-      stylesheet.getProperty(testCase.propertyName, testCase.state),
-      testCase.output,
-      'getProperty returns correct value'
-    );
-  });
+    GET_PROPERTY_TEST_CASES.forEach(testCase => {
+      t.deepEquals(
+        stylesheet.getProperty(testCase.propertyName, testCase.state),
+        testCase.output,
+        'getProperty returns correct value'
+      );
+    });
 
-  GET_DEPS_TEST_CASES.forEach(testCase => {
-    t.deepEquals(
-      stylesheet.getPropertyDependencies(testCase.propertyName),
-      testCase.output,
-      'getPropertyDependencies returns correct value'
-    );
-  });
+    GET_DEPS_TEST_CASES.forEach(testCase => {
+      t.deepEquals(
+        stylesheet.getPropertyDependencies(testCase.propertyName),
+        testCase.output,
+        'getPropertyDependencies returns correct value'
+      );
+    });
+  }
 
   t.end();
 });
