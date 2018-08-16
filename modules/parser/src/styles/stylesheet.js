@@ -13,18 +13,18 @@ export default class Stylesheet {
   constructor(data = []) {
     let rules;
 
-    // Backward compatibility - support classname to style map
     if (Array.isArray(data)) {
       // Avoid mutating input data when calling reverse()
       rules = data.slice();
     } else {
+      // Backward compatibility - support classname to style map
       rules = Object.keys(data).map(classname => ({...data[classname], class: classname}));
     }
 
     rules = rules
       // Newer rules override older ones
       .reverse()
-      .map((rule) => {
+      .map(rule => {
         const {selectors, validate} = this._parseSelector(rule.class || '*');
         const properties = this._parseProperties(rule);
         return {selectors, validate, properties};
