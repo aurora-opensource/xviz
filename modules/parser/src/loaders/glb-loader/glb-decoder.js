@@ -13,8 +13,9 @@
 // limitations under the License.
 
 /* eslint-disable camelcase, max-statements */
-import {padTo4Bytes, TextDecoder} from '../loader-utils'; // Node.js polyfills
-import assert from '../loader-utils/assert';
+import {padTo4Bytes} from '../../utils/array-utils';
+import {TextDecoder} from '../../utils/text-decoder';
+import assert from '../../utils/assert';
 
 // glTF CONSTANTS
 

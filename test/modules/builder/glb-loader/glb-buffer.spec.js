@@ -15,10 +15,8 @@
 /* eslint-disable max-len */
 import test from 'tape-catch';
 
-import {
-  _GLBBufferPacker as GLBBufferPacker,
-  _unpackGLBBuffers as unpackGLBBuffers
-} from '@xviz/builder';
+import {_GLBBufferPacker as GLBBufferPacker} from '@xviz/builder';
+import {_unpackGLBBuffers as unpackGLBBuffers} from '@xviz/parser';
 
 const BUFFERS = [
   new Int8Array([3, 2, 3]),

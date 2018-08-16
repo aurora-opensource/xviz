@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {encodeGLB} from '../glb-loader';
+import {encodeGLB} from '../glb-writer';
 
 const MAGIC_XVIZ = 0x5856495a; // XVIZ in Big-Endian ASCII
 

@@ -14,9 +14,10 @@
 
 /* eslint-disable */
 import test from 'tape-catch';
-import {toLowPrecision} from '@xviz/builder/loader-utils';
+import {toLowPrecision} from '@xviz/builder/utils';
 
-import {encodeBinaryXVIZ, parseBinaryXVIZ, _packJsonArrays as packJsonArrays} from '@xviz/builder';
+import {encodeBinaryXVIZ, _packJsonArrays as packJsonArrays} from '@xviz/builder';
+import {parseBinaryXVIZ} from '@xviz/parser';
 
 const TEST_CASES = {
   flat: {

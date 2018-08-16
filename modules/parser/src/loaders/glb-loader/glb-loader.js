@@ -12,6 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Public methods
-export {parseBinaryXVIZ} from './xviz-binary-loader';
-export {encodeBinaryXVIZ} from './xviz-binary-writer';
+import GLBDecoder from './glb-decoder';
+import unpackGLBBuffers from './unpack-glb-buffers';
+import unpackJsonArrays from './unpack-json-arrays';
+
+export function parseGLB(arrayBuffer, options = {}) {
+  const {json, binaryByteOffset} = GLBDecoder.parseGlbBuffer(arrayBuffer, options);
+  const unpackedBuffers = unpackGLBBuffers(arrayBuffer, json, binaryByteOffset);
+  return unpackJsonArrays(json, unpackedBuffers);
+}

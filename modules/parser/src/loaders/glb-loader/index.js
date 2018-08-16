@@ -12,12 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import GLBDecoder from './glb-decoder';
-import unpackGLBBuffers from './unpack-glb-buffers';
-import {unpackJsonArrays} from './pack-json-arrays';
+// Public methods
+export {parseGLB} from './glb-loader';
 
-export function parseGLB(arrayBuffer, options = {}) {
-  const {json, binaryByteOffset} = GLBDecoder.parseGlbBuffer(arrayBuffer, options);
-  const unpackedBuffers = unpackGLBBuffers(arrayBuffer, json, binaryByteOffset);
-  return unpackJsonArrays(json, unpackedBuffers);
-}
+// Experimental exports, exposes internals
+export {default as _GLBDecoder} from './glb-decoder';
+export {default as _unpackGLBBuffers} from './unpack-glb-buffers';
+export {default as _unpackJsonArrays} from './unpack-json-arrays';

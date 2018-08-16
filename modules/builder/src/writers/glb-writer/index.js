@@ -12,13 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// UTILS
-export {loadUri} from './utils/load-uri.js';
+// Public methods
+export {encodeGLB} from './glb-writer';
 
-// WRITERS
-export {encodeGLB, _GLBEncoder, _GLBBufferPacker, _packJsonArrays} from './writers/glb-writer';
-export {encodeBinaryXVIZ, XVIZWriter} from './writers/xviz-writer';
-
-// BUILDERS
-export {default as XVIZBuilder} from './builders/xviz-builder';
-export {default as XVIZMetadataBuilder} from './builders/xviz-metadata-builder';
+// Experimental exports, exposes internals
+export {default as _GLBEncoder} from './glb-encoder';
+export {default as _GLBBufferPacker} from './glb-buffer-packer';
+export {default as _packJsonArrays} from './pack-json-arrays';

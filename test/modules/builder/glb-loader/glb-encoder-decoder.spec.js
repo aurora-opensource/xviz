@@ -15,12 +15,9 @@
 /* eslint-disable max-len */
 import test from 'tape-catch';
 
-import {
-  _GLBEncoder as GLBEncoder,
-  _GLBBufferPacker as GLBBufferPacker,
-  _GLBDecoder as GLBDecoder,
-  _unpackGLBBuffers as unpackGLBBuffers
-} from '@xviz/builder';
+import {_GLBEncoder as GLBEncoder, _GLBBufferPacker as GLBBufferPacker} from '@xviz/builder';
+
+import {_GLBDecoder as GLBDecoder, _unpackGLBBuffers as unpackGLBBuffers} from '@xviz/parser';
 
 import TEST_JSON from './test-data.json';
 

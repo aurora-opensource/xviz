@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {default as GLBEncoder} from '../glb-loader/glb-encoder';
-import {GLBBufferPacker} from '../glb-loader';
-import {packJsonArrays} from '../glb-loader/pack-json-arrays';
+import GLBEncoder from '../glb-writer/glb-encoder';
+import GLBBufferPacker from '../glb-writer/glb-buffer-packer';
+import packJsonArrays from '../glb-writer/pack-json-arrays';
 
 const MAGIC_XVIZ = 0x5856495a; // XVIZ in Big-Endian ASCII
 

@@ -12,10 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {flattenToTypedArray} from '../loader-utils';
-
-const DEFAULT_TOKENIZE = index => `$$$${index}`;
-
 const DEFAULT_UNTOKENIZE = value => {
   if (typeof value === 'string') {
     const matches = value.match(/\$\$\$([0-9]+)/);
@@ -27,40 +23,8 @@ const DEFAULT_UNTOKENIZE = value => {
   return -1;
 };
 
-// Recursively packs objects, replacing typed arrays with "JSON pointers" to binary data
-export function packJsonArrays(json, bufferPacker, options = {}) {
-  const {tokenize = DEFAULT_TOKENIZE, flattenArrays = true} = options;
-  let object = json;
-
-  if (Array.isArray(object)) {
-    // TODO - handle numeric arrays, flatten them etc.
-    const typedArray = flattenArrays && flattenToTypedArray(object);
-    if (typedArray) {
-      object = typedArray;
-    } else {
-      return object.map(element => packJsonArrays(element, bufferPacker, options));
-    }
-  }
-
-  // Typed arrays, pack them as binary
-  if (ArrayBuffer.isView(object) && bufferPacker) {
-    const bufferIndex = bufferPacker.addBuffer(object);
-    return tokenize(bufferIndex);
-  }
-
-  if (object !== null && typeof object === 'object') {
-    const newObject = {};
-    for (const key in object) {
-      newObject[key] = packJsonArrays(object[key], bufferPacker, options);
-    }
-    return newObject;
-  }
-
-  return object;
-}
-
 // Recursively unpacks objects, replacing "JSON pointers" with typed arrays
-export function unpackJsonArrays(json, buffers, options = {}) {
+export default function unpackJsonArrays(json, buffers, options = {}) {
   const {untokenize = DEFAULT_UNTOKENIZE} = options;
 
   const object = json;
