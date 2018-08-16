@@ -1,4 +1,5 @@
 import {getXvizConfig} from '../config/xviz-config';
+import validate from '../utils/validate';
 import {get} from 'dotty';
 
 function noop() {}
@@ -33,5 +34,10 @@ export function parseVehiclePoseDatum(datum, startTime) {
   const {postProcessVehiclePose} = getXvizConfig();
   // TODO - this is not a proper postprocess...
   const vehiclePose = postProcessVehiclePose(datum);
-  return vehiclePose ? {time, ...vehiclePose} : null;
+
+  if (vehiclePose) {
+    validate(vehiclePose, 'vehicle-pose');
+  }
+
+  return vehiclePose;
 }
