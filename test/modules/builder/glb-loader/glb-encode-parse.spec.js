@@ -1,8 +1,9 @@
 /* eslint-disable */
 import test from 'tape-catch';
-import {toLowPrecision} from '@xviz/builder/loader-utils';
+import {toLowPrecision} from '@xviz/builder/utils';
 
-import {encodeGLB, parseGLB, _packJsonArrays as packJsonArrays} from '@xviz/builder';
+import {encodeGLB, _packJsonArrays as packJsonArrays} from '@xviz/builder';
+import {parseGLB} from '@xviz/parser';
 
 const TEST_CASES = {
   flat: {

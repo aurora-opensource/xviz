@@ -1,7 +1,7 @@
 import GLBEncoder from './glb-encoder';
 import GLBBufferPacker from './glb-buffer-packer';
-import {packJsonArrays} from './pack-json-arrays';
-import {toBuffer} from '../loader-utils';
+import packJsonArrays from './pack-json-arrays';
+import {toBuffer} from '../../utils';
 
 export function encodeGLB(inputJson, options) {
   const bufferPacker = new GLBBufferPacker();
