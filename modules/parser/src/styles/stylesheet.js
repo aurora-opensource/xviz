@@ -7,12 +7,11 @@ const NULL_VALIDATOR = () => true;
 /* Parser for single stylesheet */
 export default class Stylesheet {
   constructor(data = []) {
-    const rules = (
-      Array.isArray(data)
-      // Avoid mutating input data when calling reverse()
-      ? data.slice()
-      // Backward compatibility - support classname to style map
-      : Object.keys(data).map(classname => ({...data[classname], class: classname}))
+    const rules = (Array.isArray(data)
+      ? // Avoid mutating input data when calling reverse()
+        data.slice()
+      : // Backward compatibility - support classname to style map
+        Object.keys(data).map(classname => ({...data[classname], class: classname}))
     )
       // Newer rules override older ones
       .reverse()
