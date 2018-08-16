@@ -38,5 +38,8 @@ export {default as streamDataWorker} from './workers/stream-data-worker';
 
 // LOADERS
 
+export {parseBinaryXVIZ} from './loaders/xviz-loader';
+export {parseGLB, _GLBDecoder, _unpackGLBBuffers, _unpackJsonArrays} from './loaders/glb-loader';
+
 export {default as PLYParser} from './loaders/ply-loader/ply-parser';
 export {loadBinary, parsePLY, generateNormals, normalizeXYZ} from './loaders/ply-loader/ply-loader';

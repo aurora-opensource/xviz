@@ -1,5 +1,5 @@
-import {padTo4Bytes} from '../loader-utils';
-import assert from '../loader-utils/assert';
+import {padTo4Bytes} from '../../utils';
+import assert from '../../utils/assert';
 
 export default class GLBBufferPacker {
   constructor() {
