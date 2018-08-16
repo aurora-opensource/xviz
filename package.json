@@ -1,7 +1,7 @@
 {
   "name": "xviz",
   "description": "Utility library for handling XVIZ protocol",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "repository": {
     "type": "git",
     "url": "https://github.com/uber/xviz.git"
@@ -51,8 +51,7 @@
     "publish": "scripts/publish.sh",
     "test": "npm run lint && NODE_ENV=test node test/start test",
     "test-browser": "webpack-dev-server --config test/webpack.config.js --hot --open",
-    "version": "git add .",
-    "postversion": "git push && git push --tags"
+    "version": "git add ."
   },
   "engines": {
     "node": ">= 8",
