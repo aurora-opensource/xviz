@@ -4,7 +4,7 @@
 /* eslint-disable max-len, max-statements */
 /* global Buffer */
 import test from 'tape-catch';
-import {parseDataUri} from '@xviz/builder/loader-utils/load-uri.js';
+import {parseDataUri} from '@xviz/builder/utils/load-uri.js';
 
 test('parseDataUri', t => {
   let obj;

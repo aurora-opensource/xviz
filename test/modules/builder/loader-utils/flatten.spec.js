@@ -19,7 +19,7 @@
 // THE SOFTWARE.
 
 import test from 'tape-catch';
-import {flattenToTypedArray} from '@xviz/builder/loader-utils/flatten';
+import {flattenToTypedArray} from '@xviz/builder/utils/flatten';
 
 const FLATTEN_VERTICES_TEST_CASES = [
   {
