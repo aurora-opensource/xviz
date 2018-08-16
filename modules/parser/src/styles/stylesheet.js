@@ -6,22 +6,14 @@ const NULL_VALIDATOR = () => true;
 
 /* Parser for single stylesheet */
 export default class Stylesheet {
-  /**
-   * @constructor
-   * @param {Object} data - an array of styles objects
-   */
   constructor(data = []) {
-    let rules;
-
-    if (Array.isArray(data)) {
+    const rules = (
+      Array.isArray(data)
       // Avoid mutating input data when calling reverse()
-      rules = data.slice();
-    } else {
+      ? data.slice()
       // Backward compatibility - support classname to style map
-      rules = Object.keys(data).map(classname => ({...data[classname], class: classname}));
-    }
-
-    rules = rules
+      : Object.keys(data).map(classname => ({...data[classname], class: classname}))
+    )
       // Newer rules override older ones
       .reverse()
       .map(rule => {
@@ -134,6 +126,7 @@ export default class Stylesheet {
   _parseProperties(properties) {
     const result = {};
     for (const key in properties) {
+      // class is the selector not a property
       if (key !== 'class') {
         result[key] = new XvizStyleProperty(key, properties[key]);
       }
