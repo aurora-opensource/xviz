@@ -1,18 +1,68 @@
-// export const XVIZ_STREAM_CATEGORY = [
-//   'time_series',
-//   'primitive',
-//   'variable',
-//   'time_series',
-//   'vehicle-pose'
-// ];
-//
-// export const XVIZ_PRIMITIVE_TYPE = ['polygon', 'polyline', 'points'];
+import assert from 'assert';
+
+const streamIdValidator = builder => {
+  if (!Boolean(builder.stream_id)) {
+    throw new Error('Setup stream first');
+  }
+};
+
+const streamsValidator = (builder, operation, {value}) => {
+  const streams = builder.metadata.streams;
+  if (!streams[value]) {
+    throw new Error(`Stream ${value} is not defined in metadata.`);
+  }
+};
+
+const dataValidator = builder => {
+  // validate if data is already set
+  if (Boolean(builder._vertices || builder._category)) {
+    throw new Error('Stream already has data');
+  }
+};
+
+const CAT_OP_MAP = {
+  var: ['value'],
+  prim: ['polygon', 'polyline', 'points', 'id', 'classes']
+};
+
+const categoryValidator = (builder, operation) => {
+  // validate if this operation can be applied to this category
+  if (!CAT_OP_MAP[builder._category].includes(operation)) {
+    throw new Error(`${operation} can not be applied to ${builder._category}`);
+  }
+};
+
+const OP_VALIDATOR_MAP = {
+  stream: [streamsValidator],
+  timestamp: [streamIdValidator],
+  value: [streamIdValidator, dataValidator],
+  polygon: [streamIdValidator, dataValidator],
+  polyline: [streamIdValidator, dataValidator],
+  points: [streamIdValidator, dataValidator],
+  id: [streamIdValidator, dataValidator, categoryValidator],
+  classes: [streamIdValidator, dataValidator, categoryValidator]
+};
+
+function getValidators(operation) {
+  return OP_VALIDATOR_MAP[operation];
+}
+
+function validate(builder, operation, options) {
+  const validators = getValidators(operation);
+  for (let i = 0; i < validators.length; i++) {
+    validators[i](builder, operation, options);
+  }
+  return true;
+}
 
 // TODO: Builder could validate against stream metadata!
+// TODO: need validate with metadata defined stream category
 export default class XVIZBuilder {
-  constructor(disableStreams) {
+  constructor(metadata, disableStreams) {
+    assert(metadata && metadata.streams);
     this.disableStreams = disableStreams;
 
+    this.metadata = metadata;
     this._pose = null;
     this.pose_stream_id = null;
 
@@ -36,6 +86,8 @@ export default class XVIZBuilder {
   }
 
   stream(stream_id) {
+    validate(this, 'stream', {value: stream_id});
+
     if (this.stream_id) {
       this._flush();
     }
@@ -47,11 +99,15 @@ export default class XVIZBuilder {
 
   // single is ts, multiple is variable
   timestamp(ts) {
+    validate(this, 'timestamp');
+
     this._ts = ts;
     return this;
   }
 
   value(value) {
+    validate(this, 'value');
+
     this._values.push(value);
     this._category = 'var';
 
@@ -63,6 +119,8 @@ export default class XVIZBuilder {
   }
 
   polygon(vertices) {
+    validate(this, 'polygon');
+
     this._vertices = vertices;
     this._type = 'polygon2d';
     this._category = 'prim';
@@ -70,6 +128,8 @@ export default class XVIZBuilder {
   }
 
   polyline(vertices) {
+    validate(this, 'polyline');
+
     this._vertices = vertices;
     this._type = 'line2d';
     this._category = 'prim';
@@ -77,6 +137,9 @@ export default class XVIZBuilder {
   }
 
   points(vertices) {
+    validate(this, 'points');
+    console.log(' points ');
+
     this._vertices = vertices;
     this._type = 'points3d';
     this._category = 'prim';
@@ -84,16 +147,22 @@ export default class XVIZBuilder {
   }
 
   color(clr) {
+    validate(this, 'color');
+
     this._color = clr;
     return this;
   }
 
   id(identifier) {
+    validate(this, 'id');
+
     this._id = identifier;
     return this;
   }
 
   classes(classList) {
+    validate(this, 'classes');
+
     this._classes = classList;
     return this;
   }
