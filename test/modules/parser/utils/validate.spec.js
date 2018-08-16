@@ -7,16 +7,19 @@ const TEST_CASES = [
     input: {},
     output: false,
     error: /time is required/
-  }, {
+  },
+  {
     type: 'vehicle-pose',
     input: {time: '2018-08-16'},
     output: false,
     error: /time is not .* number/
-  }, {
+  },
+  {
     type: 'vehicle-pose',
     input: {time: 0, latitude: 37.78, longitude: -122.45},
     output: true
-  }, {
+  },
+  {
     type: 'vehicle-pose',
     input: {time: 0, latitude: 37.78, longitude: -122.45, pose: {position: {x: 0, y: 0}}},
     output: false,
