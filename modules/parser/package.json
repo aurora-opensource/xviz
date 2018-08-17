@@ -14,8 +14,10 @@
     "src"
   ],
   "dependencies": {
+    "@xviz/schema": "0.0.1",
     "color": "^3.0.0",
     "dotty": "^0.0.2",
+    "jsonschema": "^1.2.4",
     "math.gl": "^2.0.0",
     "probe.gl": "^1.0.0",
     "webworkify": "^1.5.0"

@@ -1,0 +1,24 @@
+{
+  "id": "vehicle-pose",
+  "type": "object",
+  "properties": {
+    "time": {
+      "type": "number",
+      "required": true
+    },
+    "longitude": {
+      "type": "number",
+      "required": true
+    },
+    "latitude": {
+      "type": "number",
+      "required": true
+    },
+    "altitude": {
+      "type": "number"
+    },
+    "pose": {
+      "$ref": "types/pose"
+    }
+  }
+}
