@@ -28,7 +28,7 @@ export function parseVehiclePose(vehiclePose, opts = {}) {
 
 // TODO - move to viewport-mercator-project
 function addMetersToLngLat(lngLat, xyz) {
-  const scale = 1;  // doesn't really matter
+  const scale = 1; // doesn't really matter
   const {pixelsPerMeter, pixelsPerMeter2} = getDistanceScales({
     longitude: lngLat[0],
     latitude: lngLat[1],
@@ -49,10 +49,15 @@ export function defaultPostProcessVehiclePose(vehiclePose) {
   const {longitude, latitude, altitude = 0, mapPose} = vehiclePose;
 
   const origin = [longitude, latitude, altitude];
-  const mapRelativeTransform = mapPose ? new Pose(mapPose).getTransformationMatrix() : new Matrix4();
+  const mapRelativeTransform = mapPose
+    ? new Pose(mapPose).getTransformationMatrix()
+    : new Matrix4();
   const vehicleRelativeTransform = new Pose(vehiclePose).getTransformationMatrix();
 
-  const trackPosition = addMetersToLngLat(origin, vehicleRelativeTransform.transformVector([0, 0, 0]));
+  const trackPosition = addMetersToLngLat(
+    origin,
+    vehicleRelativeTransform.transformVector([0, 0, 0])
+  );
 
   return {
     vehiclePose,
@@ -60,6 +65,6 @@ export function defaultPostProcessVehiclePose(vehiclePose) {
     mapRelativeTransform,
     vehicleRelativeTransform,
     trackPosition,
-    heading: vehiclePose.yaw / Math.PI * 180
+    heading: (vehiclePose.yaw / Math.PI) * 180
   };
 }
