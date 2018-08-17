@@ -7,7 +7,7 @@ const CATEGORY = {
   'vehicle-pose': 'vehicle-pose'
 };
 
-// _ts should be reuired or optional?
+// _ts should be required or optional?
 const requiredProps = ['stream_id', '_category', '_type'];
 
 const defaultValidateWarn = console.warn;
@@ -41,6 +41,9 @@ export default class XVIZBuilder {
   }
 
   pose(stream_id, pose) {
+    if (this._pose) {
+      this._validateWarn('Pose has been already set.');
+    }
     this._category = CATEGORY['vehicle-pose'];
     this.pose_stream_id = stream_id;
     this._pose = pose;
@@ -59,11 +62,17 @@ export default class XVIZBuilder {
 
   // single is ts, multiple is variable
   timestamp(ts) {
+    this._validateStreamId();
+    this._validatePropSetOnce('_ts');
+
     this._ts = ts;
     return this;
   }
 
   value(value) {
+    this._validateStreamId();
+    this._validatePropSetOnce('_values');
+
     this._values.push(value);
     this._category = CATEGORY.variable;
 
@@ -75,6 +84,9 @@ export default class XVIZBuilder {
   }
 
   polygon(vertices) {
+    this._validateStreamId();
+    this._validatePropSetOnce('_vertices');
+
     this._vertices = vertices;
     this._type = 'polygon2d';
     this._category = CATEGORY.primitive;
@@ -82,6 +94,9 @@ export default class XVIZBuilder {
   }
 
   polyline(vertices) {
+    this._validateStreamId();
+    this._validatePropSetOnce('_vertices');
+
     this._vertices = vertices;
     this._type = 'line2d';
     this._category = CATEGORY.primitive;
@@ -89,6 +104,9 @@ export default class XVIZBuilder {
   }
 
   points(vertices) {
+    this._validateStreamId();
+    this._validatePropSetOnce('_vertices');
+
     this._vertices = vertices;
     this._type = 'points3d';
     this._category = CATEGORY.primitive;
@@ -96,16 +114,25 @@ export default class XVIZBuilder {
   }
 
   color(clr) {
+    this._validateStreamId();
+    this._validatePropSetOnce('_color');
+
     this._color = clr;
     return this;
   }
 
   id(identifier) {
+    this._validateStreamId();
+    this._validatePropSetOnce('_id');
+
     this._id = identifier;
     return this;
   }
 
   classes(classList) {
+    this._validateStreamId();
+    this._validatePropSetOnce('_classes');
+
     this._classes = classList;
     return this;
   }
@@ -124,6 +151,23 @@ export default class XVIZBuilder {
     };
 
     return frame;
+  }
+
+  _validatePropSetOnce(prop, msg) {
+    if (!this[prop]) {
+      return;
+    }
+    if (this[prop] instanceof Array && this[prop].length === 0) {
+      return;
+    }
+
+    this._validateWarn(msg || `${prop} has been already set.`);
+  }
+
+  _validateStreamId() {
+    if (this.stream_id) {
+      this._validateWarn('Call stream first');
+    }
   }
 
   _validate() {
@@ -156,7 +200,6 @@ export default class XVIZBuilder {
       );
     }
 
-    // set primitive / value / color, classes, id ... more than once?
   }
 
   _flush() {
