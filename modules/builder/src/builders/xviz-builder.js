@@ -198,7 +198,7 @@ export default class XVIZBuilder {
     // validate based on metadata
     const streamMetadata = this.metadata.streams[this.stream_id];
     if (!streamMetadata) {
-      this._validateWarn(`${this.stream_id} is defined in metadata.`);
+      this._validateWarn(`${this.stream_id} is not defined in metadata.`);
     } else if (this._category !== streamMetadata.category) {
       this._validateWarn(
         `Category ${this._category} does not match metadata definition (${
