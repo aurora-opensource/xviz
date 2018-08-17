@@ -1,3 +1,5 @@
+import {defaultPostProcessVehiclePose} from '../parsers/parse-vehicle-pose';
+
 const DEFAULT_XVIZ_CONFIG = {
   // Config
   DEFAULT_METADATA: {},
@@ -6,19 +8,17 @@ const DEFAULT_XVIZ_CONFIG = {
   OBJECT_STREAM: 'objects',
 
   NON_RENDERING_STREAMS: [],
+  // TODO - this is xviz v1, remove
   VIDEO_STREAM_PATTERNS: {IMAGE: /^$/, VIDEO: /^$/},
 
   filterStream: streamName => true, // Use to filter out unwanted streams
-  getLabelNameFromStream: streamName => streamName, // Relabel streams
-  filterPrimitive: primitive => true, // Filter out primitives before post processing,
 
   postProcessMetadata: metadata => metadata,
-  postProcessVehiclePose: pose => pose, // Process vehicle pose from datum
+  postProcessVehiclePose: defaultPostProcessVehiclePose, // Process vehicle pose from datum
   preProcessPrimitive: primitive => primitive, // Applied before normalize primitive
   postProcessFrame: frame => frame, // Post process log frame, used in LogSlice.getCurrentFrame
   postProcessTimeslice: timeslice => timeslice, // Post process timeslice
 
-  getTransformsFromPose: pose => null, // transform matrices from vehicle pose,
   getTrackedObjectPosition: _ => null,
 
   observeObjects: () => {}
