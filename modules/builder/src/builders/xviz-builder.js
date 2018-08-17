@@ -43,6 +43,7 @@ export default class XVIZBuilder {
   pose(stream_id, pose) {
     this._validateStreamId();
     this._validatePropSetOnce('_pose');
+    this._validatePropSetOnce('_category');
 
     this._category = CATEGORY['vehicle-pose'];
     this.pose_stream_id = stream_id;
@@ -72,6 +73,7 @@ export default class XVIZBuilder {
   value(value) {
     this._validateStreamId();
     this._validatePropSetOnce('_values');
+    this._validatePropSetOnce('_category');
 
     this._values.push(value);
     this._category = CATEGORY.variable;
@@ -86,6 +88,7 @@ export default class XVIZBuilder {
   polygon(vertices) {
     this._validateStreamId();
     this._validatePropSetOnce('_vertices');
+    this._validatePropSetOnce('_category');
 
     this._vertices = vertices;
     this._type = 'polygon2d';
@@ -96,6 +99,7 @@ export default class XVIZBuilder {
   polyline(vertices) {
     this._validateStreamId();
     this._validatePropSetOnce('_vertices');
+    this._validatePropSetOnce('_category');
 
     this._vertices = vertices;
     this._type = 'line2d';
@@ -106,6 +110,7 @@ export default class XVIZBuilder {
   points(vertices) {
     this._validateStreamId();
     this._validatePropSetOnce('_vertices');
+    this._validatePropSetOnce('_category');
 
     this._vertices = vertices;
     this._type = 'points3d';
