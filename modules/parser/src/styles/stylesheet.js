@@ -6,17 +6,18 @@ const NULL_VALIDATOR = () => true;
 
 /* Parser for single stylesheet */
 export default class Stylesheet {
-  /**
-   * @constructor
-   * @param {Object} data - a map from selector to styles object
-   */
-  constructor(data = {}) {
-    const rules = Object.keys(data)
+  constructor(data = []) {
+    const rules = (Array.isArray(data)
+      ? // Avoid mutating input data when calling reverse()
+        data.slice()
+      : // Backward compatibility - support classname to style map
+        Object.keys(data).map(classname => ({...data[classname], class: classname}))
+    )
       // Newer rules override older ones
       .reverse()
-      .map(selectorString => {
-        const {selectors, validate} = this._parseSelector(selectorString);
-        const properties = this._parseProperties(data[selectorString]);
+      .map(rule => {
+        const {selectors, validate} = this._parseSelector(rule.class || '*');
+        const properties = this._parseProperties(rule);
         return {selectors, validate, properties};
       });
 
@@ -124,7 +125,10 @@ export default class Stylesheet {
   _parseProperties(properties) {
     const result = {};
     for (const key in properties) {
-      result[key] = new XvizStyleProperty(key, properties[key]);
+      // class is the selector not a property
+      if (key !== 'class') {
+        result[key] = new XvizStyleProperty(key, properties[key]);
+      }
     }
     return result;
   }
