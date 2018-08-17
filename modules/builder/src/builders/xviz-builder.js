@@ -1,64 +1,22 @@
 import assert from 'assert';
 
-const streamIdValidator = builder => {
-  if (!Boolean(builder.stream_id)) {
-    throw new Error('Setup stream first');
-  }
+const CATEGORY = {
+  time_series: 'time_series',
+  primitive: 'primitive',
+  variable: 'variable',
+  'vehicle-pose': 'vehicle-pose'
 };
 
-const streamsValidator = (builder, operation, {value}) => {
-  const streams = builder.metadata.streams;
-  if (!streams[value]) {
-    throw new Error(`Stream ${value} is not defined in metadata.`);
-  }
-};
+// _ts should be reuired or optional?
+const requiredProps = ['stream_id', '_category', '_type'];
 
-const dataValidator = builder => {
-  // validate if data is already set
-  if (Boolean(builder._vertices || builder._category)) {
-    throw new Error('Stream already has data');
-  }
-};
-
-const CAT_OP_MAP = {
-  var: ['value'],
-  prim: ['polygon', 'polyline', 'points', 'id', 'classes']
-};
-
-const categoryValidator = (builder, operation) => {
-  // validate if this operation can be applied to this category
-  if (!CAT_OP_MAP[builder._category].includes(operation)) {
-    throw new Error(`${operation} can not be applied to ${builder._category}`);
-  }
-};
-
-const OP_VALIDATOR_MAP = {
-  stream: [streamsValidator],
-  timestamp: [streamIdValidator],
-  value: [streamIdValidator, dataValidator],
-  polygon: [streamIdValidator, dataValidator],
-  polyline: [streamIdValidator, dataValidator],
-  points: [streamIdValidator, dataValidator],
-  id: [streamIdValidator, dataValidator, categoryValidator],
-  classes: [streamIdValidator, dataValidator, categoryValidator]
-};
-
-function getValidators(operation) {
-  return OP_VALIDATOR_MAP[operation];
-}
-
-function validate(builder, operation, options) {
-  const validators = getValidators(operation);
-  for (let i = 0; i < validators.length; i++) {
-    validators[i](builder, operation, options);
-  }
-  return true;
-}
+const defaultValidateWarn = console.warn;
+const defaultValidateError = console.error;
 
 // TODO: Builder could validate against stream metadata!
 // TODO: need validate with metadata defined stream category
 export default class XVIZBuilder {
-  constructor(metadata, disableStreams) {
+  constructor(metadata, disableStreams, {validateWarn, validateError}) {
     assert(metadata && metadata.streams);
     this.disableStreams = disableStreams;
 
@@ -77,17 +35,19 @@ export default class XVIZBuilder {
       variables: {},
       primitives: {}
     };
+
+    this._validateWarn = validateWarn || defaultValidateWarn;
+    this._validateError = validateError || defaultValidateError;
   }
 
   pose(stream_id, pose) {
+    this._category = CATEGORY['vehicle-pose'];
     this.pose_stream_id = stream_id;
     this._pose = pose;
     return this;
   }
 
   stream(stream_id) {
-    validate(this, 'stream', {value: stream_id});
-
     if (this.stream_id) {
       this._flush();
     }
@@ -99,17 +59,13 @@ export default class XVIZBuilder {
 
   // single is ts, multiple is variable
   timestamp(ts) {
-    validate(this, 'timestamp');
-
     this._ts = ts;
     return this;
   }
 
   value(value) {
-    validate(this, 'value');
-
     this._values.push(value);
-    this._category = 'var';
+    this._category = CATEGORY.variable;
 
     // TODO: hack
     this._type = 'float';
@@ -119,50 +75,37 @@ export default class XVIZBuilder {
   }
 
   polygon(vertices) {
-    validate(this, 'polygon');
-
     this._vertices = vertices;
     this._type = 'polygon2d';
-    this._category = 'prim';
+    this._category = CATEGORY.primitive;
     return this;
   }
 
   polyline(vertices) {
-    validate(this, 'polyline');
-
     this._vertices = vertices;
     this._type = 'line2d';
-    this._category = 'prim';
+    this._category = CATEGORY.primitive;
     return this;
   }
 
   points(vertices) {
-    validate(this, 'points');
-    console.log(' points ');
-
     this._vertices = vertices;
     this._type = 'points3d';
-    this._category = 'prim';
+    this._category = CATEGORY.primitive;
     return this;
   }
 
   color(clr) {
-    validate(this, 'color');
-
     this._color = clr;
     return this;
   }
 
   id(identifier) {
-    validate(this, 'id');
-
     this._id = identifier;
     return this;
   }
 
   classes(classList) {
-    validate(this, 'classes');
-
     this._classes = classList;
     return this;
   }
@@ -183,9 +126,44 @@ export default class XVIZBuilder {
     return frame;
   }
 
+  _validate() {
+    // validate before calling flush
+
+    // validate required fields
+    for (const prop of requiredProps) {
+      if (this[prop]) {
+        this._validateError(`${prop} is required.`);
+      }
+    }
+
+    // validate primitive
+    if (this._category === CATEGORY.primitive && !this._vertices) {
+      this._validateWarn('Primitives vertices are not provided.');
+    }
+
+    // validate variable
+    if (this._category === CATEGORY.variable && this._values.length === 0) {
+      this._validateWarn('Variable value(s) are not provided.');
+    }
+
+    // validate based on metadata
+    const streamMetadata = this.metadata.streams[this.stream_id];
+    if (!streamMetadata) {
+      this._validateWarn(`${this.stream_id} is defined in metadata.`);
+    } else if (this._category !== streamMetadata.category) {
+      this._validateWarn(
+        `Category ${this._category} does not match metadata definition (${streamMetadata.category}).`
+      );
+    }
+
+    // set primitive / value / color, classes, id ... more than once?
+  }
+
   _flush() {
+    this._validate();
+
     if (this.stream_id && !this.disableStreams.includes(this.stream_id)) {
-      if (this._category === 'var') {
+      if (this._category === CATEGORY.variable) {
         const obj = {
           timestamps: [this._ts],
           values: this._values,
@@ -199,7 +177,7 @@ export default class XVIZBuilder {
         }
       }
 
-      if (this._category === 'prim') {
+      if (this._category === CATEGORY.primitive) {
         const obj = {
           type: this._type,
           vertices: this._vertices
