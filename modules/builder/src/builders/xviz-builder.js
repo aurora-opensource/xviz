@@ -41,9 +41,9 @@ export default class XVIZBuilder {
   }
 
   pose(stream_id, pose) {
-    if (this._pose) {
-      this._validateWarn('Pose has been already set.');
-    }
+    this._validateStreamId();
+    this._validatePropSetOnce('_pose');
+
     this._category = CATEGORY['vehicle-pose'];
     this.pose_stream_id = stream_id;
     this._pose = pose;
@@ -165,8 +165,8 @@ export default class XVIZBuilder {
   }
 
   _validateStreamId() {
-    if (this.stream_id) {
-      this._validateWarn('Call stream first');
+    if (!this.stream_id) {
+      this._validateWarn('Set stream first.');
     }
   }
 
@@ -196,10 +196,11 @@ export default class XVIZBuilder {
       this._validateWarn(`${this.stream_id} is defined in metadata.`);
     } else if (this._category !== streamMetadata.category) {
       this._validateWarn(
-        `Category ${this._category} does not match metadata definition (${streamMetadata.category}).`
+        `Category ${this._category} does not match metadata definition (${
+          streamMetadata.category
+        }).`
       );
     }
-
   }
 
   _flush() {
