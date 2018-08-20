@@ -17,8 +17,31 @@
     "altitude": {
       "type": "number"
     },
-    "pose": {
-      "$ref": "types/pose"
+    "x": {
+      "type": "number"
+    },
+    "y": {
+      "type": "number"
+    },
+    "z": {
+      "type": "number"
+    },
+    "pitch": {
+      "type": "number"
+    },
+    "roll": {
+      "type": "number"
+    },
+    "yaw": {
+      "type": "number"
+    },
+    "position": {
+      "type": "array",
+      "minItems": 3
+    },
+    "orientation": {
+      "type": "array",
+      "minItems": 3
     }
   }
 }

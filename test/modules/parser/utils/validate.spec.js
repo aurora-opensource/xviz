@@ -16,12 +16,12 @@ const TEST_CASES = [
   },
   {
     type: 'vehicle-pose',
-    input: {time: 0, latitude: 37.78, longitude: -122.45},
+    input: {time: 0, latitude: 37.78, longitude: -122.45, x: 10, y: 5},
     output: true
   },
   {
     type: 'vehicle-pose',
-    input: {time: 0, latitude: 37.78, longitude: -122.45, pose: {position: {x: 0, y: 0}}},
+    input: {time: 0, latitude: 37.78, longitude: -122.45, position: {x: 0, y: 0}},
     output: false,
     error: /position is not .* array/
   }
