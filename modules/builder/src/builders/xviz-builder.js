@@ -1,18 +1,25 @@
-// export const XVIZ_STREAM_CATEGORY = [
-//   'time_series',
-//   'primitive',
-//   'variable',
-//   'time_series',
-//   'vehicle-pose'
-// ];
-//
-// export const XVIZ_PRIMITIVE_TYPE = ['polygon', 'polyline', 'points'];
+import assert from '../utils/assert';
+
+const CATEGORY = {
+  time_series: 'time_series',
+  primitive: 'primitive',
+  variable: 'variable'
+};
+
+// _ts should be required or optional?
+const requiredProps = ['stream_id', '_category', '_type'];
+
+const defaultValidateWarn = console.warn;
+const defaultValidateError = console.error;
 
 // TODO: Builder could validate against stream metadata!
+// TODO: need validate with metadata defined stream category
 export default class XVIZBuilder {
-  constructor(disableStreams) {
-    this.disableStreams = disableStreams;
+  constructor(metadata, disableStreams, {validateWarn, validateError}) {
+    assert(metadata && metadata.streams);
+    this.disableStreams = disableStreams || [];
 
+    this.metadata = metadata;
     this._pose = null;
     this.pose_stream_id = null;
 
@@ -27,9 +34,16 @@ export default class XVIZBuilder {
       variables: {},
       primitives: {}
     };
+
+    this._validateWarn = validateWarn || defaultValidateWarn;
+    this._validateError = validateError || defaultValidateError;
   }
 
   pose(stream_id, pose) {
+    this._validatePropSetOnce('_pose');
+    this._validatePropSetOnce('_category');
+
+    this._category = 'vehicle-pose';
     this.pose_stream_id = stream_id;
     this._pose = pose;
     return this;
@@ -47,13 +61,20 @@ export default class XVIZBuilder {
 
   // single is ts, multiple is variable
   timestamp(ts) {
+    this._validateStreamId();
+    this._validatePropSetOnce('_ts');
+
     this._ts = ts;
     return this;
   }
 
   value(value) {
+    this._validateStreamId();
+    this._validatePropSetOnce('_values');
+    this._validatePropSetOnce('_category');
+
     this._values.push(value);
-    this._category = 'var';
+    this._category = CATEGORY.variable;
 
     // TODO: hack
     this._type = 'float';
@@ -63,37 +84,58 @@ export default class XVIZBuilder {
   }
 
   polygon(vertices) {
+    this._validateStreamId();
+    this._validatePropSetOnce('_vertices');
+    this._validatePropSetOnce('_category');
+
     this._vertices = vertices;
     this._type = 'polygon2d';
-    this._category = 'prim';
+    this._category = CATEGORY.primitive;
     return this;
   }
 
   polyline(vertices) {
+    this._validateStreamId();
+    this._validatePropSetOnce('_vertices');
+    this._validatePropSetOnce('_category');
+
     this._vertices = vertices;
     this._type = 'line2d';
-    this._category = 'prim';
+    this._category = CATEGORY.primitive;
     return this;
   }
 
   points(vertices) {
+    this._validateStreamId();
+    this._validatePropSetOnce('_vertices');
+    this._validatePropSetOnce('_category');
+
     this._vertices = vertices;
     this._type = 'points3d';
-    this._category = 'prim';
+    this._category = CATEGORY.primitive;
     return this;
   }
 
   color(clr) {
+    this._validateStreamId();
+    this._validatePropSetOnce('_color');
+
     this._color = clr;
     return this;
   }
 
   id(identifier) {
+    this._validateStreamId();
+    this._validatePropSetOnce('_id');
+
     this._id = identifier;
     return this;
   }
 
   classes(classList) {
+    this._validateStreamId();
+    this._validatePropSetOnce('_classes');
+
     this._classes = classList;
     return this;
   }
@@ -114,9 +156,61 @@ export default class XVIZBuilder {
     return frame;
   }
 
+  _validatePropSetOnce(prop, msg) {
+    if (!this[prop]) {
+      return;
+    }
+    if (this[prop] instanceof Array && this[prop].length === 0) {
+      return;
+    }
+
+    this._validateWarn(msg || `${prop} has been already set.`);
+  }
+
+  _validateStreamId() {
+    if (!this.stream_id) {
+      this._validateWarn('A stream must be set first.');
+    }
+  }
+
+  _validate() {
+    // validate before calling flush
+
+    // validate required fields
+    for (const prop of requiredProps) {
+      if (!this[prop]) {
+        this._validateError(`${prop} is required.`);
+      }
+    }
+
+    // validate primitive
+    if (this._category === CATEGORY.primitive && !this._vertices) {
+      this._validateWarn('Primitives vertices are not provided.');
+    }
+
+    // validate variable
+    if (this._category === CATEGORY.variable && this._values.length === 0) {
+      this._validateWarn('Variable value(s) are not provided.');
+    }
+
+    // validate based on metadata
+    const streamMetadata = this.metadata.streams[this.stream_id];
+    if (!streamMetadata) {
+      this._validateWarn(`${this.stream_id} is not defined in metadata.`);
+    } else if (this._category !== streamMetadata.category) {
+      this._validateWarn(
+        `Category ${this._category} does not match metadata definition (${
+          streamMetadata.category
+        }).`
+      );
+    }
+  }
+
   _flush() {
+    this._validate();
+
     if (this.stream_id && !this.disableStreams.includes(this.stream_id)) {
-      if (this._category === 'var') {
+      if (this._category === CATEGORY.variable) {
         const obj = {
           timestamps: [this._ts],
           values: this._values,
@@ -130,7 +224,7 @@ export default class XVIZBuilder {
         }
       }
 
-      if (this._category === 'prim') {
+      if (this._category === CATEGORY.primitive) {
         const obj = {
           type: this._type,
           vertices: this._vertices
