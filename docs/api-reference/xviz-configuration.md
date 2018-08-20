@@ -21,7 +21,7 @@ Parser plugins:
 - `postProcessVehiclePose` (Function) - Post process the vehicle pose object. If overridden, must return the following:
     + `origin` (Array) - the reference point for all relative coordinates, in `[longitude, latitude, altitude]`.
     + `trackPosition` (Array) - the target of the camera, in `[longitude, latitude, altitude]`.
-    + `heading` (Number) - heading of the car, in degrees.
+    + `heading` (Number) - heading of the vehicle, in degrees.
     + `mapRelativeTransform` (Matrix4, optional) - must supply if any stream uses `map_relative` coordinates
     + `vehicleRelativeTransform` (Matrix4, optional) - must supply if any stream uses `vehicle_relative` coordinates
     + `customTransform` (Matrix4, optional) - must supply if any stream uses `custom` coordinates
