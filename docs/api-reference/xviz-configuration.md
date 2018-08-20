@@ -5,10 +5,29 @@
 
 ### setXvizConfig(config)
 
-Default Configuration.
+Constants:
 
-* `getLabelNameFromStream`: channelName => channelName, // Relabel channels
-* `filterPrimitive`: _ => true // Filter out primitives before post processing
+- `DEFAULT_METADATA` (Object) - Loaded metadata will be merged with this object. Default `{}`.
+- `PRIMARY_POSE_STREAM` (String) - Name of the vehicle pose stream. Default `vehicle-pose`.
+- `OBJECT_STREAM` (String) - Name of the object stream. Default `objects`.
+- `NON_RENDERING_STREAMS` (Array) - List of stream names to block from rendering. Default `[]`.
+
+Parser plugins:
+
+- `filterStream` (Function) - Use to filter out unwanted streams.
+- `preProcessPrimitive` (Function) - Pre process a primitive. This can be used to change the type of a primitive (e.g. from `point` to `text`) and/or modify their properties.
+- `postProcessMetadata` (Function) - Post process a metadata message.
+- `postProcessTimeslice` (Function) - Post process a timeslice message.
+- `postProcessVehiclePose` (Function) - Post process the vehicle pose object. If overridden, must return the following:
+    + `origin` (Array) - the reference point for all relative coordinates, in `[longitude, latitude, altitude]`.
+    + `trackPosition` (Array) - the target of the camera, in `[longitude, latitude, altitude]`.
+    + `heading` (Number) - heading of the vehicle, in degrees.
+    + `mapRelativeTransform` (Matrix4, optional) - must supply if any stream uses `map_relative` coordinates
+    + `vehicleRelativeTransform` (Matrix4, optional) - must supply if any stream uses `vehicle_relative` coordinates
+    + `customTransform` (Matrix4, optional) - must supply if any stream uses `custom` coordinates
+- `postProcessFrame` (Function) - Called before the current log frame is rendered.
+- `getTrackedObjectPosition` (Function) - Returns the tracking position of a selected object. The returned position should be in the same coordinate system as the object stream, in `[x, y, z]`. By default, returns the centroid of the primitive in the object stream.
+- `observeObjects` (Function) - called when new objects arrive in the object stream. Can be used to track all objects in the log.
 
 
 ### getXvizConfig(config)
@@ -20,10 +39,10 @@ Returns the current Xviz config.
 
 Sets the XVIZ settings. The default settings are:
 
-* `hiTimeResolution`: 1 / 60, // Update pose and lightweight geometry up to 60Hz
-* `loTimeResolution`: 1 / 10, // Throttle expensive geometry updates to 10Hz
-* `interpolateVehiclePose`: false, // Injects interpolated vehicle pose datums @100Hz
-* `pathDistanceThreshold`: 0.1 // Filters out close vertices (work around for PathLayer issue)
+- `hiTimeResolution` (Number) - Update pose and lightweight geometry up to 60Hz. Default `1 / 60`.
+- `loTimeResolution` (Number) - Throttle expensive geometry updates. Default `1 / 10`
+- `interpolateVehiclePose` (Boolean) - Injects interpolated vehicle pose datums. Default `false`.
+- `pathDistanceThreshold` (Number) - Filters out close vertices (work around for PathLayer issue) Default `0.1`.
 
 
 ### getXvizSettings(config)

@@ -115,13 +115,7 @@ function parseTimesliceData(data, convertPrimitive) {
   }
 
   if (vehiclePose) {
-    const newVehiclePose = parseVehiclePoseDatum(vehiclePose);
-
-    newStreams[PRIMARY_POSE_STREAM] = newVehiclePose;
-
-    Object.assign(result, {
-      vehiclePose: newVehiclePose
-    });
+    newStreams[PRIMARY_POSE_STREAM] = vehiclePose;
   }
 
   return postProcessTimeslice ? postProcessTimeslice(result) : result;
