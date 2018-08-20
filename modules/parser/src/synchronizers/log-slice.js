@@ -23,13 +23,13 @@ export default class LogSlice {
       return null;
     }
 
-    const {postProcessFrame, getObjectFeatures} = getXvizConfig();
+    const {postProcessFrame, postProcessVehiclePose, OBJECT_STREAM} = getXvizConfig();
 
     const objects = XvizObject.getAllInCurrentFrame(); // Map of XVIZ ids in current slice
 
     const frame = {
       ...others,
-      ...vehiclePose,
+      ...postProcessVehiclePose(vehiclePose),
       trackedObjectPosition,
       features: this.features,
       lookAheads: this.lookAheads,
@@ -44,7 +44,7 @@ export default class LogSlice {
     XvizObject.resetAll();
     postProcessFrame(frame);
 
-    const objectFeatures = getObjectFeatures(this);
+    const objectFeatures = this.features[OBJECT_STREAM] || [];
 
     objectFeatures.forEach(feature => {
       const xvizObject = XvizObject.get(feature.id);
