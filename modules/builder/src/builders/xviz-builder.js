@@ -1,10 +1,9 @@
-import assert from 'assert';
+import assert from '../utils/assert';
 
 const CATEGORY = {
   time_series: 'time_series',
   primitive: 'primitive',
-  variable: 'variable',
-  'vehicle-pose': 'vehicle-pose'
+  variable: 'variable'
 };
 
 // _ts should be required or optional?
@@ -45,7 +44,7 @@ export default class XVIZBuilder {
     this._validatePropSetOnce('_pose');
     this._validatePropSetOnce('_category');
 
-    this._category = CATEGORY['vehicle-pose'];
+    this._category = 'vehicle-pose';
     this.pose_stream_id = stream_id;
     this._pose = pose;
     return this;
@@ -171,7 +170,7 @@ export default class XVIZBuilder {
 
   _validateStreamId() {
     if (!this.stream_id) {
-      this._validateWarn('Set stream first.');
+      this._validateWarn('A stream must be set first.');
     }
   }
 
