@@ -17,7 +17,7 @@ const defaultValidateError = console.error;
 export default class XVIZBuilder {
   constructor(metadata, disableStreams, {validateWarn, validateError}) {
     assert(metadata && metadata.streams);
-    this.disableStreams = disableStreams;
+    this.disableStreams = disableStreams || [];
 
     this.metadata = metadata;
     this._pose = null;
@@ -40,7 +40,6 @@ export default class XVIZBuilder {
   }
 
   pose(stream_id, pose) {
-    this._validateStreamId();
     this._validatePropSetOnce('_pose');
     this._validatePropSetOnce('_category');
 
@@ -179,7 +178,7 @@ export default class XVIZBuilder {
 
     // validate required fields
     for (const prop of requiredProps) {
-      if (this[prop]) {
+      if (!this[prop]) {
         this._validateError(`${prop} is required.`);
       }
     }
