@@ -231,11 +231,7 @@ export default class XVIZBuilder {
           type: this._type
         };
 
-        if (this._data.variables[this.stream_id]) {
-          this._data.variables[this.stream_id].push(obj);
-        } else {
-          this._data.variables[this.stream_id] = [obj];
-        }
+        this._data.variables[this.stream_id] = obj;
       }
 
       if (this._category === CATEGORY.primitive) {
