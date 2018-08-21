@@ -9,7 +9,6 @@ import {LOG_STREAM_MESSAGE, STREAM_DATA_CONTENT} from '../constants';
 import {getXvizConfig} from '../config/xviz-config';
 
 import {parseLogMetadata} from './parse-log-metadata';
-import {parseVehiclePoseDatum} from './parse-vehicle-pose';
 import {parseStreamPrimitive, parseStreamVariable, parseStreamFutures} from './parse-xviz-v1';
 import {parseStreamVideoMessage} from './parse-stream-video-message';
 
