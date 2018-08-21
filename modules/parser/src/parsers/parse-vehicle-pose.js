@@ -13,11 +13,14 @@ function noop() {}
  */
 /* eslint-disable complexity, max-statements */
 export function parseVehiclePose(vehiclePose, opts = {}) {
+  const {postProcessVehiclePose} = getXvizConfig();
+
   // Callbacks to enable instrumentation
   const {onData = noop, onDone = noop} = opts;
   const context = onData(opts) || opts.context;
 
   const newVehiclePose = vehiclePose
+    .map(postProcessVehiclePose)
     // Remove invalid poses.
     .filter(Boolean);
 
@@ -45,26 +48,27 @@ function addMetersToLngLat(lngLat, xyz) {
   return [newLngLat[0], newLngLat[1], lngLat[2] + z];
 }
 
-export function defaultPostProcessVehiclePose(vehiclePose) {
-  const {longitude, latitude, altitude = 0, mapPose} = vehiclePose;
+export function getTransformsFromPose(vehiclePose) {
+  const {longitude, latitude, altitude = 0} = vehiclePose;
 
-  const origin = [longitude, latitude, altitude];
-  const mapRelativeTransform = mapPose
-    ? new Pose(mapPose).getTransformationMatrix()
-    : new Matrix4();
-  const vehicleRelativeTransform = new Pose(vehiclePose).getTransformationMatrix();
+  if (Number.isFinite(longitude) && Number.isFinite(latitude)) {
+    // Default schema
+    const origin = [longitude, latitude, altitude];
+    const pose = new Pose(vehiclePose);
+    const vehicleRelativeTransform = pose.getTransformationMatrix();
 
-  const trackPosition = addMetersToLngLat(
-    origin,
-    vehicleRelativeTransform.transformVector([0, 0, 0])
-  );
+    const trackPosition = addMetersToLngLat(
+      origin,
+      vehicleRelativeTransform.transformVector([0, 0, 0])
+    );
 
-  return {
-    vehiclePose,
-    origin: [longitude, latitude, altitude],
-    mapRelativeTransform,
-    vehicleRelativeTransform,
-    trackPosition,
-    heading: (vehiclePose.yaw / Math.PI) * 180
-  };
+    return {
+      origin: [longitude, latitude, altitude],
+      vehicleRelativeTransform,
+      trackPosition,
+      heading: (pose.yaw / Math.PI) * 180
+    };
+  }
+
+  return null;
 }
