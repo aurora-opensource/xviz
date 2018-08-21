@@ -87,41 +87,36 @@ export default class LogSlice {
    * Process a stream and put the appropriate data into
    */
   addStreamDatum(datum, streamName, lookAheadIndex) {
-    const {NON_RENDERING_STREAMS} = getXvizConfig();
-
     this.streams[streamName] = datum;
 
     this.setLabelsOnXvizObjects(datum.labels);
 
-    const isRenderable = !NON_RENDERING_STREAMS.includes(streamName);
-    if (isRenderable) {
-      const {features = [], lookAheads = [], variable, pointCloud = null, components = []} = datum;
+    const {features = [], lookAheads = [], variable, pointCloud = null, components = []} = datum;
 
-      // Future data is separate from features so we can control independently
-      if (lookAheads.length) {
-        this.lookAheads[streamName] = lookAheads[lookAheadIndex] || [];
-      }
+    // Future data is separate from features so we can control independently
+    if (lookAheads.length) {
+      this.lookAheads[streamName] = lookAheads[lookAheadIndex] || [];
+    }
 
-      // Combine data from current datums
-      if (features.length) {
-        this.features[streamName] = features;
-      }
+    // Combine data from current datums
+    if (features.length) {
+      this.features[streamName] = features;
+    }
 
-      if (components.length) {
-        this.components[streamName] = components;
-      }
+    if (components.length) {
+      this.components[streamName] = components;
+    }
 
-      // Point cloud
-      if (pointCloud) {
-        if (this.pointCloud) {
-          console.warn(`Point cloud for ${streamName} overwriting previous cloud`); // eslint-disable-line
-        }
-        this.pointCloud = pointCloud;
+    // Point cloud
+    if (pointCloud) {
+      if (this.pointCloud) {
+        console.warn(`Point cloud for ${streamName} overwriting previous cloud`); // eslint-disable-line
       }
+      this.pointCloud = pointCloud;
+    }
 
-      if (variable !== undefined) {
-        this.variables[streamName] = variable;
-      }
+    if (variable !== undefined) {
+      this.variables[streamName] = variable;
     }
   }
 
