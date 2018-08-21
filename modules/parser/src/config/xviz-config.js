@@ -1,5 +1,10 @@
+import XvizPrimitiveSettingsV1 from '../parsers/xviz-primitives-v1';
+import XvizPrimitiveSettingsV2 from '../parsers/xviz-primitives-v2';
+
 const DEFAULT_XVIZ_CONFIG = {
   // Config
+  version: 2,
+
   DEFAULT_METADATA: {},
 
   PRIMARY_POSE_STREAM: 'vehicle-pose',
@@ -32,6 +37,9 @@ const xvizSettings = Object.assign({}, DEFAULT_XVIZ_SETTINGS);
 // CONFIG contains the static configuration of XVIZ (streams, how to postprocess etc)
 export function setXvizConfig(config) {
   xvizConfig = Object.assign({}, DEFAULT_XVIZ_CONFIG, config);
+
+  xvizConfig._PRIMITIVE_SETTINGS =
+    xvizConfig.version === 1 ? XvizPrimitiveSettingsV1 : XvizPrimitiveSettingsV2;
 }
 
 export function getXvizConfig(config) {

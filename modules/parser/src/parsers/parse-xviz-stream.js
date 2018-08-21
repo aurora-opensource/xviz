@@ -1,28 +1,16 @@
 import {getXvizConfig} from '../config/xviz-config';
-import {filterVertices} from './filter-vertices';
+import {normalizeXvizPrimitive} from './parse-xviz-primitive';
 
-const PRIMITIVE_CAT = {
-  lookAheads: 'lookAheads',
-  features: 'features',
-  labels: 'labels',
+export const PRIMITIVE_CAT = {
+  lookAhead: 'lookAheads',
+  feature: 'features',
+  label: 'labels',
   pointCloud: 'pointCloud',
-  components: 'components'
-};
-
-const PRIMITIVE_CATEGORY_LOOKUP = {
-  text: PRIMITIVE_CAT.labels,
-  tree_table: PRIMITIVE_CAT.components,
-  points3d: PRIMITIVE_CAT.pointCloud,
-  point2d: PRIMITIVE_CAT.features,
-  points2d: PRIMITIVE_CAT.features,
-  line2d: PRIMITIVE_CAT.features,
-  polygon2d: PRIMITIVE_CAT.features,
-  circle: PRIMITIVE_CAT.features,
-  circle2d: PRIMITIVE_CAT.features
+  component: 'components'
 };
 
 // Handle stream-sliced data, via the ETL flow.
-export function parseXvizV1(data, convertPrimitive) {
+export function parseXvizStream(data, convertPrimitive) {
   // data is an array of objects
   // Each object is [{primitives, variables, timestamp},...]
   // Each object represents a timestamp and array of objects
@@ -63,14 +51,14 @@ export function parseXvizV1(data, convertPrimitive) {
  * data to UI elements.
  */
 export function parseStreamPrimitive(objects, streamName, time, convertPrimitive) {
-  const {observeObjects} = getXvizConfig();
+  const {observeObjects, preProcessPrimitive, _PRIMITIVE_SETTINGS} = getXvizConfig();
 
   if (!Array.isArray(objects)) {
     return {};
   }
 
   observeObjects(streamName, objects, time);
-  const primitiveMap = Object.keys(PRIMITIVE_CAT).reduce((res, cat) => {
+  const primitiveMap = Object.values(PRIMITIVE_CAT).reduce((res, cat) => {
     res[cat] = [];
     return res;
   }, {});
@@ -87,10 +75,11 @@ export function parseStreamPrimitive(objects, streamName, time, convertPrimitive
 
       for (let j = 0; j < object.length; j++) {
         // Apply custom XVIZ pre processing to this primitive
-        getXvizConfig().preProcessPrimitive({primitive: object[j], streamName, time});
+        preProcessPrimitive({primitive: object[j], streamName, time});
 
         // process each primitive
         const primitive = normalizeXvizPrimitive(
+          _PRIMITIVE_SETTINGS,
           object[j],
           objectIndex,
           streamName,
@@ -105,11 +94,12 @@ export function parseStreamPrimitive(objects, streamName, time, convertPrimitive
       // single primitive
 
       // Apply custom XVIZ postprocessing to this primitive
-      getXvizConfig().preProcessPrimitive({primitive: object, streamName, time});
+      preProcessPrimitive({primitive: object, streamName, time});
 
       // process primitive
-      category = PRIMITIVE_CATEGORY_LOOKUP[object.type];
+      category = _PRIMITIVE_SETTINGS[object.type].category;
       const primitive = normalizeXvizPrimitive(
+        _PRIMITIVE_SETTINGS,
         object,
         objectIndex,
         streamName,
@@ -134,6 +124,7 @@ export function parseStreamPrimitive(objects, streamName, time, convertPrimitive
  * data to UI elements.
  */
 export function parseStreamFutures(objects, streamName, time, convertPrimitive) {
+  const {_PRIMITIVE_SETTINGS} = getXvizConfig();
   const futures = [];
   // objects = array of objects
   // [{timestamp, primitives[]}, ...]
@@ -150,7 +141,16 @@ export function parseStreamFutures(objects, streamName, time, convertPrimitive) 
     // TODO(twojtasz): addThickness is temporary to use XVIZ thickness
     //                 on polygons.
     const future = primitives
-      .map(prim => normalizeXvizPrimitive(prim, objectIndex, streamName, time, convertPrimitive))
+      .map(prim =>
+        normalizeXvizPrimitive(
+          _PRIMITIVE_SETTINGS,
+          prim,
+          objectIndex,
+          streamName,
+          time,
+          convertPrimitive
+        )
+      )
       .filter(prim => prim !== null);
 
     futures.push(future);
@@ -256,123 +256,3 @@ function joinObjectPointCloudsToTypedArrays(objects) {
     ids
   };
 }
-
-const PRIMITIVE_PROCCESSOR = {
-  text: {
-    validate: _ => true
-  },
-  tree_table: {
-    validate: _ => true
-  },
-  points3d: {
-    validate: (primitive, streamName, time) => primitive.vertices && primitive.vertices.length > 0
-  },
-  points2d: {
-    validate: (primitive, streamName, time) => primitive.vertices && primitive.vertices.length > 0,
-    normalize: primitive => {
-      for (let i = 0; i < primitive.vertices.length; i++) {
-        primitive.vertices[i][2] = 0;
-      }
-    }
-  },
-  point2d: {
-    enableZOffSet: true,
-    validate: (primitive, streamName, time) =>
-      primitive.vertices && primitive.vertices.length === 1,
-    normalize: primitive => {
-      primitive.vertices = primitive.vertices[0];
-    }
-  },
-  line2d: {
-    enableZOffset: true,
-    validate: (primitive, streamName, time) =>
-      primitive.vertices &&
-      primitive.vertices.length >= 2 &&
-      streamName !== '/route_follower/kickout/object/velocity',
-    normalize: primitive => {
-      // Filter out identical vertices to make sure we don't get rendering artifacts
-      // in the path layer
-      // TODO - handle this directly in deck.gl PathLayer
-      primitive.vertices = filterVertices(primitive.vertices);
-    }
-  },
-  polygon2d: {
-    enableZOffset: true,
-    validate: (primitive, streamName, time) => primitive.vertices && primitive.vertices.length >= 3,
-    normalize: primitive => {
-      // This is a polygon2d primitive which per XVIZ protocol implicitly says
-      // that the provided path is closed. Push a copy of first vert to end of array.
-      // Array comparison turns out to be expensive. Looks like the polygon returned
-      // from XVIS is never closed - worst case we end up with a duplicate end vertex,
-      // which will not break the polygon layer.
-      // TODO - can't handle flat arrays for now
-      if (Array.isArray(primitive.vertices)) {
-        primitive.vertices.push(primitive.vertices[0]);
-      }
-    }
-  },
-  circle: {
-    enableZOffset: true,
-    validate: (primitive, streamName, time) => primitive.vertices && primitive.vertices.length > 0
-  },
-  circle2d: {
-    enableZOffset: true,
-    validate: (primitive, streamName, time) => primitive.center,
-    normalize: primitive => {
-      primitive.vertices = primitive.center;
-    }
-  }
-};
-
-/* eslint-disable max-depth */
-function normalizeXvizPrimitive(primitive, objectIndex, streamName, time, postProcessPrimitive) {
-  // as normalizeXvizPrimitive is called for each primitive of every frame
-  // it is intentional to mutate the primitive in place
-  // to avoid frequent allocate/discard and improve performance
-
-  const {
-    // common
-    type,
-    // line2d, polygon2d
-    vertices,
-    // circle2d
-    center
-  } = primitive;
-
-  const {enableZOffset, validate, normalize} = PRIMITIVE_PROCCESSOR[type];
-
-  // Apply a small offset to 2d geometries to battle z fighting
-  if (enableZOffset) {
-    const zOffset = objectIndex * 1e-6;
-    if (Array.isArray(vertices)) {
-      // TODO(twojtasz): this is pretty bad for memory, backend must
-      // set all 3 values otherwise we allocate and cause heavy GC
-      // TODO - this looks like it could be handled with a model matrix?
-      for (let i = 0; i < vertices.length; i++) {
-        // Flatten the data for now
-        vertices[i][2] = zOffset;
-      }
-    }
-    if (center && center.length === 2) {
-      center[2] = zOffset;
-    }
-  }
-
-  // validate
-  if (!validate(primitive, streamName, time)) {
-    return null;
-  }
-
-  // process
-  if (normalize) {
-    normalize(primitive);
-  }
-
-  // post process
-  if (postProcessPrimitive) {
-    postProcessPrimitive(primitive);
-  }
-
-  return primitive;
-}
-/* eslint-enable max-depth */

@@ -9,7 +9,7 @@ import {LOG_STREAM_MESSAGE, STREAM_DATA_CONTENT} from '../constants';
 import {getXvizConfig} from '../config/xviz-config';
 
 import {parseLogMetadata} from './parse-log-metadata';
-import {parseStreamPrimitive, parseStreamVariable, parseStreamFutures} from './parse-xviz-v1';
+import {parseStreamPrimitive, parseStreamVariable, parseStreamFutures} from './parse-xviz-stream';
 import {parseStreamVideoMessage} from './parse-stream-video-message';
 
 function isJSON(encodedString) {
