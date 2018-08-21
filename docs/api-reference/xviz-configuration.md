@@ -18,13 +18,7 @@ Parser plugins:
 - `preProcessPrimitive` (Function) - Pre process a primitive. This can be used to change the type of a primitive (e.g. from `point` to `text`) and/or modify their properties.
 - `postProcessMetadata` (Function) - Post process a metadata message.
 - `postProcessTimeslice` (Function) - Post process a timeslice message.
-- `postProcessVehiclePose` (Function) - Post process the vehicle pose object. If overridden, must return the following:
-    + `origin` (Array) - the reference point for all relative coordinates, in `[longitude, latitude, altitude]`.
-    + `trackPosition` (Array) - the target of the camera, in `[longitude, latitude, altitude]`.
-    + `heading` (Number) - heading of the vehicle, in degrees.
-    + `mapRelativeTransform` (Matrix4, optional) - must supply if any stream uses `map_relative` coordinates
-    + `vehicleRelativeTransform` (Matrix4, optional) - must supply if any stream uses `vehicle_relative` coordinates
-    + `customTransform` (Matrix4, optional) - must supply if any stream uses `custom` coordinates
+- `postProcessVehiclePose` (Function) - Post process the vehicle pose object.
 - `postProcessFrame` (Function) - Called before the current log frame is rendered.
 - `getTrackedObjectPosition` (Function) - Returns the tracking position of a selected object. The returned position should be in the same coordinate system as the object stream, in `[x, y, z]`. By default, returns the centroid of the primitive in the object stream.
 - `observeObjects` (Function) - called when new objects arrive in the object stream. Can be used to track all objects in the log.
