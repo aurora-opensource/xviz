@@ -63,6 +63,10 @@ export default {
       }
     }
   },
+  circle: {
+    category: PRIMITIVE_CAT.feature,
+    validate: (primitive, streamName, time) => primitive.vertices && primitive.vertices.length > 0
+  },
   circle2d: {
     category: PRIMITIVE_CAT.feature,
     enableZOffset: true,
