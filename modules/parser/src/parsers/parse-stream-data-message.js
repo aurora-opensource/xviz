@@ -95,7 +95,7 @@ export function parseStreamLogData(data, opts = {}) {
 
 // Extracts a TIMESLICE message
 function parseTimesliceData(data, convertPrimitive) {
-  const {PRIMARY_POSE_STREAM, postProcessTimeslice} = getXvizConfig();
+  const {PRIMARY_POSE_STREAM, postProcessTimeslice, postProcessVehiclePose} = getXvizConfig();
   const {vehicle_pose: vehiclePose, state_updates: stateUpdates, ...otherInfo} = data;
 
   let timestamp;
@@ -129,7 +129,8 @@ function parseTimesliceData(data, convertPrimitive) {
   }
 
   if (vehiclePose) {
-    newStreams[PRIMARY_POSE_STREAM] = vehiclePose;
+    result.vehiclePose = postProcessVehiclePose(vehiclePose);
+    newStreams[PRIMARY_POSE_STREAM] = result.vehiclePose;
   }
 
   return postProcessTimeslice ? postProcessTimeslice(result) : result;

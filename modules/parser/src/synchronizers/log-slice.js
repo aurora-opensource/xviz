@@ -15,6 +15,8 @@
 import {getXvizConfig} from '../config/xviz-config';
 import XvizObject from '../objects/xviz-object';
 
+import {getTransformsFromPose} from '../parsers/parse-vehicle-pose';
+
 // LOGSLICE CLASS
 
 // One time slice, one datum from each stream.
@@ -37,13 +39,14 @@ export default class LogSlice {
       return null;
     }
 
-    const {postProcessFrame, postProcessVehiclePose, OBJECT_STREAM} = getXvizConfig();
+    const {postProcessFrame, OBJECT_STREAM} = getXvizConfig();
 
     const objects = XvizObject.getAllInCurrentFrame(); // Map of XVIZ ids in current slice
 
     const frame = {
       ...others,
-      ...postProcessVehiclePose(vehiclePose),
+      ...getTransformsFromPose(vehiclePose),
+      vehiclePose,
       trackedObjectPosition,
       features: this.features,
       lookAheads: this.lookAheads,

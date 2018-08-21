@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {defaultPostProcessVehiclePose} from '../parsers/parse-vehicle-pose';
-
 const DEFAULT_XVIZ_CONFIG = {
   // Config
   DEFAULT_METADATA: {},
@@ -32,9 +30,9 @@ const DEFAULT_XVIZ_CONFIG = {
   postProcessMetadata: metadata => metadata,
   preProcessPrimitive: primitive => primitive, // Applied before normalize primitive
   postProcessTimeslice: timeslice => timeslice, // Post process timeslice
+  postProcessVehiclePose: vehiclePose => vehiclePose, // Process vehicle pose from datum
 
   // TODO - these are used at render time instead of parse time. Need API audit
-  postProcessVehiclePose: defaultPostProcessVehiclePose, // Process vehicle pose from datum
   postProcessFrame: frame => frame, // Post process log frame, used in LogSlice.getCurrentFrame
   getTrackedObjectPosition: _ => null,
   observeObjects: () => {}
