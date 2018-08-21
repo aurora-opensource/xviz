@@ -20,11 +20,6 @@ const DEFAULT_XVIZ_CONFIG = {
   // TODO - support multiple?
   OBJECT_STREAM: 'objects',
 
-  // TODO - use metadata instead?
-  NON_RENDERING_STREAMS: [],
-  // TODO - this is xviz v1, remove
-  VIDEO_STREAM_PATTERNS: {IMAGE: /^$/, VIDEO: /^$/},
-
   filterStream: streamName => true, // Use to filter out unwanted streams
 
   postProcessMetadata: metadata => metadata,

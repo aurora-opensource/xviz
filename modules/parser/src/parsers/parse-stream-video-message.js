@@ -22,7 +22,7 @@
 import {LOG_STREAM_MESSAGE} from '../constants';
 import {blobToArrayBuffer} from '../utils/binary';
 
-import {parseMediaStreamName} from './parse-log-metadata';
+import {parseLogMetadata} from './parse-log-metadata';
 
 // Handle messages from the stand alone video server
 export function parseStreamVideoMessage(message, onResult, onError) {
@@ -61,9 +61,9 @@ export function parseStreamVideoData(data) {
 
 // Extract metadata from stream message
 function parseVideoMetadata(data) {
-  const result = {type: LOG_STREAM_MESSAGE.VIDEO_METADATA};
+  const result = parseLogMetadata(data);
+  result.type = LOG_STREAM_MESSAGE.VIDEO_METADATA;
 
-  result.videosByName = parseMediaStreamName(data.image_channels, 'image');
   return result;
 }
 

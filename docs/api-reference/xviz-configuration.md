@@ -10,7 +10,6 @@ Constants:
 - `DEFAULT_METADATA` (Object) - Loaded metadata will be merged with this object. Default `{}`.
 - `PRIMARY_POSE_STREAM` (String) - Name of the vehicle pose stream. Default `vehicle-pose`.
 - `OBJECT_STREAM` (String) - Name of the object stream. Default `objects`.
-- `NON_RENDERING_STREAMS` (Array) - List of stream names to block from rendering. Default `[]`.
 
 Parser plugins:
 
