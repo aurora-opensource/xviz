@@ -232,7 +232,7 @@ function joinObjectPointCloudsToTypedArrays(objects) {
       ids[i] = object.id;
 
       if (!isPositionFlattenedArray) {
-        const vertex = object.vertices[i];
+        const vertex = object.vertices[j];
         positions[i * 3 + 0] = vertex[0];
         positions[i * 3 + 1] = vertex[1];
         positions[i * 3 + 2] = vertex[2];
