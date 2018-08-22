@@ -14,7 +14,7 @@
 
 /* global TextDecoder */
 import {setXvizConfig} from '../config/xviz-config';
-import {parseXvizV1} from '../parsers/parse-xviz-v1';
+import {parseXvizStream} from '../parsers/parse-xviz-stream';
 
 export default config => self => {
   setXvizConfig(config);
@@ -26,7 +26,7 @@ export default config => self => {
 
     try {
       let data = JSON.parse(decodedString);
-      data = parseXvizV1(data);
+      data = parseXvizStream(data);
 
       const transfers = [];
 

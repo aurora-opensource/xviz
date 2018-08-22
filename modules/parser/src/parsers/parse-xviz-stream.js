@@ -15,28 +15,24 @@
 import {getXvizConfig} from '../config/xviz-config';
 import {normalizeXvizPrimitive} from './parse-xviz-primitive';
 
-const PRIMITIVE_CAT = {
-  lookAheads: 'lookAheads',
-  features: 'features',
-  labels: 'labels',
-  pointCloud: 'pointCloud',
-  components: 'components'
+export const PRIMITIVE_CAT = {
+  LOOKAHEAD: 'lookAheads',
+  FEATURE: 'features',
+  LABEL: 'labels',
+  POINTCLOUD: 'pointCloud',
+  COMPONENT: 'components'
 };
 
-const PRIMITIVE_CATEGORY_LOOKUP = {
-  text: PRIMITIVE_CAT.labels,
-  tree_table: PRIMITIVE_CAT.components,
-  points3d: PRIMITIVE_CAT.pointCloud,
-  point2d: PRIMITIVE_CAT.features,
-  points2d: PRIMITIVE_CAT.features,
-  line2d: PRIMITIVE_CAT.features,
-  polygon2d: PRIMITIVE_CAT.features,
-  circle: PRIMITIVE_CAT.features,
-  circle2d: PRIMITIVE_CAT.features
-};
+function createPrimitiveMap() {
+  const result = {};
+  for (const key in PRIMITIVE_CAT) {
+    result[PRIMITIVE_CAT[key]] = [];
+  }
+  return result;
+}
 
 // Handle stream-sliced data, via the ETL flow.
-export function parseXvizV2(data, convertPrimitive) {
+export function parseXvizStream(data, convertPrimitive) {
   // data is an array of objects
   // Each object is [{primitives, variables, timestamp},...]
   // Each object represents a timestamp and array of objects
@@ -77,17 +73,14 @@ export function parseXvizV2(data, convertPrimitive) {
  * data to UI elements.
  */
 export function parseStreamPrimitive(objects, streamName, time, convertPrimitive) {
-  const {observeObjects} = getXvizConfig();
+  const {observeObjects, preProcessPrimitive, PRIMITIVE_SETTINGS} = getXvizConfig();
 
   if (!Array.isArray(objects)) {
     return {};
   }
 
   observeObjects(streamName, objects, time);
-  const primitiveMap = Object.keys(PRIMITIVE_CAT).reduce((res, cat) => {
-    res[cat] = [];
-    return res;
-  }, {});
+  const primitiveMap = createPrimitiveMap();
 
   let category = null;
   // Primitives are an array of XVIZ objects
@@ -96,15 +89,16 @@ export function parseStreamPrimitive(objects, streamName, time, convertPrimitive
 
     // array of primitives
     if (object && Array.isArray(object)) {
-      category = PRIMITIVE_CAT.lookAheads;
+      category = PRIMITIVE_CAT.LOOKAHEAD;
       primitiveMap[category].push([]);
 
       for (let j = 0; j < object.length; j++) {
         // Apply custom XVIZ pre processing to this primitive
-        getXvizConfig().preProcessPrimitive({primitive: object[j], streamName, time});
+        preProcessPrimitive({primitive: object[j], streamName, time});
 
         // process each primitive
         const primitive = normalizeXvizPrimitive(
+          PRIMITIVE_SETTINGS,
           object[j],
           objectIndex,
           streamName,
@@ -119,11 +113,12 @@ export function parseStreamPrimitive(objects, streamName, time, convertPrimitive
       // single primitive
 
       // Apply custom XVIZ postprocessing to this primitive
-      getXvizConfig().preProcessPrimitive({primitive: object, streamName, time});
+      preProcessPrimitive({primitive: object, streamName, time});
 
-      // process primitive
-      category = PRIMITIVE_CATEGORY_LOOKUP[object.type];
+      // normalize primitive
+      category = PRIMITIVE_SETTINGS[object.type].category;
       const primitive = normalizeXvizPrimitive(
+        PRIMITIVE_SETTINGS,
         object,
         objectIndex,
         streamName,
@@ -148,6 +143,7 @@ export function parseStreamPrimitive(objects, streamName, time, convertPrimitive
  * data to UI elements.
  */
 export function parseStreamFutures(objects, streamName, time, convertPrimitive) {
+  const {PRIMITIVE_SETTINGS} = getXvizConfig();
   const futures = [];
   // objects = array of objects
   // [{timestamp, primitives[]}, ...]
@@ -164,8 +160,17 @@ export function parseStreamFutures(objects, streamName, time, convertPrimitive) 
     // TODO(twojtasz): addThickness is temporary to use XVIZ thickness
     //                 on polygons.
     const future = primitives
-      .map(prim => normalizeXvizPrimitive(prim, objectIndex, streamName, time, convertPrimitive))
-      .filter(prim => prim !== null);
+      .map(primitive =>
+        normalizeXvizPrimitive(
+          PRIMITIVE_SETTINGS,
+          primitive,
+          objectIndex,
+          streamName,
+          time,
+          convertPrimitive
+        )
+      )
+      .filter(Boolean);
 
     futures.push(future);
   });
@@ -199,6 +204,14 @@ export function parseStreamVariable(objects, streamName, time) {
   };
 }
 
+function getVertexCount(vertices) {
+  if (vertices instanceof Float32Array) {
+    return vertices.length / 3;
+  } else {
+    return vertices.length;
+  }
+}
+
 // Joins a set of point clouds extracted from objects into a single point cloud
 // generates typed arrays that can be displayed efficiently by deck.gl
 function joinObjectPointCloudsToTypedArrays(objects) {
@@ -206,9 +219,12 @@ function joinObjectPointCloudsToTypedArrays(objects) {
     return null;
   }
 
+  // Assume 3 values (x, y, z) in flattened array
+  const countOfValuesPerPointInFlattenedArray = 3;
+
   let numInstances = 0;
   for (const object of objects) {
-    numInstances += object.vertices.length;
+    numInstances += getVertexCount(object.vertices);
   }
 
   const positions = new Float32Array(numInstances * 3);
@@ -219,9 +235,20 @@ function joinObjectPointCloudsToTypedArrays(objects) {
   // NOTE: Not a vertex attribute, ids are just efficiently stored as as 32 bit integers...
   const ids = new Uint32Array(numInstances);
 
-  let i = 0;
-  objects.forEach(object =>
-    object.vertices.forEach(vertex => {
+  objects.forEach(object => {
+    const vertexCount = getVertexCount(object.vertices);
+    const isFloat32Array = object.vertices instanceof Float32Array;
+
+    for (let i = 0; i < vertexCount; i++) {
+      let vertex = object.vertices[i];
+
+      if (isFloat32Array) {
+        vertex = [];
+        vertex[0] = object.vertices[i * 3 + 0];
+        vertex[1] = object.vertices[i * 3 + 1];
+        vertex[2] = object.vertices[i * 3 + 2];
+      }
+
       ids[i] = object.id;
 
       positions[i * 3 + 0] = vertex[0];
@@ -236,10 +263,8 @@ function joinObjectPointCloudsToTypedArrays(objects) {
       normals[i * 3 + 0] = 0;
       normals[i * 3 + 1] = 1;
       normals[i * 3 + 2] = 0;
-
-      i++;
-    })
-  );
+    }
+  });
 
   return {
     // track type so we can handle 2d & 3d clouds

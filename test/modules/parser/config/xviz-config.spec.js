@@ -12,20 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Set up a configuration (TODO/OSS - this should be a neutral config)
-import './config/xviz-config.spec';
+import {setXvizConfig, getXvizConfig} from '@xviz/parser';
+import test from 'tape-catch';
 
-import './synchronizers/log-synchronizer.spec';
-import './synchronizers/stream-synchronizer.spec';
-import './synchronizers/xviz-stream-buffer.spec';
+test('setXvizConfig', t => {
+  const postProcessFrame = () => {};
+  setXvizConfig({postProcessFrame});
+  t.is(getXvizConfig().postProcessFrame, postProcessFrame, 'XVIZ config is set');
+  t.is(getXvizConfig().version, 2, 'XVIZ default config is used');
+  t.notOk(getXvizConfig().PRIMITIVE_SETTINGS.line2d, 'XVIZ primitive settings is v2');
 
-import './parsers/filter-vertices.spec';
-import './parsers/parse-stream-data-message.spec';
+  setXvizConfig({version: 1});
+  t.ok(getXvizConfig().PRIMITIVE_SETTINGS.line2d, 'XVIZ primitive settings is v1');
 
-import './styles/xviz-style-property.spec';
-import './styles/xviz-style-parser.spec';
-
-import './objects/xviz-object.spec';
-import './objects/xviz-object-collection.spec';
-
-import './utils/worker-utils.spec';
+  t.end();
+});

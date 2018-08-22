@@ -103,7 +103,7 @@ export default class XVIZBuilder {
     this._validatePropSetOnce('_category');
 
     this._vertices = vertices;
-    this._type = 'polygon2d';
+    this._type = 'polygon';
     this._category = CATEGORY.primitive;
     return this;
   }
@@ -114,7 +114,7 @@ export default class XVIZBuilder {
     this._validatePropSetOnce('_category');
 
     this._vertices = vertices;
-    this._type = 'line2d';
+    this._type = 'polyline';
     this._category = CATEGORY.primitive;
     return this;
   }
@@ -125,7 +125,7 @@ export default class XVIZBuilder {
     this._validatePropSetOnce('_category');
 
     this._vertices = vertices;
-    this._type = 'points3d';
+    this._type = 'point';
     this._category = CATEGORY.primitive;
     return this;
   }

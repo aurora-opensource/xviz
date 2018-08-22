@@ -45,7 +45,6 @@ export {parseEtlStream} from './parsers/parse-etl-stream';
 export {parseStreamMessage, initializeWorkers} from './parsers/parse-stream-message';
 export {parseStreamDataMessage, parseStreamLogData} from './parsers/parse-stream-data-message';
 export {parseStreamVideoMessage} from './parsers/parse-stream-video-message';
-export {parseXvizV1} from './parsers/parse-xviz-v1';
 
 export {default as lidarPointCloudWorker} from './workers/lidar-point-cloud-worker';
 export {default as streamDataWorker} from './workers/stream-data-worker';
