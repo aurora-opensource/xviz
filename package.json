@@ -1,7 +1,7 @@
 {
   "name": "xviz",
   "description": "Utility library for handling XVIZ protocol",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "repository": {
     "type": "git",
     "url": "https://github.com/uber/xviz.git"
