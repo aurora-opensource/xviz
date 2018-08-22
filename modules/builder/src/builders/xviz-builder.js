@@ -160,12 +160,12 @@ export default class XVIZBuilder {
       return;
     }
 
-    this._validateWarn(msg || `${prop} has been already set.`);
+    this._validateWarn(msg || `Stream ${this.stream_id} ${prop} has been already set.`);
   }
 
   _validateStreamId() {
     if (!this.stream_id) {
-      this._validateWarn('A stream must be set first.');
+      this._validateError('A stream must be set first.');
     }
   }
 
@@ -175,18 +175,18 @@ export default class XVIZBuilder {
     // validate required fields
     for (const prop of requiredProps) {
       if (!this[prop]) {
-        this._validateError(`${prop} is required.`);
+        this._validateError(`Stream ${this.stream_id} ${prop} is required.`);
       }
     }
 
     // validate primitive
     if (this._category === CATEGORY.primitive && !this._vertices) {
-      this._validateWarn('Primitives vertices are not provided.');
+      this._validateWarn(`Stream ${this.stream_id} primitives vertices are not provided.`);
     }
 
     // validate variable
     if (this._category === CATEGORY.variable && this._values.length === 0) {
-      this._validateWarn('Variable value(s) are not provided.');
+      this._validateWarn(`Stream${this.stream_id} variable value(s) are not provided.`);
     }
 
     // validate based on metadata
@@ -196,9 +196,9 @@ export default class XVIZBuilder {
         this._validateWarn(`${this.stream_id} is not defined in metadata.`);
       } else if (this._category !== streamMetadata.category) {
         this._validateWarn(
-          `Category ${this._category} does not match metadata definition (${
-            streamMetadata.category
-          }).`
+          `Stream ${this.stream_id} category '${
+            this._category
+          }' does not match metadata definition (${streamMetadata.category}).`
         );
       }
     }
