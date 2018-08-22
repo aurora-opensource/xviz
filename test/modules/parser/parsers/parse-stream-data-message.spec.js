@@ -4,8 +4,6 @@ import {setXvizConfig, parseStreamLogData, LOG_STREAM_MESSAGE} from '@xviz/parse
 import tape from 'tape-catch';
 import xvizStreamMessages from 'test-data/xviz-stream';
 
-setXvizConfig({});
-
 // Metadata is the first message
 const TestMetadataMessage = xvizStreamMessages[0];
 
@@ -48,7 +46,7 @@ const TestTimesliceMessage = {
             color: [255, 255, 255],
             id: 1234,
             radius: 0.01,
-            type: 'points3d',
+            type: 'point',
             vertices: [[1000, 1000, 200]]
           }
         ]
@@ -67,6 +65,7 @@ const TestTimesliceMessage = {
 // TOOD: blacklisted streams in xviz common
 //
 tape('parseStreamLogData metadata', t => {
+  setXvizConfig({});
   const metaMessage = parseStreamLogData(TestMetadataMessage);
 
   t.equals(metaMessage.type, LOG_STREAM_MESSAGE.METADATA, 'Metadata type set');
@@ -82,6 +81,7 @@ tape('parseStreamLogData metadata', t => {
 });
 
 tape('parseStreamLogData metadata with full log time only', t => {
+  setXvizConfig({});
   const metaMessage = parseStreamLogData(metadataWithLogStartEnd);
 
   t.equals(metaMessage.type, LOG_STREAM_MESSAGE.METADATA, 'Metadata type set');
@@ -97,6 +97,7 @@ tape('parseStreamLogData metadata with full log time only', t => {
 });
 
 tape('parseStreamLogData error', t => {
+  setXvizConfig({});
   const metaMessage = parseStreamLogData({
     ...TestMetadataMessage,
     type: 'error'
@@ -106,6 +107,7 @@ tape('parseStreamLogData error', t => {
 });
 
 tape('parseStreamLogData timeslice INCOMPLETE', t => {
+  setXvizConfig({});
   // NOTE: no explicit type for this message yet.
   let metaMessage = parseStreamLogData({
     ...TestTimesliceMessage,
@@ -136,6 +138,7 @@ tape('parseStreamLogData timeslice INCOMPLETE', t => {
 });
 
 tape('parseStreamLogData timeslice', t => {
+  setXvizConfig({});
   // NOTE: no explicit type for this message yet.
   const metaMessage = parseStreamLogData({...TestTimesliceMessage});
   t.equals(metaMessage.type, LOG_STREAM_MESSAGE.TIMESLICE, 'Message type set for timeslice');
@@ -148,6 +151,7 @@ tape('parseStreamLogData timeslice', t => {
 });
 
 tape('parseStreamLogData pointCloud timeslice', t => {
+  setXvizConfig({});
   const PointCloudTestTimesliceMessage = {
     state_updates: [
       {
@@ -158,7 +162,7 @@ tape('parseStreamLogData pointCloud timeslice', t => {
               color: [255, 255, 255],
               id: 1234,
               radius: 0.01,
-              type: 'points3d',
+              type: 'point',
               vertices: [[1000, 1000, 200]]
             }
           ]
@@ -182,6 +186,7 @@ tape('parseStreamLogData pointCloud timeslice', t => {
 });
 
 tape('parseStreamLogData pointCloud timeslice TypedArray', t => {
+  setXvizConfig({});
   const PointCloudTestTimesliceMessage = {
     state_updates: [
       {
@@ -192,7 +197,7 @@ tape('parseStreamLogData pointCloud timeslice TypedArray', t => {
               color: [255, 255, 255],
               id: 1234,
               radius: 0.01,
-              type: 'points3d',
+              type: 'point',
               vertices: new Float32Array([1000, 1000, 200])
             }
           ]
@@ -216,6 +221,7 @@ tape('parseStreamLogData pointCloud timeslice TypedArray', t => {
 });
 
 tape('parseStreamLogData pointCloud timeslice', t => {
+  setXvizConfig({});
   const PointCloudTestTimesliceMessage = {
     state_updates: [
       {
@@ -226,14 +232,14 @@ tape('parseStreamLogData pointCloud timeslice', t => {
               color: [255, 255, 255],
               id: 1234,
               radius: 0.01,
-              type: 'points3d',
+              type: 'point',
               vertices: [[1000, 1000, 200]]
             },
             {
               color: [255, 255, 255],
               id: 1235,
               radius: 0.01,
-              type: 'points3d',
+              type: 'point',
               vertices: new Float32Array([1000, 1000, 200])
             }
           ]
