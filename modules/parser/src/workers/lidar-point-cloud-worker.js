@@ -35,7 +35,6 @@ export default config => self => {
           transfers.push(
             pointCloud.ids.buffer,
             pointCloud.colors.buffer,
-            pointCloud.normals.buffer,
             pointCloud.positions.buffer
           );
         }
