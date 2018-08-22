@@ -38,7 +38,7 @@ const xvizSettings = Object.assign({}, DEFAULT_XVIZ_SETTINGS);
 export function setXvizConfig(config) {
   xvizConfig = Object.assign({}, DEFAULT_XVIZ_CONFIG, config);
 
-  xvizConfig._PRIMITIVE_SETTINGS =
+  xvizConfig.PRIMITIVE_SETTINGS =
     xvizConfig.version === 1 ? XvizPrimitiveSettingsV1 : XvizPrimitiveSettingsV2;
 }
 

@@ -4,22 +4,22 @@ import {PRIMITIVE_CAT} from './parse-xviz-stream';
 // TODO - tests for all primitive types
 export default {
   text: {
-    category: PRIMITIVE_CAT.label,
-    validate: _ => true
+    category: PRIMITIVE_CAT.LABEL,
+    validate: primitive => true
   },
   tree_table: {
-    category: PRIMITIVE_CAT.component,
-    validate: _ => true
+    category: PRIMITIVE_CAT.COMPONENT,
+    validate: primitive => true
   },
   circle: {
-    category: PRIMITIVE_CAT.feature,
+    category: PRIMITIVE_CAT.FEATURE,
     validate: (primitive, streamName, time) => primitive.vertices && primitive.vertices.length > 0
   },
   polyline: {
-    category: PRIMITIVE_CAT.feature,
+    category: PRIMITIVE_CAT.FEATURE,
     validate: (primitive, streamName, time) => primitive.vertices && primitive.vertices.length >= 2,
     normalize: primitive => {
-      // Required by filterVertices
+      // z is required by filterVertices
       primitive.vertices.forEach(v => {
         v[2] = v[2] || 0;
       });
@@ -30,7 +30,7 @@ export default {
     }
   },
   polygon: {
-    category: PRIMITIVE_CAT.feature,
+    category: PRIMITIVE_CAT.FEATURE,
     validate: (primitive, streamName, time) => primitive.vertices && primitive.vertices.length >= 3,
     normalize: primitive => {
       // This is a polygon primitive which per XVIZ protocol implicitly says
@@ -42,7 +42,7 @@ export default {
     }
   },
   point: {
-    category: PRIMITIVE_CAT.pointCloud,
+    category: PRIMITIVE_CAT.POINTCLOUD,
     validate: (primitive, streamName, time) => primitive.vertices && primitive.vertices.length > 0
   }
 };

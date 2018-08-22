@@ -4,19 +4,19 @@ import {PRIMITIVE_CAT} from './parse-xviz-stream';
 // TODO - tests for all primitive types
 export default {
   text: {
-    category: PRIMITIVE_CAT.label,
-    validate: _ => true
+    category: PRIMITIVE_CAT.LABEL,
+    validate: primitive => true
   },
   tree_table: {
-    category: PRIMITIVE_CAT.component,
-    validate: _ => true
+    category: PRIMITIVE_CAT.COMPONENT,
+    validate: primitive => true
   },
   points3d: {
-    category: PRIMITIVE_CAT.pointCloud,
+    category: PRIMITIVE_CAT.POINTCLOUD,
     validate: (primitive, streamName, time) => primitive.vertices && primitive.vertices.length > 0
   },
   points2d: {
-    category: PRIMITIVE_CAT.feature,
+    category: PRIMITIVE_CAT.FEATURE,
     validate: (primitive, streamName, time) => primitive.vertices && primitive.vertices.length > 0,
     normalize: primitive => {
       for (let i = 0; i < primitive.vertices.length; i++) {
@@ -25,7 +25,7 @@ export default {
     }
   },
   point2d: {
-    category: PRIMITIVE_CAT.feature,
+    category: PRIMITIVE_CAT.FEATURE,
     enableZOffSet: true,
     validate: (primitive, streamName, time) =>
       primitive.vertices && primitive.vertices.length === 1,
@@ -34,7 +34,7 @@ export default {
     }
   },
   line2d: {
-    category: PRIMITIVE_CAT.feature,
+    category: PRIMITIVE_CAT.FEATURE,
     enableZOffset: true,
     validate: (primitive, streamName, time) =>
       primitive.vertices &&
@@ -48,7 +48,7 @@ export default {
     }
   },
   polygon2d: {
-    category: PRIMITIVE_CAT.feature,
+    category: PRIMITIVE_CAT.FEATURE,
     enableZOffset: true,
     validate: (primitive, streamName, time) => primitive.vertices && primitive.vertices.length >= 3,
     normalize: primitive => {
@@ -64,11 +64,11 @@ export default {
     }
   },
   circle: {
-    category: PRIMITIVE_CAT.feature,
+    category: PRIMITIVE_CAT.FEATURE,
     validate: (primitive, streamName, time) => primitive.vertices && primitive.vertices.length > 0
   },
   circle2d: {
-    category: PRIMITIVE_CAT.feature,
+    category: PRIMITIVE_CAT.FEATURE,
     enableZOffset: true,
     validate: (primitive, streamName, time) => primitive.center,
     normalize: primitive => {
