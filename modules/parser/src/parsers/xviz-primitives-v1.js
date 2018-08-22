@@ -1,7 +1,7 @@
 import {filterVertices} from './filter-vertices';
 import {PRIMITIVE_CAT} from './parse-xviz-stream';
 
-/* eslint-disable */
+// TODO - tests for all primitive types
 export default {
   text: {
     category: PRIMITIVE_CAT.label,

@@ -1,7 +1,7 @@
 import {filterVertices} from './filter-vertices';
 import {PRIMITIVE_CAT} from './parse-xviz-stream';
 
-/* eslint-disable */
+// TODO - tests for all primitive types
 export default {
   text: {
     category: PRIMITIVE_CAT.label,
@@ -11,7 +11,6 @@ export default {
     category: PRIMITIVE_CAT.component,
     validate: _ => true
   },
-  // V2
   circle: {
     category: PRIMITIVE_CAT.feature,
     validate: (primitive, streamName, time) => primitive.vertices && primitive.vertices.length > 0
@@ -34,7 +33,7 @@ export default {
     category: PRIMITIVE_CAT.feature,
     validate: (primitive, streamName, time) => primitive.vertices && primitive.vertices.length >= 3,
     normalize: primitive => {
-      // This is a polygon2d primitive which per XVIZ protocol implicitly says
+      // This is a polygon primitive which per XVIZ protocol implicitly says
       // that the provided path is closed. Push a copy of first vert to end of array.
       // Array comparison turns out to be expensive. Looks like the polygon returned
       // from XVIS is never closed - worst case we end up with a duplicate end vertex,
