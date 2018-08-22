@@ -205,8 +205,7 @@ function joinObjectPointCloudsToTypedArrays(objects) {
     return null;
   }
 
-  // Assume 3 values (x, y, z) in flattened array
-  const countOfValuesPerPointInFlattenedArray = 3;
+  const DEFAULT_COLOR = [0, 0, 0, 255];
 
   let numInstances = 0;
   for (const object of objects) {
@@ -215,50 +214,43 @@ function joinObjectPointCloudsToTypedArrays(objects) {
 
   const positions = new Float32Array(numInstances * 3);
   const colors = new Uint8ClampedArray(numInstances * 4);
-  const normals = new Float32Array(numInstances * 3);
 
   // Store object ids to enable recoloring.
   // NOTE: Not a vertex attribute, ids are just efficiently stored as as 32 bit integers...
   const ids = new Uint32Array(numInstances);
 
+  let i = 0;
   objects.forEach(object => {
     const vertexCount = getVertexCount(object.vertices);
-    const isFloat32Array = object.vertices instanceof Float32Array;
 
-    for (let i = 0; i < vertexCount; i++) {
-      let vertex = object.vertices[i];
+    const isPositionFlattenedArray = object.vertices instanceof Float32Array;
+    if (isPositionFlattenedArray) {
+      positions.set(object.vertices, i * 3);
+    }
 
-      if (isFloat32Array) {
-        vertex = [];
-        vertex[0] = object.vertices[i * 3 + 0];
-        vertex[1] = object.vertices[i * 3 + 1];
-        vertex[2] = object.vertices[i * 3 + 2];
-      }
-
+    for (let j = 0; j < vertexCount; j++, i++) {
       ids[i] = object.id;
 
-      positions[i * 3 + 0] = vertex[0];
-      positions[i * 3 + 1] = vertex[1];
-      positions[i * 3 + 2] = vertex[2];
+      if (!isPositionFlattenedArray) {
+        const vertex = object.vertices[i];
+        positions[i * 3 + 0] = vertex[0];
+        positions[i * 3 + 1] = vertex[1];
+        positions[i * 3 + 2] = vertex[2];
+      }
 
-      colors[i * 4 + 0] = object.color[0];
-      colors[i * 4 + 1] = object.color[1];
-      colors[i * 4 + 2] = object.color[2];
-      colors[i * 4 + 3] = object.color[3] || 255;
-
-      normals[i * 3 + 0] = 0;
-      normals[i * 3 + 1] = 1;
-      normals[i * 3 + 2] = 0;
+      const color = object.color || DEFAULT_COLOR;
+      colors[i * 4 + 0] = color[0];
+      colors[i * 4 + 1] = color[1];
+      colors[i * 4 + 2] = color[2];
+      colors[i * 4 + 3] = color[3] || 255;
     }
   });
 
   return {
-    // track type so we can handle 2d & 3d clouds
     type: objects[0].type,
     numInstances,
     positions,
     colors,
-    normals,
     ids
   };
 }
