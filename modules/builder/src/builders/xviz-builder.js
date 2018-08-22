@@ -33,8 +33,6 @@ export default class XVIZBuilder {
       variables: {},
       primitives: {}
     };
-
-    this._validateMetadata();
   }
 
   pose(stream_id, pose) {
@@ -154,12 +152,6 @@ export default class XVIZBuilder {
     return frame;
   }
 
-  _validateMetadata() {
-    if (!metadata) {
-      this._validateWarn('Should provide metadata.');
-    }
-  }
-
   _validatePropSetOnce(prop, msg) {
     if (!this[prop]) {
       return;
@@ -206,7 +198,7 @@ export default class XVIZBuilder {
         this._validateWarn(
           `Category ${this._category} does not match metadata definition (${
             streamMetadata.category
-            }).`
+          }).`
         );
       }
     }
