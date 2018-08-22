@@ -180,7 +180,6 @@ tape('parseStreamLogData pointCloud timeslice', t => {
   t.equals(pointCloud.numInstances, 1, 'Has 1 instance');
   t.equals(pointCloud.positions.length, 3, 'Has 3 values in positions');
   t.equals(pointCloud.colors.length, 4, 'Has 4 values in colors');
-  t.equals(pointCloud.normals.length, 3, 'Has 3 values in normals');
 
   t.end();
 });
@@ -215,7 +214,6 @@ tape('parseStreamLogData pointCloud timeslice TypedArray', t => {
   t.equals(pointCloud.numInstances, 1, 'Has 1 instance');
   t.equals(pointCloud.positions.length, 3, 'Has 3 values in positions');
   t.equals(pointCloud.colors.length, 4, 'Has 4 values in colors');
-  t.equals(pointCloud.normals.length, 3, 'Has 3 values in normals');
 
   t.end();
 });
@@ -257,7 +255,6 @@ tape('parseStreamLogData pointCloud timeslice', t => {
   t.equals(pointCloud.numInstances, 2, 'Has 2 instance');
   t.equals(pointCloud.positions.length, 6, 'Has 6 values in positions');
   t.equals(pointCloud.colors.length, 8, 'Has 8 values in colors');
-  t.equals(pointCloud.normals.length, 6, 'Has 6 values in normals');
 
   t.end();
 });
