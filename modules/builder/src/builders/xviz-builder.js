@@ -1,5 +1,3 @@
-import assert from '../utils/assert';
-
 const CATEGORY = {
   time_series: 'time_series',
   primitive: 'primitive',
@@ -13,13 +11,14 @@ const defaultValidateWarn = console.warn;
 const defaultValidateError = console.error;
 
 // TODO: Builder could validate against stream metadata!
-// TODO: need validate with metadata defined stream category
 export default class XVIZBuilder {
-  constructor(metadata, disableStreams, {validateWarn, validateError}) {
-    assert(metadata && metadata.streams);
+  constructor({metadata, disableStreams, validateWarn, validateError}) {
+    this._validateWarn = validateWarn || defaultValidateWarn;
+    this._validateError = validateError || defaultValidateError;
+
+    this.metadata = metadata || {};
     this.disableStreams = disableStreams || [];
 
-    this.metadata = metadata;
     this._pose = null;
     this.pose_stream_id = null;
 
@@ -35,8 +34,7 @@ export default class XVIZBuilder {
       primitives: {}
     };
 
-    this._validateWarn = validateWarn || defaultValidateWarn;
-    this._validateError = validateError || defaultValidateError;
+    this._validateMetadata();
   }
 
   pose(stream_id, pose) {
@@ -156,6 +154,12 @@ export default class XVIZBuilder {
     return frame;
   }
 
+  _validateMetadata() {
+    if (!metadata) {
+      this._validateWarn('Should provide metadata.');
+    }
+  }
+
   _validatePropSetOnce(prop, msg) {
     if (!this[prop]) {
       return;
@@ -194,15 +198,17 @@ export default class XVIZBuilder {
     }
 
     // validate based on metadata
-    const streamMetadata = this.metadata.streams[this.stream_id];
-    if (!streamMetadata) {
-      this._validateWarn(`${this.stream_id} is not defined in metadata.`);
-    } else if (this._category !== streamMetadata.category) {
-      this._validateWarn(
-        `Category ${this._category} does not match metadata definition (${
-          streamMetadata.category
-        }).`
-      );
+    if (this.metadata && this.metadata.streams) {
+      const streamMetadata = this.metadata.streams[this.stream_id];
+      if (!streamMetadata) {
+        this._validateWarn(`${this.stream_id} is not defined in metadata.`);
+      } else if (this._category !== streamMetadata.category) {
+        this._validateWarn(
+          `Category ${this._category} does not match metadata definition (${
+            streamMetadata.category
+            }).`
+        );
+      }
     }
   }
 
