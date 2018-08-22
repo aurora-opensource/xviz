@@ -1,4 +1,6 @@
 // Set up a configuration (TODO/OSS - this should be a neutral config)
+import './config/xviz-config.spec';
+
 import './synchronizers/log-synchronizer.spec';
 import './synchronizers/stream-synchronizer.spec';
 import './synchronizers/xviz-stream-buffer.spec';
