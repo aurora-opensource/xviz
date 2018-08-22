@@ -48,6 +48,11 @@ export default class XVIZMetadataBuilder {
     return this;
   }
 
+  pose(p) {
+    this.tmp_stream.pose = p;
+    return this;
+  }
+
   styleClassDefault(style) {
     this.styleClass('*', style);
     return this;
