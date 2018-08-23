@@ -12,12 +12,17 @@ const defaultValidateError = console.error;
 
 // TODO: Builder could validate against stream metadata!
 export default class XVIZBuilder {
-  constructor({metadata, disableStreams, validateWarn, validateError}) {
-    this._validateWarn = validateWarn || defaultValidateWarn;
-    this._validateError = validateError || defaultValidateError;
+  constructor({
+    metadata = {},
+    disableStreams = [],
+    validateWarn = defaultValidateWarn,
+    validateError = defaultValidateError
+  }) {
+    this._validateWarn = validateWarn;
+    this._validateError = validateError;
 
-    this.metadata = metadata || {};
-    this.disableStreams = disableStreams || [];
+    this.metadata = metadata;
+    this.disableStreams = disableStreams;
 
     this._pose = null;
     this.pose_stream_id = null;
