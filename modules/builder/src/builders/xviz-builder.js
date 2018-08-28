@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import assert from '../utils/assert';
-
 const CATEGORY = {
   time_series: 'time_series',
   primitive: 'primitive',
@@ -27,13 +25,19 @@ const defaultValidateWarn = console.warn;
 const defaultValidateError = console.error;
 
 // TODO: Builder could validate against stream metadata!
-// TODO: need validate with metadata defined stream category
 export default class XVIZBuilder {
-  constructor(metadata, disableStreams, {validateWarn, validateError}) {
-    assert(metadata && metadata.streams);
-    this.disableStreams = disableStreams || [];
+  constructor({
+    metadata = {},
+    disableStreams = [],
+    validateWarn = defaultValidateWarn,
+    validateError = defaultValidateError
+  }) {
+    this._validateWarn = validateWarn;
+    this._validateError = validateError;
 
     this.metadata = metadata;
+    this.disableStreams = disableStreams;
+
     this._pose = null;
     this.pose_stream_id = null;
 
@@ -48,9 +52,6 @@ export default class XVIZBuilder {
       variables: {},
       primitives: {}
     };
-
-    this._validateWarn = validateWarn || defaultValidateWarn;
-    this._validateError = validateError || defaultValidateError;
   }
 
   pose(stream_id, pose) {
@@ -178,12 +179,12 @@ export default class XVIZBuilder {
       return;
     }
 
-    this._validateWarn(msg || `${prop} has been already set.`);
+    this._validateWarn(msg || `Stream ${this.stream_id} ${prop} has been already set.`);
   }
 
   _validateStreamId() {
     if (!this.stream_id) {
-      this._validateWarn('A stream must be set first.');
+      this._validateError('A stream must be set first.');
     }
   }
 
@@ -193,30 +194,32 @@ export default class XVIZBuilder {
     // validate required fields
     for (const prop of requiredProps) {
       if (!this[prop]) {
-        this._validateError(`${prop} is required.`);
+        this._validateError(`Stream ${this.stream_id} ${prop} is required.`);
       }
     }
 
     // validate primitive
     if (this._category === CATEGORY.primitive && !this._vertices) {
-      this._validateWarn('Primitives vertices are not provided.');
+      this._validateWarn(`Stream ${this.stream_id} primitives vertices are not provided.`);
     }
 
     // validate variable
     if (this._category === CATEGORY.variable && this._values.length === 0) {
-      this._validateWarn('Variable value(s) are not provided.');
+      this._validateWarn(`Stream${this.stream_id} variable value(s) are not provided.`);
     }
 
     // validate based on metadata
-    const streamMetadata = this.metadata.streams[this.stream_id];
-    if (!streamMetadata) {
-      this._validateWarn(`${this.stream_id} is not defined in metadata.`);
-    } else if (this._category !== streamMetadata.category) {
-      this._validateWarn(
-        `Category ${this._category} does not match metadata definition (${
-          streamMetadata.category
-        }).`
-      );
+    if (this.metadata && this.metadata.streams) {
+      const streamMetadata = this.metadata.streams[this.stream_id];
+      if (!streamMetadata) {
+        this._validateWarn(`${this.stream_id} is not defined in metadata.`);
+      } else if (this._category !== streamMetadata.category) {
+        this._validateWarn(
+          `Stream ${this.stream_id} category '${
+            this._category
+          }' does not match metadata definition (${streamMetadata.category}).`
+        );
+      }
     }
   }
 
