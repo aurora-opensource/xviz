@@ -14,7 +14,7 @@
     "src"
   ],
   "dependencies": {
-    "loaders.gl": "^0.1.0"
+    "loaders.gl": "^0.3.0"
   },
   "scripts": {
     "clean": "rm -fr dist && mkdir -p dist",

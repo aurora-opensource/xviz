@@ -5448,9 +5448,9 @@ loader-utils@^1.0.2, loader-utils@^1.1.0:
     emojis-list "^2.0.0"
     json5 "^0.5.0"
 
-loaders.gl@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/loaders.gl/-/loaders.gl-0.1.0.tgz#53541423262c19c0881f2f4af2c3c4bfdf973ab2"
+loaders.gl@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/loaders.gl/-/loaders.gl-0.3.0.tgz#ef09a69ea9a8e233c8f1f507b725518a4cbed757"
   dependencies:
     d3-request "^1.0.6"
     webgl-obj-loader "^1.1.3"
