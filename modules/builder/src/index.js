@@ -2,7 +2,6 @@
 export {loadUri} from './utils/load-uri.js';
 
 // WRITERS
-export {encodeGLB, _GLBEncoder, _GLBBufferPacker, _packJsonArrays} from './writers/glb-writer';
 export {encodeBinaryXVIZ, XVIZWriter} from './writers/xviz-writer';
 
 // BUILDERS

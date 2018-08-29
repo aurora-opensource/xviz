@@ -1,4 +1,4 @@
-import {encodeGLB} from '../glb-writer';
+import {GLBBuilder} from 'loaders.gl';
 
 const MAGIC_XVIZ = 0x5856495a; // XVIZ in Big-Endian ASCII
 
@@ -10,7 +10,7 @@ export function encodeBinaryXVIZ(inputJson, options) {
 
   const newOptions = Object.assign({magic: MAGIC_XVIZ}, options);
 
-  return encodeGLB(json, newOptions);
+  return new GLBBuilder().encoode(json, newOptions);
 }
 
 export function writeBinaryXVIZtoFile(filePath, json, options) {

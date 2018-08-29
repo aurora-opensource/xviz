@@ -16,6 +16,7 @@
   "dependencies": {
     "color": "^3.0.0",
     "dotty": "^0.0.2",
+    "loaders.gl": "^0.1.0",
     "math.gl": "^2.0.0",
     "probe.gl": "^1.0.0",
     "viewport-mercator-project": "^5.0.0",
