@@ -1,7 +1,8 @@
 const CATEGORY = {
   time_series: 'time_series',
   primitive: 'primitive',
-  variable: 'variable'
+  variable: 'variable',
+  image: 'image'
 };
 
 // _ts should be required or optional?
@@ -25,10 +26,12 @@ export default class XVIZBuilder {
     this.disableStreams = disableStreams;
 
     this._pose = null;
-    this.pose_stream_id = null;
 
     // current stream_id
     this.stream_id = null;
+
+    // current camera_name
+    this.camera_name = null;
 
     // There are many fields we use to track temporary state.
     this._reset();
@@ -48,7 +51,6 @@ export default class XVIZBuilder {
     this._validatePropSetOnce('_category');
 
     this._category = 'vehicle-pose';
-    this.pose_stream_id = stream_id;
     this._pose = pose;
     return this;
   }
@@ -69,6 +71,15 @@ export default class XVIZBuilder {
     this._validatePropSetOnce('_ts');
 
     this._ts = ts;
+    return this;
+  }
+
+  image(camera_name, image) {
+    this._validateStreamId();
+    this._validatePropSetOnce('_image');
+
+    this.camera_name = camera_name;
+    this._image = image;
     return this;
   }
 
@@ -344,17 +355,24 @@ export default class XVIZBuilder {
       }
     }
 
+    if (this.camera_name) {
+      this._data.images[this.camera_name] = this._image;
+    }
+
     this._reset();
   }
 
   _reset() {
+    this.camera_name = null;
+
     this.stream_id = null;
+    this._vertices = null;
     this._values = [];
+    this._image = null;
     this._ts = null;
     this._category = null;
     this._type = null;
     this._id = null;
-    this._vertices = null;
     this._color = null;
     this._classes = null;
     this._text = null;

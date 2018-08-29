@@ -2,11 +2,15 @@ export default class XVIZMetadataBuilder {
   constructor() {
     this.data = {
       streams: {},
+      cameras: {},
       styles: {}
     };
 
     this.stream_id = null;
     this.tmp_stream = {};
+
+    this.camera_name = null;
+    this.tmp_camera = null;
   }
 
   startTime(time) {
@@ -53,6 +57,16 @@ export default class XVIZMetadataBuilder {
     return this;
   }
 
+  camera(name, info) {
+    if (this.camera_name) {
+      this._flush();
+    }
+
+    this.camera_name = name;
+    this.tmp_camera = info;
+    return this;
+  }
+
   styleClassDefault(style) {
     this.styleClass('*', style);
     return this;
@@ -81,6 +95,10 @@ export default class XVIZMetadataBuilder {
   _flush() {
     if (this.stream_id) {
       this.data.streams[this.stream_id] = this.tmp_stream;
+    }
+
+    if (this.camera_name) {
+      this.data.cameras[this.camera_name] = this.tmp_camera;
     }
 
     this._reset();
