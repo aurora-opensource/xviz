@@ -40,7 +40,7 @@ The stroke color of a `line`, `path` or `polygon` primitive. Default `#FFF`.
 
 ##### `fillColor` (array | string)
 
-The fill color of a `point`, `circle` or `polygon` primitive. Default `#FFF`.
+The fill color of a `point`, `circle`, `text` or `polygon` primitive. Default `#FFF`.
 
 ##### `radius` (number)
 
