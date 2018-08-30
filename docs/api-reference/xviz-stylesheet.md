@@ -40,7 +40,7 @@ The stroke color of a `line`, `path` or `polygon` primitive. Default `#FFF`.
 
 ##### `fillColor` (array | string)
 
-The fill color of a `point`, `circle` or `polygon` primitive. Default `#FFF`.
+The fill color of a `point`, `circle`, `text` or `polygon` primitive. Default `#FFF`.
 
 ##### `radius` (number)
 
@@ -97,3 +97,20 @@ Whether to extrude `polygon` primitives into 3D objects. Cannot be customized pe
 ##### `wireframe` (bool)
 
 Whether to draw 3D outline for extruded `polygon` primitives. Cannot be customized per object - only effective when specified inside the `*` selector. Default `false`.
+
+##### `size` (number)
+
+The size of a `text` primitive in pixels. Default `12`.
+
+##### `angle` (number)
+
+The rotation of a `text` primitive in degrees. Default `0`.
+
+##### `textAnchor` (string)
+
+The horizontal alignment of a `text` primitive relative to its position. One of `start`, `middle`, `end`. Default `middle`.
+
+##### `alignmentBaseline` (string)
+
+The vertical alignment of a `text` primitive relative to its position. One of `top`, `center`, `bottom`. Default `center`.
+
