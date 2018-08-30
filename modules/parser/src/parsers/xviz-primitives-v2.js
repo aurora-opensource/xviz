@@ -4,7 +4,7 @@ import {PRIMITIVE_CAT} from './parse-xviz-stream';
 // TODO - tests for all primitive types
 export default {
   text: {
-    category: PRIMITIVE_CAT.LABEL,
+    category: PRIMITIVE_CAT.FEATURE,
     validate: primitive => true
   },
   tree_table: {
@@ -13,7 +13,7 @@ export default {
   },
   circle: {
     category: PRIMITIVE_CAT.FEATURE,
-    validate: (primitive, streamName, time) => primitive.vertices && primitive.vertices.length > 0
+    validate: (primitive, streamName, time) => primitive.center
   },
   polyline: {
     category: PRIMITIVE_CAT.FEATURE,
