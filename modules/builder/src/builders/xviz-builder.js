@@ -31,7 +31,7 @@ export default class XVIZBuilder {
     disableStreams = [],
     validateWarn = defaultValidateWarn,
     validateError = defaultValidateError
-  }) {
+  } = {}) {
     this._validateWarn = validateWarn;
     this._validateError = validateError;
 
@@ -48,10 +48,13 @@ export default class XVIZBuilder {
     this._reset();
 
     // Storage of objects after fully constructed
-    this._data = {
-      variables: {},
-      primitives: {}
-    };
+    // Will contain
+    //  {
+    //    variables: {}
+    //    primitives: {}
+    //    futures: {}
+    //  }
+    this._data = {};
   }
 
   pose(stream_id, pose) {
@@ -147,6 +150,66 @@ export default class XVIZBuilder {
     return this;
   }
 
+  text(message) {
+    this._validateStreamId();
+    this._validatePropSetOnce('_text');
+    this._validatePropSetOnce('_category');
+
+    this._text = message;
+    this._type = 'text';
+    this._category = CATEGORY.primitive;
+    return this;
+  }
+
+  circle(position, radius) {
+    this._validateStreamId();
+    this._validatePropSetOnce('_radius');
+    this._validatePropSetOnce('_category');
+
+    this.position(position);
+
+    this._radius = radius;
+    this._type = 'circle';
+    this._category = CATEGORY.primitive;
+    return this;
+  }
+
+  stadium(start, end, radius) {
+    this._validateStreamId();
+    this._validatePropSetOnce('_radius');
+    this._validatePropSetOnce('_category');
+
+    if (start.length != 3) {
+      this._validateError(
+        `The start position must be of the form [x, y, z] where ${point} was provided`
+      );
+    }
+
+    if (end.length != 3) {
+      this._validateError(
+        `The end position must be of the form [x, y, z] where ${point} was provided`
+      );
+    }
+
+    this._vertices = [start, end];
+    this._radius = radius;
+    this._type = 'stadium';
+    this._category = CATEGORY.primitive;
+    return this;
+  }
+
+  position(point) {
+    this._validateStreamId();
+    this._validatePropSetOnce('_vertices');
+
+    if (point.length != 3) {
+      this._validateError(`A position must be of the form [x, y, z] where ${point} was provided`);
+    }
+
+    this._vertices = [point];
+    return this;
+  }
+
   classes(classList) {
     this._validateStreamId();
     this._validatePropSetOnce('_classes');
@@ -228,6 +291,10 @@ export default class XVIZBuilder {
 
     if (this.stream_id && !this.disableStreams.includes(this.stream_id)) {
       if (this._category === CATEGORY.variable) {
+        if (!this._data.variables) {
+          this._data.variables = {};
+        }
+
         const obj = {
           timestamps: [this._ts],
           values: this._values,
@@ -238,10 +305,38 @@ export default class XVIZBuilder {
       }
 
       if (this._category === CATEGORY.primitive) {
+        if (!this._data.primitives) {
+          this._data.primitives = {};
+        }
+
         const obj = {
-          type: this._type,
-          vertices: this._vertices
+          type: this._type
         };
+
+        switch (this._type) {
+          case 'polygon':
+          case 'polyline':
+          case 'point':
+            obj.vertices = this._vertices;
+            break;
+          case 'text':
+            obj.position = this._vertices[0];
+            obj.text = this._text;
+            break;
+          case 'circle':
+            obj.center = this._vertices[0];
+            obj.radius_m = this._radius;
+            break;
+          case 'stadium':
+            obj.start = this._vertices[0];
+            obj.end = this._vertices[1];
+            obj.radius_m = this._radius;
+            break;
+          case 'image':
+            Object.assign(obj, this._image);
+            break;
+          default:
+        }
 
         if (this._id) {
           obj.id = this._id;
@@ -276,5 +371,7 @@ export default class XVIZBuilder {
     this._vertices = null;
     this._color = null;
     this._classes = null;
+    this._text = null;
+    this._radius = null;
   }
 }
