@@ -62,8 +62,10 @@ const PROPERTY_FORMATTERS = {
   strokeColor: getColor,
   fillColor: getColor,
 
-  fontSize: getNumber,
+  size: getNumber,
   angle: getNumber,
+  textAnchor: String,
+  alignmentBaseline: String,
 
   radius: getNumber,
   radiusMinPixels: getNumber,
@@ -86,8 +88,10 @@ const DEFAULT_STYLES = {
   strokeColor: [255, 255, 255],
   fillColor: [255, 255, 255],
 
-  fontSize: 12,
+  size: 12,
   angle: 0,
+  textAnchor: 'middle',
+  alignmentBaseline: 'center',
 
   radius: 1,
   radiusMinPixels: 0,
