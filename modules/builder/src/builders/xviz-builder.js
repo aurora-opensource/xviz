@@ -1,16 +1,25 @@
 const CATEGORY = {
   time_series: 'time_series',
   primitive: 'primitive',
-  variable: 'variable',
-  image: 'image'
+  variable: 'variable'
 };
 
-// _ts should be required or optional?
-const requiredProps = ['stream_id', '_category', '_type'];
+const PRIMITIVE_TYPES = {
+  point: 'point',
+  polygon: 'polygon',
+  polyline: 'polyline',
+  // circle: 'circle',
+  // stadium: 'stadium',
+  // text: 'text',
+  image: 'image',
+};
+
+const requiredProps = ['streamId', '_category', '_type'];
 
 const defaultValidateWarn = console.warn;
 const defaultValidateError = console.error;
 
+// TODO: support all the v2 types
 // TODO: Builder could validate against stream metadata!
 export default class XVIZBuilder {
   constructor({
@@ -27,11 +36,8 @@ export default class XVIZBuilder {
 
     this._pose = null;
 
-    // current stream_id
-    this.stream_id = null;
-
-    // current camera_name
-    this.camera_name = null;
+    // current streamId
+    this.streamId = null;
 
     // There are many fields we use to track temporary state.
     this._reset();
@@ -46,7 +52,7 @@ export default class XVIZBuilder {
     this._data = {};
   }
 
-  pose(stream_id, pose) {
+  pose(streamId, pose) {
     this._validatePropSetOnce('_pose');
     this._validatePropSetOnce('_category');
 
@@ -55,13 +61,13 @@ export default class XVIZBuilder {
     return this;
   }
 
-  stream(stream_id) {
-    if (this.stream_id) {
+  stream(streamId) {
+    if (this.streamId) {
       this._flush();
     }
 
     this._reset();
-    this.stream_id = stream_id;
+    this.streamId = streamId;
     return this;
   }
 
@@ -71,15 +77,6 @@ export default class XVIZBuilder {
     this._validatePropSetOnce('_ts');
 
     this._ts = ts;
-    return this;
-  }
-
-  image(camera_name, image) {
-    this._validateStreamId();
-    this._validatePropSetOnce('_image');
-
-    this.camera_name = camera_name;
-    this._image = image;
     return this;
   }
 
@@ -98,13 +95,31 @@ export default class XVIZBuilder {
     return this;
   }
 
+  image({data, format, widthPixel, heightPixel}) {
+    this._validateStreamId();
+    this._validatePropSetOnce('_image');
+    this._validatePropSetOnce('_category');
+
+    this._category = CATEGORY.primitive;
+    this._type = PRIMITIVE_TYPES.image;
+
+    this._image = {
+      data,
+      format,
+      width_px: widthPixel,
+      height_px: heightPixel
+    };
+
+    return this;
+  }
+
   polygon(vertices) {
     this._validateStreamId();
     this._validatePropSetOnce('_vertices');
     this._validatePropSetOnce('_category');
 
     this._vertices = vertices;
-    this._type = 'polygon';
+    this._type = PRIMITIVE_TYPES.polygon;
     this._category = CATEGORY.primitive;
     return this;
   }
@@ -115,7 +130,7 @@ export default class XVIZBuilder {
     this._validatePropSetOnce('_category');
 
     this._vertices = vertices;
-    this._type = 'polyline';
+    this._type = PRIMITIVE_TYPES.polyline;
     this._category = CATEGORY.primitive;
     return this;
   }
@@ -126,7 +141,7 @@ export default class XVIZBuilder {
     this._validatePropSetOnce('_category');
 
     this._vertices = vertices;
-    this._type = 'point';
+    this._type = PRIMITIVE_TYPES.point;
     this._category = CATEGORY.primitive;
     return this;
   }
@@ -239,11 +254,11 @@ export default class XVIZBuilder {
       return;
     }
 
-    this._validateWarn(msg || `Stream ${this.stream_id} ${prop} has been already set.`);
+    this._validateWarn(msg || `Stream ${this.streamId} ${prop} has been already set.`);
   }
 
   _validateStreamId() {
-    if (!this.stream_id) {
+    if (!this.streamId) {
       this._validateError('A stream must be set first.');
     }
   }
@@ -254,28 +269,33 @@ export default class XVIZBuilder {
     // validate required fields
     for (const prop of requiredProps) {
       if (!this[prop]) {
-        this._validateError(`Stream ${this.stream_id} ${prop} is required.`);
+        this._validateError(`Stream ${this.streamId} ${prop} is required.`);
       }
     }
 
     // validate primitive
-    if (this._category === CATEGORY.primitive && !this._vertices) {
-      this._validateWarn(`Stream ${this.stream_id} primitives vertices are not provided.`);
+    if (this._category === CATEGORY.primitive) {
+      if (this._type === PRIMITIVE_TYPES.image && (!this._image || !this._image.data)) {
+        this._validateWarn(`Stream ${this.streamId} image data  are not provided.`);
+      }
+      if (this._type !== PRIMITIVE_TYPES.image && !this._vertices) {
+        this._validateWarn(`Stream ${this.streamId} primitives vertices are not provided.`);
+      }
     }
 
     // validate variable
     if (this._category === CATEGORY.variable && this._values.length === 0) {
-      this._validateWarn(`Stream${this.stream_id} variable value(s) are not provided.`);
+      this._validateWarn(`Stream${this.streamId} variable value(s) are not provided.`);
     }
 
     // validate based on metadata
     if (this.metadata && this.metadata.streams) {
-      const streamMetadata = this.metadata.streams[this.stream_id];
+      const streamMetadata = this.metadata.streams[this.streamId];
       if (!streamMetadata) {
-        this._validateWarn(`${this.stream_id} is not defined in metadata.`);
+        this._validateWarn(`${this.streamId} is not defined in metadata.`);
       } else if (this._category !== streamMetadata.category) {
         this._validateWarn(
-          `Stream ${this.stream_id} category '${
+          `Stream ${this.streamId} category '${
             this._category
           }' does not match metadata definition (${streamMetadata.category}).`
         );
@@ -286,7 +306,7 @@ export default class XVIZBuilder {
   _flush() {
     this._validate();
 
-    if (this.stream_id && !this.disableStreams.includes(this.stream_id)) {
+    if (this.streamId && !this.disableStreams.includes(this.streamId)) {
       if (this._category === CATEGORY.variable) {
         if (!this._data.variables) {
           this._data.variables = {};
@@ -298,7 +318,7 @@ export default class XVIZBuilder {
           type: this._type
         };
 
-        this._data.variables[this.stream_id] = obj;
+        this._data.variables[this.streamId] = obj;
       }
 
       if (this._category === CATEGORY.primitive) {
@@ -347,25 +367,20 @@ export default class XVIZBuilder {
           obj.classes = this._classes;
         }
 
-        if (this._data.primitives[this.stream_id]) {
-          this._data.primitives[this.stream_id].push(obj);
+        if (this._data.primitives[this.streamId]) {
+          this._data.primitives[this.streamId].push(obj);
         } else {
-          this._data.primitives[this.stream_id] = [obj];
+          this._data.primitives[this.streamId] = [obj];
         }
       }
-    }
 
-    if (this.camera_name) {
-      this._data.images[this.camera_name] = this._image;
     }
 
     this._reset();
   }
 
   _reset() {
-    this.camera_name = null;
-
-    this.stream_id = null;
+    this.streamId = null;
     this._vertices = null;
     this._values = [];
     this._image = null;
