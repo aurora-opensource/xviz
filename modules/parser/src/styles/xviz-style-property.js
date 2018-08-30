@@ -62,6 +62,9 @@ const PROPERTY_FORMATTERS = {
   strokeColor: getColor,
   fillColor: getColor,
 
+  fontSize: getNumber,
+  angle: getNumber,
+
   radius: getNumber,
   radiusMinPixels: getNumber,
   radiusMaxPixels: getNumber,
@@ -82,6 +85,9 @@ const DEFAULT_STYLES = {
 
   strokeColor: [255, 255, 255],
   fillColor: [255, 255, 255],
+
+  fontSize: 12,
+  angle: 0,
 
   radius: 1,
   radiusMinPixels: 0,
