@@ -52,7 +52,7 @@ export default class XVIZBuilder {
     this._data = {};
   }
 
-  pose(streamId, pose) {
+  pose(pose) {
     this._validatePropSetOnce('_pose');
     this._validatePropSetOnce('_category');
 
@@ -95,7 +95,7 @@ export default class XVIZBuilder {
     return this;
   }
 
-  image(data, widthPixel = null, heightPixel = null, format = null) {
+  image(data, format) {
     this._validateStreamId();
     this._validatePropSetOnce('_image');
     this._validatePropSetOnce('_category');
@@ -105,10 +105,20 @@ export default class XVIZBuilder {
 
     this._image = {
       data,
-      format,
-      width_px: widthPixel,
-      height_px: heightPixel
+      format
     };
+
+    return this;
+  }
+
+  dimensions(widthPixel = null, heightPixel = null, depth = null) {
+    if (!this._image) {
+      this._validateError('An image needs to be set first.');
+    }
+
+    this._image.width_px = widthPixel;
+    this._image.height_px = heightPixel;
+    this._image.depth = depth;
 
     return this;
   }
