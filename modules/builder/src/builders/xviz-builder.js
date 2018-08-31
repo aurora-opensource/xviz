@@ -8,10 +8,10 @@ const PRIMITIVE_TYPES = {
   point: 'point',
   polygon: 'polygon',
   polyline: 'polyline',
-  // circle: 'circle',
-  // stadium: 'stadium',
-  // text: 'text',
-  image: 'image',
+  circle: 'circle',
+  stadium: 'stadium',
+  text: 'text',
+  image: 'image'
 };
 
 const requiredProps = ['streamId', '_category', '_type'];
@@ -154,7 +154,7 @@ export default class XVIZBuilder {
     this.position(position);
 
     this._radius = radius;
-    this._type = 'circle';
+    this._type = PRIMITIVE_TYPES.circle;
     this._category = CATEGORY.primitive;
     return this;
   }
@@ -178,7 +178,7 @@ export default class XVIZBuilder {
 
     this._vertices = [start, end];
     this._radius = radius;
-    this._type = 'stadium';
+    this._type = PRIMITIVE_TYPES.stadium;
     this._category = CATEGORY.primitive;
     return this;
   }
@@ -276,7 +276,7 @@ export default class XVIZBuilder {
     // validate primitive
     if (this._category === CATEGORY.primitive) {
       if (this._type === PRIMITIVE_TYPES.image && (!this._image || !this._image.data)) {
-        this._validateWarn(`Stream ${this.streamId} image data  are not provided.`);
+        this._validateWarn(`Stream ${this.streamId} image data are not provided.`);
       }
       if (this._type !== PRIMITIVE_TYPES.image && !this._vertices) {
         this._validateWarn(`Stream ${this.streamId} primitives vertices are not provided.`);
@@ -373,7 +373,6 @@ export default class XVIZBuilder {
           this._data.primitives[this.streamId] = [obj];
         }
       }
-
     }
 
     this._reset();
