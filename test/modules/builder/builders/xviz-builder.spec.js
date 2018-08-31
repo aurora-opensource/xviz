@@ -31,7 +31,7 @@ test('XVIZBuilder#polygon', t => {
   const verts = [[0, 0, 0], [4, 0, 0], [4, 3, 0]];
 
   builder
-    .pose('vehicle-pose', {time: 1.0})
+    .pose({time: 1.0})
     .stream('/test/polygon')
     .polygon(verts);
 
@@ -62,7 +62,7 @@ test('XVIZBuilder#polyline', t => {
   const verts = [[0, 0, 0], [4, 0, 0], [4, 3, 0]];
 
   builder
-    .pose('vehicle-pose', {time: 1.0})
+    .pose({time: 1.0})
     .stream('/test/polyline')
     .polyline(verts);
 
@@ -92,7 +92,7 @@ test('XVIZBuilder#circle', t => {
   const pos = [4, 3, 0];
 
   builder
-    .pose('vehicle-pose', {time: 1.0})
+    .pose({time: 1.0})
     .stream('/test/circle')
     .circle(pos, 5);
 
@@ -124,7 +124,7 @@ test('XVIZBuilder#text', t => {
   const pos = [4, 3, 0];
 
   builder
-    .pose('vehicle-pose', {time: 1.0})
+    .pose({time: 1.0})
     .stream('/test/text')
     .text('test message')
     .position(pos);
@@ -156,7 +156,7 @@ test('XVIZBuilder#stadium', t => {
   const pos = [[4, 3, 0], [8, 6, 0]];
 
   builder
-    .pose('vehicle-pose', {time: 1.0})
+    .pose({time: 1.0})
     .stream('/test/stadium')
     .stadium(pos[0], pos[1], 5);
 
