@@ -95,7 +95,7 @@ export default class XVIZBuilder {
     return this;
   }
 
-  image({data, format, widthPixel, heightPixel}) {
+  image(data, widthPixel = null, heightPixel = null, format = null) {
     this._validateStreamId();
     this._validatePropSetOnce('_image');
     this._validatePropSetOnce('_category');
@@ -146,33 +146,6 @@ export default class XVIZBuilder {
     return this;
   }
 
-  color(clr) {
-    this._validateStreamId();
-    this._validatePropSetOnce('_color');
-
-    this._color = clr;
-    return this;
-  }
-
-  id(identifier) {
-    this._validateStreamId();
-    this._validatePropSetOnce('_id');
-
-    this._id = identifier;
-    return this;
-  }
-
-  text(message) {
-    this._validateStreamId();
-    this._validatePropSetOnce('_text');
-    this._validatePropSetOnce('_category');
-
-    this._text = message;
-    this._type = 'text';
-    this._category = CATEGORY.primitive;
-    return this;
-  }
-
   circle(position, radius) {
     this._validateStreamId();
     this._validatePropSetOnce('_radius');
@@ -219,6 +192,33 @@ export default class XVIZBuilder {
     }
 
     this._vertices = [point];
+    return this;
+  }
+
+  color(clr) {
+    this._validateStreamId();
+    this._validatePropSetOnce('_color');
+
+    this._color = clr;
+    return this;
+  }
+
+  id(identifier) {
+    this._validateStreamId();
+    this._validatePropSetOnce('_id');
+
+    this._id = identifier;
+    return this;
+  }
+
+  text(message) {
+    this._validateStreamId();
+    this._validatePropSetOnce('_text');
+    this._validatePropSetOnce('_category');
+
+    this._text = message;
+    this._type = 'text';
+    this._category = CATEGORY.primitive;
     return this;
   }
 
