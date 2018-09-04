@@ -15,15 +15,3 @@ test('validateExamplesFiles', t => {
 
   t.end();
 });
-
-test('validateXVIZExamples', t => {
-  // Do it by directory path first
-  const schemaDir = path.join(__dirname, '..', '..', '..', 'modules', 'schema');
-  const examplesDir = path.join(schemaDir, 'examples');
-
-  t.ok(validateExampleFiles(schemaDir, examplesDir), 'all examples match schema');
-
-  // TODO: setup imports/exports for schema files
-
-  t.end();
-});
