@@ -12,7 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Set up a configuration (TODO/OSS - this should be a neutral config)
-import './modules/builder';
-import './modules/parser';
-import './modules/schema';
+import {validateExampleFiles} from '@xviz/schema';
+import test from 'tape-catch';
+import * as path from 'path';
+
+test('validateXVIZExamples', t => {
+  // Do it by directory path first
+  const schemaDir = path.join(__dirname, '..', '..', '..', 'modules', 'schema');
+  const examplesDir = path.join(schemaDir, 'examples');
+
+  t.ok(validateExampleFiles(schemaDir, examplesDir), 'all examples match schema');
+
+  // TODO: setup imports/exports for schema files
+
+  t.end();
+});

@@ -1,0 +1,19 @@
+{
+  "name": "@xviz/schema",
+  "description": "XVIZ JSON schema",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/uber/xviz.git"
+  },
+  "dependencies": {
+    "ajv": "^6.5.2",
+    "ajv-cli": "^3.0.0",
+    "walk": "^2.3.14"
+  },
+  "scripts": {
+    "build": "echo \"No transpilation needed\"",
+    "check": "node validate.js"
+  },
+  "private": true
+}

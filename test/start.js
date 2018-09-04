@@ -33,7 +33,11 @@ moduleAlias.addAliases({
   '@xviz/parser':
     mode === 'dist'
       ? resolve(__dirname, '../modules/parser/dist/es5')
-      : resolve(__dirname, '../modules/parser/src')
+      : resolve(__dirname, '../modules/parser/src'),
+  '@xviz/schema':
+    mode === 'dist'
+      ? resolve(__dirname, '../modules/schema/dist/es5')
+      : resolve(__dirname, '../modules/schema/src')
 });
 
 switch (mode) {
