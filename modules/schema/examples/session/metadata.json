@@ -1,0 +1,34 @@
+{
+  "version": "2.0.0",
+  "streams": {
+    "/velocity": {
+      "units": "m/s"
+    }
+  },
+  "cameras": {
+    "human_name": "Front Wide",
+    "source": "/camera/front/wide",
+    "vehicle_position": [0.0, 1.2, 0.3],
+    "vehicle_orientation": [
+      [-1, 0, 0],
+      [0, 1, 0],
+      [0, 0, -1]
+    ],
+    "pixel_width": 1920,
+    "pixel_height": 1080,
+    "rectification_projection": [
+      [-1, 0, 0],
+      [0, 1, 0],
+      [0, 0, -1]
+    ],
+    "gl_projection": [
+      [-1, 0, 0, 1],
+      [0, 1, 0, 2],
+      [0, 0, -1, 0],
+      [0, 2, 3, 1]
+    ]
+  },
+  "stream_aliases": {
+    "/data/velocity": "/velocity"
+  }
+}

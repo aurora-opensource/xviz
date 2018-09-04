@@ -71,7 +71,7 @@ This is a collection of stream sets for all extractor output.
 | `update_type`    | `enum { snapshot, incremental }` | Whether we have a complete or incremental update. |
 | `updates`        |  `list<stream_set>`              |            |
 
-Here is a JSON example showing an incremental update that contains a single Stream Set, which itself has just the single `/object/polygon` containing a 
+Here is a JSON example showing an incremental update that contains a single Stream Set, which itself has just the single `/object/polygon` containing a
 
 ```
 {
@@ -80,12 +80,14 @@ Here is a JSON example showing an incremental update that contains a single Stre
         {
             "timestamp": 1001.3,
             "primitives": [
-                "name": "/object/polygon",
-                "primitives": [
-                    {
-                      "vertices": [[9, 15, 3], [20, 13, 3], [20, 5, 3]]
-                    }
-                ]
+                {
+                    "name": "/object/polygon",
+                    "primitives": [
+                        {
+                            "vertices": [[9, 15, 3], [20, 13, 3], [20, 5, 3]]
+                        }
+                    ]
+                }
             ]
         }
     ]
