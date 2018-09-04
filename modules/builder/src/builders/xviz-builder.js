@@ -365,6 +365,10 @@ export default class XVIZBuilder {
           default:
         }
 
+        if (this._ts) {
+          obj.timestamp = this._ts;
+        }
+
         if (this._id) {
           obj.id = this._id;
         }
