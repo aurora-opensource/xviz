@@ -14,7 +14,10 @@
       }
     },
     "cameras": {
-      "$ref": "https://xviz.org/schema/session/camera_info.json"
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "https://xviz.org/schema/session/camera_info.json"
+      }
     },
     "stream_aliases": {
       "type": "object",
