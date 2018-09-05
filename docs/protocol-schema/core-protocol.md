@@ -100,19 +100,21 @@ This is what a full stream set would look like populated with a basic example of
 {
     "timestamp": 1001.3,
     "primitives": [
-        "name": "/object/polygon",
-        "primitives": [
-            {
-              "vertices": [[9, 15, 3], [20, 13, 3], [20, 5, 3]]
-            }
-        ]
+        {
+            "name": "/object/polygon",
+            "primitives": [
+                {
+                  "vertices": [[9, 15, 3], [20, 13, 3], [20, 5, 3]]
+                }
+            ]
+        }
     ],
     "variables": [
         {
             "name": "/plan/time",
             "values": [1001.3, 1002.3, 1003.3]
-        },
-    ],
+        }
+    ]
 }
 ```
 
