@@ -16,7 +16,7 @@ case $MODE in
     if [ ! -z "${FILES}" ]; then
       for f in $FILES
         do
-          prettier --write $f --loglevel warn
+          npx prettier --write $f --loglevel warn
           eslint $f
       done
     fi
@@ -27,10 +27,10 @@ case $MODE in
 
   *)
     echo "Checking prettier code styles..."
-    prettier-check "{modules,test}/**/*.js" || echo "Running prettier." && prettier --write "{modules,test}/**/*.js" --loglevel warn
+    npx prettier-check "{modules,test}/**/*.js" || echo "Running prettier." && prettier --write "{modules,test}/**/*.js" --loglevel warn
 
     echo "Running eslint..."
-    eslint src test
+    npx eslint modules test
     ;;
   esac
 

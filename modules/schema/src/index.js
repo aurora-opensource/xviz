@@ -98,6 +98,7 @@ function validateFiles(validator, examplesDir, expectGood) {
   return valid;
 }
 
+// eslint-disable-next-line max-statements
 function validateFile(validator, examplesDir, examplePath, expectGood) {
   const exampleRelPath = path.relative(examplesDir, examplePath);
   let schemaRelPath = exampleRelPath.replace('.json', '.schema.json');

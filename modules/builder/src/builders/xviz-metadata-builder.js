@@ -1,3 +1,6 @@
+// Note: XVIZ data structures use snake_case
+/* eslint-disable camelcase*/
+
 export default class XVIZMetadataBuilder {
   constructor() {
     this.data = {

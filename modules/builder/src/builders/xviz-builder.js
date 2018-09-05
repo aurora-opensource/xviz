@@ -1,3 +1,6 @@
+// Note: XVIZ data structures use snake_case
+/* eslint-disable camelcase */
+
 const CATEGORY = {
   time_series: 'time_series',
   primitive: 'primitive',
@@ -16,8 +19,11 @@ const PRIMITIVE_TYPES = {
 
 const requiredProps = ['streamId', '_category', '_type'];
 
+/* global console */
+/* eslint-disable no-console */
 const defaultValidateWarn = console.warn;
 const defaultValidateError = console.error;
+/* eslint-enable no-console */
 
 // TODO: support all the v2 types
 // TODO: Builder could validate against stream metadata!
@@ -174,15 +180,15 @@ export default class XVIZBuilder {
     this._validatePropSetOnce('_radius');
     this._validatePropSetOnce('_category');
 
-    if (start.length != 3) {
+    if (start.length !== 3) {
       this._validateError(
-        `The start position must be of the form [x, y, z] where ${point} was provided`
+        `The start position must be of the form [x, y, z] where ${start} was provided`
       );
     }
 
-    if (end.length != 3) {
+    if (end.length !== 3) {
       this._validateError(
-        `The end position must be of the form [x, y, z] where ${point} was provided`
+        `The end position must be of the form [x, y, z] where ${end} was provided`
       );
     }
 
@@ -197,7 +203,7 @@ export default class XVIZBuilder {
     this._validateStreamId();
     this._validatePropSetOnce('_vertices');
 
-    if (point.length != 3) {
+    if (point.length !== 3) {
       this._validateError(`A position must be of the form [x, y, z] where ${point} was provided`);
     }
 
@@ -273,6 +279,7 @@ export default class XVIZBuilder {
     }
   }
 
+  // eslint-disable-next-line complexity
   _validate() {
     // validate before calling flush
 
@@ -313,6 +320,7 @@ export default class XVIZBuilder {
     }
   }
 
+  // eslint-disable-next-line complexity
   _flush() {
     this._validate();
 
