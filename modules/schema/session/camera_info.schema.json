@@ -1,0 +1,52 @@
+{
+  "$id": "https://xviz.org/schema/session/camera_info.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "XVIZ Camera Information",
+  "type": "object",
+  "properties": {
+    "human_name": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string"
+    },
+    "vehicle_position": {
+      "$ref": "https://xviz.org/schema/math/vector3x1.json"
+    },
+    "vehicle_orientation": {
+      "$ref": "https://xviz.org/schema/math/matrix3x3.json"
+    },
+    "pixel_width": {
+      "type": "number",
+      "minimum": 0
+    },
+    "pixel_height": {
+      "type": "number",
+      "minimum": 0
+    },
+    "rectification_projection": {
+      "$ref": "https://xviz.org/schema/math/matrix3x3.json"
+    },
+    "gl_projection": {
+      "$ref": "https://xviz.org/schema/math/matrix4x4.json"
+    }
+  },
+  "required": [
+    "human_name",
+    "source"
+  ],
+  "dependencies": {
+    "pixel_width": ["pixel_height"],
+    "pixel_height": ["pixel_width"],
+    "rectification_projection": [
+      "pixel_width",
+      "pixel_height"
+    ],
+    "gl_projection": [
+      "rectification_projection",
+      "vehicle_position",
+      "vehicle_orientation"
+    ]
+  },
+  "additionalProperties": false
+}
