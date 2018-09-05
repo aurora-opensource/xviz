@@ -79,7 +79,7 @@ function packXVIZPrimitives(primitives, bufferPacker, opts) {
       const newPrimitive = [];
       for (const element of primitives[key]) {
         const elem = {...element};
-        /* eslint-disable */
+        // eslint-disable-next-line max-depth
         if (elem.vertices.length > 3) {
           elem.vertices = packJsonArrays(elem.vertices, bufferPacker);
         }

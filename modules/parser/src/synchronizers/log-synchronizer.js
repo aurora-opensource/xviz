@@ -16,7 +16,6 @@ import BaseSynchronizer from './base-synchronizer';
 
 import assert from '../utils/assert';
 
-/* eslint-disable camelcase */
 export default class LogSynchronizer extends BaseSynchronizer {
   /**
    * @classdesc

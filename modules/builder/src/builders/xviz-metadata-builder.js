@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Note: XVIZ data structures use snake_case
+/* eslint-disable camelcase*/
+
 export default class XVIZMetadataBuilder {
   constructor() {
     this.data = {

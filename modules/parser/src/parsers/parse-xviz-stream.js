@@ -205,11 +205,7 @@ export function parseStreamVariable(objects, streamName, time) {
 }
 
 function getVertexCount(vertices) {
-  if (vertices instanceof Float32Array) {
-    return vertices.length / 3;
-  } else {
-    return vertices.length;
-  }
+  return vertices instanceof Float32Array ? vertices.length / 3 : vertices.length;
 }
 
 // Joins a set of point clouds extracted from objects into a single point cloud

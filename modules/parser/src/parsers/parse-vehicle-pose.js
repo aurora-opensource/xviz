@@ -13,9 +13,8 @@
 // limitations under the License.
 
 import {getXvizConfig} from '../config/xviz-config';
-import assert from '../utils/assert';
 
-import {_Pose as Pose, Matrix4} from 'math.gl';
+import {_Pose as Pose} from 'math.gl';
 import {getDistanceScales, lngLatToWorld, worldToLngLat} from 'viewport-mercator-project';
 
 function noop() {}
@@ -25,7 +24,6 @@ function noop() {}
  * covered by the trip in this log.
  * @param {Object} vehiclePose
  */
-/* eslint-disable complexity, max-statements */
 export function parseVehiclePose(vehiclePose, opts = {}) {
   const {postProcessVehiclePose} = getXvizConfig();
 
@@ -80,7 +78,7 @@ export function getTransformsFromPose(vehiclePose) {
       origin: [longitude, latitude, altitude],
       vehicleRelativeTransform,
       trackPosition,
-      heading: (pose.yaw / Math.PI) * 180
+      heading: pose.yaw / Math.PI * 180
     };
   }
 

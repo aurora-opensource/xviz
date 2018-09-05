@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/* eslint-disable camelcase, max-statements */
+/* eslint-disable max-statements */
 import {padTo4Bytes, copyArrayBuffer, TextEncoder} from '../../utils';
 
-const MAGIC_glTF = 0x676c5446; // glTF in Big-Endian ASCII
+// glTF in Big-Endian ASCII
+const MAGIC_glTF = 0x676c5446; // eslint-disable-line camelcase
 
 const LE = true; // Binary GLTF is little endian.
 const BE = false; // Magic needs to be written as BE

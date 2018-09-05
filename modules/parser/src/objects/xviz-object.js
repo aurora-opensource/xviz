@@ -98,7 +98,8 @@ export default class XvizObject extends BaseObject {
       // Look at the other object
       // TODO - handle degenerate case when in same position
       const bearing =
-        (Math.atan2(otherPosition[1] - myPosition[1], otherPosition[0] - myPosition[0]) / Math.PI) *
+        Math.atan2(otherPosition[1] - myPosition[1], otherPosition[0] - myPosition[0]) /
+        Math.PI *
         180;
 
       return bearing;

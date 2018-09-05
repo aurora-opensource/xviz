@@ -14,7 +14,6 @@
 
 import BaseSynchronizer from './base-synchronizer';
 
-/* eslint-disable camelcase */
 export default class StreamSynchronizer extends BaseSynchronizer {
   /**
    * @classdesc
