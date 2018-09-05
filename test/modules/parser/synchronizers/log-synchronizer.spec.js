@@ -1,5 +1,7 @@
 import {LogSynchronizer} from '@xviz/parser';
 import tape from 'tape-catch';
+
+// xviz data uses snake_case
 /* eslint-disable camelcase */
 
 const LOG_START_TIME = 0;

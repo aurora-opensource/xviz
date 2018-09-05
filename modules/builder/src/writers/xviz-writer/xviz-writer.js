@@ -13,10 +13,10 @@ export default class XVIZWriter {
     });
   }
 
-  writeFrame(xvizDirectory, frame_number, xvizFrame) {
+  writeFrame(xvizDirectory, frameNumber, xvizFrame) {
     const path = module.require('path');
     // +2 is because 1 is metadata, so we start with 2
-    const frameFilePath = path.join(xvizDirectory, `${frame_number + 2}-frame`);
+    const frameFilePath = path.join(xvizDirectory, `${frameNumber + 2}-frame`);
     writeBinaryXVIZtoFile(frameFilePath, xvizFrame, {flattenArrays: false});
   }
 }
