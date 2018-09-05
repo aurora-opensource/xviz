@@ -25,12 +25,25 @@ const Ajv = require('ajv');
 export function validateExampleFiles(schemaDir, examplesDir) {
   const validator = new Ajv();
 
-  loadAllSchemas(validator, schemaDir);
+  let valid = loadAllSchemas(validator, schemaDir);
 
-  return validateFiles(validator, examplesDir);
+  valid = valid & validateFiles(validator, examplesDir, true);
+
+  return valid;
+}
+
+export function validateInvalidFiles(schemaDir, invalidDir) {
+  const validator = new Ajv();
+
+  let valid = loadAllSchemas(validator, schemaDir);
+
+  valid = valid & validateFiles(validator, invalidDir, false);
+
+  return valid;
 }
 
 function loadAllSchemas(validator, schemaDir) {
+  let valid = true;
   const schemaOptions = {
     listeners: {
       file(fpath, stat, next) {
@@ -42,7 +55,8 @@ function loadAllSchemas(validator, schemaDir) {
           try {
             loadSchema(validator, schemaDir, relPath);
           } catch (e) {
-            console.log(`Error loading schema: ${relPath} ${e}`);
+            console.log(`${fullPath}:0: error loading ${e}`);
+            valid = false;
           }
         }
         next();
@@ -51,6 +65,8 @@ function loadAllSchemas(validator, schemaDir) {
   };
 
   walk.walkSync(schemaDir, schemaOptions);
+
+  return valid;
 }
 
 function loadSchema(validator, schemaDir, relativePath) {
@@ -71,7 +87,7 @@ function loadSchema(validator, schemaDir, relativePath) {
   validator.addSchema(schema, relativePath);
 }
 
-function validateFiles(validator, examplesDir) {
+function validateFiles(validator, examplesDir, expectGood) {
   let valid = true;
   const options = {
     listeners: {
@@ -80,9 +96,10 @@ function validateFiles(validator, examplesDir) {
           // Build the path to the matching schema
           const examplePath = path.join(fpath, stat.name);
           try {
-            valid = valid & validateFile(validator, examplesDir, examplePath);
+            valid = valid & validateFile(validator, examplesDir, examplePath, expectGood);
           } catch (e) {
-            console.log(`Error validating: ${examplePath} ${e}`);
+            console.log(`${examplePath}:0: error validating: ${e}`);
+            valid = false;
           }
         }
         next();
@@ -95,10 +112,9 @@ function validateFiles(validator, examplesDir) {
   return valid;
 }
 
-function validateFile(validator, examplesDir, examplePath) {
+function validateFile(validator, examplesDir, examplePath, expectGood) {
   const exampleRelPath = path.relative(examplesDir, examplePath);
-
-  const schemaRelPath = exampleRelPath.replace('.json', '.schema.json');
+  let schemaRelPath = exampleRelPath.replace('.json', '.schema.json');
 
   // Load the JSON to validate
   const contents = fs.readFileSync(examplePath);
@@ -110,16 +126,41 @@ function validateFile(validator, examplesDir, examplePath) {
   }
 
   // Lookup the schema and validate
-  const validate = validator.getSchema(schemaRelPath);
+  // Lets see if we in a schema directory instead
+  const directorySchema = `${path.dirname(exampleRelPath)}.schema.json`;
+  let validate = validator.getSchema(directorySchema);
+
+  if (validate === undefined) {
+    validate = validator.getSchema(schemaRelPath);
+  } else {
+    schemaRelPath = directorySchema;
+  }
+
+  if (validate === undefined) {
+    console.log(`While checking: ${examplePath}, failed to load: ${schemaRelPath}`);
+    return false;
+  }
+
   const valid = validate(data);
 
-  if (!valid) {
-    console.log(`Fail: ${examplePath}`);
+  if (expectGood) {
+    if (!valid) {
+      console.log(`Schema: ${schemaRelPath}`);
+      console.log(`${examplePath}:0: failed to validate`);
+      console.log(validate.errors);
+    } else {
+      console.log(`Pass: ${examplePath}`);
+    }
+
+    return valid;
+  }
+
+  // expectGood == false
+  if (valid) {
     console.log(`Schema: ${schemaRelPath}`);
-    console.log(validate.errors);
+    console.log(`${examplePath}:0: validated when it should not have`);
   } else {
     console.log(`Pass: ${examplePath}`);
   }
-
-  return valid;
+  return !valid;
 }
