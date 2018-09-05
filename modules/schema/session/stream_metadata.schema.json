@@ -14,7 +14,8 @@
       "type": "array",
       "items": {
         "$ref": "https://xviz.org/schema/style/class.json"
-      }
+      },
+      "additionalItems": false
     }
   },
   "required": [],

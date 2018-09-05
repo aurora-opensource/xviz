@@ -1,0 +1,7 @@
+{
+  "type": "stadium",
+  "object_id": "123",
+  "start": [9, 15, 3],
+  "end": [20, 13, 3],
+  "radius_m": 2.5
+}

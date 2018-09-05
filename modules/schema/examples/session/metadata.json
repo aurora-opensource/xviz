@@ -32,5 +32,15 @@
   },
   "stream_aliases": {
     "/data/velocity": "/velocity"
+  },
+  "ui_config": {
+    "Metrics": {
+      "name": "Metrics",
+      "needed_streams": [
+        "/velocity"
+      ],
+      "config": {
+      }
+    }
   }
 }
