@@ -1,23 +1,13 @@
-/* eslint-disable camelcase */
 import {setXvizConfig, parseStreamLogData, LOG_STREAM_MESSAGE} from '@xviz/parser';
 
 import tape from 'tape-catch';
 import xvizStreamMessages from 'test-data/xviz-stream';
 
+// xviz data uses snake_case
+/* eslint-disable camelcase */
+
 // Metadata is the first message
 const TestMetadataMessage = xvizStreamMessages[0];
-
-// const metadata = {
-//   type: 'metadata',
-//   start_time: 1194278450.6,
-//   end_time: 1194278451.6,
-//   streams: {},
-//   videos: {},
-//   map: {
-//     name: 'phx',
-//     entry_point: '6b9d0916d69943c9d88d2703e72021f5'
-//   }
-// };
 
 // Metadata missing normal start_time and end_time
 // but with the full log timing fields

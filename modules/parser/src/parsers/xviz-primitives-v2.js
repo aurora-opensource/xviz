@@ -7,6 +7,7 @@ export default {
     category: PRIMITIVE_CAT.FEATURE,
     validate: primitive => true
   },
+  // eslint-disable-next-line camelcase
   tree_table: {
     category: PRIMITIVE_CAT.COMPONENT,
     validate: primitive => true

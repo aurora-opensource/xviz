@@ -1,4 +1,4 @@
-/* eslint-disable max-depth */
+// eslint-disable-next-line max-params
 export function normalizeXvizPrimitive(
   PRIMITIVE_PROCCESSOR,
   primitive,
@@ -56,4 +56,3 @@ export function normalizeXvizPrimitive(
 
   return primitive;
 }
-/* eslint-enable max-depth */
