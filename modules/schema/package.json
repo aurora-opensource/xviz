@@ -9,6 +9,7 @@
   "dependencies": {
     "ajv": "^6.5.2",
     "ajv-cli": "^3.0.0",
+    "jsonlint": "^1.6.3",
     "walk": "^2.3.14"
   },
   "scripts": {
