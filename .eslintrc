@@ -1,6 +1,5 @@
 {
-  "plugins": [
-  ],
+  "parser": "babel-eslint",
   "extends": [
     "uber-es2015",
     "prettier"
