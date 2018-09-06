@@ -12,7 +12,7 @@
     "walk": "^2.3.14"
   },
   "scripts": {
-    "build": "echo \"No transpilation needed\"",
+    "build": "echo \"No transpilation needed for @xviz/schema\"",
     "check": "node validate.js"
   },
   "private": true
