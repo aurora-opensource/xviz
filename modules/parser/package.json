@@ -23,10 +23,11 @@
   },
   "scripts": {
     "clean": "rm -fr dist && mkdir -p dist",
-    "build-es6": "BABEL_ENV=es6 babel src --out-dir dist/es6 --source-maps --ignore 'node_modules/'",
-    "build-esm": "BABEL_ENV=esm babel src --out-dir dist/esm --source-maps --ignore 'node_modules/'",
-    "build-es5": "BABEL_ENV=es5 babel src --out-dir dist/es5 --source-maps --ignore 'node_modules/'",
-    "build": "npm run clean && npm run build-es6 && npm run build-esm && npm run build-es5"
+    "build-es6": "BABEL_ENV=es6 babel src --config-file ../../babel.config.js --out-dir dist/es6 --source-maps --ignore 'node_modules/'",
+    "build-esm": "BABEL_ENV=esm babel src --config-file ../../babel.config.js --out-dir dist/esm --source-maps --ignore 'node_modules/'",
+    "build-es5": "BABEL_ENV=es5 babel src --config-file ../../babel.config.js --out-dir dist/es5 --source-maps --ignore 'node_modules/'",
+    "build": "npm run clean && npm run build-es6 && npm run build-esm && npm run build-es5",
+    "cover": "NODE_ENV=test BABEL_ENV=cover npx nyc node ../../test/start.js cover"
   },
   "engines": {
     "node": ">= 8",

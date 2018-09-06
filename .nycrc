@@ -3,15 +3,9 @@
   "sourceMap": false,
   "instrument": false,
   "include": [
-    "src/**/*.js"
+    "modules/**/*.js"
   ],
   "exclude": [
     "test/**/*.js"
-  ],
-  "reporter": [
-    "lcov",
-    "html",
-    "text",
-    "cobertura"
   ]
 }
