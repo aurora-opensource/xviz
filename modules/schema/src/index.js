@@ -5,6 +5,8 @@ import * as path from 'path';
 import * as walk from 'walk';
 import * as fs from 'fs';
 
+import {parse as jsonlintParse} from 'jsonlint';
+
 // See: https://github.com/epoberezkin/ajv/issues/687
 const Ajv = require('ajv');
 
@@ -28,6 +30,13 @@ export function validateInvalidFiles(schemaDir, invalidDir) {
   return valid;
 }
 
+class ParseError extends Error {
+  constructor(...args) {
+    super(...args);
+    Error.captureStackTrace(this, ParseError);
+  }
+}
+
 function loadAllSchemas(validator, schemaDir) {
   let valid = true;
   const schemaOptions = {
@@ -41,8 +50,13 @@ function loadAllSchemas(validator, schemaDir) {
           try {
             loadSchema(validator, schemaDir, relPath);
           } catch (e) {
-            console.log(`${fullPath}:0: error loading ${e}`);
-            valid = false;
+            if (e instanceof ParseError) {
+              valid = false;
+              console.log(`${e.message}`);
+            } else {
+              console.log(`${fullPath}:0: error loading ${e.message}`);
+              valid = false;
+            }
           }
         }
         next();
@@ -61,14 +75,7 @@ function loadSchema(validator, schemaDir, relativePath) {
 
   console.log(`Load: ${relativePath}`);
 
-  let schema;
-  try {
-    const schemaContents = fs.readFileSync(schemaPath);
-
-    schema = JSON.parse(schemaContents);
-  } catch (e) {
-    throw new Error(`Error parsing: ${schemaPath} ${e}`);
-  }
+  const schema = parseJSONFile(schemaPath);
 
   validator.addSchema(schema, relativePath);
 }
@@ -84,8 +91,13 @@ function validateFiles(validator, examplesDir, expectGood) {
           try {
             valid = valid & validateFile(validator, examplesDir, examplePath, expectGood);
           } catch (e) {
-            console.log(`${examplePath}:0: error validating: ${e}`);
-            valid = false;
+            if (e instanceof ParseError) {
+              valid = false;
+              console.log(`${e.message}`);
+            } else {
+              console.log(`${examplePath}:0: error validating: ${e.message}`);
+              valid = false;
+            }
           }
         }
         next();
@@ -104,13 +116,7 @@ function validateFile(validator, examplesDir, examplePath, expectGood) {
   let schemaRelPath = exampleRelPath.replace('.json', '.schema.json');
 
   // Load the JSON to validate
-  const contents = fs.readFileSync(examplePath);
-  let data;
-  try {
-    data = JSON.parse(contents);
-  } catch (e) {
-    throw new Error(`Error parsing: examplePath} ${e}`);
-  }
+  const data = parseJSONFile(examplePath);
 
   // Lookup the schema and validate
   // Lets see if we in a schema directory instead
@@ -150,4 +156,30 @@ function validateFile(validator, examplesDir, examplePath, expectGood) {
     console.log(`Pass: ${examplePath}`);
   }
   return !valid;
+}
+
+function parseJSONFile(filePath) {
+  const contents = fs.readFileSync(filePath, 'utf8');
+
+  let data;
+  try {
+    data = JSON.parse(contents);
+  } catch (e) {
+    try {
+      jsonlintParse(contents);
+    } catch (egood) {
+      // Ugly hack to get the line number out of the jsonlint error
+      const lineRegex = /line ([0-9]+)/g;
+      const results = lineRegex.exec(egood.message);
+      let line = 0;
+      if (results !== null) {
+        line = parseInt(results[1], 10);
+      }
+
+      // Return the best error we can
+      throw new ParseError(`${filePath}:${line}: ${egood}`);
+    }
+  }
+
+  return data;
 }
