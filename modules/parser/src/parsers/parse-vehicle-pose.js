@@ -64,7 +64,7 @@ export function getTransformsFromPose(vehiclePose) {
       origin: [longitude, latitude, altitude],
       vehicleRelativeTransform,
       trackPosition,
-      heading: pose.yaw / Math.PI * 180
+      heading: (pose.yaw / Math.PI) * 180
     };
   }
 
