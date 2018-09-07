@@ -132,7 +132,7 @@ UI configuration that comes with the data explaining how best to display it.
 | Name             | Type              | Description |
 | ---              | ---               | --- |
 | `name`           | `string`          | Unique name for the panel |
-| `needed_strings` | `list<stream_id>` | What streams are needed to populate this panel. |
+| `needed_streams` | `list<stream_id>` | What streams are needed to populate this panel. |
 | `config`         | `declarative_ui`  | Declarative UI panel configuration |
 
 **declarative_ui** - currently unspecified

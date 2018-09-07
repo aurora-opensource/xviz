@@ -1,0 +1,7 @@
+{
+    "timestamp": 12345.5,
+    "values": [
+        ["/vehicle/torque/commanded", 5],
+        ["/vehicle/torque/actual", 4.8]
+    ]
+}

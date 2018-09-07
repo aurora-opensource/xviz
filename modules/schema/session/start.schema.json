@@ -1,0 +1,34 @@
+{
+  "$id": "https://xviz.org/schema/session/start.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "XVIZ Session Start",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(-(0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(\\.(0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*)?(\\+[0-9a-zA-Z-]+(\\.[0-9a-zA-Z-]+)*)?$"
+    },
+    "profile": {
+      "type": "string"
+    },
+    "session_type": {
+      "type": "string",
+      "enum": [
+        "live",
+        "log",
+        "unbuffered_log"
+      ]
+    },
+    "message_format": {
+      "type": "string",
+      "enum": [
+        "json",
+        "binary"
+      ]
+    }
+  },
+  "required": [
+    "version"
+  ],
+  "additionalProperties": false
+}

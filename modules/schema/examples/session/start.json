@@ -1,0 +1,6 @@
+{
+  "version": "2.0.0",
+  "profile": "basic",
+  "session_type": "log",
+  "message_format": "json"
+}

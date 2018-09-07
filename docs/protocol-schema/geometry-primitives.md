@@ -4,7 +4,7 @@ The geometry primitives currently supported in XVIZ are:
 
 * `point`
 * `polygon`
-* `polyLine`
+* `polyline`
 * `circle`
 * `stadium`
 * `text`
@@ -147,7 +147,7 @@ This is a pure JSON example, for efficiency reasons you would normally use the b
 {
     "type": "image,
     "position": [9, 15, 3],
-    "data": "/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k="
+    "data": "/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=",
     "width_px": 1280,
     "height_px": 720
 }

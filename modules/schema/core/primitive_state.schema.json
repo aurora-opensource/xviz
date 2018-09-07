@@ -8,14 +8,7 @@
       "type": "string"
     },
     "primitives": {
-      "type": "array",
-      "additionalItems": false,
-      "items": {
-        "oneOf": [
-          {"$ref": "https://xviz.org/schema/primitives/point.json"},
-          {"$ref": "https://xviz.org/schema/primitives/circle.json"}
-        ]
-      }
+      "$ref": "https://xviz.org/schema/core/_primitive_list.schema.json"
     }
   },
   "required": [ "name", "primitives" ],
