@@ -96,7 +96,7 @@ This is a single cohesive set of streams which all happened at the same time and
 
 This is what a full stream set would look like populated with a basic example of each element:
 
-```
+``` json
 {
     "timestamp": 1001.3,
     "primitives": [
@@ -129,6 +129,30 @@ Future instances are used to provide lookahead world states for a given instant.
 | `timestamps` | `list<timestamp>`       | A list of timestamps in the future |
 | `primitives` | `list<list<primitive>>` | A list of primitives for each timestamp |
 
+``` json
+{
+  "name": "/prediction/points",
+  "timestamps": [1.0, 1.1, 1.2],
+  "primitives": [
+    [
+      {
+        "points": [[1, 2, 3]]
+      }
+    ],
+    [
+      {
+        "points": [[1.5, 2, 3]]
+      }
+    ],
+    [
+      {
+        "points": [[2, 2, 3]]
+      }
+    ]
+  ]
+}
+```
+
 
 ## Primitive State
 
@@ -139,6 +163,17 @@ Future instances are used to provide lookahead world states for a given instant.
 | `name`       | `stream_id`       |   |
 | `primitives` | `list<primitive>` | Primitives to draw |
 
+``` json
+{
+    "name": "/foo",
+    "primitives": [
+        {
+            "points": [[1, 2, 3]]
+        }
+    ]
+}
+
+```
 
 ## Variable State
 
@@ -159,23 +194,10 @@ Each stream would contain the same number of values and then the velocity and je
 
 As an example a complete [`stream_set`](/docs/protocol-schema/core-protocol.md#stream-set), containing the above variables would look like:
 
-```
+``` json
 {
-    "timestamp": 1001.3,
-    "variables": [
-        {
-            "name": "/plan/time",
-            "values": [1001.3, 1002.3, 1003.3]
-        },
-                {
-            "name": "/plan/velocity",
-            "values": [2.2, 2.33, 2.54]
-        },
-        {
-            "name": "/plan/jerk",
-            "values": [0.1, 0.15, 0.05]
-        },
-    ]
+    "name": "/plan/time",
+    "values": [1001.3, 1002.3, 1003.3]
 }
 ```
 
@@ -184,23 +206,23 @@ As an example a complete [`stream_set`](/docs/protocol-schema/core-protocol.md#s
 
 This models a set of values that changes each time a data is transformed. These are used to provide instantaneous data for a moment in time. These are not used for representing the values of functions in the future. For that you would want to use Variable States.
 
-Here is an example `time_series_state` for a system producing multiple values at a specific time:
-
-```
-{
-    "timestamp": 12345.5,
-    "values": [
-        ["/vehicle/torque/commanded", 5],
-        ["/vehicle/torque/actual", 4.8],
-    ]
-}
-```
-
 | Name        | Type                       | Description |
 | ---         | ---                        | --- |
 | `timestamp` | `timestamp`                | The vehicle/log transmission\_time associated with this data. |
 | `values`    | `list<{stream_id, value}>` | Number/string/whatever |
 | `id`        | `optional<object_id>`      | Associated object, optional |
+
+Here is an example `time_series_state` for a system producing multiple values at a specific time:
+
+``` json
+{
+    "timestamp": 12345.5,
+    "values": [
+        ["/vehicle/torque/commanded", 5],
+        ["/vehicle/torque/actual", 4.8]
+    ]
+}
+```
 
 
 ## Point3D

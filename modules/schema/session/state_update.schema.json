@@ -13,10 +13,11 @@
     },
     "updates": {
       "type": "array",
-      "minItems": 1,
       "items": {
         "$ref": "https://xviz.org/schema/core/stream_set.json"
-      }
+      },
+      "minItems": 1,
+      "additionalItems": false
     }
   },
   "required": [ "update_type", "updates" ],

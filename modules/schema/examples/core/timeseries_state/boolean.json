@@ -1,0 +1,7 @@
+{
+    "timestamp": 12345.5,
+    "values": [
+        ["/vehicle/stationary", false],
+        ["/vehicle/active", true]
+    ]
+}

@@ -12,7 +12,8 @@
       "minimum": 0,
       "maximum": 255,
       "minItems": 4,
-      "maxItems": 4
+      "maxItems": 4,
+      "additionalItems": false
     },
     "thickness_m": {
       "type": "number"

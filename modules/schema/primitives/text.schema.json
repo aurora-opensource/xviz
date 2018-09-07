@@ -1,22 +1,22 @@
 {
-  "$id": "https://xviz.org/schema/primitives/circle.json",
+  "$id": "https://xviz.org/schema/primitives/text.json",
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "description": "XVIZ Point primitive",
+  "description": "XVIZ Text primitive",
   "allOf": [{ "$ref": "https://xviz.org/schema/core/primitive_base.json" }],
   "properties": {
     "object_id": {},
     "style": {},
     "classes": {},
     "type": {
-      "enum": ["circle"]
+      "enum": ["text"]
     },
-    "center": {
+    "position": {
       "$ref": "https://xviz.org/schema/math/vector3x1.json"
     },
-    "radius_m": {
-      "type": "number"
+    "text": {
+      "type": "string"
     }
   },
-  "required": [ "center", "radius_m" ],
+  "required": [ "position", "text" ],
   "additionalProperties": false
 }

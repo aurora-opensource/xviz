@@ -24,6 +24,21 @@
       "additionalProperties": {
         "type": "string"
       }
+    },
+    "ui_config": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "https://xviz.org/schema/session/ui_panel_info.json"
+      }
+    },
+    "log_info": {
+      "type": "object"
+    },
+    "map_info": {
+      "type": "object"
+    },
+    "vehicle_info": {
+      "type": "object"
     }
   },
   "required": [

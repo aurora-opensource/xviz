@@ -9,10 +9,11 @@
     },
     "primitives": {
       "type": "array",
-      "minItems": 1,
       "items": {
         "$ref": "https://xviz.org/schema/core/primitive_state.json"
-      }
+      },
+      "minItems": 1,
+      "additionalItems": false
     }
   },
   "required": [
