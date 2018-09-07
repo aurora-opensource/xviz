@@ -16,7 +16,7 @@ export default class SDV extends BaseObject {
   }
 
   get isValid() {
-    return this.xvizLog;
+    return Boolean(this.xvizLog);
   }
 
   get position() {

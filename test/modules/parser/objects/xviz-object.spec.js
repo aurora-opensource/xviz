@@ -1,7 +1,5 @@
 import {XvizObject} from '@xviz/parser';
 
-import {} from '@xviz/parser';
-
 import test from 'tape-catch';
 
 test('XvizObject#static methods', t => {

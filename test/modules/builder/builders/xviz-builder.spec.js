@@ -1,6 +1,6 @@
 /* eslint-disable */
 import test from 'tape-catch';
-import {XVIZBuilder, XVIZMetadataBuilder} from '@xviz/builder';
+import {XVIZBuilder} from '@xviz/builder';
 
 function almostEqual(a, b, tolerance = 0.00001) {
   return Math.abs(a - b) < tolerance;
@@ -38,7 +38,7 @@ test('XVIZBuilder#polygon', t => {
     ]
   };
 
-  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder polygon does not match expected output');
+  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder polygon matches expected output');
   t.end();
 });
 
@@ -69,7 +69,7 @@ test('XVIZBuilder#polyline', t => {
     ]
   };
 
-  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder polyline does not match expected output');
+  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder polyline matches expected output');
   t.end();
 });
 
@@ -101,7 +101,7 @@ test('XVIZBuilder#circle', t => {
   };
 
   console.log(JSON.stringify(builder.getFrame()));
-  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder circle does not match expected output');
+  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder circle matches expected output');
   t.end();
 });
 
@@ -133,7 +133,7 @@ test('XVIZBuilder#text', t => {
     ]
   };
 
-  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder text does not match expected output');
+  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder text matches expected output');
   t.end();
 });
 
@@ -165,6 +165,6 @@ test('XVIZBuilder#stadium', t => {
     ]
   };
 
-  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder stadium does not match expected output');
+  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder stadium matches expected output');
   t.end();
 });
