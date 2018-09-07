@@ -13,7 +13,8 @@
       "items": {
         "type": "number",
         "minimum": 0
-      }
+      },
+      "additionalItems": false
     },
     "primitives": {
       "type": "array",
