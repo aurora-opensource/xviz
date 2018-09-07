@@ -1,19 +1,19 @@
 {
-  "$id": "https://xviz.org/schema/primitives/point.json",
+  "$id": "https://xviz.org/schema/primitives/polygon.json",
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "description": "XVIZ Point primitive",
+  "description": "XVIZ Polygon primitive",
   "allOf": [{ "$ref": "https://xviz.org/schema/core/primitive_base.json" }],
   "properties": {
     "object_id": {},
     "style": {},
     "classes": {},
     "type": {
-      "enum": ["point"]
+      "enum": ["polygon"]
     },
-    "points": {
+    "vertices": {
       "$ref": "https://xviz.org/schema/math/point3d_list.schema.json"
     }
   },
-  "required": [ "points" ],
+  "required": [ "vertices" ],
   "additionalProperties": false
 }

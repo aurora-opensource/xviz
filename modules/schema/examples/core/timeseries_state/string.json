@@ -1,0 +1,6 @@
+{
+    "timestamp": 12345.5,
+    "values": [
+        ["/vehicle/mode", "moving"]
+    ]
+}

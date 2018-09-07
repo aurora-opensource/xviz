@@ -1,0 +1,5 @@
+{
+  "type": "polyline",
+  "object_id": "foo",
+  "vertices": [[0, 0, 0], [1, 2, 0], [2, 3, 0]]
+}
