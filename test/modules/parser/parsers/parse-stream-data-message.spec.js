@@ -1,13 +1,10 @@
 import {setXvizConfig, parseStreamLogData, LOG_STREAM_MESSAGE} from '@xviz/parser';
 
 import tape from 'tape-catch';
-import xvizStreamMessages from 'test-data/xviz-stream';
+import TestMetadataMessage from 'test-data/sample-metadata-message';
 
 // xviz data uses snake_case
 /* eslint-disable camelcase */
-
-// Metadata is the first message
-const TestMetadataMessage = xvizStreamMessages[0];
 
 // Metadata missing normal start_time and end_time
 // but with the full log timing fields
