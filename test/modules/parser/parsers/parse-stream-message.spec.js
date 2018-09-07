@@ -15,7 +15,6 @@
 import {setXvizConfig, parseStreamMessage} from '@xviz/parser';
 
 import tape from 'tape-catch';
-// import xvizStreamMessages from 'test-data/xviz-stream';
 
 // xviz data uses snake_case
 /* eslint-disable camelcase */
