@@ -50,8 +50,8 @@ export {default as lidarPointCloudWorker} from './workers/lidar-point-cloud-work
 export {default as streamDataWorker} from './workers/stream-data-worker';
 
 // LOADERS
-
-export {parseBinaryXVIZ} from './loaders/xviz-loader';
+// Public methods
+export {parseBinaryXVIZ} from './loaders/xviz-loader/xviz-binary-loader';
 export {parseGLB, _GLBDecoder, _unpackGLBBuffers, _unpackJsonArrays} from './loaders/glb-loader';
 
 export {default as PLYParser} from './loaders/ply-loader/ply-parser';

@@ -12,15 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// UTILS
-export {loadUri} from './utils/load-uri.js';
+import {SDV} from '@xviz/parser';
 
-// WRITERS
-export {encodeGLB, _GLBEncoder, _GLBBufferPacker, _packJsonArrays} from './writers/glb-writer';
+import test from 'tape-catch';
 
-export {encodeBinaryXVIZ} from './writers/xviz-writer/xviz-binary-writer';
-export {default as XVIZWriter} from './writers/xviz-writer/xviz-writer';
+const LOG = {
+  carPosition: [10, 10, 10],
+  heading: 90
+};
 
-// BUILDERS
-export {default as XVIZBuilder} from './builders/xviz-builder';
-export {default as XVIZMetadataBuilder} from './builders/xviz-metadata-builder';
+test('SDV#methods', t => {
+  const object = new SDV({vehicleLog: LOG});
+  t.ok(object, 'construction ok');
+  t.equal(object.isValid, true, 'getter equal');
+  t.ok(object.position, 'getter ok');
+  t.ok(Number.isFinite(object.bearing), 'getter ok');
+  t.end();
+});
