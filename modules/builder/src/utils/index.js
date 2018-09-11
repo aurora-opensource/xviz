@@ -14,3 +14,5 @@ export {flattenToTypedArray} from './flatten';
 
 // Test utility (TODO - misplaced)
 export {toLowPrecision} from './to-low-precision';
+
+export {insertTimestamp} from './sort';
