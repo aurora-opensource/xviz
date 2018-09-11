@@ -168,3 +168,65 @@ test('XVIZBuilder#stadium', t => {
   t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder stadium matches expected output');
   t.end();
 });
+
+test('XVIZBuilder#variable', t => {
+  const builder = new XVIZBuilder();
+  const ts = 1.0;
+
+  builder
+    .pose({time: ts})
+    .stream('/test/variables')
+    .timestamps([ts])
+    .values([2.0])
+    .type('double');
+
+  const expected = {
+    vehicle_pose: {time: ts},
+    state_updates: [
+      {
+        timestamp: ts,
+        variables: {
+          '/test/variables': {
+            values: [2.0],
+            timestamps: [ts],
+            type: 'double'
+          }
+        }
+      }
+    ]
+  };
+
+  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder variable matches expected output');
+  t.end();
+});
+
+test('XVIZBuilder#time_series', t => {
+  const builder = new XVIZBuilder();
+  const ts = 1.0;
+
+  builder
+    .pose({time: ts})
+    .stream('/test/time_series')
+    .timestamp(ts)
+    .value(2.0)
+    .type('double');
+
+  const expected = {
+    vehicle_pose: {time: ts},
+    state_updates: [
+      {
+        timestamp: ts,
+        variables: {
+          '/test/time_series': {
+            values: [2.0],
+            timestamps: [ts],
+            type: 'double'
+          }
+        }
+      }
+    ]
+  };
+
+  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder time_series matches expected output');
+  t.end();
+});

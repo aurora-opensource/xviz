@@ -17,6 +17,13 @@ const PRIMITIVE_TYPES = {
   image: 'image'
 };
 
+const VARIABLE_TYPES = {
+  double: 'double',
+  integer: 'integer',
+  string: 'string',
+  boolean: 'boolean'
+};
+
 const requiredProps = ['streamId', '_category', '_type'];
 
 /* global console */
@@ -77,12 +84,12 @@ export default class XVIZBuilder {
     return this;
   }
 
-  // single is ts, multiple is variable
-  timestamp(ts) {
+  // single is time_series, multiple is variable
+  timestamp(timestamp) {
     this._validateStreamId();
-    this._validatePropSetOnce('_ts');
+    this._validatePropSetOnce('_timestamps');
 
-    this._ts = ts;
+    this._timestamps = [timestamp];
     return this;
   }
 
@@ -92,12 +99,47 @@ export default class XVIZBuilder {
     this._validatePropSetOnce('_category');
 
     this._values.push(value);
+    this._category = CATEGORY.time_series;
+
+    return this;
+  }
+
+  timestamps(timestamps) {
+    if (!(timestamps instanceof Array)) {
+      this._validateError('timestamps should be array');
+    }
+    this._validateStreamId();
+    this._validatePropSetOnce('_timestamps');
+
+    this._timestamps = timestamps;
+
+    return this;
+  }
+
+  values(values) {
+    if (!(values instanceof Array)) {
+      this._validateError('values should be array');
+    }
+    this._validateStreamId();
+    this._validatePropSetOnce('_values');
+    this._validatePropSetOnce('_category');
+
+    this._values = values;
     this._category = CATEGORY.variable;
 
-    // TODO: hack
-    this._type = 'float';
+    return this;
+  }
 
-    // int, float, string, boolean
+  type(type) {
+    this._validateStreamId();
+    this._validatePropSetOnce('_type');
+
+    if (!VARIABLE_TYPES[type]) {
+      this._validateWarn(`Unrecognized type ${type} for stream ${this.streamId}`);
+    }
+
+    this._type = type;
+
     return this;
   }
 
@@ -300,9 +342,22 @@ export default class XVIZBuilder {
       }
     }
 
-    // validate variable
-    if (this._category === CATEGORY.variable && this._values.length === 0) {
-      this._validateWarn(`Stream${this.streamId} variable value(s) are not provided.`);
+    // validate variable and time_series
+    if (this._category === CATEGORY.variable || this._category === CATEGORY.time_series) {
+      if (this._values.length === 0) {
+        this._validateWarn(`Stream${this.streamId} value(s) are not provided.`);
+      }
+      if (this._timestamps.length === 0) {
+        this._validateWarn(`Stream${this.streamId} timestamp are not provided.`);
+      }
+      if (this._values.length !== this._timestamps.length) {
+        this._validateWarn(
+          `Stream${this.streamId} length of values and length of timestamps are not equal.`
+        );
+      }
+      if (!this._type) {
+        this._validateWarn(`Stream${this.streamId} type is not provided.`);
+      }
     }
 
     // validate based on metadata
@@ -325,13 +380,13 @@ export default class XVIZBuilder {
     this._validate();
 
     if (this.streamId && !this.disableStreams.includes(this.streamId)) {
-      if (this._category === CATEGORY.variable) {
+      if (this._category === CATEGORY.variable || this._category === CATEGORY.time_series) {
         if (!this._data.variables) {
           this._data.variables = {};
         }
 
         const obj = {
-          timestamps: [this._ts],
+          timestamps: this._timestamps,
           values: this._values,
           type: this._type
         };
@@ -401,7 +456,7 @@ export default class XVIZBuilder {
     this._vertices = null;
     this._values = [];
     this._image = null;
-    this._ts = null;
+    this._timestamps = null;
     this._category = null;
     this._type = null;
     this._id = null;
