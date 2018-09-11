@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/* global URL, Blob */
 import {filterVertices} from './filter-vertices';
 import {PRIMITIVE_CAT} from './parse-xviz-stream';
 
@@ -59,5 +60,15 @@ export default {
   point: {
     category: PRIMITIVE_CAT.POINTCLOUD,
     validate: (primitive, streamName, time) => primitive.vertices && primitive.vertices.length > 0
+  },
+  image: {
+    category: PRIMITIVE_CAT.IMAGE,
+    validate: (primitive, streamName, time) => primitive.data,
+    normalize: primitive => {
+      const arrayBuffer = primitive.data;
+      const imgType = primitive.format ? `image/${primitive.format}` : null;
+      const blob = new Blob([arrayBuffer], {type: imgType});
+      primitive.imageUrl = URL.createObjectURL(blob);
+    }
   }
 };

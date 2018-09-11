@@ -20,7 +20,8 @@ export const PRIMITIVE_CAT = {
   FEATURE: 'features',
   LABEL: 'labels',
   POINTCLOUD: 'pointCloud',
-  COMPONENT: 'components'
+  COMPONENT: 'components',
+  IMAGE: 'images'
 };
 
 function createPrimitiveMap() {
