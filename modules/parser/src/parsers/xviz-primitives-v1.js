@@ -80,6 +80,7 @@ export default {
   },
   circle: {
     category: PRIMITIVE_CAT.FEATURE,
+    enableZOffset: true,
     validate: (primitive, streamName, time) => primitive.vertices && primitive.vertices.length > 0
   },
   circle2d: {
