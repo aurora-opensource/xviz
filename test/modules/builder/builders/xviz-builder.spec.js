@@ -100,7 +100,6 @@ test('XVIZBuilder#circle', t => {
     ]
   };
 
-  console.log(JSON.stringify(builder.getFrame()));
   t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder circle matches expected output');
   t.end();
 });

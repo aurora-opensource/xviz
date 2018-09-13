@@ -322,6 +322,8 @@ export default class XVIZBuilder {
     if (types.length === 1) {
       return types[0];
     } else if (
+      // javascript treat 2.0 as 2 (Integer), 1.1 as float
+      // so if list of value has both `float` and `integer`, consider as `float`
       types.length === 2 &&
       types.join(',') === [VARIABLE_TYPES.float, VARIABLE_TYPES.integer].join(',')
     ) {
@@ -341,7 +343,6 @@ export default class XVIZBuilder {
     } else if (type === 'boolean') {
       return VARIABLE_TYPES.boolean;
     } else if (type === 'number') {
-      // javascript treat 2.0 as 2 (Integer)
       if (Number.isInteger(value)) {
         return VARIABLE_TYPES.integer;
       }
