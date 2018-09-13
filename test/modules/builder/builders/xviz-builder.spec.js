@@ -171,25 +171,25 @@ test('XVIZBuilder#stadium', t => {
 
 test('XVIZBuilder#variable', t => {
   const builder = new XVIZBuilder();
-  const ts = 1.0;
+  const ts1 = 1.0;
+  const ts2 = 2.0;
 
   builder
-    .pose({time: ts})
+    .pose({time: ts1})
     .stream('/test/variables')
-    .timestamps([ts])
-    .values([2.0])
-    .type('double');
+    .timestamps([ts1, ts2])
+    .values([1.1, 2.0]);
 
   const expected = {
-    vehicle_pose: {time: ts},
+    vehicle_pose: {time: ts1},
     state_updates: [
       {
-        timestamp: ts,
+        timestamp: ts1,
         variables: {
           '/test/variables': {
-            values: [2.0],
-            timestamps: [ts],
-            type: 'double'
+            values: [1.1, 2.0],
+            timestamps: [ts1, ts2],
+            type: 'float'
           }
         }
       }
@@ -208,8 +208,7 @@ test('XVIZBuilder#time_series', t => {
     .pose({time: ts})
     .stream('/test/time_series')
     .timestamp(ts)
-    .value(2.0)
-    .type('double');
+    .value(2.0);
 
   const expected = {
     vehicle_pose: {time: ts},
@@ -220,7 +219,7 @@ test('XVIZBuilder#time_series', t => {
           '/test/time_series': {
             values: [2.0],
             timestamps: [ts],
-            type: 'double'
+            type: 'integer'
           }
         }
       }

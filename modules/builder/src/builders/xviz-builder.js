@@ -18,7 +18,7 @@ const PRIMITIVE_TYPES = {
 };
 
 const VARIABLE_TYPES = {
-  double: 'double',
+  float: 'float',
   integer: 'integer',
   string: 'string',
   boolean: 'boolean'
@@ -84,8 +84,10 @@ export default class XVIZBuilder {
     return this;
   }
 
-  // single is time_series, multiple is variable
   timestamp(timestamp) {
+    if (timestamp instanceof Array) {
+      this._validateError('Input should be a single value');
+    }
     this._validateStreamId();
     this._validatePropSetOnce('_timestamps');
 
@@ -94,12 +96,16 @@ export default class XVIZBuilder {
   }
 
   value(value) {
+    if (value instanceof Array) {
+      this._validateError('Input should be single value');
+    }
     this._validateStreamId();
     this._validatePropSetOnce('_values');
     this._validatePropSetOnce('_category');
 
     this._values.push(value);
     this._category = CATEGORY.time_series;
+    this._type = this._getValueType(value);
 
     return this;
   }
@@ -126,19 +132,7 @@ export default class XVIZBuilder {
 
     this._values = values;
     this._category = CATEGORY.variable;
-
-    return this;
-  }
-
-  type(type) {
-    this._validateStreamId();
-    this._validatePropSetOnce('_type');
-
-    if (!VARIABLE_TYPES[type]) {
-      this._validateWarn(`Unrecognized type ${type} for stream ${this.streamId}`);
-    }
-
-    this._type = type;
+    this._type = this._getValuesType(values);
 
     return this;
   }
@@ -319,6 +313,43 @@ export default class XVIZBuilder {
     if (!this.streamId) {
       this._validateError('A stream must be set first.');
     }
+  }
+
+  _getValuesType(values) {
+    let types = values.map(v => this._getValueType(v));
+    types = Array.from(new Set(types)).sort();
+
+    if (types.length === 1) {
+      return types[0];
+    } else if (
+      types.length === 2 &&
+      types.join(',') === [VARIABLE_TYPES.float, VARIABLE_TYPES.integer].join(',')
+    ) {
+      return VARIABLE_TYPES.float;
+    }
+
+    this._validateError(
+      `Values type ${types.join(',')} are not consistent for stream ${this.streamId}`
+    );
+    return null;
+  }
+
+  _getValueType(value) {
+    const type = typeof value;
+    if (type === 'string') {
+      return VARIABLE_TYPES.string;
+    } else if (type === 'boolean') {
+      return VARIABLE_TYPES.boolean;
+    } else if (type === 'number') {
+      // javascript treat 2.0 as 2 (Integer)
+      if (Number.isInteger(value)) {
+        return VARIABLE_TYPES.integer;
+      }
+      return VARIABLE_TYPES.float;
+    }
+
+    this._validateError(`Unsupported type ${type} for stream ${this.streamId}`);
+    return null;
   }
 
   // eslint-disable-next-line complexity
