@@ -444,7 +444,7 @@ export default class XVIZBuilder {
 
   _formatVariable() {
     return {
-      timestamps: [this._ts],
+      timestamps: this._timestamps,
       values: this._values,
       type: this._type
     };
@@ -496,7 +496,7 @@ export default class XVIZBuilder {
   }
 
   _isFuture() {
-    return this._category === CATEGORY.primitive && this._ts;
+    return this._category === CATEGORY.primitive && this._timestamps;
   }
 
   _flushFutures() {
@@ -517,7 +517,7 @@ export default class XVIZBuilder {
     const {timestamps, primitives} = future;
 
     // insert ts and primitive to the position based on timestamp order
-    insertTimestamp(timestamps, primitives, this._ts, [primitive]);
+    insertTimestamp(timestamps, primitives, this._timestamps[0], [primitive]);
 
     this._resetPrimitives();
   }
@@ -551,7 +551,7 @@ export default class XVIZBuilder {
   }
 
   _resetPrimitives() {
-    this._ts = null;
+    this._timestamps = null;
     this._category = null;
 
     this._image = null;
@@ -566,7 +566,7 @@ export default class XVIZBuilder {
   }
 
   _resetVariables() {
-    this._ts = null;
+    this._timestamps = null;
     this._category = null;
 
     this._values = [];
