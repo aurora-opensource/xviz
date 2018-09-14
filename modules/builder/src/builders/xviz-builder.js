@@ -14,6 +14,7 @@
 
 // Note: XVIZ data structures use snake_case
 /* eslint-disable camelcase */
+import {insertTimestamp} from '../utils/sort';
 
 const CATEGORY = {
   time_series: 'time_series',
@@ -106,6 +107,11 @@ export default class XVIZBuilder {
     this._validatePropSetOnce('_timestamps');
 
     this._timestamps = [timestamp];
+
+    if (this._isFuture()) {
+      this._flushFutures();
+    }
+
     return this;
   }
 
@@ -164,6 +170,10 @@ export default class XVIZBuilder {
       format
     };
 
+    if (this._isFuture()) {
+      this._flushFutures();
+    }
+
     return this;
   }
 
@@ -187,6 +197,11 @@ export default class XVIZBuilder {
     this._vertices = vertices;
     this._type = PRIMITIVE_TYPES.polygon;
     this._category = CATEGORY.primitive;
+
+    if (this._isFuture()) {
+      this._flushFutures();
+    }
+
     return this;
   }
 
@@ -198,6 +213,11 @@ export default class XVIZBuilder {
     this._vertices = vertices;
     this._type = PRIMITIVE_TYPES.polyline;
     this._category = CATEGORY.primitive;
+
+    if (this._isFuture()) {
+      this._flushFutures();
+    }
+
     return this;
   }
 
@@ -209,6 +229,11 @@ export default class XVIZBuilder {
     this._vertices = vertices;
     this._type = PRIMITIVE_TYPES.point;
     this._category = CATEGORY.primitive;
+
+    if (this._isFuture()) {
+      this._flushFutures();
+    }
+
     return this;
   }
 
@@ -222,6 +247,11 @@ export default class XVIZBuilder {
     this._radius = radius;
     this._type = PRIMITIVE_TYPES.circle;
     this._category = CATEGORY.primitive;
+
+    if (this._isFuture()) {
+      this._flushFutures();
+    }
+
     return this;
   }
 
@@ -246,6 +276,11 @@ export default class XVIZBuilder {
     this._radius = radius;
     this._type = PRIMITIVE_TYPES.stadium;
     this._category = CATEGORY.primitive;
+
+    if (this._isFuture()) {
+      this._flushFutures();
+    }
+
     return this;
   }
 
@@ -421,6 +456,86 @@ export default class XVIZBuilder {
     }
   }
 
+  _formatVariable() {
+    return {
+      timestamps: this._timestamps,
+      values: this._values,
+      type: this._type
+    };
+  }
+
+  _formatPrimitives() {
+    const obj = {
+      type: this._type
+    };
+
+    switch (this._type) {
+      case 'polygon':
+      case 'polyline':
+      case 'point':
+        obj.vertices = this._vertices;
+        break;
+      case 'text':
+        obj.position = this._vertices[0];
+        obj.text = this._text;
+        break;
+      case 'circle':
+        obj.center = this._vertices[0];
+        obj.radius_m = this._radius;
+        break;
+      case 'stadium':
+        obj.start = this._vertices[0];
+        obj.end = this._vertices[1];
+        obj.radius_m = this._radius;
+        break;
+      case 'image':
+        Object.assign(obj, this._image);
+        break;
+      default:
+    }
+
+    if (this._id) {
+      obj.id = this._id;
+    }
+
+    if (this._color) {
+      obj.color = this._color;
+    }
+
+    if (this._classes) {
+      obj.classes = this._classes;
+    }
+
+    return obj;
+  }
+
+  _isFuture() {
+    return this._category === CATEGORY.primitive && this._timestamps;
+  }
+
+  _flushFutures() {
+    if (!this._data.futures) {
+      this._data.futures = {};
+    }
+    if (!this._data.futures[this.streamId]) {
+      this._data.futures[this.streamId] = {
+        name: this.streamId,
+        timestamps: [],
+        primitives: []
+      };
+    }
+
+    const future = this._data.futures[this.streamId];
+    const primitive = this._formatPrimitives();
+
+    const {timestamps, primitives} = future;
+
+    // insert ts and primitive to the position based on timestamp order
+    insertTimestamp(timestamps, primitives, this._timestamps[0], [primitive]);
+
+    this._resetPrimitives();
+  }
+
   // eslint-disable-next-line complexity
   _flush() {
     this._validate();
@@ -430,85 +545,51 @@ export default class XVIZBuilder {
         if (!this._data.variables) {
           this._data.variables = {};
         }
-
-        const obj = {
-          timestamps: this._timestamps,
-          values: this._values,
-          type: this._type
-        };
-
-        this._data.variables[this.streamId] = obj;
+        this._data.variables[this.streamId] = this._formatVariable();
       }
 
       if (this._category === CATEGORY.primitive) {
         if (!this._data.primitives) {
           this._data.primitives = {};
         }
-
-        const obj = {
-          type: this._type
-        };
-
-        switch (this._type) {
-          case 'polygon':
-          case 'polyline':
-          case 'point':
-            obj.vertices = this._vertices;
-            break;
-          case 'text':
-            obj.position = this._vertices[0];
-            obj.text = this._text;
-            break;
-          case 'circle':
-            obj.center = this._vertices[0];
-            obj.radius_m = this._radius;
-            break;
-          case 'stadium':
-            obj.start = this._vertices[0];
-            obj.end = this._vertices[1];
-            obj.radius_m = this._radius;
-            break;
-          case 'image':
-            Object.assign(obj, this._image);
-            break;
-          default:
+        if (!this._data.primitives[this.streamId]) {
+          this._data.primitives[this.streamId] = [];
         }
 
-        if (this._id) {
-          obj.id = this._id;
-        }
-
-        if (this._color) {
-          obj.color = this._color;
-        }
-
-        if (this._classes) {
-          obj.classes = this._classes;
-        }
-
-        if (this._data.primitives[this.streamId]) {
-          this._data.primitives[this.streamId].push(obj);
-        } else {
-          this._data.primitives[this.streamId] = [obj];
-        }
+        const primitiveObj = this._formatPrimitives();
+        this._data.primitives[this.streamId].push(primitiveObj);
       }
     }
 
     this._reset();
   }
 
-  _reset() {
-    this.streamId = null;
-    this._vertices = null;
-    this._values = [];
-    this._image = null;
+  _resetPrimitives() {
     this._timestamps = null;
     this._category = null;
+
+    this._image = null;
     this._type = null;
+    this._radius = null;
+    this._text = null;
+    this._vertices = null;
+
     this._id = null;
     this._color = null;
     this._classes = null;
-    this._text = null;
-    this._radius = null;
+  }
+
+  _resetVariables() {
+    this._timestamps = null;
+    this._category = null;
+
+    this._values = [];
+  }
+
+  _reset() {
+    this.streamId = null;
+
+    this._resetPrimitives();
+    this._resetVariables();
   }
 }

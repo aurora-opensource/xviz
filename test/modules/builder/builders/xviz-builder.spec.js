@@ -213,6 +213,46 @@ test('XVIZBuilder#variable', t => {
   t.end();
 });
 
+test('XVIZBuilder#futures-single-primitive', t => {
+  const builder = new XVIZBuilder();
+  const streamId = '/test/polygon';
+  const verts = [[0, 0, 0], [4, 0, 0], [4, 3, 0]];
+  const ts = 1.0;
+
+  builder
+    .pose({time: ts})
+    .stream(streamId)
+    .polygon(verts)
+    .timestamp(ts);
+
+  const expected = {
+    vehicle_pose: {time: ts},
+    state_updates: [
+      {
+        timestamp: ts,
+        futures: {
+          [streamId]: {
+            name: streamId,
+            timestamps: [ts],
+            primitives: [
+              [
+                {
+                  type: 'polygon',
+                  vertices: verts
+                }
+              ]
+            ]
+          }
+        }
+      }
+    ]
+  };
+
+  const frame = builder.getFrame();
+  t.deepEqual(frame, expected, 'XVIZBuilder single primitive futures matches expected output');
+  t.end();
+});
+
 test('XVIZBuilder#time_series', t => {
   const builder = new XVIZBuilder();
   const ts = 1.0;
@@ -224,7 +264,7 @@ test('XVIZBuilder#time_series', t => {
     .value(2.0);
 
   const expected = {
-    vehicle_pose: {time: ts},
+    vehicle_pose: { time: ts },
     state_updates: [
       {
         timestamp: ts,
@@ -239,6 +279,57 @@ test('XVIZBuilder#time_series', t => {
     ]
   };
 
-  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder time_series matches expected output');
+  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder variable matches expected output');
+  t.end();
+});
+
+test('XVIZBuilder#futures-multiple-primitive', t => {
+  const builder = new XVIZBuilder();
+  const streamId = '/test/polygon';
+
+  const verts1 = [[0, 0, 0], [4, 0, 0], [4, 3, 0]];
+  const verts2 = [[1, 2, 3], [0, 0, 0], [2, 3, 4]];
+  const ts1 = 1.0;
+  const ts2 = 2.0;
+
+  builder
+    .pose({time: ts1})
+    .stream(streamId)
+    .timestamp(ts1)
+    .polygon(verts1)
+    .polygon(verts2)
+    .timestamp(ts2);
+
+  const expected = {
+    vehicle_pose: {time: ts1},
+    state_updates: [
+      {
+        timestamp: ts1,
+        futures: {
+          [streamId]: {
+            name: streamId,
+            timestamps: [ts1, ts2],
+            primitives: [
+              [
+                {
+                  type: 'polygon',
+                  vertices: verts1
+                }
+              ],
+              [
+                {
+                  type: 'polygon',
+                  vertices: verts2
+                }
+              ]
+            ]
+          }
+        }
+      }
+    ]
+  };
+
+  const frame = builder.getFrame();
+  t.deepEqual(frame, expected, 'XVIZBuilder multiple primitives futures matches expected output');
   t.end();
 });

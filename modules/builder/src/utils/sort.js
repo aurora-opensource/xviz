@@ -12,8 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import './glb-loader';
-import './xviz-loader';
-import './builders';
-// import './loader-utils';
-import './utils';
+/**
+ * Insert time and value pair to the array and sort based on timestamp
+ * @param timestamps list of sorted timestamps
+ * @param values list of values sorted based on timestamps
+ * @param ts
+ * @param value
+ */
+export function insertTimestamp(timestamps, values, ts, value) {
+  let insertIndex = timestamps.findIndex(x => x > ts);
+  if (insertIndex === -1) {
+    insertIndex = timestamps.length;
+  }
+  timestamps.splice(insertIndex, 0, ts);
+  values.splice(insertIndex, 0, value);
+}
