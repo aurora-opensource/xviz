@@ -10,3 +10,4 @@ export {default as XVIZWriter} from './writers/xviz-writer/xviz-writer';
 // BUILDERS
 export {default as XVIZBuilder} from './builders/xviz-builder';
 export {default as XVIZMetadataBuilder} from './builders/xviz-metadata-builder';
+export {default as XvizDeclareUIBuilder} from './builders/xviz-declare-ui-builder';
