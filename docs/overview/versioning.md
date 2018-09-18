@@ -1,10 +1,11 @@
 # Versioning and Support
 
-The XVIZ protocol is versioned as closely as possible in accordance with [Semantic Versioning](www.semver.org):
+The XVIZ protocol is versioned as closely as possible in accordance with [Semantic Versioning](http://www.semver.org):
 
 * Major versions will be released whenever there is a breaking API change.
 * Minor versions will be released whenever a change includes additions to the API, such as additional primitives, or additional fields for existing primitives.
 * Patch versions will be released whenever a change is released that in no way changes the API.
+
 
 ### Version Support Guarantees
 

@@ -250,7 +250,7 @@ test('XVIZBuilder#time_series', t => {
     .value(2.0);
 
   const expected = {
-    vehicle_pose: { time: ts },
+    vehicle_pose: {time: ts},
     state_updates: [
       {
         timestamp: ts,
