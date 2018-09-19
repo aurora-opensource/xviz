@@ -1,25 +1,30 @@
 /* eslint-disable */
 import test from 'tape-catch';
-import {XvizDeclareUIBuilder} from '@xviz/builder';
+import { XvizUIBuilder } from '@xviz/builder';
 
-console.log(XvizDeclareUIBuilder);
+console.log(XvizUIBuilder);
 
-test('XvizDeclareUIBuilder', t => {
-  const builder = new XvizDeclareUIBuilder({});
+test('XvizBaseUIBuilder', t => {
+  const builder = new XvizUIBuilder({});
 
   builder
-    .panel('Metrics')
-    .container('child-1')
+    .panel()
+    .name('Metrics')
+    .children()
 
-    .metric('child-1-1')
-    .title('Acceleration')
-    .end()
+    .container()
+    .children()
 
-    .metric('child-1-2')
+    .metric()
     .title('Velocity')
-    .end()
+    .done()
 
-    .end();
+    .metric()
+    .title('Acceleration')
+    .done()
+
+    .done();
+
 
   const expected = [
     {
@@ -30,11 +35,11 @@ test('XvizDeclareUIBuilder', t => {
           children: [
             {
               type: 'metric',
-              title: 'Acceleration'
+              title: 'Velocity'
             },
             {
               type: 'metric',
-              title: 'Velocity'
+              title: 'Acceleration'
             }
           ]
         }
@@ -42,7 +47,9 @@ test('XvizDeclareUIBuilder', t => {
       name: 'Metrics'
     }
   ];
-  t.deepEqual(builder.getDeclareUI(), expected, 'XvizDeclareUIBuilder should match expectation');
+
+  const actual = builder.getUI();
+  t.deepEqual(actual, expected, 'XvizUIBuilder should match expectation');
 
   t.end();
 });

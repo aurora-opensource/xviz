@@ -14,7 +14,7 @@ A stylesheet is used to render all XVIZ data. It is in the following shape:
         },
         {
           class: 'label=OBJECT_LABEL selected',   // selector
-          strokeColor: '#FFC000',
+         strokeColor: '#FFC000',
           fillColor: '#FFC00080'
         }
     ]

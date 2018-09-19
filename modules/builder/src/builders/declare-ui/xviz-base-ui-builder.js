@@ -1,13 +1,8 @@
-export const XVIZ_COMPONENT_TYPES = {
-  CONTAINER: 'container',
-  METRIC: 'metric',
-  PANEL: 'panel'
-};
-
-export default class XvizComponent {
-  constructor() {
+export default class XvizBaseUiBuilder {
+  constructor({root}) {
     this._type = null;
     this._children = null;
+    this._root = root;
   }
 
   child(child) {
@@ -18,10 +13,19 @@ export default class XvizComponent {
     return this;
   }
 
-  getComponent() {
+  children() {
+    return this._root;
+  }
+
+  done() {
+    this._root.done();
+    return this._root;
+  }
+
+  getUI() {
     const obj = {type: this._type};
     if (this._children && this._children.length) {
-      obj.children = this._children.map(child => child.getComponent());
+      obj.children = this._children.map(child => child.getUI());
     }
     return obj;
   }

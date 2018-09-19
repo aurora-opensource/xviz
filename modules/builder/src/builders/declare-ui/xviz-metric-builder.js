@@ -1,9 +1,10 @@
-import XvizComponent, {XVIZ_COMPONENT_TYPES} from './xviz-component';
+import XvizBaseUiBuilder from './xviz-base-ui-builder';
+import {UI_TYPES} from './constants';
 
-export default class XvizMetric extends XvizComponent {
+export default class XvizMetricBuilder extends XvizBaseUiBuilder {
   constructor(props) {
     super(props);
-    this._type = XVIZ_COMPONENT_TYPES.METRIC;
+    this._type = UI_TYPES.METRIC;
   }
 
   streams(streams) {
@@ -21,8 +22,8 @@ export default class XvizMetric extends XvizComponent {
     return this;
   }
 
-  getComponent() {
-    const obj = super.getComponent();
+  getUI() {
+    const obj = super.getUI();
     obj.type = this._type;
 
     if (this._title) {
