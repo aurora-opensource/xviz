@@ -1,6 +1,6 @@
 /* eslint-disable */
 import test from 'tape-catch';
-import { XvizUIBuilder } from '@xviz/builder';
+import {XvizUIBuilder} from '@xviz/builder';
 
 console.log(XvizUIBuilder);
 
@@ -24,7 +24,6 @@ test('XvizBaseUIBuilder', t => {
     .done()
 
     .done();
-
 
   const expected = [
     {
