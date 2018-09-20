@@ -1,10 +1,13 @@
-/* eslint-disable */
+import {snakeToCamel} from './utils';
+
 export default class XvizBaseUiBuilder {
   constructor({root, type}) {
     this._type = type;
     this._children = null;
     this._root = root;
-    this[`${this._type}Right`] = () => this._done();
+
+    // end chaining of this builder and go back to root builder
+    this[`${snakeToCamel(this._type)}Right`] = () => this._done();
   }
 
   // add child

@@ -1,18 +1,13 @@
 import XvizBaseUiBuilder from './xviz-base-ui-builder';
 import {UI_TYPES} from './constants';
 
-export default class XvizContainerBuilder extends XvizBaseUiBuilder {
-  constructor({name, root}) {
+export default class XvizMetricBuilder extends XvizBaseUiBuilder {
+  constructor({cameras, root}) {
     super({
       root,
-      type: UI_TYPES.CONTAINER
+      type: UI_TYPES.METRIC
     });
-    this._name = name;
-  }
-
-  layout(layout) {
-    this._layout = layout;
-    return this;
+    this._cameras = cameras;
   }
 
   interactions(interactions) {
@@ -22,15 +17,12 @@ export default class XvizContainerBuilder extends XvizBaseUiBuilder {
 
   getUI() {
     const obj = super.getUI();
-    obj.name = this._name;
-
-    if (this._layout) {
-      obj.layout = this._layout;
-    }
+    obj.cameras = this._cameras;
 
     if (this._interactions) {
       obj.interactions = this._interactions;
     }
+
     return obj;
   }
 }

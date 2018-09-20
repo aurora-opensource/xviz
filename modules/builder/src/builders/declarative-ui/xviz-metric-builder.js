@@ -20,11 +20,6 @@ export default class XvizMetricBuilder extends XvizBaseUiBuilder {
     return this;
   }
 
-  metric() {
-    this._root.done();
-    return this._root;
-  }
-
   getUI() {
     const obj = super.getUI();
     obj.streams = this._streams;

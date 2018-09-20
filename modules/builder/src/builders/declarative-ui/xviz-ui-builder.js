@@ -1,17 +1,31 @@
 /* global console */
 /* eslint-disable no-console */
 import XvizPanelBuilder from './xviz-panel-builder';
-import XvizMetricBuilder from './xviz-metric-builder';
+
 import XvizContainerBuilder from './xviz-container-builder';
+
+import XvizMetricBuilder from './xviz-metric-builder';
+import XvizPlotBuilder from './xviz-plot-builder';
+import XvizTableBuilder from './xviz-table-builder';
+import XvizTreeTableBuilder from './xviz-table-builder';
+import XvizVideoBuilder from './xviz-video-builder';
+
+import {snakeToCamel} from './utils';
 import {UI_TYPES} from './constants';
 
 const defaultValidateWarn = console.warn;
 const defaultValidateError = console.error;
 
-const UI_TYPE_MAP = {
+const UI_BUILDER_MAP = {
   [UI_TYPES.PANEL]: XvizPanelBuilder,
+
+  [UI_TYPES.CONTAINER]: XvizContainerBuilder,
+
   [UI_TYPES.METRIC]: XvizMetricBuilder,
-  [UI_TYPES.CONTAINER]: XvizContainerBuilder
+  [UI_TYPES.PLOT]: XvizPlotBuilder,
+  [UI_TYPES.TABLE]: XvizTableBuilder,
+  [UI_TYPES.TREE_TABLE]: XvizTreeTableBuilder,
+  [UI_TYPES.VIDEO]: XvizVideoBuilder
 };
 
 export default class XvizUIBuilder {
@@ -23,36 +37,21 @@ export default class XvizUIBuilder {
     // maintain a builder list
     // when builder.done called, pop up the last builder
     this._builders = [this];
-  }
 
-  [`${UI_TYPES.PANEL}Left`](props) {
-    return this._setChild(UI_TYPES.PANEL, props);
-  }
-
-  [`${UI_TYPES.CONTAINER}Left`](props) {
-    if (this._builders.length === 1) {
-      this._validateError('Add a panel first');
-    }
-    return this._setChild(UI_TYPES.CONTAINER, props);
-  }
-
-  [`${UI_TYPES.METRIC}Left`](props) {
-    if (this._builders.length === 1) {
-      this._validateError('Add a panel first');
-    }
-    return this._setChild(UI_TYPES.METRIC, props);
-  }
-
-  [`${UI_TYPES.PANEL}Right`]() {
-    return this.done();
-  }
-
-  [`${UI_TYPES.CONTAINER}Right`]() {
-    return this.done();
-  }
-
-  [`${UI_TYPES.METRIC}Right`]() {
-    return this.done();
+    Object.values(UI_TYPES).map(type => {
+      // add UI builders, e.g.
+      // type `panel`
+      //  - this.panelLeft = (props) => this._setChild('panel', props);
+      //  - this.panelRight = () => this.done();
+      const camelType = snakeToCamel(type);
+      this[`${camelType}Left`] = props => {
+        if (type !== UI_TYPES.PANEL && this._builders.length === 1) {
+          this._validateError('Add a panel first');
+        }
+        return this._setChild(type, props);
+      };
+      this[`${camelType}Right`] = () => this.done();
+    });
   }
 
   getUI() {
@@ -73,7 +72,7 @@ export default class XvizUIBuilder {
   }
 
   _createUIBuilder(type, props) {
-    return new UI_TYPE_MAP[type]({
+    return new UI_BUILDER_MAP[type]({
       ...props,
       root: this
     });

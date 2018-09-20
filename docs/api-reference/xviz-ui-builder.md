@@ -15,14 +15,47 @@
 
 ## Methods
 
-##### panel()
+##### panelLeft()
 Return `XvizPannelBuilder`
 
-##### metric()
+##### panelRight()
+Return `XvizUIBuilder` instance (root).
+
+##### containerLeft()
+Return `XvizContainerBuilder`
+
+##### panelRight()
+Return `XvizUIBuilder` instance (root).
+
+##### metricLeft()
 Return `XvizMetricBuilder`
 
-##### container()
-Return `XvizContainerBuilder`
+##### metricRight()
+Return `XvizUIBuilder` instance (root).
+
+##### tableLeft()
+Return `XvizMetricBuilder`
+
+##### tableRight()
+Return `XvizUIBuilder` instance (root).
+
+##### treeTableLeft()
+Return `XvizTreeTableBuilder`
+
+##### treeTableRight()
+Return `XvizUIBuilder` instance (root).
+
+##### plotLeft()
+Return `XvizMetricBuilder`
+
+##### plotRight()
+Return `XvizUIBuilder` instance (root).
+
+##### videoLeft()
+Return `XvizMetricBuilder`
+
+##### videoRight()
+Return `XvizUIBuilder` instance (root).
 
 # Shared in different UI Builders (XvizPanelBuilder, XvizContainerBuilder, XvizMetricBuilder)
 
@@ -30,9 +63,6 @@ Return `XvizContainerBuilder`
 
 ##### children()
 Start adding children to the `panel` instance.
-
-##### done()
-Return root `XvizUIBuilder` instance.
 
 ##### getUI()
 Return an object containing all the UI elements in this instance and all its children
@@ -73,16 +103,16 @@ Return an object containing all the UI elements in this instance and all its chi
 ##### title(string)
 
 
-## How does Xviz UI builder work?
+## Xviz UI types hierarchy 
 * UI root has a list of `panel`s
 * `panel` (`XvizPannelBuilder`) has children, which could be either `component` or `container`
 * `container` (`XvizContainerBuilder`) children could be either `component` or `container`
 * `component` could be one of the following types
   - `metric` - `XvizMetricBuilder`
-  - `tree_table` (coming soon)
-  - `table` (coming soon)
-  - `plot` (coming soon)
-  - `video` (coming soon)
+  - `tree_table` - `XvizTreeTableBuilder`
+  - `table` - `XvizTableBuilder`
+  - `plot` - `XvizPlotBuilder`
+  - `video` - `XvizVideoBuilder`
 
 ## Example
 
@@ -91,22 +121,29 @@ import { XvizUIBuilder } from '@xviz/builder';
 const builder = new XvizUIBuilder({});
 
   builder
-    .panel()
-    .name('Metrics')
+    .panelLeft({
+      name: 'Metrics Panel'
+    })
     .children()
 
-    .container()
+    .containerLeft({
+      name: 'Metrics Container'
+    })
     .children()
 
-    .metric()
-    .title('Velocity')
-    .done()
+    .metricLeft({
+      streams: ['/vehicle/velocity']
+    })
+    .metricRight()
 
-    .metric()
+    .metricLeft({
+      streams: ['/vehicle/acceleration']
+    })
     .title('Acceleration')
-    .done()
+    .metricRight()
 
-    .done();
+    .containerRight()
+    .panelRight();
 ```
 
 Expected result is as following.
@@ -114,22 +151,25 @@ Expected result is as following.
    [
     {
       type: 'panel',
+      name: 'Metrics Panel',
       children: [
         {
           type: 'container',
+          name: 'Metrics Container',
           children: [
             {
               type: 'metric',
-              title: 'Velocity'
+              title: 'Velocity',
+              streams: ['/vehicle/velocity']
             },
             {
               type: 'metric',
-              title: 'Acceleration'
+              title: 'Acceleration',
+              streams: ['/vehicle/acceleration']
             }
           ]
         }
-      ],
-      name: 'Metrics'
+      ]
     }
   ];
 
