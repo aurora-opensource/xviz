@@ -282,11 +282,11 @@ export default class XVIZBuilder {
     return this;
   }
 
-  color(clr) {
+  color(color) {
     this._validateStreamId();
     this._validatePropSetOnce('_color');
 
-    this._color = clr;
+    this._color = color;
     return this;
   }
 
