@@ -2,9 +2,12 @@ import XvizBaseUiBuilder from './xviz-base-ui-builder';
 import {UI_TYPES} from './constants';
 
 export default class XvizContainerBuilder extends XvizBaseUiBuilder {
-  constructor(props) {
-    super(props);
-    this._type = UI_TYPES.CONTAINER;
+  constructor({name, root}) {
+    super({
+      root,
+      type: UI_TYPES.CONTAINER
+    });
+    this._name = name;
   }
 
   layout(layout) {
@@ -17,9 +20,14 @@ export default class XvizContainerBuilder extends XvizBaseUiBuilder {
     return this;
   }
 
+  container() {
+    this._root.done();
+    return this._root;
+  }
+
   getUI() {
     const obj = super.getUI();
-    obj.type = this._type;
+    obj.name = this._name;
 
     if (this._layout) {
       obj.layout = this._layout;

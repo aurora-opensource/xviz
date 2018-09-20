@@ -1,10 +1,13 @@
+/* eslint-disable */
 export default class XvizBaseUiBuilder {
-  constructor({root}) {
-    this._type = null;
+  constructor({root, type}) {
+    this._type = type;
     this._children = null;
     this._root = root;
+    this[`${this._type}Right`] = () => this._done();
   }
 
+  // add child
   child(child) {
     if (!this._children) {
       this._children = [];
@@ -13,12 +16,8 @@ export default class XvizBaseUiBuilder {
     return this;
   }
 
+  // start appending children to current UI element
   children() {
-    return this._root;
-  }
-
-  done() {
-    this._root.done();
     return this._root;
   }
 
@@ -28,5 +27,11 @@ export default class XvizBaseUiBuilder {
       obj.children = this._children.map(child => child.getUI());
     }
     return obj;
+  }
+
+  // done with current UI element builder
+  _done() {
+    this._root.done();
+    return this._root;
   }
 }

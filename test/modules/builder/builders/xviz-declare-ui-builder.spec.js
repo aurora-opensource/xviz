@@ -8,22 +8,30 @@ test('XvizBaseUIBuilder', t => {
   const builder = new XvizUIBuilder({});
 
   builder
-    .panel()
-    .name('Metrics')
+    .panelLeft({
+      name: 'Metrics Panel'
+    })
     .children()
 
-    .container()
+    .containerLeft({
+      name: 'Metrics Container 1'
+    })
     .children()
 
-    .metric()
+    .metricLeft({
+      streams: ['/vehicle/velocity']
+    })
     .title('Velocity')
-    .done()
+    .metricRight()
 
-    .metric()
+    .metricLeft({
+      streams: ['/vehicle/acceleration']
+    })
     .title('Acceleration')
-    .done()
+    .metricRight()
 
-    .done();
+    .containerRight()
+    .panelRight();
 
   const expected = [
     {
@@ -34,16 +42,19 @@ test('XvizBaseUIBuilder', t => {
           children: [
             {
               type: 'metric',
+              streams: ['/vehicle/velocity'],
               title: 'Velocity'
             },
             {
               type: 'metric',
+              streams: ['/vehicle/acceleration'],
               title: 'Acceleration'
             }
-          ]
+          ],
+          name: 'Metrics Container 1'
         }
       ],
-      name: 'Metrics'
+      name: 'Metrics Panel'
     }
   ];
 

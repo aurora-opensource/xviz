@@ -2,14 +2,12 @@ import XvizBaseUiBuilder from './xviz-base-ui-builder';
 import {UI_TYPES} from './constants';
 
 export default class XvizMetricBuilder extends XvizBaseUiBuilder {
-  constructor(props) {
-    super(props);
-    this._type = UI_TYPES.METRIC;
-  }
-
-  streams(streams) {
+  constructor({streams, root}) {
+    super({
+      root,
+      type: UI_TYPES.METRIC
+    });
     this._streams = streams;
-    return this;
   }
 
   description(description) {
@@ -22,9 +20,14 @@ export default class XvizMetricBuilder extends XvizBaseUiBuilder {
     return this;
   }
 
+  metric() {
+    this._root.done();
+    return this._root;
+  }
+
   getUI() {
     const obj = super.getUI();
-    obj.type = this._type;
+    obj.streams = this._streams;
 
     if (this._title) {
       obj.title = this._title;
@@ -32,10 +35,6 @@ export default class XvizMetricBuilder extends XvizBaseUiBuilder {
 
     if (this._description) {
       obj.description = this._description;
-    }
-
-    if (this._streams) {
-      obj.streams = this._streams;
     }
 
     return obj;
