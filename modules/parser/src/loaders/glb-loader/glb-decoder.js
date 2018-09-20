@@ -45,15 +45,22 @@ const COMPONENT_TYPE_ARRAY = {
 
 // https://github.com/KhronosGroup/glTF/tree/master/specification/2.0#glb-file-format-specification
 export default class GLBDecoder {
-  static parseGlbBuffer(glbArrayBuffer, options = {}) {
+  static isGLB(glbArrayBuffer, options = {}) {
     const {magic = MAGIC_GLTF} = options;
 
     // GLB Header
     const dataView = new DataView(glbArrayBuffer);
     const magic1 = dataView.getUint32(0, BE); // Magic number (the ASCII string 'glTF').
+
+    return magic1 === magic || magic1 === MAGIC_GLTF;
+  }
+
+  static parseGlbBuffer(glbArrayBuffer, options = {}) {
+    // GLB Header
+    const dataView = new DataView(glbArrayBuffer);
     const version = dataView.getUint32(4, LE); // Version 2 of binary glTF container format
     const fileLength = dataView.getUint32(8, LE); // Total byte length of generated file
-    assert(magic1 === magic || magic1 === MAGIC_GLTF);
+    assert(GLBDecoder.isGLB(glbArrayBuffer, options));
     assert(version === 2, 'Only .glb v2 supported');
     assert(fileLength > 20);
 

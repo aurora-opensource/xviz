@@ -7,3 +7,7 @@ export function parseGLB(arrayBuffer, options = {}) {
   const unpackedBuffers = unpackGLBBuffers(arrayBuffer, json, binaryByteOffset);
   return unpackJsonArrays(json, unpackedBuffers);
 }
+
+export function isGLB(arrayBuffer, options = {}) {
+  return GLBDecoder.isGLB(arrayBuffer, options);
+}

@@ -7,7 +7,7 @@
 /* global Blob, Uint8Array, TextDecoder */
 import {LOG_STREAM_MESSAGE, STREAM_DATA_CONTENT} from '../constants';
 import {getXvizConfig} from '../config/xviz-config';
-
+import {parseBinaryXVIZ, isBinaryXVIZ} from '../loaders/xviz-loader/xviz-binary-loader';
 import {parseLogMetadata} from './parse-log-metadata';
 import {parseStreamPrimitive, parseStreamVariable, parseStreamFutures} from './parse-xviz-stream';
 import {parseStreamVideoMessage} from './parse-stream-video-message';
@@ -23,6 +23,8 @@ function isJSON(encodedString) {
 function decode(data, recursive) {
   if (!data) {
     // ignore
+  } else if (isBinaryXVIZ(data)) {
+    return parseBinaryXVIZ(data);
   } else if (data instanceof Uint8Array && isJSON(data)) {
     const jsonString = new TextDecoder('utf8').decode(data);
     return JSON.parse(jsonString);

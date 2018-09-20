@@ -1,5 +1,5 @@
 // Public methods
-export {parseGLB} from './glb-loader';
+export {parseGLB, isGLB} from './glb-loader';
 
 // Experimental exports, exposes internals
 export {default as _GLBDecoder} from './glb-decoder';
