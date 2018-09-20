@@ -181,8 +181,11 @@ export function parseStreamVariable(objects, streamName, time) {
   const {timestamps, values} = objects;
   if (values.length === 1) {
     variable = values[0];
-  } else {
+  } else if (timestamps) {
     variable = values.map((v, i) => [timestamps[i], v]);
+  } else {
+    // v2
+    variable = values;
   }
 
   return {
