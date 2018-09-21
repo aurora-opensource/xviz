@@ -79,13 +79,15 @@ export default class NuTonomyConverter {
       frames: this.frames
     });
 
-    this.converters.filter(converter => converter !== gpsConverter).forEach(converter =>
-      converter.load({
-        staticData: this.staticData,
-        frames: this.frames,
-        posesByFrame: gpsConverter.getPoses()
-      })
-    );
+    this.converters
+      .filter(converter => converter !== gpsConverter)
+      .forEach(converter =>
+        converter.load({
+          staticData: this.staticData,
+          frames: this.frames,
+          posesByFrame: gpsConverter.getPoses()
+        })
+      );
 
     this.metadata = this.getMetadata();
   }
