@@ -36,6 +36,8 @@ const TEST_BROWSER_CONFIG = {
   devtool: '#inline-source-maps',
 
   resolve: {
+    // Adding `esnext` imports untranspiled source, easier for debugging
+    // mainFields: ['esnext', 'browser', 'module', 'main'],
     alias: {
       webworkify$: resolve(__dirname, '../node_modules/webworkify-webpack'),
       'test-data': resolve(TEST_DIR, 'data'),

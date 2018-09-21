@@ -12,36 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {encodeGLB} from '../glb-writer';
+import {GLTFBuilder} from '@loaders.gl/gltf';
+import {toBuffer} from '@loaders.gl/core';
 
-const MAGIC_XVIZ = 0x5856495a; // XVIZ in Big-Endian ASCII
+export function encodeBinaryXVIZ(xvizJson, options) {
+  const gltfBuilder = new GLTFBuilder();
 
-export function encodeBinaryXVIZ(inputJson, options) {
-  // For better compabitility with glTF, we put all XVIZ data in a subfield.
-  const json = {
-    xviz: inputJson
-  };
+  // TODO/ib - the following options would break backwards compatibility
+  // gltfBuilder.addExtraData('xviz', xvizJson, options)
+  // gltfBuilder.addExtension('UBER_xviz', xvizJson, options);
+  // gltfBuilder.addRequiredExtension('UBER_xviz', xvizJson, options);
 
-  const newOptions = Object.assign({magic: MAGIC_XVIZ}, options);
+  // As permitted by glTF, we put all XVIZ data in a top-level subfield.
+  gltfBuilder.addApplicationData('xviz', xvizJson, options);
 
-  return encodeGLB(json, newOptions);
+  return gltfBuilder.encodeAsGLB(options);
 }
 
 export function writeBinaryXVIZtoFile(sink, directory, name, json, options) {
   const glbFileBuffer = encodeBinaryXVIZ(json, options);
   sink.writeSync(directory, `${name}.glb`, toBuffer(glbFileBuffer), {flag: 'w'});
   return glbFileBuffer;
-}
-
-// Helper methods
-
-// Convert (copy) ArrayBuffer to Buffer
-function toBuffer(arrayBuffer) {
-  /* global Buffer */
-  const buffer = new Buffer(arrayBuffer.byteLength);
-  const view = new Uint8Array(arrayBuffer);
-  for (let i = 0; i < buffer.length; ++i) {
-    buffer[i] = view[i];
-  }
-  return buffer;
 }
