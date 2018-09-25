@@ -12,16 +12,31 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// UTILS
-export {loadUri} from './utils/load-uri.js';
+import XvizBaseUiBuilder from './xviz-base-ui-builder';
+import {UI_TYPES} from './constants';
 
-// WRITERS
-export {encodeGLB, _GLBEncoder, _GLBBufferPacker, _packJsonArrays} from './writers/glb-writer';
+export default class XvizMetricBuilder extends XvizBaseUiBuilder {
+  constructor({cameras, root}) {
+    super({
+      root,
+      type: UI_TYPES.METRIC
+    });
+    this._cameras = cameras;
+  }
 
-export {encodeBinaryXVIZ} from './writers/xviz-writer/xviz-binary-writer';
-export {default as XVIZWriter} from './writers/xviz-writer/xviz-writer';
+  interactions(interactions) {
+    this._interactions = interactions;
+    return this;
+  }
 
-// BUILDERS
-export {default as XVIZBuilder} from './builders/xviz-builder';
-export {default as XVIZMetadataBuilder} from './builders/xviz-metadata-builder';
-export {default as XvizUIBuilder} from './builders/declarative-ui/xviz-ui-builder';
+  getUI() {
+    const obj = super.getUI();
+    obj.cameras = this._cameras;
+
+    if (this._interactions) {
+      obj.interactions = this._interactions;
+    }
+
+    return obj;
+  }
+}

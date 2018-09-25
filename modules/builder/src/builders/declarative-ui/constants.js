@@ -12,16 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// UTILS
-export {loadUri} from './utils/load-uri.js';
+export const UI_TYPES = {
+  PANEL: 'panel',
 
-// WRITERS
-export {encodeGLB, _GLBEncoder, _GLBBufferPacker, _packJsonArrays} from './writers/glb-writer';
+  CONTAINER: 'container',
 
-export {encodeBinaryXVIZ} from './writers/xviz-writer/xviz-binary-writer';
-export {default as XVIZWriter} from './writers/xviz-writer/xviz-writer';
-
-// BUILDERS
-export {default as XVIZBuilder} from './builders/xviz-builder';
-export {default as XVIZMetadataBuilder} from './builders/xviz-metadata-builder';
-export {default as XvizUIBuilder} from './builders/declarative-ui/xviz-ui-builder';
+  // components
+  METRIC: 'metric',
+  PLOT: 'plot',
+  TABLE: 'table',
+  TREE_TABLE: 'tree_table',
+  VIDEO: 'video'
+};
