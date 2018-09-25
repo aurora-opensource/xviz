@@ -18,13 +18,14 @@
  * `message` refers to the raw message received via webSocket.onmessage
  * `data` refers to pre-processed data objects (blob, arraybuffer, JSON object)
  */
-/* global Blob, Uint8Array, TextDecoder */
+/* global Blob, Uint8Array */
 import {LOG_STREAM_MESSAGE, STREAM_DATA_CONTENT} from '../constants';
 import {getXvizConfig} from '../config/xviz-config';
 import {parseBinaryXVIZ, isBinaryXVIZ} from '../loaders/xviz-loader/xviz-binary-loader';
 import {parseLogMetadata} from './parse-log-metadata';
 import {parseStreamPrimitive, parseStreamVariable, parseStreamFutures} from './parse-xviz-stream';
 import {parseStreamVideoMessage} from './parse-stream-video-message';
+import {TextDecoder} from '../utils/text-decoder'; // Node.js < 9 polyfills
 
 function isJSON(encodedString) {
   const firstChar = String.fromCharCode(encodedString[0]);
