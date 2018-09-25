@@ -1,6 +1,6 @@
-/* global TextDecoder */
 import {setXvizConfig} from '../config/xviz-config';
 import {parseXvizStream} from '../parsers/parse-xviz-stream';
+import {TextDecoder} from '../utils/text-decoder'; // Node.js < 9 polyfills
 
 export default config => self => {
   setXvizConfig(config);

@@ -4,8 +4,9 @@
  * `message` refers to the raw message received via webSocket.onmessage
  * `data` refers to pre-processed data objects (blob, arraybuffer, JSON object)
  */
-/* global TextDecoder, Blob, URL */
+/* global Blob, URL */
 import {LOG_STREAM_MESSAGE} from '../constants';
+import {TextDecoder} from '../utils/text-decoder'; // Node.js < 9 polyfills
 import {blobToArrayBuffer} from '../utils/binary';
 
 import {parseLogMetadata} from './parse-log-metadata';
