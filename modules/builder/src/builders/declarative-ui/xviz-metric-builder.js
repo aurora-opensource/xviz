@@ -2,22 +2,23 @@ import XvizBaseUiBuilder from './xviz-base-ui-builder';
 import {UI_TYPES} from './constants';
 
 export default class XvizMetricBuilder extends XvizBaseUiBuilder {
-  constructor({streams, root}) {
+  constructor({streams, description, title, validateWarn, validateError}) {
     super({
-      root,
-      type: UI_TYPES.METRIC
+      type: UI_TYPES.METRIC,
+      validateWarn,
+      validateError
     });
     this._streams = streams;
-  }
-
-  description(description) {
     this._description = description;
-    return this;
+    this._title = title;
+
+    this._validate();
   }
 
-  title(title) {
-    this._title = title;
-    return this;
+  _validate() {
+    if (!this._streams || !this._streams.length) {
+      this._validateError('Metric component should have `streams`.');
+    }
   }
 
   getUI() {

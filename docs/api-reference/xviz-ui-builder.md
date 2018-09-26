@@ -15,54 +15,30 @@
 
 ## Methods
 
-##### panelLeft()
+##### panel()
 Return `XvizPannelBuilder`
 
-##### panelRight()
-Return `XvizUIBuilder` instance (root).
-
-##### containerLeft()
+##### container()
 Return `XvizContainerBuilder`
 
-##### panelRight()
-Return `XvizUIBuilder` instance (root).
-
-##### metricLeft()
+##### metric()
 Return `XvizMetricBuilder`
 
-##### metricRight()
-Return `XvizUIBuilder` instance (root).
-
-##### tableLeft()
+##### table()
 Return `XvizMetricBuilder`
 
-##### tableRight()
-Return `XvizUIBuilder` instance (root).
-
-##### treeTableLeft()
+##### treeTable()
 Return `XvizTreeTableBuilder`
 
-##### treeTableRight()
-Return `XvizUIBuilder` instance (root).
-
-##### plotLeft()
+##### plot()
 Return `XvizMetricBuilder`
 
-##### plotRight()
-Return `XvizUIBuilder` instance (root).
-
-##### videoLeft()
+##### video()
 Return `XvizMetricBuilder`
 
-##### videoRight()
-Return `XvizUIBuilder` instance (root).
-
-# Shared in different UI Builders (XvizPanelBuilder, XvizContainerBuilder, XvizMetricBuilder)
+# Shared in different UI Builders (XvizPanelBuilder, XvizContainerBuilder, XvizMetricBuilder, etc.)
 
 ## Methods
-
-##### children()
-Start adding children to the `panel` instance.
 
 ##### getUI()
 Return an object containing all the UI elements in this instance and all its children
@@ -120,30 +96,25 @@ Return an object containing all the UI elements in this instance and all its chi
 import { XvizUIBuilder } from '@xviz/builder';
 const builder = new XvizUIBuilder({});
 
-  builder
-    .panelLeft({
-      name: 'Metrics Panel'
-    })
-    .children()
+  const builder = new XvizUIBuilder({});
 
-    .containerLeft({
-      name: 'Metrics Container'
-    })
-    .children()
+  const panel = builder
+    .panel({name: 'Metrics Panel'});
 
-    .metricLeft({
-      streams: ['/vehicle/velocity']
-    })
-    .metricRight()
+  const container = builder
+    .container({name: 'Metrics Container 1'});
 
-    .metricLeft({
-      streams: ['/vehicle/acceleration']
-    })
-    .title('Acceleration')
-    .metricRight()
+  const metrics1 = builder
+    .metric({streams: ['/vehicle/velocity']})
+    .title('Velocity');
 
-    .containerRight()
-    .panelRight();
+  const metrics2 = builder
+    .metric({streams: ['/vehicle/acceleration']})
+    .title('Acceleration');
+  
+  container.child(metrics1).child(metrics2);
+  panel.child(container);
+  builder.child(panel);
 ```
 
 Expected result is as following.

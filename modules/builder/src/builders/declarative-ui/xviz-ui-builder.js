@@ -34,23 +34,15 @@ export default class XvizUIBuilder {
     this._validateError = validateError;
 
     this._children = [];
-    // maintain a builder list
-    // when builder.done called, pop up the last builder
-    this._builders = [this];
 
     Object.values(UI_TYPES).map(type => {
       // add UI builders, e.g.
       // type `panel`
-      //  - this.panelLeft = (props) => this._setChild('panel', props);
-      //  - this.panelRight = () => this.done();
+      //  - this.panel = (props) => this._setChild('panel', props);
       const camelType = snakeToCamel(type);
-      this[`${camelType}Left`] = props => {
-        if (type !== UI_TYPES.PANEL && this._builders.length === 1) {
-          this._validateError('Add a panel first');
-        }
-        return this._setChild(type, props);
+      this[camelType] = props => {
+        return this._createUIBuilder(type, props);
       };
-      this[`${camelType}Right`] = () => this.done();
     });
   }
 
@@ -66,29 +58,12 @@ export default class XvizUIBuilder {
     return this;
   }
 
-  done() {
-    this._builders.pop();
-    return this;
-  }
-
   _createUIBuilder(type, props) {
     return new UI_BUILDER_MAP[type]({
       ...props,
+      validateWarn: this._validateWarn,
+      validateError: this._validateError,
       root: this
     });
-  }
-
-  _getLastBuilder() {
-    return this._builders[this._builders.length - 1];
-  }
-
-  _setChild(type, props) {
-    const child = this._createUIBuilder(type, props);
-    const parent = this._getLastBuilder();
-
-    parent.child(child);
-    this._builders.push(child);
-
-    return child;
   }
 }

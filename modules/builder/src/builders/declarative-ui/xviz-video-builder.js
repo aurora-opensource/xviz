@@ -1,18 +1,23 @@
 import XvizBaseUiBuilder from './xviz-base-ui-builder';
 import {UI_TYPES} from './constants';
 
-export default class XvizMetricBuilder extends XvizBaseUiBuilder {
-  constructor({cameras, root}) {
+export default class XvizVideoBuilder extends XvizBaseUiBuilder {
+  constructor({cameras, interactions, validateWarn, validateError}) {
     super({
-      root,
-      type: UI_TYPES.METRIC
+      type: UI_TYPES.METRIC,
+      validateWarn,
+      validateError
     });
     this._cameras = cameras;
+    this._interactions = interactions;
+
+    this._validate();
   }
 
-  interactions(interactions) {
-    this._interactions = interactions;
-    return this;
+  _validate() {
+    if (!this._cameras) {
+      this._validateError('Video component should have `cameras`.');
+    }
   }
 
   getUI() {
