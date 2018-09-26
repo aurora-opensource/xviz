@@ -25,7 +25,7 @@ import {parseBinaryXVIZ, isBinaryXVIZ} from '../loaders/xviz-loader/xviz-binary-
 import {parseLogMetadata} from './parse-log-metadata';
 import {parseStreamPrimitive, parseStreamVariable, parseStreamFutures} from './parse-xviz-stream';
 import {parseStreamVideoMessage} from './parse-stream-video-message';
-import {TextDecoder} from '../utils/text-decoder'; // Node.js < 9 polyfills
+import {TextDecoder} from 'text-encoding'; // Node.js < 9 polyfills
 
 function isJSON(encodedString) {
   const firstChar = String.fromCharCode(encodedString[0]);
