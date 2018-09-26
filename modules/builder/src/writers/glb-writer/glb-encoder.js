@@ -1,5 +1,6 @@
 /* eslint-disable max-statements */
-import {padTo4Bytes, copyArrayBuffer, TextEncoder} from '../../utils';
+import {padTo4Bytes, copyArrayBuffer} from '../../utils';
+import {TextEncoder} from 'text-encoding';
 
 // glTF in Big-Endian ASCII
 const MAGIC_glTF = 0x676c5446; // eslint-disable-line camelcase
