@@ -76,8 +76,8 @@ All methods except `getFrame()` return `this` builder instance
 * Position has to be an array with length 3.
 * Only used for specifying where to place `text` message.
 
-##### color(color : Array)
-* `color` input should be a RGB array, i.e. [0, 0, 255]
+##### style(style : Object)
+check `xviz-stylesheet` for supported style properties
 
 ##### id(id : String)
 * Specify `id` for a primitive.
@@ -127,7 +127,7 @@ const pose = {
 };
 
 const xvizBuilder = new XVIZBuilder({
-  metadata
+  metadata,
   disableStreams
 });
 
@@ -147,14 +147,16 @@ xvizBuilder
   .stream('/point-cloud')
   .points(new Float32Array([1.23, 0.45, 0.06]))
   .timestamp()
-  .color([0, 0, 0, 255])
+  .style({
+     color: [0, 0, 0, 255]
+  })
 
   .stream('/pedestrian-1-trajectory')
   .polygon(polygon)
   .timestamp(123);
 
 
-const frame = xvizBuider.getFrame()
+const frame = xvizBuider.getFrame();
 
 // frame data format
 {
@@ -174,7 +176,7 @@ const frame = xvizBuider.getFrame()
           color: [255,0,0],
           type: 'points',
           vertices: [1.23, 0.45, 0.06]
-        }
+        }]
       },
       variables: {
         '/velocity': {
@@ -185,7 +187,7 @@ const frame = xvizBuider.getFrame()
       },
       futures: {
         '/pedestrian-1-trajectory': {
-          name: '/pedestrian-1-trajectory'
+          name: '/pedestrian-1-trajectory',
           type: 'polygon',
           timestamps: [123],
           primitives: [
@@ -194,7 +196,7 @@ const frame = xvizBuider.getFrame()
                 [1.23, 0.45, 0.06],
                 [2.45, 0.67, 0.08],
                 [1.67, 0.53, 0.07],  
-                [1.23, 0.45, 0.06],
+                [1.23, 0.45, 0.06]
               }
             ]
           ]

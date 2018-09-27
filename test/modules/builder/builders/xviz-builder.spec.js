@@ -19,7 +19,10 @@ test('XVIZBuilder#polygon', t => {
   builder
     .pose({time: 1.0})
     .stream('/test/polygon')
-    .polygon(verts);
+    .polygon(verts)
+    .style({
+      color: [255, 0, 0]
+    });
 
   const expected = {
     vehicle_pose: {time: 1.0},
@@ -30,7 +33,8 @@ test('XVIZBuilder#polygon', t => {
           '/test/polygon': [
             {
               type: 'polygon',
-              vertices: verts
+              vertices: verts,
+              color: [255, 0, 0]
             }
           ]
         }
