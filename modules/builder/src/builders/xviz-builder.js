@@ -23,13 +23,13 @@ const CATEGORY = {
 };
 
 const PRIMITIVE_TYPES = {
+  circle: 'circle',
+  image: 'image',
   point: 'point',
   polygon: 'polygon',
   polyline: 'polyline',
-  circle: 'circle',
   stadium: 'stadium',
-  text: 'text',
-  image: 'image'
+  text: 'text'
 };
 
 const VARIABLE_TYPES = {
@@ -40,6 +40,72 @@ const VARIABLE_TYPES = {
 };
 
 const requiredProps = ['streamId', '_category', '_type'];
+
+// TODO support v1? Need the full list of properties
+const STYLES = {
+  strokeColor: 'strokeColor',
+  fillColor: 'fillColor',
+  radius: 'radius',
+  radiusMinPixels: 'radiusMinPixels',
+  radiusMaxPixels: 'radiusMaxPixels',
+  strokeWidth: 'strokeWidth',
+  strokeWidthMinPixels: 'strokeWidthMinPixels',
+  strokeWidthMaxPixels: 'strokeWidthMaxPixels',
+  height: 'height',
+  opacity: 'opacity',
+  stroked: 'stroked',
+  filled: 'filled',
+  extruded: 'extruded',
+  wireframe: 'wireframe',
+  size: 'size',
+  color: 'color',
+  angle: 'angle',
+  position: 'position'
+};
+
+const PRIMITIVE_STYLE_MAP = {
+  [PRIMITIVE_TYPES.circle]: [
+    STYLES.strokeColor,
+    STYLES.fillColor,
+    STYLES.radius,
+    STYLES.radiusMinPixels,
+    STYLES.radiusMaxPixels
+  ],
+  [PRIMITIVE_TYPES.point]: [
+    STYLES.fillColor,
+    STYLES.radius,
+    STYLES.radiusMinPixels,
+    STYLES.radiusMaxPixels
+  ],
+  [PRIMITIVE_TYPES.polygon]: [
+    STYLES.strokeColor,
+    STYLES.fillColor,
+    STYLES.strokeWidth,
+    STYLES.strokeWidthMinPixels,
+    STYLES.strokeWidthMaxPixels,
+    STYLES.height,
+    STYLES.opacity,
+    STYLES.stroked,
+    STYLES.filled,
+    STYLES.extruded,
+    STYLES.wireframe
+  ],
+  // TODO need verify from here
+  [PRIMITIVE_TYPES.text]: [STYLES.size, STYLES.position, STYLES.angle, STYLES.color],
+  [PRIMITIVE_TYPES.polyline]: [
+    STYLES.strokeColor,
+    STYLES.strokeWidth,
+    STYLES.strokeWidthMinPixels,
+    STYLES.strokeWidthMaxPixels
+  ],
+  [PRIMITIVE_TYPES.stadium]: [
+    STYLES.strokeColor,
+    STYLES.fillColor,
+    STYLES.strokeWidth,
+    STYLES.strokeWidthMinPixels,
+    STYLES.strokeWidthMaxPixels
+  ]
+};
 
 /* global console */
 /* eslint-disable no-console */
@@ -296,12 +362,12 @@ export default class XVIZBuilder {
     return this;
   }
 
-  color(color) {
+  style(style) {
     this._validateStreamId();
-    this._validatePropSetOnce('_color');
+    this._validatePropSetOnce('_style');
 
-    this._color = color;
-    return this;
+    this._style = style;
+    this._validateStyle();
   }
 
   id(identifier) {
@@ -456,6 +522,23 @@ export default class XVIZBuilder {
     }
   }
 
+  _validateStyle() {
+    const properties = Object.keys(this._style);
+    const validProperties = PRIMITIVE_STYLE_MAP[this._type];
+    if (validProperties) {
+      const invalidProps = properties.filter(prop => !validProperties.includes(prop));
+      if (invalidProps && invalidProps.length > 0) {
+        this._validateWarn(
+          `Invalid style properties ${invalidProps.join(',')} for stream ${this.streamId}`
+        );
+      }
+    } else {
+      this._validateWarn(
+        `Missing style validations for stream ${this.streamId} with type ${this._type}`
+      );
+    }
+  }
+
   _formatVariable() {
     return {
       timestamps: this._timestamps,
@@ -498,8 +581,8 @@ export default class XVIZBuilder {
       obj.id = this._id;
     }
 
-    if (this._color) {
-      obj.color = this._color;
+    if (this._style) {
+      Object.assign(obj, this._style);
     }
 
     if (this._classes) {
@@ -575,7 +658,7 @@ export default class XVIZBuilder {
     this._vertices = null;
 
     this._id = null;
-    this._color = null;
+    this._style = null;
     this._classes = null;
   }
 
