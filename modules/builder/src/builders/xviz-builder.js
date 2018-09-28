@@ -354,6 +354,7 @@ export default class XVIZBuilder {
 
     this._style = style;
     this._validateStyle();
+    return this;
   }
 
   id(identifier) {
