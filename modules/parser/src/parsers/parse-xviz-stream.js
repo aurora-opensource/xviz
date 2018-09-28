@@ -14,6 +14,8 @@
 
 import {getXvizConfig} from '../config/xviz-config';
 import {normalizeXvizPrimitive} from './parse-xviz-primitive';
+import XvizObject from '../objects/xviz-object';
+import {isMainThread} from '../utils/globals';
 
 export const PRIMITIVE_CAT = {
   LOOKAHEAD: 'lookAheads',
@@ -74,13 +76,17 @@ export function parseXvizStream(data, convertPrimitive) {
  * data to UI elements.
  */
 export function parseStreamPrimitive(objects, streamName, time, convertPrimitive) {
-  const {observeObjects, preProcessPrimitive, PRIMITIVE_SETTINGS} = getXvizConfig();
+  const {OBJECT_STREAM, preProcessPrimitive, PRIMITIVE_SETTINGS} = getXvizConfig();
 
   if (!Array.isArray(objects)) {
     return {};
   }
 
-  observeObjects(streamName, objects, time);
+  if (isMainThread && streamName === OBJECT_STREAM) {
+    for (const object of objects) {
+      XvizObject.observe(object.id, time);
+    }
+  }
   const primitiveMap = createPrimitiveMap();
 
   let category = null;
