@@ -1,6 +1,10 @@
 {
   "type": "circle",
-  "object_id": "foo",
+  "object_id": "{067a2faf-64b5-4b8f-8d7d-ed873630df4f}",
   "center": [1, 2, 3],
-  "radius_m": 1.2
+  "radius_m": 1.2,
+  "style": {
+    "thickness_m": 5,
+    "color": [0, 1, 2, 3]
+  }
 }
