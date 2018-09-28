@@ -1,6 +1,9 @@
 import XvizPrimitiveSettingsV1 from '../parsers/xviz-primitives-v1';
 import XvizPrimitiveSettingsV2 from '../parsers/xviz-primitives-v2';
 
+import XvizObjectCollection from '../objects/xviz-object-collection';
+import XvizObject from '../objects/xviz-object';
+
 const DEFAULT_XVIZ_CONFIG = {
   // Config
   version: 2,
@@ -20,8 +23,7 @@ const DEFAULT_XVIZ_CONFIG = {
 
   // TODO - these are used at render time instead of parse time. Need API audit
   postProcessFrame: frame => frame, // Post process log frame, used in LogSlice.getCurrentFrame
-  getTrackedObjectPosition: _ => null,
-  observeObjects: () => {}
+  getTrackedObjectPosition: _ => null
 };
 
 const DEFAULT_XVIZ_SETTINGS = {
@@ -33,6 +35,8 @@ const DEFAULT_XVIZ_SETTINGS = {
 
 let xvizConfig = null;
 const xvizSettings = Object.assign({}, DEFAULT_XVIZ_SETTINGS);
+
+XvizObject.setDefaultCollection(new XvizObjectCollection());
 
 // CONFIG contains the static configuration of XVIZ (streams, how to postprocess etc)
 export function setXvizConfig(config) {
