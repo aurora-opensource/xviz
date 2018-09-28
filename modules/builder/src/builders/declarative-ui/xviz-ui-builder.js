@@ -29,9 +29,9 @@ const UI_BUILDER_MAP = {
 };
 
 export default class XvizUIBuilder {
-  constructor({validateWarn = defaultValidateWarn, validateError = defaultValidateError}) {
-    this._validateWarn = validateWarn;
-    this._validateError = validateError;
+  constructor(options = {}) {
+    this._validateWarn = options.validateWarn || defaultValidateWarn;
+    this._validateError = options.validateError || defaultValidateError;
 
     this._children = [];
 

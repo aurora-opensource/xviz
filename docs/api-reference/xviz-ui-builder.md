@@ -4,9 +4,6 @@
 
 ## Constructor
 
-##### metadata (Object)
-* Use `XvizMetadataBuilder` to construct metadata object.
-
 ##### validateWarn (Function),
 * called when there is a validation warning. Default is `console.warn`.
 
@@ -14,6 +11,10 @@
 * called when there is a validation error. Default is `console.error`.
 
 ## Methods
+
+##### child()
+Append child to root. 
+* Child should be `Panel` instance.
 
 ##### panel()
 Return `XvizPannelBuilder`
@@ -39,6 +40,9 @@ Return `XvizMetricBuilder`
 # Shared in different UI Builders (XvizPanelBuilder, XvizContainerBuilder, XvizMetricBuilder, etc.)
 
 ## Methods
+
+##### child()
+Append child to the UI component.
 
 ##### getUI()
 Return an object containing all the UI elements in this instance and all its children
@@ -111,10 +115,11 @@ const builder = new XvizUIBuilder({});
   const metrics2 = builder
     .metric({streams: ['/vehicle/acceleration']})
     .title('Acceleration');
-  
-  container.child(metrics1).child(metrics2);
-  panel.child(container);
+ 
+  // root's child has to be `panel` instance 
   builder.child(panel);
+  panel.child(container);
+  container.child(metrics1).child(metrics2);
 ```
 
 Expected result is as following.
