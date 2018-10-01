@@ -10,6 +10,7 @@ export default class XVIZMetadataBuilder {
 
     this.stream_id = null;
     this.tmp_stream = {};
+    this._declarativeUI = null;
   }
 
   startTime(time) {
@@ -72,13 +73,24 @@ export default class XVIZMetadataBuilder {
     return this;
   }
 
+  declarativeUI(ui) {
+    this._declarativeUI = ui;
+    return this;
+  }
+
   getMetadata() {
     this._flush();
 
-    return {
+    const metadata = {
       type: 'metadata',
       ...this.data
     };
+
+    if (this._declarativeUI) {
+      metadata.declarativeUI = this._declarativeUI;
+    }
+
+    return metadata;
   }
 
   _flush() {
