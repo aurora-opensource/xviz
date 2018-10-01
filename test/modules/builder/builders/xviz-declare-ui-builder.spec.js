@@ -12,40 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/* eslint-disable */
 import test from 'tape-catch';
 import {XvizUIBuilder} from '@xviz/builder';
-
-console.log(XvizUIBuilder);
 
 test('XvizBaseUIBuilder', t => {
   const builder = new XvizUIBuilder({});
 
-  builder
-    .panelLeft({
-      name: 'Metrics Panel'
-    })
-    .children()
+  const panel = builder.panel({name: 'Metrics Panel'});
+  const container = builder.container({name: 'Metrics Container 1'});
+  const metrics1 = builder.metric({
+    streams: ['/vehicle/velocity'],
+    title: 'Velocity'
+  });
+  const metrics2 = builder.metric({
+    streams: ['/vehicle/acceleration'],
+    title: 'Acceleration'
+  });
 
-    .containerLeft({
-      name: 'Metrics Container 1'
-    })
-    .children()
-
-    .metricLeft({
-      streams: ['/vehicle/velocity']
-    })
-    .title('Velocity')
-    .metricRight()
-
-    .metricLeft({
-      streams: ['/vehicle/acceleration']
-    })
-    .title('Acceleration')
-    .metricRight()
-
-    .containerRight()
-    .panelRight();
+  container.child(metrics1).child(metrics2);
+  panel.child(container);
+  builder.child(panel);
 
   const expected = [
     {

@@ -16,22 +16,23 @@ import XvizBaseUiBuilder from './xviz-base-ui-builder';
 import {UI_TYPES} from './constants';
 
 export default class XvizPanelBuilder extends XvizBaseUiBuilder {
-  constructor({name, root}) {
+  constructor({name, layout, interactions, validateWarn, validateError}) {
     super({
-      root,
-      type: UI_TYPES.PANEL
+      type: UI_TYPES.PANEL,
+      validateWarn,
+      validateError
     });
     this._name = name;
-  }
-
-  layout(layout) {
     this._layout = layout;
-    return this;
+    this._interactions = interactions;
+
+    this._validate();
   }
 
-  interactions(interactions) {
-    this._interactions = interactions;
-    return this;
+  _validate() {
+    if (!this._name) {
+      this._validateError('Panel should have `name`.');
+    }
   }
 
   getUI() {
