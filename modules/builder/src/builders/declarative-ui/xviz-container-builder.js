@@ -2,22 +2,24 @@ import XvizBaseUiBuilder from './xviz-base-ui-builder';
 import {UI_TYPES} from './constants';
 
 export default class XvizContainerBuilder extends XvizBaseUiBuilder {
-  constructor({name, root}) {
+  constructor({name, layout, interactions, validateWarn, validateError}) {
     super({
-      root,
-      type: UI_TYPES.CONTAINER
+      type: UI_TYPES.CONTAINER,
+      validateWarn,
+      validateError
     });
+
     this._name = name;
-  }
-
-  layout(layout) {
     this._layout = layout;
-    return this;
+    this._interactions = interactions;
+
+    this._validate();
   }
 
-  interactions(interactions) {
-    this._interactions = interactions;
-    return this;
+  _validate() {
+    if (!this._name) {
+      this._validateError('Container should have `name`.');
+    }
   }
 
   getUI() {

@@ -2,33 +2,37 @@ import XvizBaseUiBuilder from './xviz-base-ui-builder';
 import {UI_TYPES} from './constants';
 
 export default class XvizPlotBuilder extends XvizBaseUiBuilder {
-  constructor({independentVariable, dependentVariable, root}) {
+  constructor({
+    independentVariable,
+    dependentVariable,
+    description,
+    title,
+    interactions,
+    validateWarn,
+    validateError
+  }) {
     super({
-      root,
-      type: UI_TYPES.PLOT
+      type: UI_TYPES.PLOT,
+      validateWarn,
+      validateError
     });
     this._independentVariable = independentVariable;
     this._dependentVariable = dependentVariable;
-  }
-
-  description(description) {
     this._description = description;
-    return this;
-  }
-
-  title(title) {
     this._title = title;
-    return this;
+    this._interactions = interactions;
+
+    this._validate();
   }
 
-  interactions(interactions) {
-    this._interactions = interactions;
-    return this;
+  _validate() {
+    if (!this._name) {
+      this._validateError('Panel should have `name`.');
+    }
   }
 
   getUI() {
     const obj = super.getUI();
-    obj.streams = this._streams;
     obj.independentVariable = this._independentVariable;
     obj.dependentVariable = this._dependentVariable;
 

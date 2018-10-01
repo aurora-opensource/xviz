@@ -2,32 +2,33 @@ import XvizBaseUiBuilder from './xviz-base-ui-builder';
 import {UI_TYPES} from './constants';
 
 export default class XvizTreeTableBuilder extends XvizBaseUiBuilder {
-  constructor({stream, root}) {
+  constructor({
+    stream,
+    description,
+    title,
+    displayObjectId,
+    interactions,
+    validateWarn,
+    validateError
+  }) {
     super({
-      root,
-      type: UI_TYPES.METRIC
+      type: UI_TYPES.METRIC,
+      validateWarn,
+      validateError
     });
     this._stream = stream;
-  }
-
-  description(description) {
     this._description = description;
-    return this;
-  }
-
-  title(title) {
     this._title = title;
-    return this;
-  }
-
-  displayObjectId(displayObjectId) {
     this._displayObjectId = displayObjectId;
-    return this;
+    this._interactions = interactions;
+
+    this._validate();
   }
 
-  interactions(interactions) {
-    this._interactions = interactions;
-    return this;
+  _validate() {
+    if (!this._stream) {
+      this._validateError('TreeTable component should have `stream`.');
+    }
   }
 
   getUI() {
