@@ -287,6 +287,9 @@ test('XVIZBuilder#futures-multiple-primitive', t => {
     .stream(streamId)
     .timestamp(ts1)
     .polygon(verts1)
+    .style({
+      color: [255, 0, 0]
+    })
     .polygon(verts2)
     .timestamp(ts2);
 
@@ -303,7 +306,8 @@ test('XVIZBuilder#futures-multiple-primitive', t => {
               [
                 {
                   type: 'polygon',
-                  vertices: verts1
+                  vertices: verts1,
+                  color: [255, 0, 0]
                 }
               ],
               [
@@ -320,6 +324,7 @@ test('XVIZBuilder#futures-multiple-primitive', t => {
   };
 
   const frame = builder.getFrame();
+  console.log(JSON.stringify(frame));
   t.deepEqual(frame, expected, 'XVIZBuilder multiple primitives futures matches expected output');
   t.end();
 });
