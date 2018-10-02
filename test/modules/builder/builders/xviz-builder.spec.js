@@ -1,14 +1,12 @@
-/* eslint-disable */
+/* eslint-disable camelcase */
 import test from 'tape-catch';
 import {XVIZBuilder} from '@xviz/builder';
 
-function almostEqual(a, b, tolerance = 0.00001) {
-  return Math.abs(a - b) < tolerance;
-}
-
 test('XVIZBuilder#default-ctor', t => {
+  /* eslint-disable no-unused-vars */
   const builder = new XVIZBuilder({});
   t.end();
+  /* eslint-enable  no-unused-vars */
 });
 
 test('XVIZBuilder#polygon', t => {
@@ -324,7 +322,6 @@ test('XVIZBuilder#futures-multiple-primitive', t => {
   };
 
   const frame = builder.getFrame();
-  console.log(JSON.stringify(frame));
   t.deepEqual(frame, expected, 'XVIZBuilder multiple primitives futures matches expected output');
   t.end();
 });
