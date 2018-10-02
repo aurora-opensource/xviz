@@ -1,11 +1,11 @@
-# XvizBuilder
+# XVIZBuilder
 
-`XvizBuilder` class provides convenient chaining functions to format data for the xviz protocol.
+`XVIZBuilder` class provides convenient chaining functions to format data for the xviz protocol.
 
 ## Constructor
 
 ##### metadata (Object)
-* Use `XvizMetadataBuilder` to construct metadata object.
+* Use `XVIZMetadataBuilder` to construct metadata object.
 
 ##### disableStreams (Array)
 * disableStreams are not flushed to frame.
@@ -23,10 +23,23 @@ All methods except `getFrame()` return `this` builder instance
 ##### `getFrame()`
 * Return an object with xviz protocol containing all the streams in current frame built from the XvizBuilder instance.
 
-##### `pose( pose : Object)`
+##### `pose(pose : Object)`
 * Set the vehicle pose stream.
 
-##### stream(streamId : String)
+##### primitive(stream_id : String) | XVIZPrimitiveBuilder
+* Start building a `primitive` or `future` stream.
+* Return `XVIZPrimitiveBuilder` instance
+
+##### variable(stream_id : String) | XVIZVariableBuilder
+* Start building a `variables` stream.
+* Return `XVIZVariableBuilder` instance
+
+
+##### timeSeries(stream_id : String) | XVIZTimeSeriesBuilder
+* Start building a `timeSeries` stream.
+* Return `XVIZTimeSeriesBuilder` instance
+
+**Naming rules for `streamId`**
 * Start building a stream.
 * `streamId` has to be path-like. 
   - always starts with a `/`
@@ -38,7 +51,7 @@ Examples:
    - `/vehicle/velocity`
    - `/object/car-1`
 
-### For `time_series`
+# XVIZTimeSeriesBuilder
 
 ##### timestamp(timestamp : Number)
 * Set timestamp.
@@ -47,7 +60,7 @@ Examples:
 * Value has to be one of `Number`, `String`, or `boolean`.
 
 
-### For `variable`
+# XVIZVariableBuilder
 
 ##### timestamps(timestamps : Array)
 * Set timestamps of a variable.
@@ -57,7 +70,7 @@ Examples:
 * Each element in `values` array should be `Number`, `String`, or `boolean`.
 
 
-### For `primitive`
+# XVIZPrimitiveBuilder
 
 ##### polygon(vertices : TypedArray)
 
@@ -147,19 +160,20 @@ const polygon = new Float32Array([
 ]);
 
 xvizBuilder
-  .pose('/vehicle-pose', pose)
-  .stream('/velocity')
+  .pose(pose)
+
+  .variable('/velocity')
   .timestamp(123)
   .value(1.23)
 
-  .stream('/point-cloud')
+  .primitive('/point-cloud')
   .points(new Float32Array([1.23, 0.45, 0.06]))
   .timestamp()
   .style({
      color: [0, 0, 0, 255]
   })
 
-  .stream('/pedestrian-1-trajectory')
+  .primitive('/pedestrian-1-trajectory')
   .polygon(polygon)
   .timestamp(123);
 
@@ -213,6 +227,5 @@ const frame = xvizBuider.getFrame();
     }
   ]
 }
-
 
 ```

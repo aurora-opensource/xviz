@@ -42,7 +42,7 @@ const UI_BUILDER_MAP = {
   [UI_TYPES.VIDEO]: XvizVideoBuilder
 };
 
-export default class XvizUIBuilder {
+export default class XVIZUIBuilder {
   constructor(options = {}) {
     this._validateWarn = options.validateWarn || defaultValidateWarn;
     this._validateError = options.validateError || defaultValidateError;

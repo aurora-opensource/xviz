@@ -20,7 +20,7 @@ test('XVIZBuilder#default-ctor', t => {
   /* eslint-disable no-unused-vars */
   const builder = new XVIZBuilder({});
   t.end();
-  /* eslint-enable  no-unused-vars */
+  /* eslint-enable no-unused-vars */
 });
 
 test('XVIZBuilder#polygon', t => {
@@ -30,7 +30,7 @@ test('XVIZBuilder#polygon', t => {
 
   builder
     .pose({time: 1.0})
-    .stream('/test/polygon')
+    .primitive('/test/polygon')
     .polygon(verts)
     .style({
       color: [255, 0, 0]
@@ -54,7 +54,54 @@ test('XVIZBuilder#polygon', t => {
     ]
   };
 
-  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder polygon matches expected output');
+  const frame = builder.getFrame();
+  t.deepEqual(frame, expected, 'XVIZBuilder polygon matches expected output');
+  t.end();
+});
+
+test('XVIZBuilder#single-stream-multiple-polygons', t => {
+  const builder = new XVIZBuilder();
+
+  const verts1 = [[1, 2, 3], [0, 0, 0], [2, 3, 4]];
+  const verts2 = [[0, 0, 0], [4, 0, 0], [4, 3, 0]];
+
+  builder
+    .pose({time: 1.0})
+    .primitive('/test/polygon')
+    .polygon(verts1)
+    .style({
+      color: [255, 0, 0]
+    })
+    .polygon(verts2)
+    .style({
+      color: [0, 255, 0]
+    });
+
+  const expected = {
+    vehicle_pose: {time: 1.0},
+    state_updates: [
+      {
+        timestamp: 1.0,
+        primitives: {
+          '/test/polygon': [
+            {
+              type: 'polygon',
+              vertices: verts1,
+              color: [255, 0, 0]
+            },
+            {
+              type: 'polygon',
+              vertices: verts2,
+              color: [0, 255, 0]
+            }
+          ]
+        }
+      }
+    ]
+  };
+
+  const frame = builder.getFrame();
+  t.deepEqual(frame, expected, 'XVIZBuilder multiple polygon match expected output');
   t.end();
 });
 
@@ -65,7 +112,7 @@ test('XVIZBuilder#polyline', t => {
 
   builder
     .pose({time: 1.0})
-    .stream('/test/polyline')
+    .primitive('/test/polyline')
     .polyline(verts);
 
   const expected = {
@@ -95,7 +142,7 @@ test('XVIZBuilder#circle', t => {
 
   builder
     .pose({time: 1.0})
-    .stream('/test/circle')
+    .primitive('/test/circle')
     .circle(pos, 5);
 
   const expected = {
@@ -126,7 +173,7 @@ test('XVIZBuilder#text', t => {
 
   builder
     .pose({time: 1.0})
-    .stream('/test/text')
+    .primitive('/test/text')
     .text('test message')
     .position(pos);
 
@@ -158,7 +205,7 @@ test('XVIZBuilder#stadium', t => {
 
   builder
     .pose({time: 1.0})
-    .stream('/test/stadium')
+    .primitive('/test/stadium')
     .stadium(pos[0], pos[1], 5);
 
   const expected = {
@@ -191,7 +238,7 @@ test('XVIZBuilder#variable', t => {
 
   builder
     .pose({time: ts1})
-    .stream('/test/variables')
+    .variable('/test/variables')
     .timestamps([ts1, ts2])
     .values([1.1, 2.0]);
 
@@ -215,6 +262,88 @@ test('XVIZBuilder#variable', t => {
   t.end();
 });
 
+test('XVIZBuilder#multiple-variables', t => {
+  const builder = new XVIZBuilder();
+  const ts1 = 1.0;
+  const ts2 = 2.0;
+
+  builder
+    .pose({time: ts1})
+    .variable('/test/variables_1')
+    .timestamps([ts1, ts2])
+    .values([1.1, 2.0]);
+
+  builder
+    .variable('/test/variables_2')
+    .timestamps([ts2, ts1])
+    .values([2.0, 1.1]);
+
+  const expected = {
+    vehicle_pose: {time: ts1},
+    state_updates: [
+      {
+        timestamp: ts1,
+        variables: {
+          '/test/variables_1': {
+            values: [1.1, 2.0],
+            timestamps: [ts1, ts2],
+            type: 'float'
+          },
+          '/test/variables_2': {
+            values: [2.0, 1.1],
+            timestamps: [ts2, ts1],
+            type: 'float'
+          }
+        }
+      }
+    ]
+  };
+
+  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder multiple variables match expected output');
+  t.end();
+});
+
+test('XVIZBuilder#time_series', t => {
+  const builder = new XVIZBuilder();
+  const ts1 = 1.0;
+  const ts2 = 1.0;
+
+  builder
+    .pose({time: ts1})
+    .timeSeries('/test/time_series_1')
+    .timestamp(ts1)
+    .value(1.0);
+
+  builder
+    .timeSeries('/test/time_series_2')
+    .timestamp(ts2)
+    .value(2.0);
+
+  const expected = {
+    vehicle_pose: {time: ts1},
+    state_updates: [
+      {
+        timestamp: ts1,
+        variables: {
+          '/test/time_series_1': {
+            values: [1.0],
+            timestamps: [ts1],
+            type: 'integer'
+          },
+          '/test/time_series_2': {
+            values: [2.0],
+            timestamps: [ts2],
+            type: 'integer'
+          }
+        }
+      }
+    ]
+  };
+
+  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder variable matches expected output');
+  t.end();
+});
+
 test('XVIZBuilder#futures-single-primitive', t => {
   const builder = new XVIZBuilder();
   const streamId = '/test/polygon';
@@ -223,7 +352,7 @@ test('XVIZBuilder#futures-single-primitive', t => {
 
   builder
     .pose({time: ts})
-    .stream(streamId)
+    .primitive(streamId)
     .polygon(verts)
     .timestamp(ts);
 
@@ -255,48 +384,18 @@ test('XVIZBuilder#futures-single-primitive', t => {
   t.end();
 });
 
-test('XVIZBuilder#time_series', t => {
-  const builder = new XVIZBuilder();
-  const ts = 1.0;
-
-  builder
-    .pose({time: ts})
-    .stream('/test/time_series')
-    .timestamp(ts)
-    .value(2.0);
-
-  const expected = {
-    vehicle_pose: {time: ts},
-    state_updates: [
-      {
-        timestamp: ts,
-        variables: {
-          '/test/time_series': {
-            values: [2.0],
-            timestamps: [ts],
-            type: 'integer'
-          }
-        }
-      }
-    ]
-  };
-
-  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder variable matches expected output');
-  t.end();
-});
-
 test('XVIZBuilder#futures-multiple-primitive', t => {
   const builder = new XVIZBuilder();
   const streamId = '/test/polygon';
 
-  const verts1 = [[0, 0, 0], [4, 0, 0], [4, 3, 0]];
-  const verts2 = [[1, 2, 3], [0, 0, 0], [2, 3, 4]];
-  const ts1 = 1.0;
-  const ts2 = 2.0;
+  const verts1 = [[1, 2, 3], [0, 0, 0], [2, 3, 4]];
+  const verts2 = [[0, 0, 0], [4, 0, 0], [4, 3, 0]];
+  const ts1 = 2.0;
+  const ts2 = 1.0;
 
   builder
-    .pose({time: ts1})
-    .stream(streamId)
+    .pose({time: ts2})
+    .primitive(streamId)
     .timestamp(ts1)
     .polygon(verts1)
     .style({
@@ -306,26 +405,26 @@ test('XVIZBuilder#futures-multiple-primitive', t => {
     .timestamp(ts2);
 
   const expected = {
-    vehicle_pose: {time: ts1},
+    vehicle_pose: {time: ts2},
     state_updates: [
       {
-        timestamp: ts1,
+        timestamp: ts2,
         futures: {
           [streamId]: {
             name: streamId,
-            timestamps: [ts1, ts2],
+            timestamps: [ts2, ts1],
             primitives: [
               [
                 {
                   type: 'polygon',
-                  vertices: verts1,
-                  color: [255, 0, 0]
+                  vertices: verts2
                 }
               ],
               [
                 {
                   type: 'polygon',
-                  vertices: verts2
+                  vertices: verts1,
+                  color: [255, 0, 0]
                 }
               ]
             ]

@@ -13,10 +13,10 @@
 // limitations under the License.
 
 import test from 'tape-catch';
-import {XvizUIBuilder} from '@xviz/builder';
+import {XVIZUIBuilder} from '@xviz/builder';
 
 test('XvizBaseUIBuilder', t => {
-  const builder = new XvizUIBuilder({});
+  const builder = new XVIZUIBuilder({});
 
   const panel = builder.panel({name: 'Metrics Panel'});
   const container = builder.container({name: 'Metrics Container 1'});
@@ -59,7 +59,7 @@ test('XvizBaseUIBuilder', t => {
   ];
 
   const actual = builder.getUI();
-  t.deepEqual(actual, expected, 'XvizUIBuilder should match expectation');
+  t.deepEqual(actual, expected, 'XVIZUIBuilder should match expectation');
 
   t.end();
 });
