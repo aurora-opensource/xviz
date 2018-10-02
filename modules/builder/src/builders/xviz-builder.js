@@ -174,10 +174,6 @@ export default class XVIZBuilder {
 
     this._timestamps = [timestamp];
 
-    if (this._isFuture()) {
-      this._flushFutures();
-    }
-
     return this;
   }
 
@@ -256,6 +252,10 @@ export default class XVIZBuilder {
   }
 
   polygon(vertices) {
+    if (this._isFuture()) {
+      this._flushFutures();
+    }
+
     this._validateStreamId();
     this._validatePropSetOnce('_vertices');
     this._validatePropSetOnce('_category');
@@ -264,14 +264,14 @@ export default class XVIZBuilder {
     this._type = PRIMITIVE_TYPES.polygon;
     this._category = CATEGORY.primitive;
 
-    if (this._isFuture()) {
-      this._flushFutures();
-    }
-
     return this;
   }
 
   polyline(vertices) {
+    if (this._isFuture()) {
+      this._flushFutures();
+    }
+
     this._validateStreamId();
     this._validatePropSetOnce('_vertices');
     this._validatePropSetOnce('_category');
@@ -280,14 +280,14 @@ export default class XVIZBuilder {
     this._type = PRIMITIVE_TYPES.polyline;
     this._category = CATEGORY.primitive;
 
-    if (this._isFuture()) {
-      this._flushFutures();
-    }
-
     return this;
   }
 
   points(vertices) {
+    if (this._isFuture()) {
+      this._flushFutures();
+    }
+
     this._validateStreamId();
     this._validatePropSetOnce('_vertices');
     this._validatePropSetOnce('_category');
@@ -296,14 +296,14 @@ export default class XVIZBuilder {
     this._type = PRIMITIVE_TYPES.point;
     this._category = CATEGORY.primitive;
 
-    if (this._isFuture()) {
-      this._flushFutures();
-    }
-
     return this;
   }
 
   circle(position, radius) {
+    if (this._isFuture()) {
+      this._flushFutures();
+    }
+
     this._validateStreamId();
     this._validatePropSetOnce('_radius');
     this._validatePropSetOnce('_category');
@@ -314,14 +314,14 @@ export default class XVIZBuilder {
     this._type = PRIMITIVE_TYPES.circle;
     this._category = CATEGORY.primitive;
 
-    if (this._isFuture()) {
-      this._flushFutures();
-    }
-
     return this;
   }
 
   stadium(start, end, radius) {
+    if (this._isFuture()) {
+      this._flushFutures();
+    }
+
     this._validateStreamId();
     this._validatePropSetOnce('_radius');
     this._validatePropSetOnce('_category');
@@ -342,10 +342,6 @@ export default class XVIZBuilder {
     this._radius = radius;
     this._type = PRIMITIVE_TYPES.stadium;
     this._category = CATEGORY.primitive;
-
-    if (this._isFuture()) {
-      this._flushFutures();
-    }
 
     return this;
   }
@@ -368,6 +364,7 @@ export default class XVIZBuilder {
 
     this._style = style;
     this._validateStyle();
+    return this;
   }
 
   id(identifier) {
@@ -619,11 +616,11 @@ export default class XVIZBuilder {
     this._resetPrimitives();
   }
 
-  // eslint-disable-next-line complexity
+  /* eslint-disable complexity, max-depth */
   _flush() {
     this._validate();
 
-    if (this.streamId && !this.disableStreams.includes(this.streamId)) {
+    if (!this.disableStreams.includes(this.streamId)) {
       if (this._category === CATEGORY.variable || this._category === CATEGORY.time_series) {
         if (!this._data.variables) {
           this._data.variables = {};
@@ -632,20 +629,25 @@ export default class XVIZBuilder {
       }
 
       if (this._category === CATEGORY.primitive) {
-        if (!this._data.primitives) {
-          this._data.primitives = {};
-        }
-        if (!this._data.primitives[this.streamId]) {
-          this._data.primitives[this.streamId] = [];
-        }
+        if (this._isFuture()) {
+          this._flushFutures();
+        } else {
+          if (!this._data.primitives) {
+            this._data.primitives = {};
+          }
+          if (!this._data.primitives[this.streamId]) {
+            this._data.primitives[this.streamId] = [];
+          }
 
-        const primitiveObj = this._formatPrimitives();
-        this._data.primitives[this.streamId].push(primitiveObj);
+          const primitiveObj = this._formatPrimitives();
+          this._data.primitives[this.streamId].push(primitiveObj);
+        }
       }
     }
 
     this._reset();
   }
+  /* eslint-enable */
 
   _resetPrimitives() {
     this._timestamps = null;

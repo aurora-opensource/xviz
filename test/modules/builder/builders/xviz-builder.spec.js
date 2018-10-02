@@ -12,17 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/* eslint-disable */
+/* eslint-disable camelcase */
 import test from 'tape-catch';
 import {XVIZBuilder} from '@xviz/builder';
 
-function almostEqual(a, b, tolerance = 0.00001) {
-  return Math.abs(a - b) < tolerance;
-}
-
 test('XVIZBuilder#default-ctor', t => {
+  /* eslint-disable no-unused-vars */
   const builder = new XVIZBuilder({});
   t.end();
+  /* eslint-enable  no-unused-vars */
 });
 
 test('XVIZBuilder#polygon', t => {
@@ -301,6 +299,9 @@ test('XVIZBuilder#futures-multiple-primitive', t => {
     .stream(streamId)
     .timestamp(ts1)
     .polygon(verts1)
+    .style({
+      color: [255, 0, 0]
+    })
     .polygon(verts2)
     .timestamp(ts2);
 
@@ -317,7 +318,8 @@ test('XVIZBuilder#futures-multiple-primitive', t => {
               [
                 {
                   type: 'polygon',
-                  vertices: verts1
+                  vertices: verts1,
+                  color: [255, 0, 0]
                 }
               ],
               [
