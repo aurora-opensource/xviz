@@ -1,4 +1,3 @@
-/* eslint-disable */
 import test from 'tape-catch';
 import {validateStreamId} from '@xviz/builder/utils';
 
@@ -16,7 +15,6 @@ test('validateStreamId', t => {
 
   const validCasesResults = validTestCases.map(testCase => validateStreamId(testCase));
   const invalidCasesResults = invalidTestCases.map(testCase => validateStreamId(testCase));
-  console.log(invalidCasesResults);
 
   t.ok(validCasesResults.every(res => res), 'All of the cases should be valid.');
   t.ok(invalidCasesResults.every(res => !res), 'All of the cases should be invalid.');
