@@ -26,9 +26,17 @@ All methods except `getFrame()` return `this` builder instance
 ##### `pose( pose : Object)`
 * Set the vehicle pose stream.
 
-##### stream(stream_id : String)
+##### stream(streamId : String)
 * Start building a stream.
+* `streamId` has to be path-like. 
+  - always starts with a `/`
+  - sections contain only: `[a-zA-Z0-9_-:.]`
+  - does not end with a `/`
 
+Examples:
+   - `/vehicle-pose`
+   - `/vehicle/velocity`
+   - `/object/car-1`
 
 ### For `time_series`
 
