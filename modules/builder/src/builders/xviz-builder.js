@@ -1,6 +1,7 @@
 // Note: XVIZ data structures use snake_case
 /* eslint-disable camelcase */
 import {insertTimestamp} from '../utils/sort';
+import {validateStreamId} from '../utils/validate';
 
 const CATEGORY = {
   time_series: 'time_series',
@@ -148,6 +149,8 @@ export default class XVIZBuilder {
 
     this._reset();
     this.streamId = streamId;
+    this._validateStreamId();
+
     return this;
   }
 
@@ -410,6 +413,12 @@ export default class XVIZBuilder {
   _validateStreamId() {
     if (!this.streamId) {
       this._validateError('A stream must be set first.');
+    }
+    const isValid = validateStreamId(this.streamId);
+    if (!isValid) {
+      this._validateWarn(
+        `${this.streamId} does not follow path like pattern. check xviz-builder doc for details.`
+      );
     }
   }
 
