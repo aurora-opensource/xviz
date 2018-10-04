@@ -5,13 +5,14 @@
  * `data` refers to pre-processed data objects (blob, arraybuffer, JSON object)
  */
 /* global Blob, Uint8Array */
-import {LOG_STREAM_MESSAGE, STREAM_DATA_CONTENT} from '../constants';
-import {getXvizConfig} from '../config/xviz-config';
+import {LOG_STREAM_MESSAGE} from '../constants';
 import {parseBinaryXVIZ, isBinaryXVIZ} from '../loaders/xviz-loader/xviz-binary-loader';
 import {parseLogMetadata} from './parse-log-metadata';
-import {parseStreamPrimitive, parseStreamVariable, parseStreamFutures} from './parse-xviz-stream';
 import {parseStreamVideoMessage} from './parse-stream-video-message';
 import {TextDecoder} from 'text-encoding'; // Node.js < 9 polyfills
+import parseTimesliceDataV1 from './parse-timeslice-data-v1';
+import parseTimesliceDataV2 from './parse-timeslice-data-v2';
+import {getXvizConfig} from '..';
 
 function isJSON(encodedString) {
   const firstChar = String.fromCharCode(encodedString[0]);
@@ -81,85 +82,9 @@ export function parseStreamLogData(data, opts = {}) {
   }
 }
 
-// Extracts a TIMESLICE message
 function parseTimesliceData(data, convertPrimitive) {
-  const {PRIMARY_POSE_STREAM, postProcessTimeslice, postProcessVehiclePose} = getXvizConfig();
-  const {vehicle_pose: vehiclePose, state_updates: stateUpdates, ...otherInfo} = data;
-
-  let timestamp;
-  if (vehiclePose) {
-    timestamp = vehiclePose.time;
-  } else if (stateUpdates) {
-    timestamp = stateUpdates.reduce((t, stateUpdate) => {
-      return Math.max(t, stateUpdate.timestamp);
-    }, 0);
-  }
-
-  if (!timestamp) {
-    // Incomplete stream message, just tag it accordingly so client can ignore it
-    return {type: LOG_STREAM_MESSAGE.INCOMPLETE};
-  }
-
-  const newStreams = {};
-  const result = {
-    ...otherInfo,
-    type: LOG_STREAM_MESSAGE.TIMESLICE,
-    streams: newStreams,
-    channels: newStreams, // TODO -remove, backwards compatibility
-    timestamp,
-    missingContentFlags:
-      (!stateUpdates && STREAM_DATA_CONTENT.XVIZ) | (!vehiclePose && STREAM_DATA_CONTENT.VEHICLE)
-  };
-
-  if (stateUpdates) {
-    const xvizStreams = parseStateUpdates(stateUpdates, timestamp, convertPrimitive);
-    Object.assign(newStreams, xvizStreams);
-  }
-
-  if (vehiclePose) {
-    result.vehiclePose = postProcessVehiclePose(vehiclePose);
-    newStreams[PRIMARY_POSE_STREAM] = result.vehiclePose;
-  }
-
-  return postProcessTimeslice ? postProcessTimeslice(result) : result;
-}
-
-function parseStateUpdates(stateUpdates, timestamp, convertPrimitive) {
-  const {filterStream} = getXvizConfig();
-
-  const newStreams = {};
-  const primitives = {};
-  const variables = {};
-  const futures = {};
-
-  for (const stateUpdate of stateUpdates) {
-    Object.assign(primitives, stateUpdate.primitives);
-    Object.assign(variables, stateUpdate.variables);
-    Object.assign(futures, stateUpdate.futures);
-  }
-
-  Object.keys(primitives)
-    .filter(streamName => filterStream(streamName))
-    .forEach(primitive => {
-      newStreams[primitive] = parseStreamPrimitive(
-        primitives[primitive],
-        primitive,
-        timestamp,
-        convertPrimitive
-      );
-    });
-
-  Object.keys(variables)
-    .filter(streamName => filterStream(streamName))
-    .forEach(variable => {
-      newStreams[variable] = parseStreamVariable(variables[variable], variable, timestamp);
-    });
-
-  Object.keys(futures)
-    .filter(streamName => filterStream(streamName))
-    .forEach(future => {
-      newStreams[future] = parseStreamFutures(futures[future], future, timestamp, convertPrimitive);
-    });
-
-  return newStreams;
+  const {version} = getXvizConfig();
+  return version === 1
+    ? parseTimesliceDataV1(data, convertPrimitive)
+    : parseTimesliceDataV2(data, convertPrimitive);
 }
