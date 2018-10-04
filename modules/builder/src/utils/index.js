@@ -27,3 +27,5 @@ export {flattenToTypedArray} from './flatten';
 export {toLowPrecision} from './to-low-precision';
 
 export {insertTimestamp} from './sort';
+
+export {validateStreamId} from './validate';
