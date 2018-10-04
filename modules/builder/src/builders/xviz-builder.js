@@ -149,7 +149,7 @@ export default class XVIZBuilder {
 
     this._reset();
     this.streamId = streamId;
-    this._validateStreamId(streamId);
+    this._validateStreamId();
 
     return this;
   }
@@ -416,7 +416,9 @@ export default class XVIZBuilder {
     }
     const isValid = validateStreamId(this.streamId);
     if (!isValid) {
-      this._validateWarn(`${this.streamId} does not follow path like pattern. check xviz-builder doc for details.`)
+      this._validateWarn(
+        `${this.streamId} does not follow path like pattern. check xviz-builder doc for details.`
+      );
     }
   }
 
