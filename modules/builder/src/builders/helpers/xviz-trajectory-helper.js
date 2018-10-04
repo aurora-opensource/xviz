@@ -4,7 +4,7 @@ import * as turf from '@turf/turf';
 /**
  * Given vertices and a base pose, transform the vertices to `basePose` relative coordinates
  * @param vertices {Array} list of [x, y, z] or [x, y]
- * @param basePose {Object} {x, y, z, roll, pitch, yaw}
+ * @param basePose {Object} {x, y, z, longitude, latitude, altitude, roll, pitch, yaw}
  * @returns {Array} list of vertices in relative coordinates
  */
 export function getRelativeCoordinates(vertices, basePose) {
@@ -18,9 +18,10 @@ export function getRelativeCoordinates(vertices, basePose) {
 
 /**
  * Generate trajectory for list of poses with given start frame and end frame
- * @param poses, frames of pose data, each frame contains a `pose` entry with {x, y, z, roll, pitch, yaw}
- * @param startFrame, start frame of trajectory
- * @param endFrame, end frame of trajectory
+ * @param poses {Array}, frames of pose data,
+ *   each frame contains a `pose` entry with {x, y, z, longitude, latitude, altitude, roll, pitch, yaw}
+ * @param startFrame {Number}, start frame of trajectory
+ * @param endFrame {Number}, end frame of trajectory
  * @returns {Array} trajectory, list of vertices
  */
 export function getPoseTrajectory({poses, startFrame, endFrame}) {
@@ -36,11 +37,11 @@ export function getPoseTrajectory({poses, startFrame, endFrame}) {
 
 /**
  * Get object trajectory in pose relative coordinates
- * @param targetObject
- * @param objectFrames, all the frames of objects
- * @param poseFrames, all the frames of base poses
- * @param startFrame, start frame of trajectory
- * @param endFrame, end frame of trajectory
+ * @param targetObject {Object} {id, x, y, z, ...}
+ * @param objectFrames {Array}, all the frames of objects, (object: {id, x, y, z})
+ * @param poseFrames {Array}, all the frames of base poses (pose: {longitude, latitude, altitude})
+ * @param startFrame {Number}, start frame of trajectory
+ * @param endFrame {Number}, end frame of trajectory
  * @returns {Array} trajectory, list of vertices
  */
 export function getObjectTrajectory({
@@ -56,7 +57,7 @@ export function getObjectTrajectory({
   const motions = getObjectMotions(targetObject, objectFrames, startFrame, limit);
 
   for (let i = 0; i < motions.length; i++) {
-    const t = motions[i];
+    const step = motions[i];
     const currVehiclePose = poseFrames[startFrame + i].pose;
 
     const [x, y] = getPoseOffset(startVehiclePose, currVehiclePose);
@@ -67,7 +68,7 @@ export function getObjectTrajectory({
 
     // objects in curr frame are meters offset based on current vehicle pose
     // need to convert to the coordinate system of the start vehicle pose
-    const p = transformMatrix.transformVector([t.x, t.y, t.z]);
+    const p = transformMatrix.transformVector([step.x, step.y, step.z]);
     vertices.push([p[0] + x, p[1] + y, p[2]]);
   }
 
@@ -83,13 +84,23 @@ function getPoseOffset(p1, p2) {
   return [distInMeters * Math.cos(radianDiff), distInMeters * Math.sin(radianDiff)];
 }
 
+function getFrameObjects(frames, frameNumber) {
+  if (frames instanceof Map) {
+    return frames.get(frameNumber);
+  }
+  if (frames instanceof Array) {
+    return frames[frameNumber];
+  }
+  return null;
+}
+
 /**
  * Generate motions for target object
- * @param targetObject {object} {startFrame, endFrame, id, x, y, z, pitch, roll, yaw...}
- * @param objectFrames {Map}, key is frameNumber, value is list of objects}
- * @param startFrame Number
- * @param endFrame Number
- * @returns {Array} list of motions from startFrame to endFrame including object pose info (x, y, z,  roll, pitch, yaw)
+ * @param targetObject {Object} {startFrame, endFrame, id, x, y, z,...}
+ * @param objectFrames {Map | Array}, either a Map (key is frameNumber, value is list of objects) or an array of frames
+ * @param startFrame {Number}
+ * @param endFrame {Number}
+ * @returns {Array} list of motions from given startFrame to endFrame
  */
 function getObjectMotions(targetObject, objectFrames, startFrame, endFrame) {
   startFrame = Math.max(targetObject.firstFrame, startFrame);
@@ -97,7 +108,7 @@ function getObjectMotions(targetObject, objectFrames, startFrame, endFrame) {
 
   const motions = [];
   for (let i = startFrame; i < endFrame; i++) {
-    const objects = objectFrames.get(i);
+    const objects = getFrameObjects(objectFrames, i);
     const object = objects.find(obj => obj.id === targetObject.id);
     motions.push(object);
   }
