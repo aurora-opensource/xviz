@@ -25,3 +25,9 @@ export {default as XVIZWriter} from './writers/xviz-writer/xviz-writer';
 export {default as XVIZBuilder} from './builders/xviz-builder';
 export {default as XVIZMetadataBuilder} from './builders/xviz-metadata-builder';
 export {default as XvizUIBuilder} from './builders/declarative-ui/xviz-ui-builder';
+
+export {
+  getPoseTrajectory as _getPoseTrajectory,
+  getObjectTrajectory as _getObjectTrajectory,
+  getRelativeCoordinates as _getRelativeCoordinates
+} from './builders/helpers/xviz-trajectory-helper';

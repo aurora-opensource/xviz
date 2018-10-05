@@ -14,7 +14,9 @@
     "src"
   ],
   "dependencies": {
-    "text-encoding": "^0.6.4"
+    "text-encoding": "^0.6.4",
+    "@turf/turf": "^5.1.6",
+    "math.gl": "^2.0.0"
   },
   "scripts": {
     "clean": "rm -fr dist && mkdir -p dist",
