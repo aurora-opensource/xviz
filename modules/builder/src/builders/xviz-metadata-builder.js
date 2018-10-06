@@ -1,8 +1,17 @@
 // Note: XVIZ data structures use snake_case
 /* eslint-disable camelcase*/
 
+/* global console */
+/* eslint-disable no-console */
+const defaultValidateWarn = console.warn;
+const defaultValidateError = console.error;
+/* eslint-enable no-console */
+
 export default class XVIZMetadataBuilder {
-  constructor() {
+  constructor({validateWarn = defaultValidateWarn, validateError = defaultValidateError} = {}) {
+    this._validateWarn = validateWarn;
+    this._validateError = validateError;
+
     this.data = {
       streams: {},
       styles: {}
@@ -62,12 +71,20 @@ export default class XVIZMetadataBuilder {
   }
 
   styleClass(className, style) {
+    if (!this.stream_id) {
+      this._validateError('A stream must set before adding a style rule.');
+      return this;
+    }
+
+    const streamRule = {
+      ...style,
+      class: className
+    };
+
     if (!this.data.styles[this.stream_id]) {
-      this.data.styles[this.stream_id] = {
-        [className]: style
-      };
+      this.data.styles[this.stream_id] = [streamRule];
     } else {
-      this.data.styles[this.stream_id][className] = style;
+      this.data.styles[this.stream_id].push(streamRule);
     }
     return this;
   }
