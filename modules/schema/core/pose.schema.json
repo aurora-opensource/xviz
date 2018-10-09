@@ -47,5 +47,5 @@
     "position",
     "orientation"
   ],
-  "additionalProperties": false
+  "additionalProperties": true
 }
