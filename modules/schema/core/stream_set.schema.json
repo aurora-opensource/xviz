@@ -26,6 +26,39 @@
       },
       "minItems": 1,
       "additionalItems": false
+    },
+    "time_series": {
+      "type": "array",
+      "items": {
+        "$ref": "https://xviz.org/schema/core/timeseries_state.schema.json"
+      },
+      "minItems": 1,
+      "additionalItems": false
+    },
+    "future_instances": {
+      "type": "array",
+      "items": {
+        "$ref": "https://xviz.org/schema/core/future_instances.json"
+      },
+      "minItems": 1,
+      "additionalItems": false
+    },
+    "variables": {
+      "type": "array",
+      "items": {
+        "$ref": "https://xviz.org/schema/core/variable_state.json"
+      },
+      "minItems": 1,
+      "additionalItems": false
+    },
+    "annotations": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {"$ref": "https://xviz.org/schema/core/annotation_visual.json"}
+        ]
+      },
+      "additionalItems": false
     }
   },
   "required": [
