@@ -7,15 +7,11 @@ Streams are named in accordance with a few simple rules.
 
 ### Use file system-like hierarchical names
 
-**Good** - uses path separators
+**Must** - uses path separators
 
 `/system/object/bounds`
 
 `/system/object/velocity`
-
-**Bad** - uses lots of underscores
-
-`system_object_bounds`
 
 ### Stream names should not contain ids.
 
@@ -26,6 +22,8 @@ All of the objects go on the same stream, using the `id` field to tell them apar
 `/object`
 
 **Bad** - a stream per object
+
+This ignores the 'id' support of elements in XVIZ and provides no cross stream object linking.
 
 `/object/123`
 

@@ -14,6 +14,3 @@ For XVIZ that is stored in binary GLB file format, the binary GLB file must be u
 
 Then postprocessing will take place to ensure the data is in a standardized, easy to work with format, and also apply some application configuration, for instance filtering certain channels etc.
 
-
-## API Overview
-

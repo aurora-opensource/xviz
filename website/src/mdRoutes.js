@@ -21,6 +21,39 @@ export default [{
     }, {
       name: 'Roadmap',
       markdown: require('../../docs/overview/roadmap.md')
+    }, {
+      name: 'Related Projects',
+      markdown: require('../../docs/overview/related.md')
+    }]
+  }, {
+    name: 'Developer\'s Guide',
+    children: [{
+      name: 'Overview',
+      markdown: require('../../docs/developers-guide/README.md')
+    }, {
+      name: 'Installing',
+      markdown: require('../../docs/developers-guide/installing-xviz.md')
+    }, {
+      name: 'Structure of XVIZ Data',
+      markdown: require('../../docs/developers-guide/structure-of-xviz.md')
+    }, {
+      name: 'Generating XVIZ',
+      markdown: require('../../docs/developers-guide/generating-xviz.md')
+    }, {
+      name: 'Serving XVIZ',
+      markdown: require('../../docs/developers-guide/serving-xviz.md')
+    }, {
+      name: 'Parsing XVIZ',
+      markdown: require('../../docs/developers-guide/parsing-xviz.md')
+    }, {
+      name: 'Styling XVIZ',
+      markdown: require('../../docs/developers-guide/styling-xviz.md')
+    }, {
+      name: 'Using the Declarative UI',
+      markdown: require('../../docs/developers-guide/using-declarative-ui.md')
+    }, {
+      name: 'Using XVIZ without JavaScript',
+      markdown: require('../../docs/developers-guide/using-xviz-in-other-languages.md')
     }]
   }, {
     name: 'Protocol Schema',
@@ -76,35 +109,5 @@ export default [{
       name: 'XVIZ Loader',
       markdown: require('../../docs/api-reference/xviz-loader.md')
     }]
-  }, {
-    name: 'Developer\'s Guide',
-    children: [{
-      name: 'Overview',
-      markdown: require('../../docs/developers-guide/README.md')
-    }, {
-      name: 'Installing',
-      markdown: require('../../docs/developers-guide/installing-xviz.md')
-    }, {
-      name: 'Structure of XVIZ Data',
-      markdown: require('../../docs/developers-guide/structure-of-xviz.md')
-    }, {
-      name: 'Generating XVIZ',
-      markdown: require('../../docs/developers-guide/generating-xviz.md')
-    }, {
-      name: 'Serving XVIZ',
-      markdown: require('../../docs/developers-guide/serving-xviz.md')
-    }, {
-      name: 'Parsing XVIZ',
-      markdown: require('../../docs/developers-guide/parsing-xviz.md')
-    }, {
-      name: 'Styling XVIZ',
-      markdown: require('../../docs/developers-guide/styling-xviz.md')
-    }, {
-      name: 'Using the Declarative UI',
-      markdown: require('../../docs/developers-guide/using-declarative-ui.md')
-    }, {
-      name: 'Using XVIZ without JavaScript',
-      markdown: require('../../docs/developers-guide/using-xviz-in-other-languages.md')
-    }]
-  }]
+  }] 
 }];

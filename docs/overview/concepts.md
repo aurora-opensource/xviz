@@ -10,15 +10,17 @@ A data object (typically from a robotics system) that we wish to visualize.
 
 ## Stream
 
-A stream is a sequence of timestamped datums of similar structure. Different types of datums are organized in different streams.
+A stream is a sequence of timestamped datums of the same type. Different types of datums are organized in different streams.
 
-* **Stream Name** - Each stream must be given a logical name. The application defines these names, XVIZ does not reserve or give special interpretation to any names, however `/` separators can be used in names to indicate hierarchy.
+* **Stream Name** - Each stream must be given a unique name. The application defines these names, XVIZ requires the names follow a path-like structure separated by '/', such as '/vehicle/velocity'.
 * **Stream Type** - The type of a stream is defined by what kind of datums it contains.
 
 The following stream types are predefined by the protocol, and the XVIZ client library contains support for parsing and displaying them:
 
-* **Pose Stream** - A set of positions that describes the position of an actor and any relative coordinate system(s) it defines.
+* **Pose Stream** - A set of positions that describes the position and orientaton of an actor and any relative coordinate system(s) it defines.
 * **Geometry Types** - geometry primitives
+* **Variables** - arrays of data
+* **Time series** - individual samples of a larger series
 * **Tree Table** - hierarchical data structure, use to convey dense record type data
 * **Image Stream** - Binary format image data
 
@@ -28,11 +30,6 @@ The following stream types are predefined by the protocol, and the XVIZ client l
 A source of XVIZ streams. A source can be a pre-generated log loaded from a URL or a file, but it can also be a live data served over e.g. a socket.
 
 Each source contains one or more streams, as well as a metadata about the streams.
-
-
-## Video
-
-XVIZ can sync with external video sources provided that they have been encoded in a suitable way.
 
 
 ## Metadata
@@ -45,9 +42,14 @@ A special XVIZ message that contains descriptive information about the data sour
 An XVIZ primitive is a geometric object such as a point, line, polygon etc that should be visualized. It can be tagged and given special styling (color etc).
 
 
+## Style
+
+XVIZ support a form of stylesheets, allowing object properties to be specified based stream and class.
+
+
 ## Object
 
-Objects can be defined by attaching object identifiers to geometry primitives, which will define an object identity across time slices.
+Objects can be defined by attaching identifiers to primitives, variables, and time series. The identifier enables linking information across streams and time slices.
 
 
 ## Variable
@@ -60,11 +62,11 @@ A sequences of values the occur at a one time.  Like the speed of travel over a 
 Time stamped values can be included in streams.  Each time the stream updates you get a new timestamp, value pair.
 
 
-## Style
+## Video
 
-XVIZ support a form of style sheets, allowing object properties such as colors, line widths etc to be specified based on e.g. classes.
+XVIZ can sync with external video sources provided that they have been encoded in a suitable way.
 
 
 ## Encoding
 
-The XVIZ protocol specification does not prescribe any given encoding, however the XVIZ libraries come with support for parsing a JSON encoding.
+The XVIZ protocol specification does not prescribe any given encoding, however the XVIZ libraries come with support for encoding and parsing in JSON.
