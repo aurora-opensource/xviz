@@ -28,6 +28,27 @@ As an example, the stream `/object/shape` would contain all primitive shapes, wh
 Since the representation for an object is split across streams, XVIZ base types can have an ID which will be used to maintain the relationship of the data. In the example above, the /shape stream would transmit the object’s shape information, while the /velocity stream would transmit the object’s velocity information. These streams are separated for ease of parsing and improved data compression - for example, object shapes may only need to be updated once per second, whereas velocities might be more useful updated 10 times per second.
 
 
+
+### Poses
+
+A core part of XVIZ is knowing the location of the vehicle(s) so they can be displayed relative to the other data. This defines the location of the vehicle from it's own arbitrary frame, along with it's location in latitude, longitude, form.
+
+| Name           | Type               | Description |
+| ---            | ---                | --- |
+| `timestamp`    | `float`            | The vehicle/log transmission\_time associated with this data. |
+| `mapOrigin`    | `map_origin`       | Uniquely identifies an object for all time. |
+| `position`     | `array<float>(3)`  | x, y, z position in meters |
+| `orientation`  | `array<float>(3)`  | roll, pitch, yaw angle in radians  |
+
+The `map_origin` object describes a location in geographic coordinates and altitude:
+
+| Name        | Type     | Description |
+| ---         | ---      | --- |
+| `longitude` | `float`  | The east-west geographic coordinate in degrees |
+| `latitude`  | `float`  | The north-south geographic coordinate in degrees |
+| `altitude`  | `float`  | The altitude above sea level in meters |
+
+
 ### Styles
 
 Similar to CSS each primitive can have one or more classes, each of which can have associated style information.  This allows the styling information to be sent out of band with the main data flows, and only once.  Learn more in the [style specification](/docs/protocol-schema/style-specification.md).
@@ -88,7 +109,8 @@ This is a single cohesive set of streams which all happened at the same time and
 | ---             | ---                                 | --- |
 | `timestamp`     | `timestamp`                         | The vehicle/log transmission\_time associated with this data. |
 | `primitives`    | `map<stream_id, primitive_state>`   | Streams containing list of primitives.  |
-| `time_series`   | `list<time_series_state>` |   |
+| `poses`         | `list<pose>`                        | Related vehicle poses  |
+| `time_series`   | `list<time_series_state>`           |   |
 | `future_states` | `map<stream_id, future_instances>`  | Streams containing This represents a collection of primitives at different timestamps, for the current stream set timestamp  |
 | `variables`     | `map<stream_id, variable_state>`    | Streams containing list of values.  |
 | `annotations`   | `map<stream_id, annotation_state>`  | Streams containing annotations  |
