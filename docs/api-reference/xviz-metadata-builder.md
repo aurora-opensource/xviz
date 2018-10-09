@@ -14,7 +14,7 @@ Set log start time.
 ###### endTime(time : Number)
 Set log end time.
 
-###### stream(stream_id : String)
+###### stream(streamId : String)
 Add a stream.
 
 ###### category(category : String)
@@ -51,8 +51,21 @@ check `geometry-primitives` for details.
 ###### unit(unit : String)
 Set unit for `variable` or `time_series`. e.g. `m/s`, `m/s^2`
 
-###### coordinate(coord : String)
-`vehicle_relative`, `custom`, `map_relative`
+###### coordinate(coordinate : String)
+Set the coordinate for a stream.
+
+`vehicle_relative`, `map_relative` or any customized name.
+
+###### transformMatrix(matrix: Matrix4 | Array)
+Add a custom transform matrix.  In order to make a relative adjustment from the core pose of the stream.
+`matrix` could be an Matrix4 ([math.gl](https://github.com/uber-web/math.gl/blob/master/docs/api-reference/matrix4.md)) instance or an array of 16 numbers.
+
+###### pose(pose: object)
+Stream data from sensors can have a pose offset relative to the vehicle pose. `pose` is a convenient function we have to day to construct a transform matrix from a pose definition.
+
+`pose` will be applied to a identity matrix.
+
+`object`, provide parameters to construct a `Pose` instance. `longitude, latitude, altitude, x, y, z, roll, pitch, yaw`.
 
 ###### styleClassDefault(style : Object)
 Define default style with style object.
