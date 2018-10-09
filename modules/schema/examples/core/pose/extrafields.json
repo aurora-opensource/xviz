@@ -1,0 +1,11 @@
+{
+  "timestamp": 1001.3,
+  "mapOrigin": {
+    "longitude": 40.4641969,
+    "latitude": -79.9733218,
+    "altitude": 219
+  },
+  "position": [238.4, 1002.5, 5.0],
+  "orientation": [0.5, 10.0, 84.5],
+  "id": "3e0d881a-3c2a-4372-8428-c54a22c54290"
+}

@@ -1,0 +1,51 @@
+{
+  "$id": "https://xviz.org/schema/core/pose.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "timestamp": {
+      "type": "number",
+      "minimum": 0
+    },
+    "mapOrigin": {
+      "type": "object",
+      "properties": {
+        "longitude": {
+          "type": "number"
+        },
+        "latitude": {
+          "type": "number"
+        },
+        "altitude": {
+          "type": "number"
+        }
+      },
+      "required": [ "longitude", "latitude", "altitude" ],
+      "additionalProperties": false
+    },
+    "position": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "minItems": 3,
+      "maxItems": 3,
+      "additionalItems": false
+    },
+    "orientation": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "minItems": 3,
+      "maxItems": 3,
+      "additionalItems": false
+    }
+  },
+  "required": [
+    "timestamp",
+    "position",
+    "orientation"
+  ],
+  "additionalProperties": true
+}
