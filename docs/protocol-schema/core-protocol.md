@@ -11,7 +11,7 @@ Here is a map of all the objects in a typical XVIZ world state:
 
 ### Streams and World State
 
-XVIZ divides the state of the world into a set of nested streams.  This allows user to quickly explore and filter the visual world to suit their use case.  Each stream changes over time atomically.  The world state represents a complete set of all the latest stream states for a particular time.
+XVIZ divides the state of the world into a set of streams.  This allows user to quickly explore and filter the visual world to suit their use case.  Each stream changes over time atomically.  The world state represents a complete set of all the latest stream states for a particular time.
 
 ### Primitives and Objects
 
@@ -96,7 +96,7 @@ This is a single cohesive set of streams which all happened at the same time and
 
 This is what a full stream set would look like populated with a basic example of each element:
 
-``` json
+```js
 {
     "timestamp": 1001.3,
     "primitives": [
@@ -129,7 +129,7 @@ Future instances are used to provide lookahead world states for a given instant.
 | `timestamps` | `list<timestamp>`       | A list of timestamps in the future |
 | `primitives` | `list<list<primitive>>` | A list of primitives for each timestamp |
 
-``` json
+```js
 {
   "name": "/prediction/points",
   "timestamps": [1.0, 1.1, 1.2],
@@ -163,7 +163,7 @@ Future instances are used to provide lookahead world states for a given instant.
 | `name`       | `stream_id`       |   |
 | `primitives` | `list<primitive>` | Primitives to draw |
 
-``` json
+```js
 {
     "name": "/foo",
     "primitives": [
@@ -194,7 +194,7 @@ Each stream would contain the same number of values and then the velocity and je
 
 As an example a complete [`stream_set`](/docs/protocol-schema/core-protocol.md#stream-set), containing the above variables would look like:
 
-``` json
+```js
 {
     "name": "/plan/time",
     "values": [1001.3, 1002.3, 1003.3]
@@ -214,7 +214,7 @@ This models a set of values that changes each time a data is transformed. These 
 
 Here is an example `time_series_state` for a system producing multiple values at a specific time:
 
-``` json
+```js
 {
     "timestamp": 12345.5,
     "values": [
@@ -252,7 +252,7 @@ To see all the primitives see:
 
 As an example in JSON of a `point` primitive using style classes:
 
-```
+```js
 {
     "type": "polygon",
     "id": "178beda89169420cbb876c14acdba7f8",
@@ -263,7 +263,7 @@ As an example in JSON of a `point` primitive using style classes:
 
 You can do the same with inline styles but it is much less efficient to send the same styling information for each object over and over.  Here is what it looks like to use an inline style form:
 
-```
+```js
 {
     "type": "polygon",
     "id": "178beda89169420cbb876c14acdba7f8",

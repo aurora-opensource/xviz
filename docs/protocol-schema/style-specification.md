@@ -1,7 +1,7 @@
 # Stylesheet Specification
 
 A stylesheet is used to render all XVIZ data. It is in the following shape:
-```js
+```
 {
     '/object/shape':                          // channel name
     {

@@ -20,3 +20,8 @@ Per "convention", one frame of data is encoded in one `.glb` file, which allows 
 A frame can contain multiple streams. This makes it easy to allow multiple data producers to write into the same frame and makes it easy for the client to distinguish data from different producers.
 
 Note that all streams contain the same type of data (geometrical primitives, variables etc), so clients can just combine the data from all streams and display it, without knowing what the actual streams are.
+
+### JSON files
+
+XVIZ can also be encoded in JSON. The advantages of binary encoding large data is lost, but the broad array of tools available to manipulate and inspect JSON are useful when troubleshooting.
+
