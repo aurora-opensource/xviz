@@ -3,6 +3,13 @@
   "streams": {
     "/velocity": {
       "units": "m/s"
+    },
+    "/objects": {
+      "style_info": {
+        "highlighted": {
+          "color": [255, 0, 0, 255]
+        }
+      }
     }
   },
   "cameras": {

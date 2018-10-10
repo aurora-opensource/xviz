@@ -11,11 +11,10 @@
       "type": "string"
     },
     "style_info": {
-      "type": "array",
-      "items": {
-        "$ref": "https://xviz.org/schema/style/class.json"
-      },
-      "additionalItems": false
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "https://xviz.org/schema/style/value.json"
+      }
     }
   },
   "required": [],
