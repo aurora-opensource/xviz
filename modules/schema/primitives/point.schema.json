@@ -12,6 +12,13 @@
     },
     "points": {
       "$ref": "https://xviz.org/schema/math/point3d_list.schema.json"
+    },
+    "colors": {
+      "type": "array",
+      "items": {
+        "$ref": "https://xviz.org/schema/style/_color.schema.json"
+      },
+      "additionalItems": false
     }
   },
   "required": [ "points" ],
