@@ -1,0 +1,19 @@
+{
+  "version": "2.0.0",
+  "streams": {
+    "/sensors/lidar/points": {
+      "coordinate": "VEHICLE_RELATIVE",
+      "transform": [[0, 1, 2, 3], [0, 1, 2, 3], [0, 1, 2, 3], [0, 1, 2, 3]]
+    },
+    "/objects": {
+      "coordinate": "IDENTITY"
+    },
+    "/map/state": {
+      "coordinate": "DYNAMIC",
+      "transform": "map_base"
+    },
+    "/poi/markers": {
+      "coordinate": "GEOGRAPHIC"
+    }
+  }
+}
