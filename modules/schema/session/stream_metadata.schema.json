@@ -10,6 +10,8 @@
     "units": {
       "type": "string"
     },
+    "coordinate": {},
+    "transform": {},
     "style_info": {
       "type": "array",
       "items": {
@@ -18,6 +20,31 @@
       "additionalItems": false
     }
   },
+  "anyOf": [
+    {
+      "properties": {
+        "coordinate": {
+          "enum": [
+            "GEOGRAPHIC",
+            "IDENTITY"
+          ]
+        }
+      }
+    },
+    {
+      "properties": {
+        "coordinate": { "enum": ["VEHICLE_RELATIVE"] },
+        "transform": { "$ref": "https://xviz.org/schema/math/matrix4x4.json" }
+      }
+    },
+    {
+      "properties": {
+        "coordinate": { "enum": ["DYNAMIC"] },
+        "transform": { "type": "string" }
+      },
+      "required": ["transform"]
+    }
+  ],
   "required": [],
   "additionalProperties": false
 }

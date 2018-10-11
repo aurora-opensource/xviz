@@ -1,0 +1,9 @@
+{
+  "version": "2.0.0",
+  "streams": {
+    "/map/state": {
+      "coordinate": "DYNAMIC",
+      "transform": 1
+    }
+  }
+}

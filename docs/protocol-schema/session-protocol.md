@@ -100,12 +100,14 @@ Here is a JSON example showing an incremental update that contains a single Stre
 
 Metadata provides information about the structure of a stream. Ideally redundant information is removed from streams and put into metadata packets that are sent at the start of streaming or when a reconfiguration happens.
 
-| Name          | Type                   | Description |
-| ---           | ---                    | --- |
-| `source`      | `string`               | URL for where this stream comes from.  Allowing you to fetch the data from S3 for example.  An empty string means it comes through the standard XVIZ stream. |
-| `units`       | `string`               | For variable and time series data this lets the user know what kind of data they are looking at. |
+| Name          | Type                       | Description |
+| ---           | ---                        | --- |
+| `source`      | `string`                   | URL for where this stream comes from.  Allowing you to fetch the data from S3 for example.  An empty string means it comes through the standard XVIZ stream. |
+| `coordinate`  | `optional<enum{ frames }>` | Defaults to IDENTITY, defines the coordinate frame for the data in the stream |
+| `transform`   | `string, 4x4` | String for IDENTITY, 4x4 matrix for `VEHICLE_RELATIVE` |
+| `units`       | `string`                   | For variable and time series data this lets the user know what kind of data they are looking at. |
 | `value_map`   | `optional<enum{ stream values  }>` | A list of all of the values that will be sent on the stream. The indexes of the values are used to translate them into numeric values for plotting. |
-| `style_info`  | `map<class_id, style>` | Describes how the data should be rendered. |
+| `style_info`  | `map<class_id, style>`     | Describes how the data should be rendered. |
 
 
 ### Camera Info
