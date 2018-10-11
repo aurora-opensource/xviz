@@ -1,4 +1,3 @@
 {
-  "name": "/plan/options",
   "values": ["straight", "left", "right"]
 }

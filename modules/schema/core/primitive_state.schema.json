@@ -4,13 +4,12 @@
   "description": "XVIZ Primitive State",
   "type": "object",
   "properties": {
-    "name": {
-      "type": "string"
-    },
     "primitives": {
       "$ref": "https://xviz.org/schema/core/_primitive_list.schema.json"
     }
   },
-  "required": [ "name", "primitives" ],
+  "required": [
+    "primitives"
+  ],
   "additionalProperties": false
 }

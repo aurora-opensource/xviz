@@ -1,15 +1,14 @@
 {
   "timestamp": 1001.3,
-  "primitives": [
-    {
-      "name": "/object/points",
+  "primitives": {
+    "/object/points": {
       "primitives": [
         {
           "points": [[9, 15, 3], [20, 13, 3], [20, 5, 3]]
         }
       ]
     }
-  ],
+  },
   "time_series": [
     {
       "timestamp": 12345.5,
@@ -19,9 +18,8 @@
       ]
     }
   ],
-  "future_instances": [
-    {
-      "name": "/prediction/points",
+  "future_instances": {
+    "/prediction/points": {
       "timestamps": [1.0, 1.1, 1.2],
       "primitives": [
         [
@@ -41,15 +39,14 @@
         ]
       ]
     }
-  ],
-  "variables": [
-    {
-      "name": "/plan/time",
+  },
+  "variables": {
+    "/plan/time": {
       "values": [1001.3, 1002.3, 1003.3]
     }
-  ],
-  "annotations": [
-    {
+  },
+  "annotations": {
+    "/object/highlights": {
       "object_id": "122",
       "style_classes": [
         "highlighted"
@@ -58,5 +55,5 @@
         "color": [255, 0, 0, 255]
       }
     }
-  ]
+  }
 }
