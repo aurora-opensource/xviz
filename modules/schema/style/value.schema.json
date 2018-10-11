@@ -5,15 +5,23 @@
   "type": "object",
   "properties": {
     "color": {
-      "type": "array",
-      "items": {
-        "type": "number"
-      },
-      "minimum": 0,
-      "maximum": 255,
-      "minItems": 4,
-      "maxItems": 4,
-      "additionalItems": false
+      "oneof": [
+        {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minimum": 0,
+          "maximum": 255,
+          "minItems": 4,
+          "maxItems": 4,
+          "additionalItems": false
+        },
+        {
+          "type": "string",
+          "pattern": "^#[0-9a-fA-F]{6,8}$"
+        }
+      ]
     },
     "thickness_m": {
       "type": "number"
