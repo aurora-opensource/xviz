@@ -5,6 +5,9 @@
       "coordinate": "VEHICLE_RELATIVE",
       "transform": [[0, 1, 2, 3], [0, 1, 2, 3], [0, 1, 2, 3], [0, 1, 2, 3]]
     },
+    "/sensors/lidar/radar": {
+      "coordinate": "VEHICLE_RELATIVE"
+    },
     "/objects": {
       "coordinate": "IDENTITY"
     },

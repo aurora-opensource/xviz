@@ -35,8 +35,7 @@
       "properties": {
         "coordinate": { "enum": ["VEHICLE_RELATIVE"] },
         "transform": { "$ref": "https://xviz.org/schema/math/matrix4x4.json" }
-      },
-      "required": ["transform"]
+      }
     },
     {
       "properties": {
