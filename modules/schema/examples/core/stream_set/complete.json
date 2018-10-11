@@ -1,0 +1,62 @@
+{
+  "timestamp": 1001.3,
+  "primitives": [
+    {
+      "name": "/object/points",
+      "primitives": [
+        {
+          "points": [[9, 15, 3], [20, 13, 3], [20, 5, 3]]
+        }
+      ]
+    }
+  ],
+  "time_series": [
+    {
+      "timestamp": 12345.5,
+      "values": [
+        ["/vehicle/torque/commanded", 5],
+        ["/vehicle/torque/actual", 4.8]
+      ]
+    }
+  ],
+  "future_instances": [
+    {
+      "name": "/prediction/points",
+      "timestamps": [1.0, 1.1, 1.2],
+      "primitives": [
+        [
+          {
+            "points": [[1, 2, 3]]
+          }
+        ],
+        [
+          {
+            "points": [[1.5, 2, 3]]
+          }
+        ],
+        [
+          {
+            "points": [[2, 2, 3]]
+          }
+        ]
+      ]
+    }
+  ],
+  "variables": [
+    {
+      "name": "/plan/time",
+      "values": [1001.3, 1002.3, 1003.3]
+    }
+  ],
+  "annotations": [
+    {
+      "object_id": "122",
+      "style_classes": [
+        "highlighted"
+      ],
+      "inline_style": {
+        "color": [255, 0, 0, 255]
+      }
+    }
+  ]
+}
