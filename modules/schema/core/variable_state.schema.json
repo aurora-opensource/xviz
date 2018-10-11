@@ -4,9 +4,6 @@
   "description": "XVIZ Variable State",
   "type": "object",
   "properties": {
-    "name": {
-      "type": "string"
-    },
     "values": {
       "type": "array",
       "items": {
@@ -15,6 +12,8 @@
       "additionalItems": false
     }
   },
-  "required": [ "name", "values" ],
+  "required": [
+    "values"
+  ],
   "additionalProperties": false
 }

@@ -1,5 +1,4 @@
 {
-    "name": "/foo",
     "primitives": [
         {
             "points": [[1, 2, 3]]
