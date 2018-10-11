@@ -181,9 +181,11 @@ An example of this would be planning data as a function of time over the next 10
 
 Each stream would contain the same number of values and then the velocity and jerk streams could be plotted as a function of the time stream. For more details on how to plot see the UI Metadata section.
 
-| Name     | Type           | Description |
-| ---      | ---            | --- |
-| `values` | `list<values>` | The values |
+| Name     | Type                      | Description |
+| ---      | ---                       | --- |
+| `values`    | `list<values>`         | The values |
+| `object_id` | `optional<object_id>`  | Associated object, optional |
+
 
 As an example a complete [`stream_set`](/docs/protocol-schema/core-protocol.md#stream-set), containing the above variables would look like:
 
@@ -202,7 +204,7 @@ This models a set of values that changes each time a data is transformed. These 
 | ---         | ---                        | --- |
 | `timestamp` | `timestamp`                | The vehicle/log transmission\_time associated with this data. |
 | `values`    | `list<{stream_id, value}>` | Number/string/whatever |
-| `id`        | `optional<object_id>`      | Associated object, optional |
+| `object_id` | `optional<object_id>`      | Associated object, optional |
 
 Here is an example `time_series_state` for a system producing multiple values at a specific time:
 
