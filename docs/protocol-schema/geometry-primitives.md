@@ -18,7 +18,7 @@ The point primitive is the most basic XVIZ drawable. It can represent either a s
 | Name    | Type                   | Description |
 | ---     | ---                    | ---         |
 | points  | list<Point3d>          | If more than one point is in the list then this is a point cloud, otherwise it is just a single point. |
-| colors  | optional<list<color>>  | If present this provides a color for every point in the `points` list. |
+| colors  | optional<list<color>>  | If present this provides a color for every point in the `points` list, and overrides any inline or class color styling. |
 
 Example:
 
