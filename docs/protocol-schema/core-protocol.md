@@ -84,14 +84,14 @@ Details in separate [style specification](/docs/protocol-schema/style-specificat
 
 This is a single cohesive set of streams which all happened at the same time and be associated with a single system frame.  This is what an XVIZ extractor produces.
 
-| Name            | Type                      | Description |
-| ---             | ---                       | --- |
-| `timestamp`     | `timestamp`               | The vehicle/log transmission\_time associated with this data. |
-| `primitives`    | `list<primitive_state>`   |   |
+| Name            | Type                                | Description |
+| ---             | ---                                 | --- |
+| `timestamp`     | `timestamp`                         | The vehicle/log transmission\_time associated with this data. |
+| `primitives`    | `map<stream_id, primitive_state>`   | Streams containing list of primitives.  |
 | `time_series`   | `list<time_series_state>` |   |
-| `future_states` | `list<future_instances>`  | This represents a collection of primitives at different timestamps, for the current stream set timestamp  |
-| `variables`     | `list<variable_state>`    |   |
-| `annotations`   | `list<annotation_state>`  |   |
+| `future_states` | `map<stream_id, future_instances>`  | Streams containing This represents a collection of primitives at different timestamps, for the current stream set timestamp  |
+| `variables`     | `map<stream_id, variable_state>`    | Streams containing list of values.  |
+| `annotations`   | `map<stream_id, annotation_state>`  | Streams containing annotations  |
 
 
 This is what a full stream set would look like populated with a basic example of each element:
@@ -99,22 +99,20 @@ This is what a full stream set would look like populated with a basic example of
 ```js
 {
     "timestamp": 1001.3,
-    "primitives": [
-        {
-            "name": "/object/polygon",
+    "primitives": {
+        "/object/polygon": {
             "primitives": [
                 {
                   "vertices": [[9, 15, 3], [20, 13, 3], [20, 5, 3]]
                 }
             ]
         }
-    ],
+    },
     "variables": [
-        {
-            "name": "/plan/time",
+        "/plan/time": {
             "values": [1001.3, 1002.3, 1003.3]
         }
-    ]
+    }
 }
 ```
 
@@ -125,13 +123,11 @@ Future instances are used to provide lookahead world states for a given instant.
 
 | Name         | Type                    | Description |
 | ---          | ---                     | --- |
-| `name`       | `stream_id`             |   |
 | `timestamps` | `list<timestamp>`       | A list of timestamps in the future |
 | `primitives` | `list<list<primitive>>` | A list of primitives for each timestamp |
 
 ```js
 {
-  "name": "/prediction/points",
   "timestamps": [1.0, 1.1, 1.2],
   "primitives": [
     [
@@ -160,12 +156,10 @@ Future instances are used to provide lookahead world states for a given instant.
 
 | Name         | Type              | Description |
 | ---          | ---               | --- |
-| `name`       | `stream_id`       |   |
 | `primitives` | `list<primitive>` | Primitives to draw |
 
 ```js
 {
-    "name": "/foo",
     "primitives": [
         {
             "points": [[1, 2, 3]]
@@ -189,14 +183,12 @@ Each stream would contain the same number of values and then the velocity and je
 
 | Name     | Type           | Description |
 | ---      | ---            | --- |
-| `name`   | `stream_id`    |   |
 | `values` | `list<values>` | The values |
 
 As an example a complete [`stream_set`](/docs/protocol-schema/core-protocol.md#stream-set), containing the above variables would look like:
 
 ```js
 {
-    "name": "/plan/time",
     "values": [1001.3, 1002.3, 1003.3]
 }
 ```

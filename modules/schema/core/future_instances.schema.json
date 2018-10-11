@@ -4,9 +4,6 @@
   "description": "XVIZ Future Instances",
   "type": "object",
   "properties": {
-    "name": {
-      "type": "string"
-    },
     "timestamps": {
       "type": "array",
       "minItems": 1,
@@ -25,7 +22,6 @@
     }
   },
   "required": [
-    "name",
     "timestamps",
     "primitives"
   ],

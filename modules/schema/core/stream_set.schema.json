@@ -8,12 +8,10 @@
       "type": "number"
     },
     "primitives": {
-      "type": "array",
-      "items": {
+      "type": "object",
+      "additionalProperties": {
         "$ref": "https://xviz.org/schema/core/primitive_state.json"
-      },
-      "minItems": 1,
-      "additionalItems": false
+      }
     },
     "time_series": {
       "type": "array",
@@ -24,29 +22,24 @@
       "additionalItems": false
     },
     "future_instances": {
-      "type": "array",
-      "items": {
+      "type": "object",
+      "additionalProperties": {
         "$ref": "https://xviz.org/schema/core/future_instances.json"
-      },
-      "minItems": 1,
-      "additionalItems": false
+      }
     },
     "variables": {
-      "type": "array",
-      "items": {
+      "type": "object",
+      "additionalProperties": {
         "$ref": "https://xviz.org/schema/core/variable_state.json"
-      },
-      "minItems": 1,
-      "additionalItems": false
+      }
     },
     "annotations": {
-      "type": "array",
-      "items": {
+      "type": "object",
+      "additionalProperties": {
         "oneOf": [
           {"$ref": "https://xviz.org/schema/core/annotation_visual.json"}
         ]
-      },
-      "additionalItems": false
+      }
     }
   },
   "required": [
