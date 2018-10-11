@@ -25,6 +25,9 @@
         "additionalItems": false
       },
       "additionalItems": false
+    },
+    "object_id": {
+      "type": "string"
     }
   },
   "required": [ "timestamp", "values" ],
