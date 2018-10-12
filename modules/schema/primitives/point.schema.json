@@ -15,9 +15,22 @@
     },
     "colors": {
       "type": "array",
-      "items": {
-        "$ref": "https://xviz.org/schema/style/_color.schema.json"
-      },
+      "oneOf": [
+        {
+          "items": {
+            "$ref": "https://xviz.org/schema/style/_color.schema.json"
+          }
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "number"
+          },
+          "minimum": 0,
+          "maximum": 255,
+          "minItems": 4
+        }
+      ],
       "additionalItems": false
     }
   },

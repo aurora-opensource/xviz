@@ -10,6 +10,12 @@ The geometry primitives currently supported in XVIZ are:
 * `text`
 * `image`
 
+## Flat Arrays
+
+For faster loading directly in memory buffers where you see `list<Point3d>` a flat list of numbers can be supplied.  In those cases that list must be a multiple of 3, where each 3 elements is the `(x,y,z)` tuple that makes up a 3D point.
+
+The same is true of `list<color>`, instead the list must be a multiple of 4, where each element is the `(r, g, b, a)` color tuple.
+
 
 ## Point Primitive
 
@@ -17,8 +23,8 @@ The point primitive is the most basic XVIZ drawable. It can represent either a s
 
 | Name    | Type                   | Description |
 | ---     | ---                    | ---         |
-| points  | list<Point3d>          | If more than one point is in the list then this is a point cloud, otherwise it is just a single point. |
-| colors  | optional<list<color>>  | If present this provides a color for every point in the `points` list, and overrides any inline or class color styling. |
+| points  | list<Point3d>          | If more than one point is in the list then this is a point cloud, otherwise it is just a single point. (Optionally flattened) |
+| colors  | optional<list<color>>  | If present this provides a color for every point in the `points` list, and overrides any inline or class color styling.  |
 
 Example:
 
@@ -36,7 +42,7 @@ The polygon primitive is used to draw any closed shape.
 
 | Name    | Type           | Description |
 | ---     | ---            | ---         |
-| vertices | list<Point3d> | The vertices of the polygon. Minimum of 3 vertices required. |
+| vertices | list<Point3d> | The vertices of the polygon. Minimum of 3 vertices required. (Optionally flattened) |
 
 JSON example using style class for styling:
 
@@ -54,7 +60,7 @@ The polyline primitive is used to draw any polygonal chain.
 
 | Name     | Type          | Description |
 | ---      | ---           | ---         |
-| vertices | list<Point3d> | The vertices of the polyline. Minimum of 2 vertices required. |
+| vertices | list<Point3d> | The vertices of the polyline. Minimum of 2 vertices required. (Optionally flattened) |
 
 JSON example using style class for styling:
 
