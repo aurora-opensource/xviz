@@ -13,7 +13,7 @@
       "minItems": 4,
       "maxItems": 4,
       "additionalItems": false
-        },
+    },
     {
       "type": "string",
       "pattern": "^#[0-9a-fA-F]{6,8}$"

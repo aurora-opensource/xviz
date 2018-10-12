@@ -4,20 +4,43 @@
   "description": "XVIZ Style Value",
   "type": "object",
   "properties": {
-    "color": {
+    "fillColor": {
       "$ref": "https://xviz.org/schema/style/_color.schema.json"
     },
-    "thickness_m": {
+    "strokeColor": {
+      "$ref": "https://xviz.org/schema/style/_color.schema.json"
+    },
+    "strokeWidth": {
       "type": "number"
     },
-    "font_scale": {
+    "radius": {
+      "type": "number"
+    },
+    "size": {
+      "type": "number"
+    },
+    "angle": {
+      "type": "number"
+    },
+    "textAnchor": {
+      "enum": ["start", "middle", "end"]
+    },
+    "alignmentBaseline": {
+      "enum": ["top", "center", "bottom"]
+    },
+    "height": {
       "type": "number"
     }
   },
   "anyOf": [
-    {"required": ["color"]},
-    {"required": ["thickness_m"]},
-    {"required": ["font_scale"]}
+    {"required": ["fillColor"]},
+    {"required": ["strokeColor"]},
+    {"required": ["strokeWidth"]},
+    {"required": ["radius"]},
+    {"required": ["size"]},
+    {"required": ["angle"]},
+    {"required": ["textAnchor"]},
+    {"required": ["alignmentBaseline"]}
   ],
   "additionalProperties": false
 }

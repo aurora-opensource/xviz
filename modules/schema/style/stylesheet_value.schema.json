@@ -1,0 +1,54 @@
+{
+  "$id": "https://xviz.org/schema/style/stylesheet_value.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "XVIZ Stylesheet Value",
+  "allOf": [{ "$ref": "https://xviz.org/schema/style/value.json" }],
+  "type": "object",
+  "properties": {
+    "radiusMinPixels": {
+      "type": "number",
+      "minimum": 0
+    },
+    "radiusMaxPixels": {
+      "type": "number",
+      "minimum": 0
+    },
+    "strokeWidthMinPixels": {
+      "type": "number",
+      "minimum": 0
+    },
+    "strokeWidthMaxPixels": {
+      "type": "number",
+      "minimum": 0
+    },
+    "opacity": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "stroked": {
+      "type": "boolean"
+    },
+    "filled": {
+      "type": "boolean"
+    },
+    "extruded": {
+      "type": "boolean"
+    },
+    "wireframe": {
+      "type": "boolean"
+    }
+  },
+  "anyOf": [
+    {"required": ["radiusMinPixels"]},
+    {"required": ["radiusMaxPixels"]},
+    {"required": ["strokeWidthMinPixels"]},
+    {"required": ["strokeWidthMaxPixels"]},
+    {"required": ["opacity"]},
+    {"required": ["stroked"]},
+    {"required": ["filled"]},
+    {"required": ["extruded"]},
+    {"required": ["wireframe"]}
+  ],
+  "additionalProperties": false
+}
