@@ -5,7 +5,7 @@
   "end": [20, 13, 3],
   "radius_m": 2.5,
   "style": {
-    "strokeWidth": 5,
-    "fillColor": [0, 1, 2, 3]
+    "stroke_width": 5,
+    "fill_color": [0, 1, 2, 3]
   }
 }

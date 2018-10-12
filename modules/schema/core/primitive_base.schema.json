@@ -10,7 +10,7 @@
       "type": "string"
     },
     "style": {
-      "$ref": "https://xviz.org/schema/style/value.json"
+      "$ref": "https://xviz.org/schema/style/object_value.json"
     },
     "classes": {
       "type": "array",
