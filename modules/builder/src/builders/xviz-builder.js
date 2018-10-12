@@ -53,7 +53,7 @@ export default class XVIZBuilder {
     });
   }
 
-  pose(streamId) {
+  pose(streamId = '/vehicle_pose') {
     this._streamBuilder = this._poseBuilder.stream(streamId);
     return this._streamBuilder;
   }
