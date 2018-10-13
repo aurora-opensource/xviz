@@ -135,17 +135,13 @@ export default class BaseSynchronizer {
     }
 
     // Find the right timeslices
-    if (!this._streamsByReverseTime || this.loResTime !== this._lastLoResTime) {
-      const {TIME_WINDOW} = getXvizSettings();
-      this._lastLoResTime = this.loResTime;
-      this._streamsByReverseTime = this._getTimeRangeInReverse(
-        this.loResTime - TIME_WINDOW,
-        this.loResTime
-      );
-      xvizStats.bump('geometry-refresh');
-    } else {
-      xvizStats.bump('geometry-reuse');
-    }
+    const {TIME_WINDOW} = getXvizSettings();
+    this._lastLoResTime = this.loResTime;
+    this._streamsByReverseTime = this._getTimeRangeInReverse(
+      this.loResTime - TIME_WINDOW,
+      this.loResTime
+    );
+    xvizStats.bump('geometry-refresh');
 
     return getCurrentLogSliceMemoized(
       streamFilter,
