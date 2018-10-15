@@ -4,7 +4,7 @@ export {default as xvizStats} from './utils/stats';
 // GENERIC XVIZ EXPORTS
 
 // Common constants
-export {LOG_STREAM_MESSAGE, STREAM_DATA_CONTENT} from './constants';
+export {LOG_STREAM_MESSAGE} from './constants';
 
 // Configuration
 export {setXvizConfig, getXvizConfig, setXvizSettings, getXvizSettings} from './config/xviz-config';
