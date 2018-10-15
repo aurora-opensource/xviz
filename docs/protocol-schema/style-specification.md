@@ -29,33 +29,36 @@ An important part of style class resolution is how style precedence is defined. 
 
 ### Selectors
 
-Each style object contains a `class` field that specifies the selector of the style. A style only applies to an object if the selector is matched. The default selector is `*`.
+Each style object contains a `class` field that specifies the selector of the style. A style only applies to an object if the selector is matched.
 
 * `<name>` matches an object if it contains the given field.
 * Space separate multiple selectors to match an objects that satisfies them all.
-* `*` matches all objects.
 * If an object matches multiple selectors in a stylesheet, the one that is defined last trumps.
 
-Here is an example of style classes defined for a stream '/object/shape'
+Here is an example of metadata with style classes defined for a stream '/object/shape'
 
 ```js
 {
-    '/object/shape':                        // stream name
-    [
-        {
-          class: '*',
-          stroke_color: '#FFFFFF'
-        },
-        {
-          class: 'OBJECT_LABEL',            // selector
-          stroke_color: '#9D9DA3'
-        },
-        {
-          class: 'OBJECT_LABEL selected',   // selector
-          stroke_color: '#FFC000',
-          fill_color: '#FFC00080'
+    'version': '2.0.0',
+    'streams': {
+        '/object/shape': {                      // stream name
+            'style_classes': [
+                {
+                  'name': 'OBJECT_LABEL',            // selector
+                  'style': {
+                      'stroke_color': '#9D9DA3'
+                  }
+                },
+                {
+                  'name': 'OBJECT_LABEL selected',   // selector
+                  'style': {
+                      'stroke_color': '#FFC000',
+                      'fill_color': '#FFC00080'
+                  }
+                }
+            ]
         }
-    ]
+    }
 }
 ```
 
@@ -73,87 +76,119 @@ These style properties that can be set on individual objects or in a stylesheet.
 
 ##### `fill_color` (array | string)
 
-The fill color of a `point`, `circle`, `text` or `polygon` primitive. Default `#FFFFFF`.
+The fill color of a `point`, `circle`, `text` or `polygon` primitive.
+
+Default: `#FFFFFF`
 
 ##### `stroke_color` (array | string)
 
-The stroke color of a `line`, `path` or `polygon` primitive. Default `#FFFFFF`.
+The stroke color of a `line`, `path` or `polygon` primitive.
+
+Default: `#FFFFFF`
 
 ##### `stroke_width` (number)
 
-The stroke width of a `line`, `path` or `polygon` primitive in meters. Default `1`.
+The stroke width of a `line`, `path` or `polygon` primitive in meters.
+
+Default: `1`
 
 ##### `radius` (number)
 
-The radius of a `point` or `circle` primitive in meters. Default `1`.
+The radius of a `point` or `circle` primitive in meters.
+
+Default: `1`
 
 ##### `height` (number)
 
-The height of an extruded `polygon` primitive in meters. Default `0`.
+The height of an extruded `polygon` primitive in meters.
+
+Default: `0`
 
 ##### `size` (number)
 
-The size of a `text` primitive in pixels. Default `12`.
+The size of a `text` primitive in pixels.
+
+Default: `12`
 
 ##### `angle` (number)
 
-The rotation of a `text` primitive in degrees. Default `0`.
+The rotation of a `text` primitive in degrees.
+
+Default: `0`
 
 ##### `text_anchor` (string)
 
-The horizontal alignment of a `text` primitive relative to its position. One of `start`, `middle`, `end`. Default `middle`.
+The horizontal alignment of a `text` primitive relative to its position.
+
+One of `start`, `middle`, `end`.
+
+Default: `middle`
 
 ##### `alignment_baseline` (string)
 
-The vertical alignment of a `text` primitive relative to its position. One of `top`, `center`, `bottom`. Default `center`.
+The vertical alignment of a `text` primitive relative to its position.
+
+One of `top`, `center`, `bottom`.
+
+Default: `center`
 
 ## Per Stream Properties
 
-Cannot be customized per object - only effective when specified inside the `*` selector. 
+Cannot be customized per object - only effective when specified inside in the stream style.
 
 ##### `radius_min_pixels` (number)
 
 The minimum pixels to draw the radius of `point` or `circle` primitives. Prevent the circles from being too small to see at a far-away zoom level.
 
-Cannot be customized per object * only effective when specified inside the `*` selector. Default no constraints.
+Default: no constraint
 
 ##### `radius_max_pixels` (number)
 
 The maximum pixels to draw the radius of `point` or `circle` primitives. Prevent the circles from getting too large at a closed-up zoom level.
 
-Cannot be customized per object - only effective when specified inside the `*` selector. Default no constraints.
+Default: no constraint
 
 ##### `stroke_width_min_pixels` (number)
 
 The minimum pixels to draw the stroke with of `line`, `path` or `polygon` primitives. Prevent the lines from being too thin to see at a far-away zoom level.
 
-Cannot be customized per object - only effective when specified inside the `*` selector. Default no constraints.
+Default: no constraint
 
 ##### `stroke_width_max_pixels` (number)
 
 The maximum pixels to draw the stroke with of `line`, `path` or `polygon` primitives. Prevent the lines from getting too thick at a closed-up zoom level.
 
-Cannot be customized per object - only effective when specified inside the `*` selector. Default no constraints.
+Default: no constraint
 
 ##### `opacity` (number)
 
-Opacity of the object, between `0` and `1`. Default `1`.
+Opacity of the object, between `0` and `1`.
+
+Default: `1`.
 
 ##### `stroked` (bool)
 
-Whether to draw outline of `polygon` primitives. Cannot be customized per object - only effective when specified inside the `*` selector. Default `true`.
+Whether to draw outline of `polygon` primitives.
+
+Default: `true`
 
 ##### `filled` (bool)
 
-Whether to fill `polygon` primitives. Cannot be customized per object - only effective when specified inside the `*` selector. Default `true`.
+Whether to fill `polygon` primitives.
+
+Default: `true`
 
 ##### `extruded` (bool)
 
-Whether to extrude `polygon` primitives into 3D objects. Cannot be customized per object - only effective when specified inside the `*` selector. Default `false`.
+Whether to extrude `polygon` primitives into 3D objects.
+
+Default: `false`
 
 ##### `wireframe` (bool)
 
-Whether to draw 3D outline for extruded `polygon` primitives. Cannot be customized per object - only effective when specified inside the `*` selector. Default `false`.
+Whether to draw 3D outline for extruded `polygon` primitives.
+
+Default: `false`
 
 ## Explanation of Object Property and Stream Property
 

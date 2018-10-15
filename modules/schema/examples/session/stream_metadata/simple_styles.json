@@ -6,7 +6,7 @@
   "style_classes": [
     {
       "name": "fancy",
-      "styles": {
+      "style": {
         "stroke_width": 2
       }
     }

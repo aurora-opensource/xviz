@@ -1,6 +1,6 @@
 # Styling XVIZ
 
-Styling in XVIZ happens at multiple levels. 
+Styling in XVIZ happens at multiple levels.
 
 ## Object inline styles
 
