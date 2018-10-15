@@ -1,0 +1,46 @@
+{
+  "$id": "https://xviz.org/schema/style/object_value.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "XVIZ Object Style Value",
+  "type": "object",
+  "properties": {
+    "fill_color": {
+      "$ref": "https://xviz.org/schema/style/_color.schema.json"
+    },
+    "stroke_color": {
+      "$ref": "https://xviz.org/schema/style/_color.schema.json"
+    },
+    "stroke_width": {
+      "type": "number"
+    },
+    "radius": {
+      "type": "number"
+    },
+    "size": {
+      "type": "number"
+    },
+    "angle": {
+      "type": "number"
+    },
+    "text_anchor": {
+      "enum": ["start", "middle", "end"]
+    },
+    "alignment_baseline": {
+      "enum": ["top", "center", "bottom"]
+    },
+    "height": {
+      "type": "number"
+    }
+  },
+  "anyOf": [
+    {"required": ["fill_color"]},
+    {"required": ["stroke_color"]},
+    {"required": ["stroke_width"]},
+    {"required": ["radius"]},
+    {"required": ["size"]},
+    {"required": ["angle"]},
+    {"required": ["text_anchor"]},
+    {"required": ["alignment_baseline"]}
+  ],
+  "additionalProperties": false
+}

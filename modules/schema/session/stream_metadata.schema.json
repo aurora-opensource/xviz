@@ -12,7 +12,10 @@
     },
     "coordinate": {},
     "transform": {},
-    "style_info": {
+    "stream_style": {
+        "$ref": "https://xviz.org/schema/style/stream_value.json"
+    },
+    "style_classes": {
       "type": "array",
       "items": {
         "$ref": "https://xviz.org/schema/style/class.json"

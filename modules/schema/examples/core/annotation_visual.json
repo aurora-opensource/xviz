@@ -4,6 +4,6 @@
     "highlighted"
   ],
   "inline_style": {
-    "color": [255, 0, 0, 255]
+    "fill_color": [255, 0, 0, 255]
   }
 }

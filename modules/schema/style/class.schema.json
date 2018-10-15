@@ -7,13 +7,13 @@
     "name": {
       "type": "string"
     },
-    "styles": {
-      "$ref": "https://xviz.org/schema/style/value.json"
+    "style": {
+      "$ref": "https://xviz.org/schema/style/object_value.json"
     }
   },
   "additionalProperties": false,
   "required": [
     "name",
-    "styles"
+    "style"
   ]
 }

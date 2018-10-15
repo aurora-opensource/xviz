@@ -110,11 +110,7 @@ export default [{
     }, {
       name: 'XvizLogSlice',
       markdown: require('../../docs/api-reference/xviz-log-slice.md')
-    }, {
-      name: 'XvizStylesheet',
-      markdown: require('../../docs/api-reference/xviz-stylesheet.md')
-    }, {
-      name: 'XvizObject',
+    }, { name: 'XvizObject',
       markdown: require('../../docs/api-reference/xviz-object.md')
     }, {
       name: 'XvizObjectCollection',
