@@ -1,7 +1,7 @@
 {
   "name": "important_object",
-  "styles": {
-    "color": [255, 0, 0, 255],
-    "thickness_m": 0.15
+  "style": {
+    "fill_color": [255, 0, 0, 255],
+    "stroke_width": 0.15
   }
 }
