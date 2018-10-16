@@ -53,6 +53,7 @@ export function getTransformsFromPose(vehiclePose) {
     // Default schema
     const origin = [longitude, latitude, altitude];
     const pose = new Pose(vehiclePose);
+
     const vehicleRelativeTransform = pose.getTransformationMatrix();
 
     const trackPosition = addMetersToLngLat(

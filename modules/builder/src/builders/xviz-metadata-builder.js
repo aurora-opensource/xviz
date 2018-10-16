@@ -1,15 +1,34 @@
 // Note: XVIZ data structures use snake_case
 /* eslint-disable camelcase*/
+import {_Pose as Pose, Matrix4} from 'math.gl';
+
+/* global console */
+/* eslint-disable no-console */
+const defaultValidateWarn = console.warn;
+const defaultValidateError = console.error;
+/* eslint-enable no-console */
 
 export default class XVIZMetadataBuilder {
-  constructor() {
+  constructor(options = {}) {
+    this._validateWarn = options.validateWarn || defaultValidateWarn;
+    this._validateError = options.validateError || defaultValidateError;
+
     this.data = {
       streams: {},
       styles: {}
     };
 
-    this.stream_id = null;
+    this.streamId = null;
     this.tmp_stream = {};
+  }
+
+  getMetadata() {
+    this._flush();
+
+    return {
+      type: 'metadata',
+      ...this.data
+    };
   }
 
   startTime(time) {
@@ -22,17 +41,17 @@ export default class XVIZMetadataBuilder {
     return this;
   }
 
-  stream(stream_id) {
-    if (this.stream_id) {
+  stream(streamId) {
+    if (this.streamId) {
       this._flush();
     }
 
-    this.stream_id = stream_id;
+    this.streamId = streamId;
     return this;
   }
 
-  category(cat) {
-    this.tmp_stream.category = cat;
+  category(category) {
+    this.tmp_stream.category = category;
     return this;
   }
 
@@ -46,13 +65,25 @@ export default class XVIZMetadataBuilder {
     return this;
   }
 
-  coordinate(t) {
-    this.tmp_stream.coordinate = t;
+  coordinate(coordinate) {
+    this.tmp_stream.coordinate = coordinate;
     return this;
   }
 
-  pose(p) {
-    this.tmp_stream.pose = p;
+  transformMatrix(matrix) {
+    if (matrix instanceof Array) {
+      matrix = new Matrix4(matrix);
+    }
+
+    this.tmp_matrix_transform = matrix;
+    return this;
+  }
+
+  pose(position = {}, orientation = {}) {
+    const {x = 0, y = 0, z = 0} = position;
+    const {roll = 0, pitch = 0, yaw = 0} = orientation;
+    const pose = new Pose({x, y, z, roll, pitch, yaw});
+    this.tmp_pose_transform = pose.getTransformationMatrix();
     return this;
   }
 
@@ -62,35 +93,41 @@ export default class XVIZMetadataBuilder {
   }
 
   styleClass(className, style) {
-    if (!this.data.styles[this.stream_id]) {
-      this.data.styles[this.stream_id] = {
+    if (!this.data.styles[this.streamId]) {
+      this.data.styles[this.streamId] = {
         [className]: style
       };
     } else {
-      this.data.styles[this.stream_id][className] = style;
+      this.data.styles[this.streamId][className] = style;
     }
     return this;
   }
 
-  getMetadata() {
-    this._flush();
-
-    return {
-      type: 'metadata',
-      ...this.data
-    };
-  }
-
   _flush() {
-    if (this.stream_id) {
-      this.data.streams[this.stream_id] = this.tmp_stream;
+    if (this.streamId) {
+      const streamData = this.tmp_stream;
+
+      let transform = null;
+      if (this.tmp_pose_transform && this.tmp_matrix_transform) {
+        this._validateError('`pose` and `transformMatrix` cannot be applied at the same time.');
+      } else {
+        transform = this.tmp_matrix_transform || this.tmp_pose_transform;
+      }
+
+      if (transform) {
+        streamData.transform = transform;
+      }
+
+      this.data.streams[this.streamId] = streamData;
     }
 
     this._reset();
   }
 
   _reset() {
-    this.stream_id = null;
+    this.streamId = null;
     this.tmp_stream = {};
+    this.tmp_matrix_transform = null;
+    this.tmp_pose_transform = null;
   }
 }
