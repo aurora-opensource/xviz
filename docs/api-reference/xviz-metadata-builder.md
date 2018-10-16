@@ -60,12 +60,15 @@ Set the coordinate for a stream.
 Add a custom transform matrix.  In order to make a relative adjustment from the core pose of the stream.
 `matrix` could be an Matrix4 ([math.gl](https://github.com/uber-web/math.gl/blob/master/docs/api-reference/matrix4.md)) instance or an array of 16 numbers.
 
-###### pose(pose: object)
+###### pose(position: Object, orientation: Object)
+`position`: `{x, y, z}` 
+`orientation`: `{roll, pitch, yaw}`
+
 Stream data from sensors can have a pose offset relative to the vehicle pose. `pose` is a convenient function we have to day to construct a transform matrix from a pose definition.
 
-`pose` will be applied to a identity matrix.
+`position` and `orientation` will be used to construct a [Pose](https://github.com/uber-web/math.gl/blob/master/src/pose.js) instance and applied to a identity matrix.
 
-`object`, provide parameters to construct a `Pose` instance. `longitude, latitude, altitude, x, y, z, roll, pitch, yaw`.
+**Note:** Both `pose` and `transformMatrix` can not be applied at the same time.
 
 ###### styleClassDefault(style : Object)
 Define default style with style object.

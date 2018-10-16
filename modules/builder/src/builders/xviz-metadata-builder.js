@@ -71,23 +71,19 @@ export default class XVIZMetadataBuilder {
   }
 
   transformMatrix(matrix) {
-    if (this.tmp_stream.pose) {
-      this._validateWarn('`pose` and `transformMatrix` can not be applied at the same time.');
-    }
-
     if (matrix instanceof Array) {
       matrix = new Matrix4(matrix);
     }
 
-    this.tmp_stream.matrix = matrix;
+    this.tmp_matrix_transform = matrix;
     return this;
   }
 
-  pose(p) {
-    if (this.tmp_stream.matrix) {
-      this._validateWarn('`pose` and `transformMatrix` can not be applied at the same time.');
-    }
-    this.tmp_stream.pose = p;
+  pose(position = {}, orientation = {}) {
+    const {x = 0, y = 0, z = 0} = position;
+    const {roll = 0, pitch = 0, yaw = 0} = orientation;
+    const pose = new Pose({x, y, z, roll, pitch, yaw});
+    this.tmp_pose_transform = pose.getTransformationMatrix();
     return this;
   }
 
@@ -109,16 +105,15 @@ export default class XVIZMetadataBuilder {
 
   _flush() {
     if (this.streamId) {
-      const {pose, matrix, ...others} = this.tmp_stream;
-
-      const streamData = {...others};
+      const streamData = this.tmp_stream;
 
       let transform = null;
-      if (matrix) {
-        transform = matrix;
-      } else if (pose) {
-        transform = new Pose(pose).getTransformationMatrix();
+      if (this.tmp_pose_transform && this.tmp_matrix_transform) {
+        this._validateError('`pose` and `transformMatrix` cannot be applied at the same time.');
+      } else {
+        transform = this.tmp_matrix_transform || this.tmp_pose_transform;
       }
+
       if (transform) {
         streamData.transform = transform;
       }
@@ -132,5 +127,7 @@ export default class XVIZMetadataBuilder {
   _reset() {
     this.streamId = null;
     this.tmp_stream = {};
+    this.tmp_matrix_transform = null;
+    this.tmp_pose_transform = null;
   }
 }
