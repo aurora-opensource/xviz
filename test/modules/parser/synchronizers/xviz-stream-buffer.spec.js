@@ -20,32 +20,32 @@ const TEST_TIMESLICES = [
   {
     id: 'TS-1',
     timestamp: 1002,
-    channels: {A: 2, B: 0}
+    streams: {A: 2, B: 0}
   },
   {
     id: 'TS-2',
     timestamp: 1001,
-    channels: {A: 1, C: 1}
+    streams: {A: 1, C: 1}
   },
   {
     id: 'TS-3',
     timestamp: 1005,
-    channels: {A: 5}
+    streams: {A: 5}
   },
   {
     id: 'TS-4',
     timestamp: 1003,
-    channels: {A: 3}
+    streams: {A: 3}
   },
   {
     id: 'TS-5',
     timestamp: 1004,
-    channels: {A: 4, B: -1}
+    streams: {A: 4, B: -1}
   },
   {
     id: 'TS-6',
     timestamp: 1001,
-    channels: {A: 1.1}
+    streams: {A: 1.1}
   }
 ];
 

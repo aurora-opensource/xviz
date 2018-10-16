@@ -187,7 +187,7 @@ export default class XvizStreamBuffer {
    */
   insert(timeslice) {
     // backwards compatibility - normalize time slice
-    timeslice.streams = timeslice.streams || timeslice.channels || {};
+    timeslice.streams = timeslice.streams || {};
 
     const {timeslices} = this;
     const {timestamp} = timeslice;

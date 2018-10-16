@@ -34,7 +34,7 @@ export function postDeserialize(message) {
   const {OBJECT_STREAM} = getXvizConfig();
 
   const {type} = message;
-  const streams = message.streams || message.channels;
+  const streams = message.streams;
   if (type === LOG_STREAM_MESSAGE.TIMESLICE) {
     // Populate global object metadata
     // ParseXvizV1 did the same thing on the thread that it's run
