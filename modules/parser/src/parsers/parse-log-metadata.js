@@ -9,7 +9,7 @@ export function parseLogMetadata(data) {
 
 export function parseLogMetadataV1(data) {
   // streams is the map from stream names (ie streams) to the url resource
-  const originalStreams = get(data, 'streams') || get(data, 'channels') || [];
+  const originalStreams = get(data, 'streams') || [];
 
   // Use XVIZ configuration to filter out unwanted / blacklisted streams
   const {STREAM_BLACKLIST} = getXvizConfig();
