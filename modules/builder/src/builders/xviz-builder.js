@@ -14,10 +14,12 @@
 
 // Note: XVIZ data structures use snake_case
 /* eslint-disable camelcase */
-import XvizVariableBuilder from './xviz-variable-builder';
+import XVIZPoseBuilder from './xviz-pose-builder';
 import XVIZPrimitiveBuilder from './xviz-primitive-builder';
 import XVIZTimeSeriesBuilder from './xviz-time-series-builder';
 import XVIZValidator from './xviz-validator';
+import XvizVariableBuilder from './xviz-variable-builder';
+import {PRIMARY_POSE_STREAM} from './constant';
 
 /* global console */
 /* eslint-disable no-console */
@@ -41,12 +43,14 @@ export default class XVIZBuilder {
     this.metadata = metadata;
     this.disableStreams = disableStreams;
 
-    this._pose = null;
-
     // Current streamBuilder
     this._streamBuilder = null;
 
     // Construct different builders
+    this._poseBuilder = new XVIZPoseBuilder({
+      metadata: this.metadata,
+      validator: this._validator
+    });
     this._variablesBuilder = new XvizVariableBuilder({
       metadata: this.metadata,
       validator: this._validator
@@ -59,6 +63,11 @@ export default class XVIZBuilder {
       metadata: this.metadata,
       validator: this._validator
     });
+  }
+
+  pose(streamId = PRIMARY_POSE_STREAM) {
+    this._streamBuilder = this._poseBuilder.stream(streamId);
+    return this._streamBuilder;
   }
 
   variable(streamId) {
@@ -76,20 +85,36 @@ export default class XVIZBuilder {
     return this._streamBuilder;
   }
 
-  pose(pose) {
-    this._validator.propSetOnce(this, '_pose');
-
-    this._category = 'vehicle-pose';
-    this._pose = pose;
-    return this;
+  /*
+  frame data: {
+    state_updates: [{
+      timestamp,
+      poses: {
+      '/vehicle-pose': {},
+      ...
+      },
+      primitives: {},
+      variables: {},
+      futures: {}
+    }]
   }
-
+   */
   getFrame() {
+    const {poses} = this._poseBuilder.getData();
+
+    if (!poses || !poses[PRIMARY_POSE_STREAM]) {
+      this._validator.error(`Every frame requires a ${PRIMARY_POSE_STREAM} stream`);
+    }
+
     const {primitives, futures} = this._primitivesBuilder.getData();
     const {variables} = this._variablesBuilder.getData();
     const {variables: timeSeries} = this._timeSeriesBuilder.getData();
 
-    const data = {};
+    const data = {
+      timestamp: poses[PRIMARY_POSE_STREAM].timestamp,
+      poses
+    };
+
     if (primitives) {
       data.primitives = primitives;
     }
@@ -106,13 +131,7 @@ export default class XVIZBuilder {
     }
 
     const frame = {
-      vehicle_pose: this._pose,
-      state_updates: [
-        {
-          timestamp: this._pose.time,
-          ...data
-        }
-      ]
+      state_updates: [data]
     };
 
     return frame;
