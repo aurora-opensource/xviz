@@ -1,6 +1,4 @@
-// Extracts a TIMESLICE message
-/* eslint-disable */
-
+// Extracts a TIMESLICE message v2
 import {LOG_STREAM_MESSAGE, STREAM_DATA_CONTENT} from '../constants';
 import {getXvizConfig} from '../config/xviz-config';
 import {parseXVIZPose} from './parse-xviz-pose';
@@ -13,11 +11,9 @@ export default function parseTimesliceData(data, convertPrimitive) {
   let timestamp;
   if (stateUpdates) {
     timestamp = stateUpdates.reduce((t, stateUpdate) => {
-      return Math.max(t, stateUpdate.poses[PRIMARY_POSE_STREAM].timestamp);
+      return Math.max(t, stateUpdate.timestamp);
     }, 0);
   }
-
-  console.log('timestamp', timestamp);
 
   if (!timestamp) {
     // Incomplete stream message, just tag it accordingly so client can ignore it

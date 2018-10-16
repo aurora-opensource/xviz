@@ -51,6 +51,7 @@ const TestTimesliceMessageV1 = {
 const TestTimesliceMessageV2 = {
   state_updates: [
     {
+      timestamp: 1001.0,
       poses: {
         '/vehicle_pose': {
           timestamp: 1001.0,
@@ -191,6 +192,7 @@ tape('parseStreamLogData pointCloud timeslice', t => {
   const PointCloudTestTimesliceMessage = {
     state_updates: [
       {
+        timestamp: 1001.0,
         poses: {
           '/vehicle_pose': {
             timestamp: 1001.0,
@@ -232,6 +234,7 @@ tape('parseStreamLogData pointCloud timeslice TypedArray', t => {
   const PointCloudTestTimesliceMessage = {
     state_updates: [
       {
+        timestamp: 1001.0,
         poses: {
           '/vehicle_pose': {
             timestamp: 1001.0,
@@ -273,6 +276,7 @@ tape('parseStreamLogData pointCloud timeslice', t => {
   const PointCloudTestTimesliceMessage = {
     state_updates: [
       {
+        timestamp: 1001.0,
         poses: {
           '/vehicle_pose': {
             timestamp: 1001.0,

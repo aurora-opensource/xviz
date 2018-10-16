@@ -1,4 +1,4 @@
-// Extracts a TIMESLICE message
+// Extracts a TIMESLICE message v1
 import {getXvizConfig, LOG_STREAM_MESSAGE, STREAM_DATA_CONTENT} from '..';
 import {parseStreamFutures, parseStreamPrimitive, parseStreamVariable} from './parse-xviz-stream';
 

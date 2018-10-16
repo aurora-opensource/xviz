@@ -74,6 +74,7 @@ export default class XVIZBuilder {
   /*
   frame data: {
     state_updates: [{
+      timestamp,
       poses: {
       '/vehicle-pose': {},
       ...
