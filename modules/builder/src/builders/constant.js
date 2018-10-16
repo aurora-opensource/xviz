@@ -2,7 +2,8 @@
 export const CATEGORY = {
   time_series: 'time_series',
   primitive: 'primitive',
-  variable: 'variable'
+  variable: 'variable',
+  pose: 'pose'
 };
 
 export const VARIABLE_TYPES = {
@@ -86,3 +87,5 @@ export const PRIMITIVE_STYLE_MAP = {
     STYLES.strokeWidthMaxPixels
   ]
 };
+
+export const PRIMARY_POSE_STREAM = '/vehicle-pose';

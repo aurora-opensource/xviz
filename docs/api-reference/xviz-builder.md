@@ -20,22 +20,37 @@
 ## Methods
 All methods except `getFrame()` return `this` builder instance
 
-##### `getFrame()`
+##### getFrame()
 * Return an object with xviz protocol containing all the streams in current frame built from the XvizBuilder instance.
 
-##### `pose(pose : Object)`
-* Set the vehicle pose stream.
+##### pose(streamId : String) : XVIZPoseBuilder
+`streamId` is default to `/vehicle_pose` if not specified. 
+Also for a frame, stream `/vehicle_pose` must be defined.
+Additional poses can be defined but are not required.
 
-##### primitive(stream_id : String) | XVIZPrimitiveBuilder
+* Start building a `pose` stream.
+* Return `XVIZPoseBuilder` instance
+* `Pose` structure
+
+```js
+{
+  timestamp: timestamp,
+  mapOrigin: {longitude, latitude, altitude},
+  position: [x, y, z],
+  orientation: [roll, pitch, yaw]
+}
+
+```
+
+##### primitive(streamId : String) : XVIZPrimitiveBuilder
 * Start building a `primitive` or `future` stream.
 * Return `XVIZPrimitiveBuilder` instance
 
-##### variable(stream_id : String) | XVIZVariableBuilder
+##### variable(streamId : String) : XVIZVariableBuilder
 * Start building a `variables` stream.
 * Return `XVIZVariableBuilder` instance
 
-
-##### timeSeries(stream_id : String) | XVIZTimeSeriesBuilder
+##### timeSeries(streamId : String) : XVIZTimeSeriesBuilder
 * Start building a `timeSeries` stream.
 * Return `XVIZTimeSeriesBuilder` instance
 
@@ -51,23 +66,13 @@ Examples:
    - `/vehicle/velocity`
    - `/object/car-1`
 
-# XVIZTimeSeriesBuilder
+# XVIZPoseBuilder
 
-##### timestamp(timestamp : Number)
-* Set timestamp.
+##### mapOrigin(longitude : Number, latitude : Number, altitude : Number)
 
-##### value(value : Any)
-* Value has to be one of `Number`, `String`, or `boolean`.
+##### position(x: Number, y : Number, z : Number)
 
-
-# XVIZVariableBuilder
-
-##### timestamps(timestamps : Array)
-* Set timestamps of a variable.
-
-##### values(values : Any)
-* `values` and `timestamps` should be matched pairs.
-* Each element in `values` array should be `Number`, `String`, or `boolean`.
+##### orientation(roll: Number, pitch : Number, yaw : Number)
 
 
 # XVIZPrimitiveBuilder
@@ -109,6 +114,25 @@ check `xviz-stylesheet` for supported style properties
 ##### timestamp(timestamp : Number)
 * Primitive with timestamp is considered as `future`.
 * check `core-protocol` for definition of future.
+
+
+# XVIZVariableBuilder
+
+##### timestamps(timestamps : Array)
+* Set timestamps of a variable.
+
+##### values(values : Any)
+* `values` and `timestamps` should be matched pairs.
+* Each element in `values` array should be `Number`, `String`, or `boolean`.
+
+
+# XVIZTimeSeriesBuilder
+
+##### timestamp(timestamp : Number)
+* Set timestamp.
+
+##### value(value : Any)
+* Value has to be one of `Number`, `String`, or `boolean`.
 
 
 ## Example
