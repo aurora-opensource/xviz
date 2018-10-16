@@ -175,7 +175,7 @@ export default class XvizStreamBuffer {
    * Gets loaded stream slices within the current buffer
    */
   getStreams() {
-    return {...(this.streams || this.channels)};
+    return {...this.streams};
   }
 
   /**
@@ -198,7 +198,7 @@ export default class XvizStreamBuffer {
    */
   insert(timeslice) {
     // backwards compatibility - normalize time slice
-    timeslice.streams = timeslice.streams || timeslice.channels || {};
+    timeslice.streams = timeslice.streams || {};
 
     const {timeslices} = this;
     const {timestamp} = timeslice;

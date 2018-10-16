@@ -9,39 +9,39 @@ const TEST_BUFFER = new XvizStreamBuffer();
 TEST_BUFFER.timeslices = [
   {
     timestamp: 50,
-    channels: {
+    streams: {
       log1: {value: 1},
       log2: {value: 10}
     }
   },
   {
     timestamp: 100,
-    channels: {
+    streams: {
       log1: {value: 1},
       log2: {value: 20}
     }
   },
   {
     timestamp: 200,
-    channels: {
+    streams: {
       log1: {value: 2}
     }
   },
   {
     timestamp: 250,
-    channels: {
+    streams: {
       log2: {value: 30}
     }
   },
   {
     timestamp: 300,
-    channels: {
+    streams: {
       log1: {value: 3}
     }
   },
   {
     timestamp: 300.1,
-    channels: {
+    streams: {
       log2: {value: 40}
     }
   }

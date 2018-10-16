@@ -7,11 +7,11 @@ export default config => self => {
 
   function onResult(message) {
     const transfers = [];
-    const {channels} = message;
+    const {streams} = message;
 
-    if (channels) {
-      for (const streamName in channels) {
-        const {pointCloud} = channels[streamName];
+    if (streams) {
+      for (const streamName in streams) {
+        const {pointCloud} = streams[streamName];
         if (pointCloud) {
           transfers.push(
             pointCloud.ids.buffer,

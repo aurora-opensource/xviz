@@ -4,7 +4,7 @@ import {get} from 'dotty';
 // Post-processes log metadata
 export function parseLogMetadata(data) {
   // streams is the map from stream names (ie streams) to the url resource
-  const originalStreams = get(data, 'streams') || get(data, 'channels') || [];
+  const originalStreams = get(data, 'streams') || [];
 
   // Use XVIZ configuration to filter out unwanted / blacklisted streams
   const {filterStream} = getXvizConfig();
