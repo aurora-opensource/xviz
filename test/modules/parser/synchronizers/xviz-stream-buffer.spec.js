@@ -14,7 +14,7 @@
 
 import test from 'tape-catch';
 
-import {XvizStreamBuffer, STREAM_DATA_CONTENT} from '@xviz/parser';
+import {XvizStreamBuffer} from '@xviz/parser';
 
 const TEST_TIMESLICES = [
   {
@@ -63,7 +63,7 @@ test('XvizStreamBuffer#constructor', t => {
     endOffset: 5
   });
   t.ok(xvizStreamBufferLimited instanceof XvizStreamBuffer, 'constructor does not throw error');
-  t.ok(xvizStreamBufferLimited.isOffsetLimited, 'buffer is limited');
+  t.is(xvizStreamBufferLimited.bufferType, 1, 'buffer is limited');
 
   t.throws(() => new XvizStreamBuffer({startOffset: 1, endOffset: 5}), 'validates parameters');
 
@@ -80,38 +80,6 @@ test('XvizStreamBuffer#getLoadedTimeRange', t => {
     {start: 1001, end: 1005},
     'returns correct buffer range'
   );
-
-  t.end();
-});
-
-test('XvizStreamBuffer#getLoadedTimeRange - partial timeslices', t => {
-  const testPartialTimeslices = [
-    {timestamp: 1000.0, missingContentFlags: STREAM_DATA_CONTENT.VEHICLE},
-    {timestamp: 1000.04, missingContentFlags: STREAM_DATA_CONTENT.XVIZ},
-    {timestamp: 1000.1, missingContentFlags: STREAM_DATA_CONTENT.VEHICLE},
-    {timestamp: 1000.14, missingContentFlags: STREAM_DATA_CONTENT.XVIZ},
-    {timestamp: 1000.2, missingContentFlags: STREAM_DATA_CONTENT.VEHICLE},
-    {timestamp: 1000.24, missingContentFlags: STREAM_DATA_CONTENT.XVIZ},
-    {timestamp: 1000.3, missingContentFlags: STREAM_DATA_CONTENT.VEHICLE},
-    {timestamp: 1000.34, missingContentFlags: STREAM_DATA_CONTENT.XVIZ}
-  ];
-  const testCases = [
-    null,
-    {start: 1000.04, end: 1000.04},
-    {start: 1000.04, end: 1000.04},
-    {start: 1000.04, end: 1000.14},
-    {start: 1000.04, end: 1000.14},
-    {start: 1000.04, end: 1000.24},
-    {start: 1000.04, end: 1000.24},
-    {start: 1000.04, end: 1000.34}
-  ];
-
-  const xvizStreamBuffer = new XvizStreamBuffer();
-
-  testCases.forEach((result, i) => {
-    xvizStreamBuffer.timeslices = testPartialTimeslices.slice(0, i + 1);
-    t.deepEquals(xvizStreamBuffer.getLoadedTimeRange(), result, 'returns correct buffer range');
-  });
 
   t.end();
 });
@@ -238,7 +206,7 @@ test('XvizStreamBuffer#updateFixedBuffer contraction, removes invalid data', t =
 
   t.ok(xvizStreamBuffer.hasBuffer(1002, 1003), 'returns true for new range');
   t.ok(!xvizStreamBuffer.hasBuffer(1001, 1004), 'returns false for outside of range');
-  t.ok(xvizStreamBuffer.isFixedLimited, 'buffer is limited');
+  t.is(xvizStreamBuffer.bufferType, 2, 'buffer is limited');
   t.end();
 });
 
@@ -251,7 +219,7 @@ test('XvizStreamBuffer#updateFixedBuffer uncapped expansion', t => {
   t.is(end, 1010, 'expands buffer end');
   t.is(oldStart, 1002, 'returns old buffer start');
   t.is(oldEnd, 1004, 'returns old buffer end');
-  t.ok(xvizStreamBuffer.isFixedLimited, 'buffer is limited');
+  t.is(xvizStreamBuffer.bufferType, 2, 'buffer is limited');
   t.end();
 });
 

@@ -19,7 +19,7 @@
  * `data` refers to pre-processed data objects (blob, arraybuffer, JSON object)
  */
 /* global Blob, Uint8Array */
-import {LOG_STREAM_MESSAGE, STREAM_DATA_CONTENT} from '../constants';
+import {LOG_STREAM_MESSAGE} from '../constants';
 import {getXvizConfig} from '../config/xviz-config';
 import {parseBinaryXVIZ, isBinaryXVIZ} from '../loaders/xviz-loader/xviz-binary-loader';
 import {parseLogMetadata} from './parse-log-metadata';
@@ -120,9 +120,7 @@ function parseTimesliceData(data, convertPrimitive) {
     type: LOG_STREAM_MESSAGE.TIMESLICE,
     streams: newStreams,
     channels: newStreams, // TODO -remove, backwards compatibility
-    timestamp,
-    missingContentFlags:
-      (!stateUpdates && STREAM_DATA_CONTENT.XVIZ) | (!vehiclePose && STREAM_DATA_CONTENT.VEHICLE)
+    timestamp
   };
 
   if (stateUpdates) {
