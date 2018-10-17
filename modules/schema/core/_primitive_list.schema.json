@@ -4,9 +4,14 @@
   "description": "Internal XVIZ primitive list",
   "type": "array",
   "items": {
-    "oneOf": [
+    "anyOf": [
+      {"$ref": "https://xviz.org/schema/primitives/circle.json"},
+      {"$ref": "https://xviz.org/schema/primitives/image.json"},
       {"$ref": "https://xviz.org/schema/primitives/point.json"},
-      {"$ref": "https://xviz.org/schema/primitives/circle.json"}
+      {"$ref": "https://xviz.org/schema/primitives/polygon.json"},
+      {"$ref": "https://xviz.org/schema/primitives/polyline.json"},
+      {"$ref": "https://xviz.org/schema/primitives/stadium.json"},
+      {"$ref": "https://xviz.org/schema/primitives/text.json"}
     ]
   },
   "additionalItems": false
