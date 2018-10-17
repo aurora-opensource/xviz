@@ -169,29 +169,22 @@ Future instances are used to provide lookahead world states for a given instant.
 
 ```
 
+
 ## Variable State
 
-Variable states are for representing metrics data as a function of time, distance, or anything else. Variable states can be used to provide lookahead values at a given moment, similar to how future instances provide visual lookahead information.
+Maps a stream like `/constraints` to a single or multiple item list of variables.  Multiple items indicate each object refers to a different variable.
 
-An example of this would be planning data as a function of time over the next 10 seconds. For example, the following three streams would represent three variable states
-
-    /plan/time
-    /plan/velocity
-    /plan/jerk
-
-Each stream would contain the same number of values and then the velocity and jerk streams could be plotted as a function of the time stream. For more details on how to plot see the UI Metadata section.
-
-| Name     | Type                      | Description |
-| ---      | ---                       | --- |
-| `values`    | `list<values>`         | The values |
-| `object_id` | `optional<object_id>`  | Associated object, optional |
-
-
-As an example a complete [`stream_set`](/docs/protocol-schema/core-protocol.md#stream-set), containing the above variables would look like:
+| Name         | Type              | Description |
+| ---          | ---               | --- |
+| `variables`  | `list<variables>` | Variables to display |
 
 ```js
 {
-    "values": [1001.3, 1002.3, 1003.3]
+    "variables": [
+        {
+            "values": [1001.3, 1002.3, 1003.3]
+        }
+    ]
 }
 ```
 
@@ -272,6 +265,33 @@ You can do the same with inline styles but it is much less efficient to send the
         }
     ],
     "vertices": [[9, 15, 3], [20, 13, 3], [20, 5, 3]]
+}
+```
+
+
+## Variables
+
+Variable are for representing metrics data as a function of time, distance, or anything else. Variable states can be used to provide lookahead values at a given moment, similar to how future instances provide visual lookahead information.
+
+An example of this would be planning data as a function of time over the next 10 seconds. For example, the following three streams would represent three variable states
+
+    /plan/time
+    /plan/velocity
+    /plan/jerk
+
+Each stream would contain the same number of values and then the velocity and jerk streams could be plotted as a function of the time stream. For more details on how to plot see the UI Metadata section.
+
+| Name     | Type                      | Description |
+| ---      | ---                       | --- |
+| `values`    | `list<values>`         | The values |
+| `object_id` | `optional<object_id>`  | Associated object, optional |
+
+
+As an example a complete [`stream_set`](/docs/protocol-schema/core-protocol.md#stream-set), containing the above variables would look like:
+
+```js
+{
+    "values": [1001.3, 1002.3, 1003.3]
 }
 ```
 
