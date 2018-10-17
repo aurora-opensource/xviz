@@ -1,6 +1,6 @@
 {
-  "$id": "https://xviz.org/schema/primitives/polygon.json",
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "id": "https://xviz.org/schema/primitives/polygon.json",
+  "$schema": "http://json-schema.org/draft-04/schema#",
   "description": "XVIZ Polygon primitive",
   "allOf": [{ "$ref": "https://xviz.org/schema/core/primitive_base.json" }],
   "properties": {
