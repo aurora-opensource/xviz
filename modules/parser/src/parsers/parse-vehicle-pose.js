@@ -9,10 +9,8 @@ function noop() {}
  * @param {Object} vehiclePose
  */
 export function parseVehiclePose(vehiclePose, opts = {}) {
-  const {postProcessVehiclePose} = opts;
-
   // Callbacks to enable instrumentation
-  const {onData = noop, onDone = noop} = opts;
+  const {onData = noop, onDone = noop, postProcessVehiclePose} = opts;
   const context = onData(opts) || opts.context;
 
   if (postProcessVehiclePose) {

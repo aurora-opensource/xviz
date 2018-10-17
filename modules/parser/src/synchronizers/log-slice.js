@@ -7,7 +7,7 @@ import {getTransformsFromPose} from '../parsers/parse-vehicle-pose';
 
 // One time slice, one datum from each stream.
 export default class LogSlice {
-  constructor(streamFilter, lookAheadIndex, ...streamsByReverseTime) {
+  constructor(streamFilter, lookAheadIndex, streamsByReverseTime) {
     this.features = {};
     this.variables = {};
     this.pointCloud = null;
@@ -15,12 +15,13 @@ export default class LogSlice {
     this.components = {};
     this.streams = {};
 
-    this.initialize(streamFilter, lookAheadIndex, ...streamsByReverseTime);
+    this.initialize(streamFilter, lookAheadIndex, streamsByReverseTime);
   }
 
   // Extract car data from vehicle_pose and get geoJson for related frames
   /* eslint-disable max-statements */
-  getCurrentFrame({vehiclePose, trackedObjectPosition, ...others}, postProcessFrame) {
+  getCurrentFrame(params, postProcessFrame) {
+    const {vehiclePose} = params;
     if (!vehiclePose) {
       return null;
     }
@@ -30,10 +31,9 @@ export default class LogSlice {
     const objects = XvizObject.getAllInCurrentFrame(); // Map of XVIZ ids in current slice
 
     const frame = {
-      ...others,
+      ...params,
       ...getTransformsFromPose(vehiclePose),
       vehiclePose,
-      trackedObjectPosition,
       features: this.features,
       lookAheads: this.lookAheads,
       variables: this.variables,
@@ -72,7 +72,7 @@ export default class LogSlice {
    * Among other things parses XVIZ Object-related info from misc streams and merge into XVIZ
    * feature properties.
    */
-  initialize(streamFilter, lookAheadIndex, ...streamsByReverseTime) {
+  initialize(streamFilter, lookAheadIndex, streamsByReverseTime) {
     // get data if we don't already have that stream && it is not filtered.
     // TODO: make streamFilter a list of filtered streams
     // so it can default to [], and then only exclude if filter.includes(x)
