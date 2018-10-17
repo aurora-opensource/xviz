@@ -1,5 +1,3 @@
-import {getXvizConfig} from '../config/xviz-config';
-
 import {_Pose as Pose} from 'math.gl';
 import {getDistanceScales, lngLatToWorld, worldToLngLat} from 'viewport-mercator-project';
 
@@ -11,20 +9,22 @@ function noop() {}
  * @param {Object} vehiclePose
  */
 export function parseVehiclePose(vehiclePose, opts = {}) {
-  const {postProcessVehiclePose} = getXvizConfig();
+  const {postProcessVehiclePose} = opts;
 
   // Callbacks to enable instrumentation
   const {onData = noop, onDone = noop} = opts;
   const context = onData(opts) || opts.context;
 
-  const newVehiclePose = vehiclePose
-    .map(postProcessVehiclePose)
-    // Remove invalid poses.
-    .filter(Boolean);
+  if (postProcessVehiclePose) {
+    vehiclePose = vehiclePose
+      .map(postProcessVehiclePose)
+      // Remove invalid poses.
+      .filter(Boolean);
+  }
 
   onDone({...opts, context});
 
-  return newVehiclePose;
+  return vehiclePose;
 }
 
 // TODO - move to viewport-mercator-project

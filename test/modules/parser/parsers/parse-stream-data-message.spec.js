@@ -23,6 +23,7 @@ const metadataWithLogStartEnd = {
 // TODO replace with second message in stream
 // NOTE: the timestamp in 'primtives' is not required to match that of 'vehicle_pose'
 const TestTimesliceMessage = {
+  timestamp: 1001.1,
   state_updates: [
     {
       timestamp: 1001.0,
@@ -98,9 +99,9 @@ tape('parseStreamLogData timeslice INCOMPLETE', t => {
   // NOTE: no explicit type for this message yet.
   let metaMessage = parseStreamLogData({
     ...TestTimesliceMessage,
-    vehicle_pose: null
+    timestamp: null
   });
-  t.equals(metaMessage.type, LOG_STREAM_MESSAGE.TIMESLICE, 'Missing vehicle_pose is ok');
+  t.equals(metaMessage.type, LOG_STREAM_MESSAGE.TIMESLICE, 'Missing timestamp is ok');
 
   metaMessage = parseStreamLogData({
     ...TestTimesliceMessage,
@@ -110,14 +111,8 @@ tape('parseStreamLogData timeslice INCOMPLETE', t => {
 
   metaMessage = parseStreamLogData({
     ...TestTimesliceMessage,
-    vehicle_pose: {time: null}
-  });
-  t.equals(metaMessage.type, LOG_STREAM_MESSAGE.INCOMPLETE, 'Missing time is incomplete');
-
-  metaMessage = parseStreamLogData({
-    ...TestTimesliceMessage,
     state_updates: [],
-    vehicle_pose: null
+    timestamp: null
   });
   t.equals(metaMessage.type, LOG_STREAM_MESSAGE.INCOMPLETE, 'Missing time is incomplete');
 
@@ -131,8 +126,8 @@ tape('parseStreamLogData timeslice', t => {
   t.equals(metaMessage.type, LOG_STREAM_MESSAGE.TIMESLICE, 'Message type set for timeslice');
   t.equals(
     metaMessage.timestamp,
-    TestTimesliceMessage.vehicle_pose.time,
-    'Message timestamp set from vehicle_pose'
+    TestTimesliceMessage.timestamp,
+    'Message timestamp set from timeslice'
   );
   t.end();
 });

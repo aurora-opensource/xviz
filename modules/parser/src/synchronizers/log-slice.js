@@ -20,12 +20,12 @@ export default class LogSlice {
 
   // Extract car data from vehicle_pose and get geoJson for related frames
   /* eslint-disable max-statements */
-  getCurrentFrame({vehiclePose, trackedObjectPosition, ...others}) {
+  getCurrentFrame({vehiclePose, trackedObjectPosition, ...others}, postProcessFrame) {
     if (!vehiclePose) {
       return null;
     }
 
-    const {postProcessFrame, OBJECT_STREAM} = getXvizConfig();
+    const {OBJECT_STREAM} = getXvizConfig();
 
     const objects = XvizObject.getAllInCurrentFrame(); // Map of XVIZ ids in current slice
 
@@ -45,7 +45,9 @@ export default class LogSlice {
 
     // OBJECTS
     XvizObject.resetAll();
-    postProcessFrame(frame);
+    if (postProcessFrame) {
+      postProcessFrame(frame);
+    }
 
     const objectFeatures = this.features[OBJECT_STREAM] || [];
 
