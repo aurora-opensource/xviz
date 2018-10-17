@@ -42,7 +42,11 @@
   },
   "variables": {
     "/plan/time": {
-      "values": [1001.3, 1002.3, 1003.3]
+      "variables": [
+        {
+          "values": [1001.3, 1002.3, 1003.3]
+        }
+      ]
     }
   },
   "annotations": {
