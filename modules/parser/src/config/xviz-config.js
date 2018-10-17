@@ -41,7 +41,7 @@ export function setXvizConfig(config) {
   }
 }
 
-export function getXvizConfig(config) {
+export function getXvizConfig() {
   return xvizConfig;
 }
 
@@ -51,6 +51,6 @@ export function setXvizSettings(config) {
   Object.assign(xvizSettings, config);
 }
 
-export function getXvizSettings(config) {
+export function getXvizSettings() {
   return xvizSettings;
 }
