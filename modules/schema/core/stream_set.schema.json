@@ -36,9 +36,7 @@
     "annotations": {
       "type": "object",
       "additionalProperties": {
-        "oneOf": [
-          {"$ref": "https://xviz.org/schema/core/annotation_visual.json"}
-        ]
+        "$ref": "https://xviz.org/schema/core/annotation_state.json"
       }
     }
   },
