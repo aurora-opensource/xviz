@@ -1,0 +1,22 @@
+{
+  "annotations": [
+    {
+      "object_id": "{067a2faf-64b5-4b8f-8d7d-ed873630df4f}",
+      "style_classes": [
+        "highlighted"
+      ],
+      "inline_style": {
+        "fill_color": [255, 0, 0, 255]
+      }
+    },
+    {
+      "object_id": "{317d719e-f95a-49a7-91fc-3706b2eeb5c2}",
+      "style_classes": [
+        "unimportant"
+      ],
+      "inline_style": {
+        "fill_color": [10, 10, 10, 255]
+      }
+    }
+  ]
+}
