@@ -11,8 +11,8 @@ export default class StreamSynchronizer extends BaseSynchronizer {
    * @param {XvizStreamBuffer} streamBuffer - The stream buffer
    * - Each timeslice object must contain a GPS timestamp
    */
-  constructor(startTime, streamBuffer) {
-    super(startTime);
+  constructor(startTime, streamBuffer, opts) {
+    super(startTime, opts);
 
     this.streamBuffer = streamBuffer;
   }

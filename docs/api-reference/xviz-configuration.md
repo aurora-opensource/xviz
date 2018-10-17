@@ -7,21 +7,13 @@
 
 Constants:
 
-- `DEFAULT_METADATA` (Object) - Loaded metadata will be merged with this object. Default `{}`.
 - `PRIMARY_POSE_STREAM` (String) - Name of the vehicle pose stream. Default `vehicle-pose`.
 - `OBJECT_STREAM` (String) - Name of the object stream. Default `objects`.
+- `STREAM_BLACKLIST` (Array) - Names of the streams to block. Default empty.
 
 Parser plugins:
 
-- `filterStream` (Function) - Use to filter out unwanted streams.
 - `preProcessPrimitive` (Function) - Pre process a primitive. This can be used to change the type of a primitive (e.g. from `point` to `text`) and/or modify their properties.
-- `postProcessMetadata` (Function) - Post process a metadata message.
-- `postProcessTimeslice` (Function) - Post process a timeslice message.
-- `postProcessVehiclePose` (Function) - Post process the vehicle pose object.
-- `postProcessFrame` (Function) - Called before the current log frame is rendered.
-- `getTrackedObjectPosition` (Function) - Returns the tracking position of a selected object. The returned position should be in the same coordinate system as the object stream, in `[x, y, z]`. By default, returns the centroid of the primitive in the object stream.
-- `observeObjects` (Function) - called when new objects arrive in the object stream. Can be used to track all objects in the log.
-
 
 ### getXvizConfig(config)
 

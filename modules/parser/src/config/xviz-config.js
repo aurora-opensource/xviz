@@ -8,22 +8,13 @@ const DEFAULT_XVIZ_CONFIG = {
   // Config
   version: 2,
 
-  DEFAULT_METADATA: {},
-
-  PRIMARY_POSE_STREAM: 'vehicle-pose',
+  PRIMARY_POSE_STREAM: '/vehicle_pose',
   // TODO - support multiple?
   OBJECT_STREAM: 'objects',
 
-  filterStream: streamName => true, // Use to filter out unwanted streams
+  STREAM_BLACKLIST: new Set(),
 
-  postProcessMetadata: metadata => metadata,
-  preProcessPrimitive: primitive => primitive, // Applied before normalize primitive
-  postProcessTimeslice: timeslice => timeslice, // Post process timeslice
-  postProcessVehiclePose: vehiclePose => vehiclePose, // Process vehicle pose from datum
-
-  // TODO - these are used at render time instead of parse time. Need API audit
-  postProcessFrame: frame => frame, // Post process log frame, used in LogSlice.getCurrentFrame
-  getTrackedObjectPosition: _ => null
+  preProcessPrimitive: primitive => primitive // Applied before normalize primitive
 };
 
 const DEFAULT_XVIZ_SETTINGS = {
@@ -33,7 +24,7 @@ const DEFAULT_XVIZ_SETTINGS = {
   pathDistanceThreshold: 0.1 // Filters out close vertices (work around for PathLayer issue)
 };
 
-let xvizConfig = null;
+let xvizConfig = Object.assign({}, DEFAULT_XVIZ_CONFIG);
 const xvizSettings = Object.assign({}, DEFAULT_XVIZ_SETTINGS);
 
 XvizObject.setDefaultCollection(new XvizObjectCollection());
@@ -44,12 +35,13 @@ export function setXvizConfig(config) {
 
   xvizConfig.PRIMITIVE_SETTINGS =
     xvizConfig.version === 1 ? XvizPrimitiveSettingsV1 : XvizPrimitiveSettingsV2;
+
+  if (Array.isArray(xvizConfig.STREAM_BLACKLIST)) {
+    xvizConfig.STREAM_BLACKLIST = new Set(xvizConfig.STREAM_BLACKLIST);
+  }
 }
 
-export function getXvizConfig(config) {
-  if (!xvizConfig) {
-    throw new Error('Need to set XVIZ config');
-  }
+export function getXvizConfig() {
   return xvizConfig;
 }
 
@@ -59,6 +51,6 @@ export function setXvizSettings(config) {
   Object.assign(xvizSettings, config);
 }
 
-export function getXvizSettings(config) {
+export function getXvizSettings() {
   return xvizSettings;
 }
