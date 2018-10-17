@@ -45,3 +45,34 @@ test('XVIZMetadataBuilder#build', t => {
   t.deepEqual(metadata, expected, 'XVIZMetadataBuilder build matches expected output');
   t.end();
 });
+
+test('XVIZMetadataBuilder#stylesheet', t => {
+  const xb = new XVIZMetadataBuilder();
+  xb.stream('/test').styleClassDefault({
+    strokeColor: '#57AD57AA',
+    strokeWidth: 1.4,
+    strokeWidthMinPixels: 1
+  });
+
+  const metadata = xb.getMetadata();
+
+  const expected = {
+    type: 'metadata',
+    streams: {
+      '/test': {}
+    },
+    styles: {
+      '/test': [
+        {
+          class: '*',
+          strokeColor: '#57AD57AA',
+          strokeWidth: 1.4,
+          strokeWidthMinPixels: 1
+        }
+      ]
+    }
+  };
+
+  t.deepEqual(metadata, expected, 'XVIZMetadataBuilder build matches expected output');
+  t.end();
+});

@@ -17,31 +17,6 @@ import tape from 'tape-catch';
 
 const TEST_STYLESHEETS = [
   {
-    title: 'Key-value map style (to be deprecated)',
-    stylesheet: {
-      '*': {
-        extruded: true,
-        height: 1.5,
-        strokeWidth: 1,
-        opacity: 0.5,
-        fillColor: '#808080'
-      },
-      'type=bike': {
-        fillColor: '#0000FF',
-        opacity: 1
-      },
-      'type=car tracked': {
-        strokeWidth: 3
-      },
-      tracked: {
-        fillColor: '#FFFF00'
-      },
-      fancy: {
-        fillColor: '#101010'
-      }
-    }
-  },
-  {
     title: 'Array style',
     stylesheet: [
       {
