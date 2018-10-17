@@ -25,21 +25,25 @@ import {parse as jsonlintParse} from 'jsonlint';
 const Ajv = require('ajv');
 
 export function validateExampleFiles(schemaDir, examplesDir) {
-  const validator = new Ajv();
+  const validator = newAjv();
 
   let valid = loadAllSchemas(validator, schemaDir);
 
-  valid = valid & validateFiles(validator, examplesDir, true);
+  if (valid) {
+    valid = validateFiles(validator, examplesDir, true);
+  }
 
   return valid;
 }
 
 export function validateInvalidFiles(schemaDir, invalidDir) {
-  const validator = new Ajv();
+  const validator = newAjv();
 
   let valid = loadAllSchemas(validator, schemaDir);
 
-  valid = valid & validateFiles(validator, invalidDir, false);
+  if (valid) {
+    valid = validateFiles(validator, invalidDir, false);
+  }
 
   return valid;
 }
@@ -49,6 +53,32 @@ class ParseError extends Error {
     super(...args);
     Error.captureStackTrace(this, ParseError);
   }
+}
+
+function newAjv() {
+  const validator = newAjvDraft4();
+  return validator;
+}
+
+// Draft 4 schema is more widely supported, but requires special
+// construction
+function newAjvDraft4() {
+  const ajv = new Ajv({
+    meta: false, // Prevent loading future schemas
+    schemaId: 'id', // needed because we use 'id' in draft-04
+    extendRefs: 'fail' // Be more strict, don't allow ref extension
+  });
+
+  const metaSchema = require('ajv/lib/refs/json-schema-draft-04.json');
+  ajv.addMetaSchema(metaSchema);
+  ajv._opts.defaultMeta = metaSchema.id;
+
+  // Disable keywords defined in future drafts
+  ajv.removeKeyword('propertyNames');
+  ajv.removeKeyword('contains');
+  ajv.removeKeyword('const');
+
+  return ajv;
 }
 
 function loadAllSchemas(validator, schemaDir) {
@@ -144,7 +174,9 @@ function validateFile(validator, examplesDir, examplePath, expectGood) {
   }
 
   if (validate === undefined) {
-    console.log(`While checking: ${examplePath}, failed to load: ${schemaRelPath}`);
+    console.log(
+      `ERROR: While checking: ${examplePath}, failed to load: ${schemaRelPath} and: ${directorySchema}`
+    );
     return false;
   }
 
