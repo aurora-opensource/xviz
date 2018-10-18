@@ -21,6 +21,8 @@ import * as fs from 'fs';
 
 import {parse as jsonlintParse} from 'jsonlint';
 
+export {SCHEMA_DATA} from './data';
+
 // See: https://github.com/epoberezkin/ajv/issues/687
 const Ajv = require('ajv');
 
@@ -46,6 +48,19 @@ export function validateInvalidFiles(schemaDir, invalidDir) {
   }
 
   return valid;
+}
+
+export function loadValidator(schemaDir) {
+  const validator = newAjv();
+
+  const valid = loadAllSchemas(validator, schemaDir);
+
+  if (!valid) {
+    const error = `Could not load all schemas from: ${schemaDir}`;
+    throw error;
+  }
+
+  return validator;
 }
 
 class ParseError extends Error {
