@@ -36,14 +36,16 @@ test('XVIZMetadataBuilder#build-with-transformMatrix-array', t => {
       }
     },
     styles: {
-      '/test/stream': {
-        '*': {
+      '/test/stream': [
+        {
+          class: '*',
           color: [255, 0, 0]
         },
-        'test-style': {
+        {
+          class: 'test-style',
           color: [0, 255, 0]
         }
-      }
+      ]
     },
     start_time: 0,
     end_time: 1
@@ -159,5 +161,36 @@ test('XVIZMetadataBuilder#multiple-streams', t => {
     expected,
     'XVIZMetadataBuilder mulitple streams build matches expected output'
   );
+  t.end();
+});
+
+test('XVIZMetadataBuilder#stylesheet', t => {
+  const xb = new XVIZMetadataBuilder();
+  xb.stream('/test').styleClassDefault({
+    strokeColor: '#57AD57AA',
+    strokeWidth: 1.4,
+    strokeWidthMinPixels: 1
+  });
+
+  const metadata = xb.getMetadata();
+
+  const expected = {
+    type: 'metadata',
+    streams: {
+      '/test': {}
+    },
+    styles: {
+      '/test': [
+        {
+          class: '*',
+          strokeColor: '#57AD57AA',
+          strokeWidth: 1.4,
+          strokeWidthMinPixels: 1
+        }
+      ]
+    }
+  };
+
+  t.deepEqual(metadata, expected, 'XVIZMetadataBuilder build matches expected output');
   t.end();
 });

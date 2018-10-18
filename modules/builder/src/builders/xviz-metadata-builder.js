@@ -9,9 +9,9 @@ const defaultValidateError = console.error;
 /* eslint-enable no-console */
 
 export default class XVIZMetadataBuilder {
-  constructor(options = {}) {
-    this._validateWarn = options.validateWarn || defaultValidateWarn;
-    this._validateError = options.validateError || defaultValidateError;
+  constructor({validateWarn = defaultValidateWarn, validateError = defaultValidateError} = {}) {
+    this._validateWarn = validateWarn;
+    this._validateError = validateError;
 
     this.data = {
       streams: {},
@@ -93,12 +93,20 @@ export default class XVIZMetadataBuilder {
   }
 
   styleClass(className, style) {
+    if (!this.streamId) {
+      this._validateError('A stream must set before adding a style rule.');
+      return this;
+    }
+
+    const streamRule = {
+      ...style,
+      class: className
+    };
+
     if (!this.data.styles[this.streamId]) {
-      this.data.styles[this.streamId] = {
-        [className]: style
-      };
+      this.data.styles[this.streamId] = [streamRule];
     } else {
-      this.data.styles[this.streamId][className] = style;
+      this.data.styles[this.streamId].push(streamRule);
     }
     return this;
   }

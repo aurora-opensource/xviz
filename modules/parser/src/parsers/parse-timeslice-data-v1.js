@@ -1,9 +1,9 @@
 // Extracts a TIMESLICE message v1
-import {getXvizConfig, LOG_STREAM_MESSAGE, STREAM_DATA_CONTENT} from '..';
+import {getXvizConfig, LOG_STREAM_MESSAGE} from '..';
 import {parseStreamFutures, parseStreamPrimitive, parseStreamVariable} from './parse-xviz-stream';
 
 export default function parseTimesliceData(data, convertPrimitive) {
-  const {PRIMARY_POSE_STREAM, postProcessTimeslice, postProcessVehiclePose} = getXvizConfig();
+  const {PRIMARY_POSE_STREAM} = getXvizConfig();
   const {vehicle_pose: vehiclePose, state_updates: stateUpdates, ...otherInfo} = data;
 
   let timestamp;
@@ -25,10 +25,7 @@ export default function parseTimesliceData(data, convertPrimitive) {
     ...otherInfo,
     type: LOG_STREAM_MESSAGE.TIMESLICE,
     streams: newStreams,
-    channels: newStreams, // TODO -remove, backwards compatibility
-    timestamp,
-    missingContentFlags:
-      (!stateUpdates && STREAM_DATA_CONTENT.XVIZ) | (!vehiclePose && STREAM_DATA_CONTENT.VEHICLE)
+    timestamp
   };
 
   if (stateUpdates) {
@@ -37,15 +34,15 @@ export default function parseTimesliceData(data, convertPrimitive) {
   }
 
   if (vehiclePose) {
-    result.vehiclePose = postProcessVehiclePose(vehiclePose);
-    newStreams[PRIMARY_POSE_STREAM] = result.vehiclePose;
+    // v1 -> v2
+    newStreams[PRIMARY_POSE_STREAM] = vehiclePose;
   }
 
-  return postProcessTimeslice ? postProcessTimeslice(result) : result;
+  return result;
 }
 
 function parseStateUpdates(stateUpdates, timestamp, convertPrimitive) {
-  const {filterStream} = getXvizConfig();
+  const {STREAM_BLACKLIST} = getXvizConfig();
 
   const newStreams = {};
   const primitives = {};
@@ -59,7 +56,7 @@ function parseStateUpdates(stateUpdates, timestamp, convertPrimitive) {
   }
 
   Object.keys(primitives)
-    .filter(streamName => filterStream(streamName))
+    .filter(streamName => !STREAM_BLACKLIST.has(streamName))
     .forEach(primitive => {
       newStreams[primitive] = parseStreamPrimitive(
         primitives[primitive],
@@ -70,13 +67,13 @@ function parseStateUpdates(stateUpdates, timestamp, convertPrimitive) {
     });
 
   Object.keys(variables)
-    .filter(streamName => filterStream(streamName))
+    .filter(streamName => !STREAM_BLACKLIST.has(streamName))
     .forEach(variable => {
       newStreams[variable] = parseStreamVariable(variables[variable], variable, timestamp);
     });
 
   Object.keys(futures)
-    .filter(streamName => filterStream(streamName))
+    .filter(streamName => !STREAM_BLACKLIST.has(streamName))
     .forEach(future => {
       newStreams[future] = parseStreamFutures(futures[future], future, timestamp, convertPrimitive);
     });

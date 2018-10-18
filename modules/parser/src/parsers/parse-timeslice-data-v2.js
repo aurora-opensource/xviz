@@ -1,15 +1,14 @@
 // Extracts a TIMESLICE message v2
-import {LOG_STREAM_MESSAGE, STREAM_DATA_CONTENT} from '../constants';
+import {LOG_STREAM_MESSAGE} from '../constants';
 import {getXvizConfig} from '../config/xviz-config';
 import {parseXVIZPose} from './parse-xviz-pose';
 import {parseStreamFutures, parseStreamPrimitive, parseStreamVariable} from './parse-xviz-stream';
 
 export default function parseTimesliceData(data, convertPrimitive) {
-  const {PRIMARY_POSE_STREAM, postProcessTimeslice, postProcessVehiclePose} = getXvizConfig();
   const {state_updates: stateUpdates, ...otherInfo} = data;
 
-  let timestamp;
-  if (stateUpdates) {
+  let timestamp = data.timestamp;
+  if (!timestamp && stateUpdates) {
     timestamp = stateUpdates.reduce((t, stateUpdate) => {
       return Math.max(t, stateUpdate.timestamp);
     }, 0);
@@ -25,10 +24,8 @@ export default function parseTimesliceData(data, convertPrimitive) {
     ...otherInfo,
     type: LOG_STREAM_MESSAGE.TIMESLICE,
     streams: newStreams,
-    channels: newStreams, // TODO -remove, backwards compatibility
-    timestamp,
+    timestamp
     // TODO/Xintong validate primary vehicle pose in each update?
-    missingContentFlags: !stateUpdates && STREAM_DATA_CONTENT.XVIZ
   };
 
   if (stateUpdates) {
@@ -36,16 +33,11 @@ export default function parseTimesliceData(data, convertPrimitive) {
     Object.assign(newStreams, xvizStreams);
   }
 
-  if (newStreams[PRIMARY_POSE_STREAM]) {
-    result.vehiclePose = postProcessVehiclePose(newStreams[PRIMARY_POSE_STREAM]);
-    newStreams[PRIMARY_POSE_STREAM] = result.vehiclePose;
-  }
-
-  return postProcessTimeslice ? postProcessTimeslice(result) : result;
+  return result;
 }
 
 function parseStateUpdates(stateUpdates, timestamp, convertPrimitive) {
-  const {filterStream} = getXvizConfig();
+  const {STREAM_BLACKLIST} = getXvizConfig();
 
   const newStreams = {};
   const poses = {};
@@ -61,13 +53,13 @@ function parseStateUpdates(stateUpdates, timestamp, convertPrimitive) {
   }
 
   Object.keys(poses)
-    .filter(streamName => filterStream(streamName))
+    .filter(streamName => !STREAM_BLACKLIST.has(streamName))
     .forEach(streamName => {
       newStreams[streamName] = parseXVIZPose(poses[streamName]);
     });
 
   Object.keys(primitives)
-    .filter(streamName => filterStream(streamName))
+    .filter(streamName => !STREAM_BLACKLIST.has(streamName))
     .forEach(primitive => {
       newStreams[primitive] = parseStreamPrimitive(
         primitives[primitive],
@@ -78,13 +70,13 @@ function parseStateUpdates(stateUpdates, timestamp, convertPrimitive) {
     });
 
   Object.keys(variables)
-    .filter(streamName => filterStream(streamName))
+    .filter(streamName => !STREAM_BLACKLIST.has(streamName))
     .forEach(variable => {
       newStreams[variable] = parseStreamVariable(variables[variable], variable, timestamp);
     });
 
   Object.keys(futures)
-    .filter(streamName => filterStream(streamName))
+    .filter(streamName => !STREAM_BLACKLIST.has(streamName))
     .forEach(future => {
       newStreams[future] = parseStreamFutures(futures[future], future, timestamp, convertPrimitive);
     });

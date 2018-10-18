@@ -7,10 +7,10 @@ export function parseLogMetadata(data) {
   const originalStreams = get(data, 'streams') || get(data, 'channels') || [];
 
   // Use XVIZ configuration to filter out unwanted / blacklisted streams
-  const {filterStream} = getXvizConfig();
+  const {STREAM_BLACKLIST} = getXvizConfig();
   const streams = {};
   Object.keys(originalStreams).forEach(streamName => {
-    if (filterStream(streamName)) {
+    if (!STREAM_BLACKLIST.has(streamName)) {
       streams[streamName] = originalStreams[streamName];
     }
   });
@@ -33,5 +33,5 @@ export function parseLogMetadata(data) {
     eventEndTime
   };
 
-  return getXvizConfig().postProcessMetadata(metadata, data) || metadata;
+  return metadata;
 }

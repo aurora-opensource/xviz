@@ -1,11 +1,14 @@
-// TODO/OSS - break this dependency
-import {STREAM_DATA_CONTENT} from '../constants';
 import XvizObject from '../objects/xviz-object';
 import assert from '../utils/assert';
 
 // Insert positions
 const LEFT = 0;
 const RIGHT = 1;
+
+// Buffer types
+const UNLIMITED = 0;
+const OFFSET = 1;
+const FIXED = 2;
 
 export default class XvizStreamBuffer {
   /**
@@ -17,10 +20,11 @@ export default class XvizStreamBuffer {
    *  relative to the current time.
    */
   constructor({startOffset = null, endOffset = null, maxLength = null} = {}) {
-    this.isOffsetLimited = Number.isFinite(startOffset) && Number.isFinite(endOffset);
-
-    if (this.isOffsetLimited) {
+    if (Number.isFinite(startOffset) && Number.isFinite(endOffset)) {
       assert(startOffset <= 0 && endOffset >= 0, 'Steam buffer offset');
+      this.bufferType = OFFSET;
+    } else {
+      this.bufferType = UNLIMITED;
     }
 
     this.options = {
@@ -63,14 +67,18 @@ export default class XvizStreamBuffer {
       options: {maxLength}
     } = this;
     assert(start < end, 'updateFixedBuffer start / end');
+    assert(
+      this.bufferType === UNLIMITED || this.bufferType === FIXED,
+      'updateFixedBuffer multiple buffer types'
+    );
+    this.bufferType = FIXED;
+
     if (!maxLength) {
       // If we have no limits on buffer size, just use the new provided values
       this.bufferStart = start;
       this.bufferEnd = end;
     } else if (
-      !this.isFixedLimited ||
-      !bufferStart ||
-      !bufferEnd ||
+      !Number.isFinite(bufferStart) ||
       start > bufferEnd + maxLength ||
       start < bufferStart - maxLength
     ) {
@@ -89,11 +97,6 @@ export default class XvizStreamBuffer {
       this.bufferStart = Math.min(bufferEnd, end - maxLength);
       this.bufferEnd = Math.min(this.bufferStart + maxLength, end);
     }
-    this.isFixedLimited = true;
-    assert(
-      !(this.isOffsetLimited && this.isFixedLimited),
-      'updateFixedBuffer multiple buffer types'
-    );
     this._pruneBuffer();
     return {start: this.bufferStart, end: this.bufferEnd, oldStart: bufferStart, oldEnd: bufferEnd};
   }
@@ -103,7 +106,7 @@ export default class XvizStreamBuffer {
    * @returns {object} - {start | null, end | null} timestamps if any timeslice is loaded
    */
   getBufferRange() {
-    if (this.isOffsetLimited || this.isFixedLimited) {
+    if (this.bufferType !== UNLIMITED) {
       const {bufferStart, bufferEnd} = this;
       if (Number.isFinite(bufferStart)) {
         // buffer range should be ignored if setCurrentTime has not been called
@@ -121,39 +124,11 @@ export default class XvizStreamBuffer {
     const {timeslices} = this;
     const len = timeslices.length;
 
-    let start = Infinity;
-    let end = -Infinity;
-
-    // Find the first frame with complete content
-    for (let i = 0, missingContentFlags = STREAM_DATA_CONTENT.ALL; i < len; i++) {
-      const timeslice = timeslices[i];
-      missingContentFlags &= timeslice.missingContentFlags;
-
-      if (!missingContentFlags) {
-        start = timeslice.timestamp;
-        break;
-      }
-    }
-
-    // Find the last frame with complete content
-    // Always favor timestamp on the vehicle pose
-    let lastTimesliceWithVehicleData = null;
-    for (let i = len - 1, missingContentFlags = STREAM_DATA_CONTENT.ALL; i >= 0; i--) {
-      const timeslice = timeslices[i];
-      missingContentFlags &= timeslice.missingContentFlags;
-      if (!(timeslice.missingContentFlags & STREAM_DATA_CONTENT.VEHICLE)) {
-        lastTimesliceWithVehicleData = timeslice;
-      }
-
-      if (!missingContentFlags) {
-        end = lastTimesliceWithVehicleData.timestamp;
-        break;
-      }
-    }
-
-    if (start <= end) {
-      // Both are found
-      return {start, end};
+    if (len > 0) {
+      return {
+        start: timeslices[0].timestamp,
+        end: timeslices[len - 1].timestamp
+      };
     }
     return null;
   }
@@ -175,7 +150,7 @@ export default class XvizStreamBuffer {
    * Gets loaded stream slices within the current buffer
    */
   getStreams() {
-    return {...(this.streams || this.channels)};
+    return {...this.streams};
   }
 
   /**
@@ -222,9 +197,7 @@ export default class XvizStreamBuffer {
         videos: {
           ...timesliceAtInsertPosition.videos,
           ...timeslice.videos
-        },
-        missingContentFlags:
-          timesliceAtInsertPosition.missingContentFlags & timeslice.missingContentFlags
+        }
       };
     } else {
       timeslices.splice(insertPosition, 0, timeslice);
@@ -236,6 +209,7 @@ export default class XvizStreamBuffer {
         .filter(Boolean);
     }
 
+    // TODO - remove when updating to v2
     for (const streamName in timeslice.videos) {
       this.videos[streamName] = timeslices
         .map(timeSlice => timeSlice.videos && timeSlice.videos[streamName])
@@ -252,7 +226,7 @@ export default class XvizStreamBuffer {
    * @params {number} timestamp - timestamp of the playhead
    */
   setCurrentTime(timestamp) {
-    if (this.isOffsetLimited) {
+    if (this.bufferType === OFFSET) {
       const {
         options: {startOffset, endOffset}
       } = this;
@@ -292,8 +266,8 @@ export default class XvizStreamBuffer {
    * @returns {bool}
    */
   isInBufferRange(timestamp) {
-    const {bufferStart, bufferEnd, isOffsetLimited, isFixedLimited} = this;
-    if ((isOffsetLimited || isFixedLimited) && Number.isFinite(bufferStart)) {
+    const {bufferStart, bufferEnd, bufferType} = this;
+    if (bufferType !== UNLIMITED && Number.isFinite(bufferStart)) {
       return timestamp >= bufferStart && timestamp <= bufferEnd;
     }
     return true;
