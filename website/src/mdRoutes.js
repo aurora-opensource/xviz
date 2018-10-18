@@ -40,6 +40,9 @@ export default [{
       name: 'Generating XVIZ',
       markdown: require('../../docs/developers-guide/generating-xviz.md')
     }, {
+      name: 'Validating XVIZ',
+      markdown: require('../../docs/developers-guide/validating-xviz.md')
+    }, {
       name: 'Serving XVIZ',
       markdown: require('../../docs/developers-guide/serving-xviz.md')
     }, {
@@ -104,6 +107,9 @@ export default [{
     }, {
       name: 'XVIZ Loader',
       markdown: require('../../docs/api-reference/xviz-loader.md')
+    }, {
+      name: 'XVIZValidator',
+      markdown: require('../../docs/api-reference/xviz-validator.md')
     }]
   }] 
 }];
