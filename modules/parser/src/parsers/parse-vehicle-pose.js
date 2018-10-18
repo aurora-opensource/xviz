@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {_Pose as Pose} from 'math.gl';
-import {getDistanceScales, lngLatToWorld, worldToLngLat} from 'viewport-mercator-project';
+import {addMetersToLngLat} from 'viewport-mercator-project';
 
 function noop() {}
 
@@ -37,25 +37,6 @@ export function parseVehiclePose(vehiclePose, opts = {}) {
   onDone({...opts, context});
 
   return vehiclePose;
-}
-
-// TODO - move to viewport-mercator-project
-function addMetersToLngLat(lngLat, xyz) {
-  const scale = 1; // doesn't really matter
-  const {pixelsPerMeter, pixelsPerMeter2} = getDistanceScales({
-    longitude: lngLat[0],
-    latitude: lngLat[1],
-    scale,
-    highPrecision: true
-  });
-  const [x, y, z] = xyz;
-
-  const worldspace = lngLatToWorld(lngLat, scale);
-  worldspace[0] += x * (pixelsPerMeter[0] + pixelsPerMeter2[0] * y);
-  worldspace[1] -= y * (pixelsPerMeter[1] + pixelsPerMeter2[1] * y);
-
-  const newLngLat = worldToLngLat(worldspace, scale);
-  return [newLngLat[0], newLngLat[1], lngLat[2] + z];
 }
 
 export function getTransformsFromPose(vehiclePose) {

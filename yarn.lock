@@ -9558,9 +9558,9 @@ verror@1.10.0:
     core-util-is "1.0.2"
     extsprintf "^1.2.0"
 
-viewport-mercator-project@^5.0.0:
-  version "5.3.0"
-  resolved "https://registry.yarnpkg.com/viewport-mercator-project/-/viewport-mercator-project-5.3.0.tgz#16b7c99813495ef951480893a5b7d82d9c49034b"
+viewport-mercator-project@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/viewport-mercator-project/-/viewport-mercator-project-6.0.0.tgz#33b8bb40bae44978b889e5425f4f5d26f2367ecb"
   dependencies:
     "@babel/runtime" "^7.0.0"
     math.gl "^2.1.0"
