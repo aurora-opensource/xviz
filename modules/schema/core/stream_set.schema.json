@@ -7,6 +7,18 @@
     "timestamp": {
       "type": "number"
     },
+    "poses": {
+      "type": "object",
+      "properties": {
+        "/vehicle_pose": {
+          "$ref": "https://xviz.org/schema/core/pose.json"
+        }
+      },
+      "additionalProperties": {
+        "$ref": "https://xviz.org/schema/core/pose.json"
+      },
+      "required": [ "/vehicle_pose" ]
+    },
     "primitives": {
       "type": "object",
       "additionalProperties": {
