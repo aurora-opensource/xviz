@@ -58,4 +58,3 @@ Then open `dist/index.html` to view.
 ## Coding Standard
 
 xviz uses a pinned version of the [uber-es2015](https://www.npmjs.com/package/eslint-config-uber-es2015) linter rules.
-
