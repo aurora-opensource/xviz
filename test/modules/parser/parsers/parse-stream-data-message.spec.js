@@ -37,6 +37,7 @@ const metadataWithLogStartEnd = {
 // TODO replace with second message in stream
 // NOTE: the timestamp in 'primtives' is not required to match that of 'vehicle_pose'
 const TestTimesliceMessageV1 = {
+  timestamp: 1001.1,
   state_updates: [
     {
       variables: null,
@@ -90,9 +91,9 @@ const TestTimesliceMessageV2 = {
   ]
 };
 
-// TOOD: blacklisted streams in xviz common
+// TODO: blacklisted streams in xviz common
 tape('parseStreamLogData metadata', t => {
-  setXvizConfig({PRIMARY_POSE_STREAM: '/vehicle_pose'});
+  setXvizConfig({});
   const metaMessage = parseStreamLogData(TestMetadataMessage);
 
   t.equals(metaMessage.type, LOG_STREAM_MESSAGE.METADATA, 'Metadata type set');
@@ -108,7 +109,7 @@ tape('parseStreamLogData metadata', t => {
 });
 
 tape('parseStreamLogData metadata v1', t => {
-  setXvizConfig({PRIMARY_POSE_STREAM: '/vehicle_pose'});
+  setXvizConfig({});
   const metaMessage = parseStreamLogData(TestMetadataMessage);
 
   t.equals(metaMessage.type, LOG_STREAM_MESSAGE.METADATA, 'Metadata type set');
@@ -124,7 +125,7 @@ tape('parseStreamLogData metadata v1', t => {
 });
 
 tape('parseStreamLogData metadata with full log time only', t => {
-  setXvizConfig({PRIMARY_POSE_STREAM: '/vehicle_pose'});
+  setXvizConfig({});
   const metaMessage = parseStreamLogData(metadataWithLogStartEnd);
 
   t.equals(metaMessage.type, LOG_STREAM_MESSAGE.METADATA, 'Metadata type set');
@@ -140,7 +141,7 @@ tape('parseStreamLogData metadata with full log time only', t => {
 });
 
 tape('parseStreamLogData error', t => {
-  setXvizConfig({PRIMARY_POSE_STREAM: '/vehicle_pose'});
+  setXvizConfig({});
   const metaMessage = parseStreamLogData({
     ...TestTimesliceMessageV2,
     type: 'error'
@@ -150,13 +151,19 @@ tape('parseStreamLogData error', t => {
 });
 
 tape('parseStreamLogData timeslice INCOMPLETE', t => {
-  setXvizConfig({PRIMARY_POSE_STREAM: '/vehicle_pose'});
-
+  setXvizConfig({});
+  // NOTE: no explicit type for this message yet.
   let metaMessage = parseStreamLogData({
+    ...TestTimesliceMessageV2,
+    timestamp: null
+  });
+  t.equals(metaMessage.type, LOG_STREAM_MESSAGE.TIMESLICE, 'Missing timestamp is ok');
+
+  metaMessage = parseStreamLogData({
     ...TestTimesliceMessageV2,
     state_updates: null
   });
-  t.equals(metaMessage.type, LOG_STREAM_MESSAGE.INCOMPLETE, 'Missing state_updates is incomplete');
+  t.equals(metaMessage.type, LOG_STREAM_MESSAGE.INCOMPLETE, 'Missing state_updates incomplete');
 
   metaMessage = parseStreamLogData({
     ...TestTimesliceMessageV2,
@@ -170,13 +177,20 @@ tape('parseStreamLogData timeslice INCOMPLETE', t => {
       }
     ]
   });
+  t.equals(metaMessage.type, LOG_STREAM_MESSAGE.INCOMPLETE, 'Missing state_updates is incomplete');
+
+  metaMessage = parseStreamLogData({
+    ...TestTimesliceMessageV2,
+    state_updates: [],
+    timestamp: null
+  });
   t.equals(metaMessage.type, LOG_STREAM_MESSAGE.INCOMPLETE, 'Missing timestamp is incomplete');
 
   t.end();
 });
 
 tape('parseStreamLogData timeslice', t => {
-  setXvizConfig({PRIMARY_POSE_STREAM: '/vehicle_pose'});
+  setXvizConfig({});
   // NOTE: no explicit type for this message yet.
   const metaMessage = parseStreamLogData({...TestTimesliceMessageV2});
   t.equals(metaMessage.type, LOG_STREAM_MESSAGE.TIMESLICE, 'Message type set for timeslice');
@@ -202,7 +216,7 @@ tape('parseStreamLogData timeslice (metadata v1)', t => {
 });
 
 tape('parseStreamLogData pointCloud timeslice', t => {
-  setXvizConfig({PRIMARY_POSE_STREAM: '/vehicle_pose'});
+  setXvizConfig({});
   const PointCloudTestTimesliceMessage = {
     state_updates: [
       {
@@ -244,7 +258,7 @@ tape('parseStreamLogData pointCloud timeslice', t => {
 });
 
 tape('parseStreamLogData pointCloud timeslice TypedArray', t => {
-  setXvizConfig({PRIMARY_POSE_STREAM: '/vehicle_pose'});
+  setXvizConfig({});
   const PointCloudTestTimesliceMessage = {
     state_updates: [
       {
@@ -286,7 +300,7 @@ tape('parseStreamLogData pointCloud timeslice TypedArray', t => {
 });
 
 tape('parseStreamLogData pointCloud timeslice', t => {
-  setXvizConfig({PRIMARY_POSE_STREAM: '/vehicle_pose'});
+  setXvizConfig({});
   const PointCloudTestTimesliceMessage = {
     state_updates: [
       {

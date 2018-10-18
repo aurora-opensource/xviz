@@ -29,11 +29,3 @@ export const LOG_STREAM_MESSAGE = {
   ERROR: 'ERROR',
   INCOMPLETE: 'INCOMPLETE'
 };
-
-// TODO/OSS - is this generic enough
-// These are bit flags that marks the completeness of a time slice
-export const STREAM_DATA_CONTENT = {
-  VEHICLE: 1,
-  XVIZ: 2,
-  ALL: 3
-};

@@ -20,17 +20,18 @@ import memoize from '../utils/memoize';
 import assert from '../utils/assert';
 
 // MEMOIZATION OF LOGSLICE CONSTRUCTOR AND GET METHOD
-
 const getCurrentLogSliceMemoized = memoize(
   (streamFilter, lookAheadIndex, ...streamsByReverseTime) => {
     xvizStats.bump('getCurrentLogSliceMemoized');
-    return new LogSlice(streamFilter, lookAheadIndex, ...streamsByReverseTime);
+    return new LogSlice(streamFilter, lookAheadIndex, streamsByReverseTime);
   }
 );
 
-const getCurrentFrame = memoize((logSlice, vehiclePose, trackedObjectId, trackedObjectPosition) => {
-  return logSlice.getCurrentFrame({vehiclePose, trackedObjectId, trackedObjectPosition});
-});
+const getCurrentFrameMemoized = memoize(
+  (logSlice, vehiclePose, trackedObjectId, postProcessFrame) => {
+    return logSlice.getCurrentFrame({vehiclePose, trackedObjectId}, postProcessFrame);
+  }
+);
 
 /**
  * Synchronizes log data across streams and provide the latest data
@@ -49,8 +50,9 @@ const getCurrentFrame = memoize((logSlice, vehiclePose, trackedObjectId, tracked
  * - Each timeslice object must contain a GPS timestamp
  */
 export default class BaseSynchronizer {
-  constructor(startTime) {
+  constructor(startTime, opts = {}) {
     this.startTime = startTime;
+    this.opts = opts;
 
     this.time = 0;
     this.hiResTime = 0;
@@ -70,14 +72,19 @@ export default class BaseSynchronizer {
     }
 
     // Gets pose by hiResTime frequency
-    const {vehiclePose, trackedObjectPosition} = this._getPositions(logSlice, trackedObjectId);
+    const vehiclePose = this._getVehiclePose(logSlice);
 
     if (vehiclePose !== this._lastVehiclePose) {
       xvizStats.bump('vehiclePose');
       this._lastVehiclePose = vehiclePose;
     }
 
-    return getCurrentFrame(logSlice, vehiclePose, trackedObjectId, trackedObjectPosition);
+    return getCurrentFrameMemoized(
+      logSlice,
+      vehiclePose,
+      trackedObjectId,
+      this.opts.postProcessFrame
+    );
   }
 
   // @return {Number} Currently set time
@@ -135,17 +142,13 @@ export default class BaseSynchronizer {
     }
 
     // Find the right timeslices
-    if (!this._streamsByReverseTime || this.loResTime !== this._lastLoResTime) {
-      const {TIME_WINDOW} = getXvizSettings();
-      this._lastLoResTime = this.loResTime;
-      this._streamsByReverseTime = this._getTimeRangeInReverse(
-        this.loResTime - TIME_WINDOW,
-        this.loResTime
-      );
-      xvizStats.bump('geometry-refresh');
-    } else {
-      xvizStats.bump('geometry-reuse');
-    }
+    const {TIME_WINDOW} = getXvizSettings();
+    this._lastLoResTime = this.loResTime;
+    this._streamsByReverseTime = this._getTimeRangeInReverse(
+      this.loResTime - TIME_WINDOW,
+      this.loResTime
+    );
+    xvizStats.bump('geometry-refresh');
 
     return getCurrentLogSliceMemoized(
       streamFilter,
@@ -179,15 +182,11 @@ export default class BaseSynchronizer {
   // PRIVATE HELPER METHODS
 
   // Get pose, pose and trackedObjectId
-  _getPositions(logSlice, trackedObjectId) {
-    const {PRIMARY_POSE_STREAM, getTrackedObjectPosition} = getXvizConfig(logSlice);
-    const vehiclePose =
+  _getVehiclePose(logSlice) {
+    const {PRIMARY_POSE_STREAM} = getXvizConfig();
+    return (
       this.getHiResDatum('/interpolated_vehicle_pose') ||
-      logSlice.getStream(PRIMARY_POSE_STREAM, null);
-
-    return {
-      vehiclePose,
-      trackedObjectPosition: getTrackedObjectPosition(logSlice, trackedObjectId)
-    };
+      logSlice.getStream(PRIMARY_POSE_STREAM, null)
+    );
   }
 }
