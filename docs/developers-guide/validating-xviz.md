@@ -1,0 +1,39 @@
+# Validating XVIZ
+
+
+## Validating XVIZ metadata
+
+```js
+import {XVIZValidator} from '@xviz/schema';
+
+const validator = new XVIZValidator();
+
+// Throws on error
+metadata = {
+  version: "2.0.0"
+};
+
+validator.validatorMetadata(metadata);
+```
+
+## Validating XVIZ primitives
+
+```js
+// Create a stream
+import {XVIZBuilder} from '@xviz/builder';
+
+const builder = new XVIZBuilder();
+
+builder
+  .pose({time: ts1})
+  .stream('/test/polygon')
+  .timestamp(ts1)
+  .polygon([[0, 0, 0], [4, 0, 0], [4, 3, 0]]);
+
+// Validate it
+import {XVIZValidator} from '@xviz/schema;
+
+const validator = new XVIZValidator();
+
+validator.validateStateUpdate(builder.getFrame())
+```
