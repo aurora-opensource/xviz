@@ -27,7 +27,7 @@ export default class XVIZPrimitiveBuilder extends XVIZBaseBuilder {
 
   image(data, format) {
     if (this._type) {
-      this.flush();
+      this._flush();
     }
 
     this.validatePropSetOnce('_image');
@@ -55,7 +55,7 @@ export default class XVIZPrimitiveBuilder extends XVIZBaseBuilder {
 
   polygon(vertices) {
     if (this._type) {
-      this.flush();
+      this._flush();
     }
 
     this.validatePropSetOnce('_vertices');
@@ -68,7 +68,7 @@ export default class XVIZPrimitiveBuilder extends XVIZBaseBuilder {
 
   polyline(vertices) {
     if (this._type) {
-      this.flush();
+      this._flush();
     }
 
     this.validatePropSetOnce('_vertices');
@@ -81,7 +81,7 @@ export default class XVIZPrimitiveBuilder extends XVIZBaseBuilder {
 
   points(vertices) {
     if (this._type) {
-      this.flush();
+      this._flush();
     }
 
     this.validatePropSetOnce('_vertices');
@@ -94,7 +94,7 @@ export default class XVIZPrimitiveBuilder extends XVIZBaseBuilder {
 
   circle(position, radius) {
     if (this._type) {
-      this.flush();
+      this._flush();
     }
 
     this.validatePropSetOnce('_radius');
@@ -109,7 +109,7 @@ export default class XVIZPrimitiveBuilder extends XVIZBaseBuilder {
 
   stadium(start, end, radius) {
     if (this._type) {
-      this.flush();
+      this._flush();
     }
 
     this.validatePropSetOnce('_radius');
@@ -136,7 +136,7 @@ export default class XVIZPrimitiveBuilder extends XVIZBaseBuilder {
   // TODO/Xintong validate `text` primitive
   text(message) {
     if (this._type) {
-      this.flush();
+      this._flush();
     }
 
     this._text = message;
@@ -182,22 +182,20 @@ export default class XVIZPrimitiveBuilder extends XVIZBaseBuilder {
     return this;
   }
 
-  validate() {
-    super.validate();
+  _validate() {
+    super._validate();
 
     const isImage = this._type === PRIMITIVE_TYPES.image;
     if (isImage && (!this._image || !this._image.data)) {
-      this.validateWarn(`Stream ${this.streamId} image data are not provided.`);
+      this.validateWarn(`Stream ${this._streamId} image data are not provided.`);
     }
     if (!isImage && !this._vertices) {
-      this.validateWarn(`Stream ${this.streamId} primitives vertices are not provided.`);
+      this.validateWarn(`Stream ${this._streamId} primitives vertices are not provided.`);
     }
   }
 
-  flush() {
-    this.validate();
-
-    super.flush();
+  _flush() {
+    this._validate();
 
     if (this._isFuture()) {
       this._flushFutures();
@@ -209,7 +207,7 @@ export default class XVIZPrimitiveBuilder extends XVIZBaseBuilder {
 
   getData() {
     if (this._type) {
-      this.flush();
+      this._flush();
     }
 
     const data = {};
@@ -234,15 +232,15 @@ export default class XVIZPrimitiveBuilder extends XVIZBaseBuilder {
   }
 
   _flushFutures() {
-    if (!this._futures[this.streamId]) {
-      this._futures[this.streamId] = {
-        name: this.streamId,
+    if (!this._futures[this._streamId]) {
+      this._futures[this._streamId] = {
+        name: this._streamId,
         timestamps: [],
         primitives: []
       };
     }
 
-    const future = this._futures[this.streamId];
+    const future = this._futures[this._streamId];
     const primitive = this._formatPrimitive();
 
     const {timestamps, primitives} = future;
@@ -254,12 +252,12 @@ export default class XVIZPrimitiveBuilder extends XVIZBaseBuilder {
   }
 
   _flushPrimitives() {
-    if (!this._primitives[this.streamId]) {
-      this._primitives[this.streamId] = [];
+    if (!this._primitives[this._streamId]) {
+      this._primitives[this._streamId] = [];
     }
 
     const primitive = this._formatPrimitive();
-    this._primitives[this.streamId].push(primitive);
+    this._primitives[this._streamId].push(primitive);
 
     this.reset();
   }

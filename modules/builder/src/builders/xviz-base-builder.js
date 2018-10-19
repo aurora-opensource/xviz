@@ -1,46 +1,47 @@
+/* XVIZBaseBuilder provides validation and category information
+ * shared across all builders.
+ */
 export default class XVIZBaseBuilder {
   constructor({validator, category, metadata}) {
-    this.category = category;
-    this.metadata = metadata;
+    this._streamId = null;
+    this._category = category;
+    this._metadata = metadata;
 
     this._validator = validator;
   }
 
   stream(streamId) {
-    if (this.streamId) {
-      this.flush();
+    if (this._streamId) {
+      this._flush();
     }
 
-    this.streamId = streamId;
+    this._streamId = streamId;
     return this;
   }
 
   getStreamId() {
-    return this.streamId;
+    return this._streamId;
   }
 
   getCategory() {
-    return this.category;
+    return this._category;
   }
 
   getMetadata() {
-    return this.metadata;
+    return this._metadata;
   }
 
-  reset() {
-    this.streamId = null;
-    this.category = null;
+  _flush() {
+    throw new Error('Derived class must implement the "_flush()" method.');
   }
 
-  flush() {}
-
-  getData() {
-    return null;
+  _reset() {
+    this._category = null;
   }
 
-  validate() {
-    this._validator.hasProp(this, 'streamId');
-    this._validator.hasProp(this, 'category');
+  _validate() {
+    this._validator.hasProp(this, '_streamId');
+    this._validator.hasProp(this, '_category');
     this._validator.matchMetadata(this);
   }
 

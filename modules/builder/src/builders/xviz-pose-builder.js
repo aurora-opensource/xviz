@@ -31,9 +31,7 @@ export default class XVIZPoseBuilder extends XVIZBaseBuilder {
     return this;
   }
 
-  flush() {
-    super.flush();
-
+  _flush() {
     if (!this._poses) {
       this._poses = {};
     }
@@ -55,7 +53,7 @@ export default class XVIZPoseBuilder extends XVIZBaseBuilder {
       data.orientation = this._orientation;
     }
 
-    this._poses[this.streamId] = data;
+    this._poses[this._streamId] = data;
   }
 
   reset() {
@@ -68,8 +66,8 @@ export default class XVIZPoseBuilder extends XVIZBaseBuilder {
   }
 
   getData() {
-    if (this.streamId) {
-      this.flush();
+    if (this._streamId) {
+      this._flush();
     }
 
     return {

@@ -24,10 +24,10 @@ export default class XVIZValidator {
   }
 
   propSetOnce(builder, prop, msg) {
-    if (!this[prop]) {
+    if (!builder[prop]) {
       return;
     }
-    if (this[prop] instanceof Array && this[prop].length === 0) {
+    if (builder[prop] instanceof Array && builder[prop].length === 0) {
       return;
     }
 
@@ -57,17 +57,16 @@ export default class XVIZValidator {
   validateStyle(builder) {
     const properties = Object.keys(builder._style);
     const validProperties = PRIMITIVE_STYLE_MAP[builder._type];
+    const streamId = builder.getStreamId();
     if (validProperties) {
       const invalidProps = properties.filter(prop => !validProperties.includes(prop));
       if (invalidProps && invalidProps.length > 0) {
-        this.warn(
-          `Invalid style properties ${invalidProps.join(',')} for stream ${builder.streamId}`
-        );
+        this.warn(`Invalid style properties ${invalidProps.join(',')} for stream ${streamId}`);
       }
     } else {
       this.warn(
         this,
-        `Missing style validations for stream ${builder.streamId} with type ${builder._type}`
+        `Missing style validations for stream ${streamId} with type ${builder._type}`
       );
     }
   }

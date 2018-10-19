@@ -93,8 +93,8 @@ export default class XVIZBuilder {
     }
 
     const {primitives, futures} = this._primitivesBuilder.getData();
-    const {variables} = this._variablesBuilder.getData();
-    const {variables: timeSeries} = this._timeSeriesBuilder.getData();
+    const variables = this._variablesBuilder.getData();
+    const timeSeries = this._timeSeriesBuilder.getData();
 
     const data = {
       timestamp: poses[PRIMARY_POSE_STREAM].timestamp,
@@ -108,12 +108,10 @@ export default class XVIZBuilder {
       data.futures = futures;
     }
     if (variables) {
-      data.variables = data.variables || {};
-      Object.assign(data.variables, variables);
+      data.variables = variables;
     }
     if (timeSeries) {
-      data.variables = data.variables || {};
-      Object.assign(data.variables, timeSeries);
+      data.time_series = timeSeries;
     }
 
     const frame = {

@@ -299,13 +299,7 @@ test('XVIZBuilder#variable', t => {
   const builder = new XVIZBuilder();
   setupPose(builder);
 
-  const ts1 = 1.0;
-  const ts2 = 2.0;
-
-  builder
-    .variable('/test/variables')
-    .timestamps([ts1, ts2])
-    .values([1.1, 2.0]);
+  builder.variable('/test/variables').values([1.1, 2.0]);
 
   const expected = {
     state_updates: [
@@ -316,9 +310,11 @@ test('XVIZBuilder#variable', t => {
         },
         variables: {
           '/test/variables': {
-            values: [1.1, 2.0],
-            timestamps: [ts1, ts2],
-            type: 'float'
+            variables: [
+              {
+                values: [1.1, 2.0]
+              }
+            ]
           }
         }
       }
@@ -333,18 +329,9 @@ test('XVIZBuilder#multiple-variables', t => {
   const builder = new XVIZBuilder();
   setupPose(builder);
 
-  const ts1 = 1.0;
-  const ts2 = 2.0;
+  builder.variable('/test/variables_1').values([1.1, 2.0]);
 
-  builder
-    .variable('/test/variables_1')
-    .timestamps([ts1, ts2])
-    .values([1.1, 2.0]);
-
-  builder
-    .variable('/test/variables_2')
-    .timestamps([ts2, ts1])
-    .values([2.0, 1.1]);
+  builder.variable('/test/variables_2').values([2.0, 1.1]);
 
   const expected = {
     state_updates: [
@@ -355,14 +342,18 @@ test('XVIZBuilder#multiple-variables', t => {
         },
         variables: {
           '/test/variables_1': {
-            values: [1.1, 2.0],
-            timestamps: [ts1, ts2],
-            type: 'float'
+            variables: [
+              {
+                values: [1.1, 2.0]
+              }
+            ]
           },
           '/test/variables_2': {
-            values: [2.0, 1.1],
-            timestamps: [ts2, ts1],
-            type: 'float'
+            variables: [
+              {
+                values: [2.0, 1.1]
+              }
+            ]
           }
         }
       }
@@ -397,18 +388,12 @@ test('XVIZBuilder#time_series', t => {
         poses: {
           [PRIMARY_POSE_STREAM]: DEFAULT_POSE
         },
-        variables: {
-          '/test/time_series_1': {
-            values: [1.0],
-            timestamps: [ts1],
-            type: 'integer'
-          },
-          '/test/time_series_2': {
-            values: [2.0],
-            timestamps: [ts2],
-            type: 'integer'
+        time_series: [
+          {
+            timestamp: ts1,
+            values: [['/test/time_series_1', 1.0], ['/test/time_series_2', 2.0]]
           }
-        }
+        ]
       }
     ]
   };
