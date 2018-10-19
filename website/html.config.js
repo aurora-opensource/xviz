@@ -13,12 +13,12 @@
 // limitations under the License.
 
 module.exports = {
-
   title: 'XVIZ',
 
-  meta: [{
-    name: 'description',
-    content: 'Robotics Visualization Protocol'
-  }]
-
+  meta: [
+    {
+      name: 'description',
+      content: 'Robotics Visualization Protocol'
+    }
+  ]
 };
