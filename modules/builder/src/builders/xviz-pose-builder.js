@@ -12,7 +12,7 @@ export default class XVIZPoseBuilder extends XVIZBaseBuilder {
   }
 
   mapOrigin(longitude, latitude, altitude) {
-    this._mapOrigin = [longitude, latitude, altitude];
+    this._mapOrigin = {longitude, latitude, altitude};
     return this;
   }
 
