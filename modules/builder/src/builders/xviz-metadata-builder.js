@@ -14,19 +14,27 @@ export default class XVIZMetadataBuilder {
     this._validateError = validateError;
 
     this.data = {
-      streams: {},
-      styles: {}
+      streams: {}
     };
 
     this.streamId = null;
     this.tmp_stream = {};
+    this.tmp_matrix_transform = null;
+    this.tmp_pose_transform = null;
+    // TODO:
+    // cameras
+    // stream_aliases
+    // ui_config
+    // log_info
+    // map_info
+    // vehicle_info
   }
 
   getMetadata() {
     this._flush();
 
     return {
-      type: 'metadata',
+      version: '2.0.0',
       ...this.data
     };
   }
@@ -50,18 +58,25 @@ export default class XVIZMetadataBuilder {
     return this;
   }
 
+  // Used for validation in XVIZBuilder
   category(category) {
     this.tmp_stream.category = category;
     return this;
   }
 
+  // Used for validation in XVIZBuilder
   type(t) {
     this.tmp_stream.type = t;
     return this;
   }
 
+  source(source) {
+    this.tmp_stream.source = source;
+    return this;
+  }
+
   unit(u) {
-    this.tmp_stream.unit = u;
+    this.tmp_stream.units = u;
     return this;
   }
 
@@ -87,26 +102,26 @@ export default class XVIZMetadataBuilder {
     return this;
   }
 
-  styleClassDefault(style) {
-    this.styleClass('*', style);
+  streamStyle(style) {
+    this.tmp_stream.stream_style = style;
     return this;
   }
 
-  styleClass(className, style) {
+  styleClass(name, style) {
     if (!this.streamId) {
       this._validateError('A stream must set before adding a style rule.');
       return this;
     }
 
     const streamRule = {
-      ...style,
-      class: className
+      name,
+      style
     };
 
-    if (!this.data.styles[this.streamId]) {
-      this.data.styles[this.streamId] = [streamRule];
+    if (!this.tmp_stream.style_classes) {
+      this.tmp_stream.style_classes = [streamRule];
     } else {
-      this.data.styles[this.streamId].push(streamRule);
+      this.tmp_stream.style_classes.push(streamRule);
     }
     return this;
   }

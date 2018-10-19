@@ -18,7 +18,7 @@ test('XVIZMetadataBuilder#build-with-transformMatrix-array', t => {
     .type('circle')
     .coordinate('test-coordinate')
     .transformMatrix([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16])
-    .styleClassDefault({color: [255, 0, 0]})
+    .streamStyle({color: [255, 0, 0]})
     .styleClass('test-style', {color: [0, 255, 0]});
 
   const metadata = xb.getMetadata();
@@ -26,26 +26,25 @@ test('XVIZMetadataBuilder#build-with-transformMatrix-array', t => {
   t.comment(JSON.stringify(metadata));
 
   const expected = {
-    type: 'metadata',
+    version: '2.0.0',
     streams: {
       '/test/stream': {
         category: 'primitive',
         type: 'circle',
         coordinate: 'test-coordinate',
-        transform: new Matrix4([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16])
-      }
-    },
-    styles: {
-      '/test/stream': [
-        {
-          class: '*',
+        transform: new Matrix4([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]),
+        stream_style: {
           color: [255, 0, 0]
         },
-        {
-          class: 'test-style',
-          color: [0, 255, 0]
-        }
-      ]
+        style_classes: [
+          {
+            name: 'test-style',
+            style: {
+              color: [0, 255, 0]
+            }
+          }
+        ]
+      }
     },
     start_time: 0,
     end_time: 1
@@ -75,7 +74,7 @@ test('XVIZMetadataBuilder#build-with-transformMatrix-matrix4', t => {
   t.comment(JSON.stringify(metadata));
 
   const expected = {
-    type: 'metadata',
+    version: '2.0.0',
     streams: {
       '/test/stream': {
         category: 'primitive',
@@ -84,7 +83,6 @@ test('XVIZMetadataBuilder#build-with-transformMatrix-matrix4', t => {
         transform: new Matrix4([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 2, 3, 1])
       }
     },
-    styles: {},
     start_time: 0,
     end_time: 1
   };
@@ -111,7 +109,7 @@ test('XVIZMetadataBuilder#build-with-pose', t => {
   t.comment(JSON.stringify(metadata));
 
   const expected = {
-    type: 'metadata',
+    version: '2.0.0',
     streams: {
       '/test/stream': {
         category: 'primitive',
@@ -119,7 +117,6 @@ test('XVIZMetadataBuilder#build-with-pose', t => {
         transform: new Matrix4([1, 0, -0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 2, 3, 1])
       }
     },
-    styles: {},
     start_time: 0,
     end_time: 1
   };
@@ -142,7 +139,7 @@ test('XVIZMetadataBuilder#multiple-streams', t => {
   t.comment(JSON.stringify(metadata));
 
   const expected = {
-    type: 'metadata',
+    version: '2.0.0',
     streams: {
       '/test-stream/1': {
         category: 'primitive'
@@ -151,7 +148,6 @@ test('XVIZMetadataBuilder#multiple-streams', t => {
         category: 'variable'
       }
     },
-    styles: {},
     start_time: 0,
     end_time: 1
   };
@@ -166,7 +162,7 @@ test('XVIZMetadataBuilder#multiple-streams', t => {
 
 test('XVIZMetadataBuilder#stylesheet', t => {
   const xb = new XVIZMetadataBuilder();
-  xb.stream('/test').styleClassDefault({
+  xb.stream('/test').streamStyle({
     strokeColor: '#57AD57AA',
     strokeWidth: 1.4,
     strokeWidthMinPixels: 1
@@ -175,19 +171,15 @@ test('XVIZMetadataBuilder#stylesheet', t => {
   const metadata = xb.getMetadata();
 
   const expected = {
-    type: 'metadata',
+    version: '2.0.0',
     streams: {
-      '/test': {}
-    },
-    styles: {
-      '/test': [
-        {
-          class: '*',
+      '/test': {
+        stream_style: {
           strokeColor: '#57AD57AA',
           strokeWidth: 1.4,
           strokeWidthMinPixels: 1
         }
-      ]
+      }
     }
   };
 

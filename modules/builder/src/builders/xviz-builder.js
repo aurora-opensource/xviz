@@ -72,16 +72,17 @@ export default class XVIZBuilder {
   }
 
   /*
-  frame data: {
-    state_updates: [{
-      timestamp,
-      poses: {
-      '/vehicle-pose': {},
-      ...
-      },
-      primitives: {},
-      variables: {},
-      futures: {}
+  frame data:
+  {
+    update_type: 'snapshot',
+    updates: [{
+      state_updates: [{
+        timestamp,
+        poses: {'/vehicle-pose': {}, ...},
+        primitives: {},
+        variables: {},
+        future_instances: {}
+      }]
     }]
   }
    */
@@ -105,7 +106,7 @@ export default class XVIZBuilder {
       data.primitives = primitives;
     }
     if (futures) {
-      data.futures = futures;
+      data.future_instances = futures;
     }
     if (variables) {
       data.variables = variables;
@@ -115,7 +116,12 @@ export default class XVIZBuilder {
     }
 
     const frame = {
-      state_updates: [data]
+      update_type: 'snapshot',
+      updates: [
+        {
+          state_updates: [data]
+        }
+      ]
     };
 
     return frame;

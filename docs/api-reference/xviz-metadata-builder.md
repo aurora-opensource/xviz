@@ -70,7 +70,7 @@ Stream data from sensors can have a pose offset relative to the vehicle pose. `p
 
 **Note:** Both `pose` and `transformMatrix` can not be applied at the same time.
 
-###### styleClassDefault(style : Object)
+###### streamStyle(style : Object)
 Define default style with style object.
 
 ###### styleClass(className : String, style : Object)

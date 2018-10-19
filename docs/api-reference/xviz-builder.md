@@ -152,7 +152,7 @@ xvizMetaBuider
   .stream('/point-cloud')
   .category('primitive')
   .type('point')
-  .styleClassDefault({
+  .streamStyle({
     fillColor: '#00a',
     radiusPixels: 2
   })
