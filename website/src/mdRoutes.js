@@ -111,12 +111,16 @@ export default [
             markdown: require('../../docs/protocol-schema/geometry-primitives.md')
           },
           {
-            name: 'Panel Specification',
-            markdown: require('../../docs/protocol-schema/panel-specification.md')
-          },
-          {
             name: 'Styling Specification',
             markdown: require('../../docs/protocol-schema/style-specification.md')
+          },
+          {
+            name: 'Declarative UI',
+            markdown: require('../../docs/protocol-schema/declarative-ui.md')
+          },
+          {
+            name: 'UI Primitives',
+            markdown: require('../../docs/protocol-schema/ui-primitives.md')
           }
         ]
       },
