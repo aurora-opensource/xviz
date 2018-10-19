@@ -1,6 +1,9 @@
-# Panel Primitives
+# UI Primitives
 
-## TreeTable Primitive
+These are XVIZ primitives that are designed to be used in 2D UI, like the XVIZ declarative UI
+framework.
+
+## TreeTable Type
 
 The TreeTable primitive represents data in a way similar to that of a file system explorer window.
 The data is hierarchical with common fields at each node and some fields being empty depending on
