@@ -42,8 +42,7 @@ test('XVIZBuilder#single-pose', t => {
     ]
   };
 
-  const frame = builder.getFrame();
-  t.deepEqual(frame, expected, 'XVIZBuilder single pose matches expected output');
+  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder single pose matches expected output');
   t.end();
 });
 
@@ -75,8 +74,7 @@ test('XVIZBuilder#multiple-poses', t => {
     ]
   };
 
-  const frame = builder.getFrame();
-  t.deepEqual(frame, expected, 'XVIZBuilder single pose matches expected output');
+  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder single pose matches expected output');
   t.end();
 });
 
@@ -89,6 +87,7 @@ test('XVIZBuilder#polygon', t => {
   builder
     .primitive('/test/polygon')
     .polygon(verts)
+    .id('1')
     .style({
       color: [255, 0, 0]
     });
@@ -105,7 +104,46 @@ test('XVIZBuilder#polygon', t => {
             {
               type: 'polygon',
               vertices: verts,
-              color: [255, 0, 0]
+              color: [255, 0, 0],
+              object_id: '1'
+            }
+          ]
+        }
+      }
+    ]
+  };
+
+  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder pose and polygon match expected output');
+  t.end();
+});
+
+test('XVIZBuilder#points', t => {
+  const builder = new XVIZBuilder();
+  setupPose(builder);
+
+  const points = [[0, 0, 0], [4, 0, 0], [4, 3, 0]];
+  const colors = [[255, 0, 0, 255], [0, 255, 0, 255], [0, 0, 255, 255]];
+
+  builder
+    .primitive('/test/points')
+    .points(points)
+    .id('1')
+    .colors(colors);
+
+  const expected = {
+    state_updates: [
+      {
+        timestamp: 1.0,
+        poses: {
+          [PRIMARY_POSE_STREAM]: DEFAULT_POSE
+        },
+        primitives: {
+          '/test/points': [
+            {
+              type: 'point',
+              points,
+              colors,
+              object_id: '1'
             }
           ]
         }
@@ -114,7 +152,11 @@ test('XVIZBuilder#polygon', t => {
   };
 
   const frame = builder.getFrame();
-  t.deepEqual(frame, expected, 'XVIZBuilder pose and polygon match expected output');
+  t.deepEqual(
+    frame.state_updates[0].primitives,
+    expected.state_updates[0].primitives,
+    'XVIZBuilder points match expected output'
+  );
   t.end();
 });
 
@@ -161,8 +203,7 @@ test('XVIZBuilder#single-stream-multiple-polygons', t => {
     ]
   };
 
-  const frame = builder.getFrame();
-  t.deepEqual(frame, expected, 'XVIZBuilder multiple polygon match expected output');
+  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder multiple polygon match expected output');
   t.end();
 });
 
@@ -292,6 +333,51 @@ test('XVIZBuilder#stadium', t => {
   };
 
   t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder stadium matches expected output');
+  t.end();
+});
+
+test('XVIZBuilder#image', t => {
+  const builder = new XVIZBuilder();
+  setupPose(builder);
+
+  const imageData = Uint8Array.from([1, 2, 3, 4]);
+
+  builder
+    .primitive('/test/image')
+    .image(imageData, 'png')
+    .dimensions(2, 2)
+    .position([10, 10, 0]);
+
+  const expected = {
+    state_updates: [
+      {
+        timestamp: 1.0,
+        poses: {
+          [PRIMARY_POSE_STREAM]: DEFAULT_POSE
+        },
+        primitives: {
+          '/test/image': [
+            {
+              type: 'image',
+              format: 'png',
+              width_px: 2,
+              height_px: 2,
+              data: imageData,
+              position: [10, 10, 0]
+            }
+          ]
+        }
+      }
+    ]
+  };
+
+  const frame = builder.getFrame();
+  t.deepEqual(
+    frame.state_updates[0].primitives,
+    expected.state_updates[0].primitives,
+    'XVIZBuilder image matches expected output'
+  );
+  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder image matches expected output');
   t.end();
 });
 

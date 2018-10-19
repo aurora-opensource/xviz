@@ -30,6 +30,10 @@ export default class XVIZPrimitiveBuilder extends XVIZBaseBuilder {
       this._flush();
     }
 
+    if (!(data instanceof Uint8Array)) {
+      this.validateError('An image data must be a Uint8Array.');
+    }
+
     this.validatePropSetOnce('_image');
     this._type = PRIMITIVE_TYPES.image;
 
@@ -41,14 +45,13 @@ export default class XVIZPrimitiveBuilder extends XVIZBaseBuilder {
     return this;
   }
 
-  dimensions(widthPixel = null, heightPixel = null, depth = null) {
+  dimensions(widthPixel = null, heightPixel = null) {
     if (!this._image) {
       this.validateError('An image needs to be set first.');
     }
 
     this._image.width_px = widthPixel;
     this._image.height_px = heightPixel;
-    this._image.depth = depth;
 
     return this;
   }
@@ -152,6 +155,13 @@ export default class XVIZPrimitiveBuilder extends XVIZBaseBuilder {
     }
 
     this._vertices = [point];
+    return this;
+  }
+
+  colors(colorArray) {
+    this.validatePropSetOnce('_colors');
+
+    this._colors = colorArray;
     return this;
   }
 
@@ -262,6 +272,7 @@ export default class XVIZPrimitiveBuilder extends XVIZBaseBuilder {
     this.reset();
   }
 
+  /* eslint-disable complexity */
   _formatPrimitive() {
     const obj = {
       type: this._type
@@ -270,8 +281,13 @@ export default class XVIZPrimitiveBuilder extends XVIZBaseBuilder {
     switch (this._type) {
       case 'polygon':
       case 'polyline':
-      case 'point':
         obj.vertices = this._vertices;
+        break;
+      case 'point':
+        if (this._colors) {
+          obj.colors = this._colors;
+        }
+        obj.points = this._vertices;
         break;
       case 'text':
         obj.position = this._vertices[0];
@@ -287,13 +303,16 @@ export default class XVIZPrimitiveBuilder extends XVIZBaseBuilder {
         obj.radius_m = this._radius;
         break;
       case 'image':
+        if (this._vertices) {
+          this._image.position = this._vertices[0];
+        }
         Object.assign(obj, this._image);
         break;
       default:
     }
 
     if (this._id) {
-      obj.id = this._id;
+      obj.object_id = this._id;
     }
 
     if (this._style) {
@@ -306,6 +325,7 @@ export default class XVIZPrimitiveBuilder extends XVIZBaseBuilder {
 
     return obj;
   }
+  /* eslint-enable complexity */
 
   _validateStyle() {
     this._validator.validateStyle(this);
@@ -319,6 +339,7 @@ export default class XVIZPrimitiveBuilder extends XVIZBaseBuilder {
     this._vertices = null;
     this._radius = null;
     this._text = null;
+    this._colors = null;
 
     this._id = null;
     this._style = null;
