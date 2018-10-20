@@ -108,8 +108,8 @@ reconfiguration happens.
 | Name         | Type                              | Description                                                                                                                                                |
 | ------------ | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `source`     | `string`                          | URL for where this stream comes from. Allowing you to fetch the data from S3 for example. An empty string means it comes through the standard XVIZ stream. |
-| `coordinate` | `optional<enum{ frames }>`        | Defaults to IDENTITY, defines the coordinate frame for the data in the stream                                                                              |
-| `transform`  | `string, 4x4`                     | String for IDENTITY, 4x4 matrix for `VEHICLE_RELATIVE`                                                                                                     |
+| `coordinate` | `optional<enum{ frames }>`        | Defaults to `IDENTITY`, defines the coordinate frame for the data in the stream                                                                            |
+| `transform`  | `string, 4x4 float matrix`        | String for `IDENTITY`, matrix in column major order for `VEHICLE_RELATIVE`                                                                             |
 | `units`      | `string`                          | For variable and time series data this lets the user know what kind of data they are looking at.                                                           |
 | `value_map`  | `optional<enum{ stream values }>` | A list of all of the values that will be sent on the stream. The indexes of the values are used to translate them into numeric values for plotting.        |
 | `style_info` | `map<class_id, style>`            | Describes how the data should be rendered.                                                                                                                 |
@@ -118,16 +118,16 @@ reconfiguration happens.
 
 Everything you need to display and deeply integrate video into a 3D application.
 
-| Name                       | Type               | Description                                                                                                         |
-| -------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------------- |
-| `human_name`               | `string`           | Readable camera name                                                                                                |
-| `source`                   | `string`           | either URL or "<internal>" (in XVIZ stream)                                                                         |
-| `vehicle_position`         | `3x1 float vector` | Translation offset from vehicle position to camera position                                                         |
-| `vehicle_orientation`      | `3x3 float matrix` | Rotation offset from vehicle position to camera position                                                            |
-| `pixel_width`              | `int`              | Width of the raw camera images                                                                                      |
-| `pixel_height`             | `int`              | Height of the raw camera images                                                                                     |
-| `rectification_projection` | `3x3 float matrix` | Transform raw pixel coordinates to rectified coordinates (use in a shader, reference). Also called a "homography".  |
-| `gl_projection`            | `4x4 float matrix` | Goes from 3D world coordinates to rectified image coordinates. Use with OpenGL to draw 3D data on top of the image. |
+| Name                       | Type               | Description                                                                                                                        |
+| -------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `human_name`               | `string`           | Readable camera name                                                                                                               |
+| `source`                   | `string`           | either URL or "<internal>" (in XVIZ stream)                                                                                        |
+| `vehicle_position`         | `3x1 float vector` | Translation offset from vehicle position to camera position                                                                        |
+| `vehicle_orientation`      | `3x3 float matrix` | Rotation offset from vehicle position to camera position (column major)                                                            |
+| `pixel_width`              | `int`              | Width of the raw camera images                                                                                                     |
+| `pixel_height`             | `int`              | Height of the raw camera images                                                                                                    |
+| `rectification_projection` | `3x3 float matrix` | Transform raw pixel coordinates to rectified coordinates (use in a shader, reference). Also called a "homography" (column major).  |
+| `gl_projection`            | `4x4 float matrix` | Goes from 3D world coordinates to rectified image coordinates. Use with OpenGL to draw 3D data on top of the image (column major). |
 
 ### UI Panel Info
 
