@@ -1,0 +1,38 @@
+{
+  "type": "panel",
+  "name": "Metrics Panel",
+  "children": [
+    {
+      "type": "container",
+      "name": "Metrics Container 1",
+      "children": [
+        {
+          "type": "container",
+          "name": "Sub Container",
+          "children": [
+            {
+              "type": "metric",
+              "streams": ["/vehicle/temp/inside"],
+              "title": "Inside Temp"
+            },
+            {
+              "type": "metric",
+              "streams": ["/vehicle/temp/output"],
+              "title": "Outside Temp"
+            }
+          ]
+        },
+        {
+          "type": "metric",
+          "streams": ["/vehicle/velocity"],
+          "title": "Velocity"
+        },
+        {
+          "type": "metric",
+          "streams": ["/vehicle/acceleration"],
+          "title": "Acceleration"
+        }
+      ]
+    }
+  ]
+}

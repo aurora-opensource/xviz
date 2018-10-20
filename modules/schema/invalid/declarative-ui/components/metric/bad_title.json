@@ -1,0 +1,5 @@
+{
+  "type": "metric",
+  "title": 1,
+  "streams": ["/vehicle/velocity"]
+}

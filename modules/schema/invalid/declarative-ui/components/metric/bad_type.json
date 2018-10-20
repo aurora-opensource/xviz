@@ -1,0 +1,5 @@
+{
+  "type": "not a valid type",
+  "title": "Velocity",
+  "streams": ["/vehicle/velocity"]
+}

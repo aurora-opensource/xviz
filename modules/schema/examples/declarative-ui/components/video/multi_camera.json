@@ -1,0 +1,8 @@
+{
+  "type": "video",
+  "cameras": [
+    "front-center-roof-camera",
+    "rear-starboard-roof-camera",
+    "rear-port-roof-camera"
+  ]
+}
