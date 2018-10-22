@@ -1,0 +1,16 @@
+{
+  "type": "panel",
+  "name": "Metrics Panel",
+  "children": [
+    {
+      "type": "container",
+      "children": [
+        {
+          "type": "metric",
+          "streams": ["/vehicle/velocity"],
+          "title": "Velocity"
+        }
+      ]
+    }
+  ]
+}

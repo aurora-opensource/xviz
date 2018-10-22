@@ -26,8 +26,8 @@ _Example skeleton UI showing how the pieces fit together_
 Layout types describe the different ways the contents of a layout element can be arranged, for
 example vertically or horizontally. Currently supported arrangement types are:
 
-- Vertical
-- Horizontal
+- Vertical (`vertical`)
+- Horizontal (`horizontal`)
 
 ### Vertical Layout
 
@@ -51,14 +51,14 @@ Layout interactions describe the ways that a layout element can be manipulated b
 interactions are completely optional, so each layout element can have zero, one, or more layout
 interactions applied to it. Currently supported layout interactions include:
 
-- Drag to Reorder
-- Drag out
+- Drag to Reorder (`reorderable`)
+- Drag out (`dragout`)
 
 ### Drag to Reorder
 
 When a layout element supports the drag to reorder interaction, it means that the elements inside of
 the layout element can be rearranged by clicking and dragging them. The formal type for drag to
-reorder is reorderable.
+reorder is `reorderable`.
 
 ### Drag Out
 
@@ -66,7 +66,7 @@ When a layout element supports the drag out interaction, it means that the compo
 components) can be moved outside of their layout element. A table, for example, could be clicked and
 dragged to free float inside the application outside of the panel that originally contained it.
 Components previously dragged out can be dragged back into the layout element that originally
-contained them. The formal type for drag out is drag_out.
+contained them. The formal type for drag out is `dragout`.
 
 ## Component Interaction Types
 
@@ -101,39 +101,45 @@ Panels are typically grouped together in tabs along the edge of an application. 
 together related pieces of data at a high level. Panels provide a convenient way for a team to group
 all of their data together.
 
-\_TODO: screentshot: panel from streetscape.gl demo app\_\_
+_TODO: screentshot: panel from streetscape.gl demo app_
 
-| **Name**     | **Type**               | **Description**                                                                                     |
-| ------------ | ---------------------- | --------------------------------------------------------------------------------------------------- |
-| name         | string                 | The name of this panel, will be displayed at the top of the panel                                   |
-| layout       | layout_type            | One of the supported layout types; defines how the elements inside of the panel should be arranged. |
-| interactions | list<interaction_type> | A list of all of the interactions supported by this panel.                                          |
-| components   | list<component_id>     | All of the components inside of this panel and the order in which they should be rendered           |
-| containers   | list<container_id>     | All of the containers inside of this panel in the order in which they should be rendered            |
+| **Name**       | **Type**                       | **Description**                                                                                          |
+| -------------- | ------------------------------ | -------------------------------------------------------------------------------------------------------- |
+| `name`         | `string`                       | The name of this panel, will be displayed at the top of the panel                                        |
+| `layout`       | `layout_type`                  | One of the supported layout types; defines how the elements inside of the panel should be arranged.      |
+| `interactions` | `list<interaction_type>`       | A list of all of the interactions supported by this panel.                                               |
+| `children`     | `list<component OR container>` | All of the components and containers inside of this panel and the order in which they should be rendered |
 
 ### Containers
 
 Containers are used to group components together into logical groupings of information that should
-be displayed together. To some extent, they can be thought of as HTML \<div\>s. Components within
+be displayed together. To some extent, they can be thought of as HTML `<div>`s. Components within
 the container will be rendered above any other containers that are nested inside of the container.
 
-\_TODO: screentshot: panel with containers from streetscape.gl demo app\_\_
+_TODO: screentshot: panel with containers from streetscape.gl demo app_
 
-| **Name**     | **Type**                 | **Description**                                                                                     |
-| ------------ | ------------------------ | --------------------------------------------------------------------------------------------------- |
-| name         | string                   | The name of this container, will be displayed at the top of the container                           |
-| layout       | layout_type              | One of the supported layout types; defines how the elements inside of the panel should be arranged. |
-| interactions | `list<interaction_type>` | A list of all of the interactions supported by this container.                                      |
-| components   | `list<component_id>`     | All of the components inside of this container in the order that they should be rendered            |
-| containers   | `list<container_id>`     | All of the containers inside of this container in the order that they should be rendered            |
+| **Name**       | **Type**                       | **Description**                                                                                          |
+| -------------- | ------------------------------ | -------------------------------------------------------------------------------------------------------- |
+| `name`         | `string`                       | The name of this container, will be displayed at the top of the container                                |
+| `layout`       | `layout_type`                  | One of the supported layout types; defines how the elements inside of the panel should be arranged.      |
+| `interactions` | `list<interaction_type>`       | A list of all of the interactions supported by this panel.                                               |
+| `children`     | `list<component OR container>` | All of the components and containers inside of this panel and the order in which they should be rendered |
 
 ## Components
 
 Component is the base type for all visual elements.
 
-| **Name** | **Type**               | **Description**                     |
-| -------- | ---------------------- | ----------------------------------- |
-| type     | enum{ component_type } | The explicit type of this component |
+| **Name** | **Type**                 | **Description**                     |
+| -------- | ------------------------ | ----------------------------------- |
+| `type`   | `enum{ component_type }` | The explicit type of this component |
+
+The valid values of `component_type`:
+
+- `metric`
+- `plot`
+- `table`
+- `treetable`
+- `video`
 
 ### Table
 
@@ -141,12 +147,12 @@ The Table element renders data similar to how data is presented in a traditional
 
 _TODO: screentshot: panel with table from streetscape.gl demo app_
 
-| **Name**          | **Type**  | **Description**                                                                                          |
-| ----------------- | --------- | -------------------------------------------------------------------------------------------------------- |
-| stream            | stream_id | The stream name to populate the table data from. Must be a stream of [[LINK EM TO TreeTable] primitives. |
-| title             | string    | A title to display above the component.                                                                  |
-| description       | string    | A description of this element, displayed when hovering over the title.                                   |
-| display_object_id | boolean   | Controls whether or not the object ID column, which is automatically added to TreeTables, is displayed.  |
+| **Name**          | **Type**    | **Description**                                                                                          |
+| ----------------- | ----------- | -------------------------------------------------------------------------------------------------------- |
+| `stream`          | `stream_id` | The stream name to populate the table data from. Must be a stream of [[LINK EM TO TreeTable] primitives. |
+| `title`           | `string`    | A title to display above the component.                                                                  |
+| `description`     | `string`    | A description of this element, displayed when hovering over the title.                                   |
+| `displayObjectId` | `boolean`   | Controls whether or not the object ID column, which is automatically added to TreeTables, is displayed.  |
 
 #### Supported Interactions
 
@@ -163,11 +169,11 @@ _TODO: screentshot: panel with table from streetscape.gl demo app_
 {
   "components": [
     {
-      "display_object_id": true,
       "type": "table",
-      "description": "These are the details of this table",
-      "stream": "/prediction/some_table",
       "title": "A table showing something"
+      "description": "These are the details of this table",
+      "displayObjectId": true,
+      "stream": "/prediction/some_table",
     }
   ]
 }
@@ -191,19 +197,17 @@ time series data on the same chart so that data can be easily compared.
 
 _TODO: screenshot: streetscape.gl demo app showing drag-able sub-panels_
 
-| **Name**    | **Type**               | **Description**                                                                                         |
-| ----------- | ---------------------- | ------------------------------------------------------------------------------------------------------- |
-| streams     | map<string, stream_id> | The streams to display in the chart.. Must be a stream of [time series states TODO LINK TO TIME SERIES] |
-| title       | string                 |                                                                                                         |
-| description | string                 | Displayed when hovering over the title                                                                  |
+| **Name**      | **Type**                 | **Description**                                                                                         |
+| ------------- | ------------------------ | ------------------------------------------------------------------------------------------------------- |
+| `streams`     | `map<string, stream_id>` | The streams to display in the chart.. Must be a stream of [time series states TODO LINK TO TIME SERIES] |
+| `title`       | `string`                 |                                                                                                         |
+| `description` | `string`                 | Displayed when hovering over the title                                                                  |
 
 #### Supported Interactions
 
-**Interaction** **Description**
-
----
-
-Details on Hover When hovering over a metrics element, the
+| **Interaction**  | **Description**                                                                                |
+| ---------------- | ---------------------------------------------------------------------------------------------- |
+| Details on Hover | When hovering over a metrics element, the current value of the metric at the location is shown |
 
 #### JSON Example
 
@@ -211,10 +215,10 @@ Details on Hover When hovering over a metrics element, the
 {
   "components": [
     {
-      "streams": ["/some_value/actual", "/some_value/commanded"],
+      "title": "Some metric",
       "type": "metric",
       "description": "The actual vs commanded value for some variable",
-      "title": "Some metric"
+      "streams": ["/some_value/actual", "/some_value/commanded"]
     }
   ]
 }
@@ -224,12 +228,12 @@ Details on Hover When hovering over a metrics element, the
 
 ```
 components:
-  - description: The actual vs commanded value for some variable
+  - type: metric
+    title: Some metric
+    description: The actual vs commanded value for some variable
     streams:
       - /some_value/actual
       - /some_value/commanded
-    title: Some metric
-    type: metric
 ```
 
 ### Plot
@@ -237,14 +241,14 @@ components:
 The Plot component is used for showing one or more variables as a function of other another
 variable. It is useful for viewing data side-by-side.
 
-\_TODO: screenshot: streetscape.gl demo app showing normal variable plot\_\_
+_TODO: screenshot: streetscape.gl demo app showing normal variable plot_
 
-| **Name**             | **Type**        | **Description**                                                                         |
-| -------------------- | --------------- | --------------------------------------------------------------------------------------- |
-| independent_variable | stream_id       | The stream to use as the X axis.                                                        |
-| dependent_variable   | list<stream_id> | The streams to plot on the Y axis as a function of the stream that makes up the X axis. |
-| title                | string          | Shown at the top of the plot                                                            |
-| description          | string          | Displayed when hovering over the title                                                  |
+| **Name**              | **Type**          | **Description**                                                                         |
+| --------------------- | ----------------- | --------------------------------------------------------------------------------------- |
+| `independentVariable` | `stream_id`       | The stream to use as the X axis.                                                        |
+| `dependentVariable`   | `list<stream_id>` | The streams to plot on the Y axis as a function of the stream that makes up the X axis. |
+| `title`               | `string`          | Shown at the top of the plot                                                            |
+| `description`         | `string`          | Displayed when hovering over the title                                                  |
 
 #### Supported Interactions
 
@@ -259,11 +263,11 @@ variable. It is useful for viewing data side-by-side.
 {
   "components": [
     {
-      "independent_variable": "/some/stream",
-      "dependent_variables": ["/some/other_stream", "/some/second_other_stream"],
       "type": "plot",
+      "title": "Some Other Streams vs Some Stream",
       "description": "The change in some streams as a function of the other one",
-      "title": "Some Other Streams vs Some Stream"
+      "independentVariable": "/some/stream",
+      "dependentVariables": ["/some/other_stream", "/some/second_other_stream"]
     }
   ]
 }
@@ -273,14 +277,13 @@ variable. It is useful for viewing data side-by-side.
 
 ```
 components:
-  - independent_variable: /some/stream
-    dependent_variables:
+  - type: plot
+    title: Some Other Streams vs Some Stream
+    description: The change in some streams as a function of the other one
+    independentVariable: /some/stream
+    dependentVariables:
     - /some/other_stream
     - /some/second_other_stream
-    description: The change in some streams as a function of the other one
-    independent_variable: /some/stream
-    title: Some Other Streams vs Some Stream
-    type: plot
 ```
 
 ### Video
@@ -291,9 +294,9 @@ streams concurrently, multiple video elements need to be created.
 
 _TODO: screenshot: streetscape.gl demo app showing the video element_
 
-| **Name** | **Type**     | **Description**                                                                                                            |
-| -------- | ------------ | -------------------------------------------------------------------------------------------------------------------------- |
-| cameras  | list<string> | A list of the streams of video that can be rendered by this element. Only [[cameras listed - TODO link to camera metadata] |
+| **Name**  | **Type**       | **Description**                                                                                                            |
+| --------- | -------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `cameras` | `list<string>` | A list of the streams of video that can be rendered by this element. Only [[cameras listed - TODO link to camera metadata] |
 
 #### Supported Interactions
 
@@ -308,12 +311,12 @@ _TODO: screenshot: streetscape.gl demo app showing the video element_
 {
   "components": [
     {
+      "type": "video",
       "cameras": [
         "front-center-roof-camera",
         "rear-starboard-roof-camera",
         "rear-port-roof-camera"
-      ],
-      "type": "video"
+      ]
     }
   ]
 }
@@ -323,11 +326,11 @@ _TODO: screenshot: streetscape.gl demo app showing the video element_
 
 ```
 components:
-  - cameras:
+  - type: video
+    cameras:
       - front-center-roof-camera
       - rear-starboard-roof-camera
       - rear-port-roof-camera
-    type: video
 ```
 
 ### TreeTable
@@ -342,12 +345,12 @@ being collapsible.
 
 _TODO: screenshot: streetscape.gl demo app showing treetable data_
 
-| **Name**          | **Type**  | **Description**                                                                      |
-| ----------------- | --------- | ------------------------------------------------------------------------------------ |
-| stream            | stream_id | The stream of TreeTable primitives to populate with which to populate this component |
-| title             | string    | A title to display at the top of the TreeTable                                       |
-| description       | string    | A description of this component, displayed when hovering over the title.             |
-| display_object_id | boolean   | Whether or not to display the object ID column                                       |
+| **Name**            | **Type**    | **Description**                                                                      |
+| ------------------- | ----------- | ------------------------------------------------------------------------------------ |
+| `stream`            | `stream_id` | The stream of TreeTable primitives to populate with which to populate this component |
+| `title`             | `string`    | A title to display at the top of the TreeTable                                       |
+| `description`       | `string`    | A description of this component, displayed when hovering over the title.             |
+| `display_object_id` | `boolean`   | Whether or not to display the object ID column                                       |
 
 #### Supported Interactions
 
@@ -393,70 +396,78 @@ Below is a complete example of what a panel definition would look like
 
 ```
 {
-  "containers": [
-    {
-      "containers": [],
-      "layout": "horizontal",
-      "name": "Example Container #1",
-      "components": [
-        {
-          "display_object_id": false,
-          "type": "table",
-          "description": "These are the details of this table",
-          "stream": "/some/table_stream",
-          "title": "A nested table showing something"
-        },
-        {
-          "independent_variable": "/some/stream",
-          "title": "A nested plot!",
-          "dependent_variables": ["/some/other_stream", "/some/second_other_stream"],
-          "description": "The change in some streams as a function of the other one",
-          "type": "plot"
-        }
-      ],
-      "interactions": ["drag_out"]
-    }
-  ],
+  "type": "panel",
   "layout": "vertical",
   "name": "Example Panel",
-  "components": [
+  "interactions": ["reorderable"],
+  "children": [
     {
-      "display_object_id": true,
+      "type": "container",
+      "layout": "horizontal",
+      "name": "Example Container #1",
+      "interactions": ["dragout"],
+      "children": [
+        {
+          "type": "table",
+          "title": "A nested table showing something",
+          "description": "These are the details of this table",
+          "stream": "/some/table_stream",
+          "displayObjectId": false
+        },
+        {
+          "type": "plot",
+          "title": "A nested plot!",
+          "description": "The change in some streams as a function of the other one",
+          "independentVariable": "/some/stream",
+          "dependentVariable": [
+            "/some/other_stream",
+            "/some/second_other_stream"
+          ]
+        }
+      ]
+    },
+    {
       "type": "table",
+      "title": "A table showing something",
       "description": "These are the details of this table",
-      "stream": "/prediction/some_table",
-      "title": "A table showing something"
+      "displayObjectId": true,
+      "stream": "/prediction/some_table"
     },
     {
-      "streams": ["/some_value/actual", "/some_value/commanded"],
       "type": "metric",
+      "title": "Some metric",
       "description": "The actual vs commanded value for some variable",
-      "title": "Some metric"
+      "streams": [
+        "/some_value/actual",
+        "/some_value/commanded"
+      ]
     },
     {
-      "independent_variable": "/some/stream",
-      "dependent_variables": ["/some/other_stream", "/some/second_other_stream"],
       "type": "plot",
+      "title": "Some Other Streams vs Some Stream",
       "description": "The change in some streams as a function of the other one",
-      "title": "Some Other Streams vs Some Stream"
+      "independentVariable": "/some/stream",
+      "dependentVariable": [
+        "/some/other_stream",
+        "/some/second_other_stream"
+      ]
     },
     {
+      "type": "video",
       "cameras": [
         "front-center-roof-camera",
         "rear-starboard-roof-camera",
         "rear-port-roof-camera"
-      ],
-      "type": "video"
+      ]
     },
     {
-      "display_object_id": false,
-      "type": "tree_table",
+      "type": "treetable",
+      "title": "A TreeTable!",
       "description": "These are the details of the TreeTable",
-      "stream": "/some/stream/of/treetable/primmatives",
-      "title": "A TreeTable!"
+      "displayObjectId": false,
+      "stream": "/some/stream/of/treetable/primmatives"
     }
-  ],
-  "interactions": ["reorderable"]
+  ]
 }
 ```
 

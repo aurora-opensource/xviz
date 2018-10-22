@@ -48,6 +48,7 @@ function loadAllSchemas(schemaDir) {
             const cleanedPath = relPath
               .replace(/\//g, '_')
               .replace(/\./g, '_')
+              .replace(/-/g, '_')
               .replace(/__/g, '_');
             const identifier = snakeToCamel(cleanedPath);
             schemaMap[identifier] = {
