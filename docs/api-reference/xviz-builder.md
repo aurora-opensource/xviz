@@ -153,8 +153,8 @@ xvizMetaBuider
   .category('primitive')
   .type('point')
   .streamStyle({
-    fillColor: '#00a',
-    radiusPixels: 2
+    fill_color: '#00a',
+    radius_pixels: 2
   })
 
   .stream('/pedestrian-1-trajectory')
@@ -194,7 +194,7 @@ xvizBuilder
   .points(new Float32Array([1.23, 0.45, 0.06]))
   .timestamp()
   .style({
-     color: [0, 0, 0, 255]
+     fill_color: [0, 0, 0, 255]
   })
 
   .primitive('/pedestrian-1-trajectory')

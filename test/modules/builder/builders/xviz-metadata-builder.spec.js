@@ -171,9 +171,9 @@ test('XVIZMetadataBuilder#multiple-streams', t => {
 test('XVIZMetadataBuilder#stylesheet', t => {
   const xb = new XVIZMetadataBuilder();
   xb.stream('/test').streamStyle({
-    strokeColor: '#57AD57AA',
-    strokeWidth: 1.4,
-    strokeWidthMinPixels: 1
+    stroke_color: '#57AD57AA',
+    stroke_width: 1.4,
+    stroke_width_min_pixels: 1
   });
 
   const metadata = xb.getMetadata();
@@ -183,9 +183,9 @@ test('XVIZMetadataBuilder#stylesheet', t => {
     streams: {
       '/test': {
         stream_style: {
-          strokeColor: '#57AD57AA',
-          strokeWidth: 1.4,
-          strokeWidthMinPixels: 1
+          stroke_color: '#57AD57AA',
+          stroke_width: 1.4,
+          stroke_width_min_pixels: 1
         }
       }
     }

@@ -24,14 +24,14 @@ export const PRIMITIVE_TYPES = {
 };
 
 export const STYLES = {
-  strokeColor: 'strokeColor',
-  fillColor: 'fillColor',
+  stroke_color: 'stroke_color',
+  fill_color: 'fill_color',
   radius: 'radius',
-  radiusMinPixels: 'radiusMinPixels',
-  radiusMaxPixels: 'radiusMaxPixels',
-  strokeWidth: 'strokeWidth',
-  strokeWidthMinPixels: 'strokeWidthMinPixels',
-  strokeWidthMaxPixels: 'strokeWidthMaxPixels',
+  radius_min_pixels: 'radius_min_pixels',
+  radius_max_pixels: 'radius_max_pixels',
+  stroke_width: 'stroke_width',
+  stroke_width_min_pixels: 'stroke_width_min_pixels',
+  stroke_width_max_pixels: 'stroke_width_max_pixels',
   height: 'height',
   opacity: 'opacity',
   stroked: 'stroked',
@@ -41,29 +41,30 @@ export const STYLES = {
   size: 'size',
   color: 'color',
   angle: 'angle',
-  position: 'position'
+  text_anchor: 'text_anchor',
+  alignment_baseline: 'alignment_baseline'
 };
 
 export const PRIMITIVE_STYLE_MAP = {
   [PRIMITIVE_TYPES.circle]: [
-    STYLES.strokeColor,
-    STYLES.fillColor,
+    STYLES.stroke_color,
+    STYLES.fill_color,
     STYLES.radius,
-    STYLES.radiusMinPixels,
-    STYLES.radiusMaxPixels
+    STYLES.radius_min_pixels,
+    STYLES.radius_max_pixels
   ],
   [PRIMITIVE_TYPES.point]: [
-    STYLES.fillColor,
+    STYLES.fill_color,
     STYLES.radius,
-    STYLES.radiusMinPixels,
-    STYLES.radiusMaxPixels
+    STYLES.radius_min_pixels,
+    STYLES.radius_max_pixels
   ],
   [PRIMITIVE_TYPES.polygon]: [
-    STYLES.strokeColor,
-    STYLES.fillColor,
-    STYLES.strokeWidth,
-    STYLES.strokeWidthMinPixels,
-    STYLES.strokeWidthMaxPixels,
+    STYLES.stroke_color,
+    STYLES.fill_color,
+    STYLES.stroke_width,
+    STYLES.stroke_width_min_pixels,
+    STYLES.stroke_width_max_pixels,
     STYLES.height,
     STYLES.opacity,
     STYLES.stroked,
@@ -72,19 +73,25 @@ export const PRIMITIVE_STYLE_MAP = {
     STYLES.wireframe
   ],
   // TODO need verify from here
-  [PRIMITIVE_TYPES.text]: [STYLES.size, STYLES.position, STYLES.angle, STYLES.color],
+  [PRIMITIVE_TYPES.text]: [
+    STYLES.size,
+    STYLES.angle,
+    STYLES.text_anchor,
+    STYLES.alignment_baseline,
+    STYLES.color
+  ],
   [PRIMITIVE_TYPES.polyline]: [
-    STYLES.strokeColor,
-    STYLES.strokeWidth,
-    STYLES.strokeWidthMinPixels,
-    STYLES.strokeWidthMaxPixels
+    STYLES.stroke_color,
+    STYLES.stroke_width,
+    STYLES.stroke_width_min_pixels,
+    STYLES.stroke_width_max_pixels
   ],
   [PRIMITIVE_TYPES.stadium]: [
-    STYLES.strokeColor,
-    STYLES.fillColor,
-    STYLES.strokeWidth,
-    STYLES.strokeWidthMinPixels,
-    STYLES.strokeWidthMaxPixels
+    STYLES.stroke_color,
+    STYLES.fill_color,
+    STYLES.stroke_width,
+    STYLES.stroke_width_min_pixels,
+    STYLES.stroke_width_max_pixels
   ]
 };
 

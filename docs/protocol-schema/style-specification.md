@@ -245,15 +245,15 @@ This table shows what style properties apply to each primitive type.
 This table shows the _additional_ style properties that apply at the stream level for each primitive
 type.
 
-| Type\Property | opacity | stroked | filled | extruded | wireframe | radiusMinPixel | radius_max_pixels | stroke_width_min_pixels | stroke_width_min_pixels |
-| ------------- | ------- | ------- | ------ | -------- | --------- | -------------- | ----------------- | ----------------------- | ----------------------- |
-| circle        | x       |         |        |          |           | x              | x                 |                         |                         |
-| image         |         |         |        |          |           |                |                   |                         |                         |
-| point         | x       |         |        |          |           |                |                   |                         |                         |
-| polygon       | x       | x       | x      | x        | x         |                |                   | x                       | x                       |
-| polyline      | x       |         |        |          |           |                |                   | x                       | x                       |
-| stadium       | x       | x       | x      | x        | x         |                |                   | x                       | x                       |
-| text          | x       |         |        |          |           |                |                   |                         |                         |
+| Type\Property | opacity | stroked | filled | extruded | wireframe | radius_min_pixel | radius_max_pixels | stroke_width_min_pixels | stroke_width_min_pixels |
+| ------------- | ------- | ------- | ------ | -------- | --------- | ---------------- | ----------------- | ----------------------- | ----------------------- |
+| circle        | x       |         |        |          |           | x                | x                 |                         |                         |
+| image         |         |         |        |          |           |                  |                   |                         |                         |
+| point         | x       |         |        |          |           |                  |                   |                         |                         |
+| polygon       | x       | x       | x      | x        | x         |                  |                   | x                       | x                       |
+| polyline      | x       |         |        |          |           |                  |                   | x                       | x                       |
+| stadium       | x       | x       | x      | x        | x         |                  |                   | x                       | x                       |
+| text          | x       |         |        |          |           |                  |                   |                         |                         |
 
 ## Stype Property Default Values
 

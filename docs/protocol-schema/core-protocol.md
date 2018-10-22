@@ -296,16 +296,10 @@ information for each object over and over. Here is what it looks like to use an 
 {
     "type": "polygon",
     "id": "178beda89169420cbb876c14acdba7f8",
-    "style": [
-        {
-            "type": "fillColor"
-            "value": "#FF0000",
-        },
-        {
-            "type": "strokeColor",
-            "value": "#000080"
-        }
-    ],
+    "style": {
+        "fill_color": "#FF0000",
+        "stroke_color": "#000080"
+    },
     "vertices": [[9, 15, 3], [20, 13, 3], [20, 5, 3]]
 }
 ```

@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import {XvizStyleParser, Stylesheet} from '@xviz/parser';
 import tape from 'tape-catch';
 
@@ -10,34 +11,34 @@ const TEST_STYLESHEETS = [
         style: {
           extruded: true,
           height: 1.5,
-          strokeWidth: 1,
+          stroke_width: 1,
           opacity: 0.5,
-          fillColor: '#808080'
+          fill_color: '#808080'
         }
       },
       {
         name: 'type=bike',
         style: {
-          fillColor: '#0000FF',
+          fill_color: '#0000FF',
           opacity: 1
         }
       },
       {
         name: 'type=car tracked',
         style: {
-          strokeWidth: 3
+          stroke_width: 3
         }
       },
       {
         name: 'tracked',
         style: {
-          fillColor: '#FFFF00'
+          fill_color: '#FFFF00'
         }
       },
       {
         name: 'fancy',
         style: {
-          fillColor: '#101010'
+          fill_color: '#101010'
         }
       }
     ]
@@ -56,37 +57,37 @@ const GET_PROPERTY_TEST_CASES = [
     output: 1.5
   },
   {
-    propertyName: 'fillColor',
+    propertyName: 'fill_color',
     state: CAR,
     output: [128, 128, 128]
   },
   {
-    propertyName: 'fillColor',
+    propertyName: 'fill_color',
     state: BIKE,
     output: [0, 0, 255]
   },
   {
-    propertyName: 'fillColor',
+    propertyName: 'fill_color',
     state: TRACKED_CAR,
     output: [255, 255, 0]
   },
   {
-    propertyName: 'fillColor',
+    propertyName: 'fill_color',
     state: TRACKED_BIKE,
     output: [255, 255, 0]
   },
   {
-    propertyName: 'strokeWidth',
+    propertyName: 'stroke_width',
     state: CAR,
     output: 1
   },
   {
-    propertyName: 'strokeWidth',
+    propertyName: 'stroke_width',
     state: TRACKED_CAR,
     output: 3
   },
   {
-    propertyName: 'fillColor',
+    propertyName: 'fill_color',
     state: FANCY_BUS,
     output: [16, 16, 16]
   }
@@ -94,11 +95,11 @@ const GET_PROPERTY_TEST_CASES = [
 
 const GET_DEPS_TEST_CASES = [
   {
-    propertyName: 'fillColor',
+    propertyName: 'fill_color',
     output: ['fancy', 'tracked', 'type']
   },
   {
-    propertyName: 'strokeWidth',
+    propertyName: 'stroke_width',
     output: ['type', 'tracked']
   },
   {
