@@ -24,7 +24,7 @@ export function parseStreamMessage({
   worker = false,
   maxConcurrency = 4
 }) {
-  if (worker) {
+  if (false && worker) {
     if (!workerFarm) {
       initializeWorkers({worker, maxConcurrency});
     }
