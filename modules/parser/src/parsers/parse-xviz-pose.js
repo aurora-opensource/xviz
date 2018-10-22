@@ -6,7 +6,7 @@ export function parseXVIZPose(pose) {
   };
 
   if (mapOrigin) {
-    const [longitude, latitude, altitude] = mapOrigin;
+    const {longitude, latitude, altitude} = mapOrigin;
     Object.assign(result, {
       longitude,
       latitude,
