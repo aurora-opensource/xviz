@@ -56,7 +56,7 @@ export function parseXvizStream(data, convertPrimitive) {
   return {};
 }
 
-/* eslint-disable max-depth, max-statements */
+/* eslint-disable max-depth, max-statements, complexity, camelcase */
 
 /* Processes an individual primitive time sample and converts the
  * data to UI elements.
@@ -70,7 +70,8 @@ export function parseStreamPrimitive(objects, streamName, time, convertPrimitive
 
   if (isMainThread && streamName === OBJECT_STREAM) {
     for (const object of objects) {
-      XvizObject.observe(object.id, time);
+      // v1: id, v2: object_id
+      XvizObject.observe(object.id || object.object_id, time);
     }
   }
   const primitiveMap = createPrimitiveMap();
@@ -130,8 +131,6 @@ export function parseStreamPrimitive(objects, streamName, time, convertPrimitive
   return primitiveMap;
 }
 
-/* eslint-enable max-depth, max-statements */
-
 /* Processes the futures and converts the
  * data to UI elements.
  */
@@ -177,7 +176,6 @@ export function parseStreamFutures(objects, streamName, time, convertPrimitive) 
 /* Processes an individual variable time sample and converts the
  * data to UI elements.
  */
-/* eslint-disable camelcase */
 export function parseStreamVariable(objects, streamName, time) {
   const isVar = !Array.isArray(objects);
   if (!isVar) {
@@ -206,12 +204,10 @@ export function parseStreamVariable(objects, streamName, time) {
 
   return entry;
 }
-/* eslint-enable camelcase */
 
 /* Processes a time_series sample and converts the
  * data to UI elements.
  */
-/* eslint-disable camelcase */
 export function parseStreamTimeSeries(seriesArray, streamBlackList) {
   if (!Array.isArray(seriesArray)) {
     return {};
@@ -242,7 +238,6 @@ export function parseStreamTimeSeries(seriesArray, streamBlackList) {
 
   return timeSeriesStreams;
 }
-/* eslint-enable camelcase */
 
 function getVertexCount(vertices) {
   return vertices instanceof Float32Array ? vertices.length / 3 : vertices.length;
@@ -273,6 +268,25 @@ function joinObjectPointCloudsToTypedArrays(objects) {
   objects.forEach(object => {
     const vertexCount = getVertexCount(object.vertices);
 
+    // Setup for per-point color
+    let vertexColors = object.colors;
+    let vertexColorStride = null;
+    if (vertexColors) {
+      if (vertexColors.length / 4 === vertexCount) {
+        vertexColorStride = 4;
+      } else if (vertexColors.length / 3 === vertexCount) {
+        vertexColorStride = 4;
+      } else {
+        vertexColors = null;
+      }
+    }
+
+    const isColorFlattenedArray = object.colors instanceof Float32Array;
+    const vertexColorTyped = isColorFlattenedArray && vertexColorStride === 4;
+    if (vertexColorTyped) {
+      colors.set(object.colors, i * 4);
+    }
+
     const isPositionFlattenedArray = object.vertices instanceof Float32Array;
     if (isPositionFlattenedArray) {
       positions.set(object.vertices, i * 3);
@@ -288,11 +302,17 @@ function joinObjectPointCloudsToTypedArrays(objects) {
         positions[i * 3 + 2] = vertex[2];
       }
 
-      const color = object.color || DEFAULT_COLOR;
-      colors[i * 4 + 0] = color[0];
-      colors[i * 4 + 1] = color[1];
-      colors[i * 4 + 2] = color[2];
-      colors[i * 4 + 3] = color[3] || 255;
+      if (!vertexColorTyped) {
+        let color = object.color || DEFAULT_COLOR;
+        if (vertexColors) {
+          color = vertexColors[j * vertexColorStride];
+        }
+
+        colors[i * 4 + 0] = color[0];
+        colors[i * 4 + 1] = color[1];
+        colors[i * 4 + 2] = color[2];
+        colors[i * 4 + 3] = color[3] || 255;
+      }
     }
   });
 

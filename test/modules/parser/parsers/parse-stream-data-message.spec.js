@@ -66,10 +66,10 @@ const TestTimesliceMessageV2 = {
         '/test/stream': [
           {
             color: [255, 255, 255],
-            id: 1234,
+            object_id: 1234,
             radius: 0.01,
             type: 'point',
-            vertices: [[1000, 1000, 200]]
+            points: [[1000, 1000, 200]]
           }
         ]
       }
@@ -219,10 +219,10 @@ tape('parseStreamLogData pointCloud timeslice', t => {
           '/test/stream': [
             {
               color: [255, 255, 255],
-              id: 1234,
+              object_id: 1234,
               radius: 0.01,
               type: 'point',
-              vertices: [[1000, 1000, 200]]
+              points: [[1000, 1000, 200]]
             }
           ]
         }
@@ -261,10 +261,10 @@ tape('parseStreamLogData pointCloud timeslice TypedArray', t => {
           '/test/stream': [
             {
               color: [255, 255, 255],
-              id: 1234,
+              object_id: 1234,
               radius: 0.01,
               type: 'point',
-              vertices: new Float32Array([1000, 1000, 200])
+              points: new Float32Array([1000, 1000, 200])
             }
           ]
         }
@@ -303,17 +303,17 @@ tape('parseStreamLogData pointCloud timeslice', t => {
           '/test/stream': [
             {
               color: [255, 255, 255],
-              id: 1234,
+              object_id: 1234,
               radius: 0.01,
               type: 'point',
-              vertices: [[1000, 1000, 200]]
+              points: [[1000, 1000, 200]]
             },
             {
               color: [255, 255, 255],
-              id: 1235,
+              object_id: 1235,
               radius: 0.01,
               type: 'point',
-              vertices: new Float32Array([1000, 1000, 200])
+              points: new Float32Array([1000, 1000, 200])
             }
           ]
         }
