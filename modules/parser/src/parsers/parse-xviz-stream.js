@@ -177,6 +177,7 @@ export function parseStreamFutures(objects, streamName, time, convertPrimitive) 
 /* Processes an individual variable time sample and converts the
  * data to UI elements.
  */
+/* eslint-disable camelcase */
 export function parseStreamVariable(objects, streamName, time) {
   const isVar = !Array.isArray(objects);
   if (!isVar) {
@@ -184,7 +185,7 @@ export function parseStreamVariable(objects, streamName, time) {
   }
 
   let variable;
-  const {timestamps, values} = objects;
+  const {timestamps, values, object_id} = objects;
   if (values.length === 1) {
     variable = values[0];
   } else if (timestamps) {
@@ -194,11 +195,54 @@ export function parseStreamVariable(objects, streamName, time) {
     variable = values;
   }
 
-  return {
+  const entry = {
     time,
     variable
   };
+
+  if (objects) {
+    entry.id = object_id;
+  }
+
+  return entry;
 }
+/* eslint-enable camelcase */
+
+/* Processes a time_series sample and converts the
+ * data to UI elements.
+ */
+/* eslint-disable camelcase */
+export function parseStreamTimeSeries(seriesArray, streamBlackList) {
+  if (!Array.isArray(seriesArray)) {
+    return {};
+  }
+
+  const timeSeriesStreams = {};
+  seriesArray.forEach(timeSeriesEntry => {
+    const {timestamp, values, object_id} = timeSeriesEntry;
+
+    values.forEach(streamValue => {
+      const [streamName, variable] = streamValue;
+
+      if (!streamBlackList.has(streamName)) {
+        const entry = {time: timestamp, variable};
+        if (object_id) {
+          entry.id = object_id;
+        }
+
+        const tsStream = timeSeriesStreams[streamName];
+        if (tsStream) {
+          throw new Error('Unexpected time_series duplicate');
+        } else {
+          timeSeriesStreams[streamName] = entry;
+        }
+      }
+    });
+  });
+
+  return timeSeriesStreams;
+}
+/* eslint-enable camelcase */
 
 function getVertexCount(vertices) {
   return vertices instanceof Float32Array ? vertices.length / 3 : vertices.length;

@@ -2,7 +2,12 @@
 import {LOG_STREAM_MESSAGE} from '../constants';
 import {getXvizConfig} from '../config/xviz-config';
 import {parseXVIZPose} from './parse-xviz-pose';
-import {parseStreamFutures, parseStreamPrimitive, parseStreamVariable} from './parse-xviz-stream';
+import {
+  parseStreamFutures,
+  parseStreamPrimitive,
+  parseStreamVariable,
+  parseStreamTimeSeries
+} from './parse-xviz-stream';
 
 export default function parseTimesliceData(data, convertPrimitive) {
   const {state_updates: stateUpdates, ...otherInfo} = data;
@@ -43,6 +48,7 @@ function parseStateUpdates(stateUpdates, timestamp, convertPrimitive) {
   const poses = {};
   const primitives = {};
   const variables = {};
+  const timeSeries = [];
   const futures = {};
 
   for (const stateUpdate of stateUpdates) {
@@ -50,6 +56,12 @@ function parseStateUpdates(stateUpdates, timestamp, convertPrimitive) {
     Object.assign(primitives, stateUpdate.primitives);
     Object.assign(variables, stateUpdate.variables);
     Object.assign(futures, stateUpdate.futures);
+
+    if (stateUpdate.time_series) {
+      if (timeSeries) {
+        timeSeries.push(...stateUpdate.time_series);
+      }
+    }
   }
 
   Object.keys(poses)
@@ -74,6 +86,11 @@ function parseStateUpdates(stateUpdates, timestamp, convertPrimitive) {
     .forEach(variable => {
       newStreams[variable] = parseStreamVariable(variables[variable], variable, timestamp);
     });
+
+  if (timeSeries.length) {
+    const timeSeriesStreams = parseStreamTimeSeries(timeSeries, STREAM_BLACKLIST);
+    Object.assign(newStreams, timeSeriesStreams);
+  }
 
   Object.keys(futures)
     .filter(streamName => !STREAM_BLACKLIST.has(streamName))
