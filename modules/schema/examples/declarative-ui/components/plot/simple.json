@@ -1,0 +1,10 @@
+{
+  "type": "plot",
+  "title": "Some Other Streams vs Some Stream",
+  "description": "The change in some streams as a function of the other one",
+  "independentVariable": "/some/stream",
+  "dependentVariable": [
+    "/some/other_stream",
+    "/some/second_other_stream"
+  ]
+}

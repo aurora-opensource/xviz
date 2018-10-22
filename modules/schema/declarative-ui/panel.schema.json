@@ -1,0 +1,80 @@
+{
+  "id": "https://xviz.org/schema/declarative-ui/panel.json",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "Declarative UI Panel Info",
+  "allOf": [{ "$ref": "#/definitions/with_children" }],
+  "properties": {
+    "type": {
+      "enum": ["panel"]
+    },
+    "name": {},
+    "layout": {},
+    "interactions": {},
+    "children": {}
+  },
+  "additionalProperties": false,
+  "definitions": {
+    "with_children": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "layout": {
+          "type": "string",
+          "enum": ["vertical", "horizontal"]
+        },
+        "interactions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "reorderable",
+              "dragout"
+            ]
+          },
+          "additionalItems": false
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {"$ref": "https://xviz.org/schema/declarative-ui/components/metric.json"},
+              {"$ref": "https://xviz.org/schema/declarative-ui/components/plot.json"},
+              {"$ref": "https://xviz.org/schema/declarative-ui/components/table.json"},
+              {"$ref": "https://xviz.org/schema/declarative-ui/components/treetable.json"},
+              {"$ref": "https://xviz.org/schema/declarative-ui/components/video.json"},
+              {"$ref": "#/definitions/container"}
+            ]
+          },
+          "additionalItems": false
+        }
+      },
+      "required": [
+        "name",
+        "children"
+      ]
+    },
+    "container": {
+      "title": "container",
+      "description": "Group of components",
+      "allOf": [{ "$ref": "#/definitions/with_children" }],
+      "properties": {
+        "type": {
+          "enum": ["container"]
+        },
+        "name": {},
+        "layout": {},
+        "interactions": {},
+        "children": {}
+      },
+      "required": [
+        "type"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

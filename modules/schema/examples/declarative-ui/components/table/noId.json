@@ -1,0 +1,6 @@
+{
+  "type": "table",
+  "title": "A table showing something",
+  "description": "These are the details of this table",
+  "stream": "/prediction/some_table"
+}

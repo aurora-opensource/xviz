@@ -1,0 +1,7 @@
+{
+  "type": "treetable",
+  "title": "A Tree Table showing something",
+  "description": "These are the details of this tree table",
+  "displayObjectId": true,
+  "stream": "/prediction/some_treetable"
+}
