@@ -46,8 +46,10 @@ test('XVIZMetadataBuilder#build-with-transformMatrix-array', t => {
         ]
       }
     },
-    start_time: 0,
-    end_time: 1
+    log_info: {
+      start_time: 0,
+      end_time: 1
+    }
   };
 
   t.deepEqual(
@@ -83,8 +85,10 @@ test('XVIZMetadataBuilder#build-with-transformMatrix-matrix4', t => {
         transform: new Matrix4([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 2, 3, 1])
       }
     },
-    start_time: 0,
-    end_time: 1
+    log_info: {
+      start_time: 0,
+      end_time: 1
+    }
   };
 
   t.deepEqual(
@@ -117,8 +121,10 @@ test('XVIZMetadataBuilder#build-with-pose', t => {
         transform: new Matrix4([1, 0, -0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 2, 3, 1])
       }
     },
-    start_time: 0,
-    end_time: 1
+    log_info: {
+      start_time: 0,
+      end_time: 1
+    }
   };
 
   t.deepEqual(metadata, expected, 'XVIZMetadataBuilder build with pose matches expected output');
@@ -148,8 +154,10 @@ test('XVIZMetadataBuilder#multiple-streams', t => {
         category: 'variable'
       }
     },
-    start_time: 0,
-    end_time: 1
+    log_info: {
+      start_time: 0,
+      end_time: 1
+    }
   };
 
   t.deepEqual(

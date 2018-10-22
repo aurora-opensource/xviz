@@ -6,28 +6,39 @@ const TEST_STYLESHEETS = [
     title: 'Array style',
     stylesheet: [
       {
-        extruded: true,
-        height: 1.5,
-        strokeWidth: 1,
-        opacity: 0.5,
-        fillColor: '#808080'
+        name: '*',
+        style: {
+          extruded: true,
+          height: 1.5,
+          strokeWidth: 1,
+          opacity: 0.5,
+          fillColor: '#808080'
+        }
       },
       {
-        class: 'type=bike',
-        fillColor: '#0000FF',
-        opacity: 1
+        name: 'type=bike',
+        style: {
+          fillColor: '#0000FF',
+          opacity: 1
+        }
       },
       {
-        class: 'type=car tracked',
-        strokeWidth: 3
+        name: 'type=car tracked',
+        style: {
+          strokeWidth: 3
+        }
       },
       {
-        class: 'tracked',
-        fillColor: '#FFFF00'
+        name: 'tracked',
+        style: {
+          fillColor: '#FFFF00'
+        }
       },
       {
-        class: 'fancy',
-        fillColor: '#101010'
+        name: 'fancy',
+        style: {
+          fillColor: '#101010'
+        }
       }
     ]
   }

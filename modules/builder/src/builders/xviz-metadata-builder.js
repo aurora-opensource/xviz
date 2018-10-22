@@ -21,11 +21,11 @@ export default class XVIZMetadataBuilder {
     this.tmp_stream = {};
     this.tmp_matrix_transform = null;
     this.tmp_pose_transform = null;
+    this.tmp_log_info = {};
     // TODO:
     // cameras
     // stream_aliases
     // ui_config
-    // log_info
     // map_info
     // vehicle_info
   }
@@ -33,19 +33,25 @@ export default class XVIZMetadataBuilder {
   getMetadata() {
     this._flush();
 
-    return {
+    const metadata = {
       version: '2.0.0',
       ...this.data
     };
+
+    if (Object.keys(this.tmp_log_info).length > 0) {
+      metadata.log_info = this.tmp_log_info;
+    }
+
+    return metadata;
   }
 
   startTime(time) {
-    this.data.start_time = time;
+    this.tmp_log_info.start_time = time;
     return this;
   }
 
   endTime(time) {
-    this.data.end_time = time;
+    this.tmp_log_info.end_time = time;
     return this;
   }
 

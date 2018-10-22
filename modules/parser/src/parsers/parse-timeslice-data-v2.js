@@ -9,8 +9,27 @@ import {
   parseStreamTimeSeries
 } from './parse-xviz-stream';
 
+/* eslint-disable camelcase */
+
 export default function parseTimesliceData(data, convertPrimitive) {
-  const {state_updates: stateUpdates, ...otherInfo} = data;
+  const {update_type, updates} = data;
+
+  if (update_type !== 'snapshot') {
+    throw new Error(
+      `Only XVIZ update_type of "snapshot" is currently supported. Type "${update_type}" is not supported.`
+    );
+  }
+
+  if (updates.length > 1) {
+    throw new Error(
+      `Only XVIZ first update of "snapshot" is currently supported. Current updates has "${
+        updates.length
+      }" entries.`
+    );
+  }
+
+  const firstUpdate = updates[0];
+  const {state_updates: stateUpdates, ...otherInfo} = firstUpdate;
 
   let timestamp = data.timestamp;
   if (!timestamp && stateUpdates) {
@@ -55,7 +74,7 @@ function parseStateUpdates(stateUpdates, timestamp, convertPrimitive) {
     Object.assign(poses, stateUpdate.poses);
     Object.assign(primitives, stateUpdate.primitives);
     Object.assign(variables, stateUpdate.variables);
-    Object.assign(futures, stateUpdate.futures);
+    Object.assign(futures, stateUpdate.future_instances);
 
     if (stateUpdate.time_series) {
       if (timeSeries) {

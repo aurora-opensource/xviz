@@ -13,6 +13,7 @@ export function initializeWorkers({worker, maxConcurrency = 4}) {
   }
 }
 
+/* eslint-disable no-constant-condition */
 export function parseStreamMessage({
   message,
   // callbacks
