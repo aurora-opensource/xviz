@@ -1,9 +1,12 @@
 /* eslint-disable camelcase */
 import test from 'tape-catch';
 import XvizVariableBuilder from '@xviz/builder/builders/xviz-variable-builder';
-import XVIZValidator from '@xviz/builder/builders/xviz-validator';
+import {default as XVIZBuilderValidator} from '@xviz/builder/builders/xviz-validator';
+import {XVIZValidator} from '@xviz/schema';
 
-const validator = new XVIZValidator({
+const schemaValidator = new XVIZValidator();
+
+const validator = new XVIZBuilderValidator({
   validateWarn: msg => {
     throw new Error(msg);
   },
@@ -43,6 +46,7 @@ test('XvizVariableBuilder#single entry', t => {
   const data = builder.getData();
 
   t.deepEqual(data, expected, 'XvizVariableBuilder single entry matches expected output');
+  schemaValidator.validate('core/variable_state', data['/test']);
   t.end();
 });
 
@@ -71,6 +75,8 @@ test('XvizVariableBuilder#multiple entry', t => {
   const data = builder.getData();
 
   t.deepEqual(data, expected, 'XvizVariableBuilder multiple entry matches expected output');
+  schemaValidator.validate('core/variable_state', data['/test']);
+  schemaValidator.validate('core/variable_state', data['/foo']);
   t.end();
 });
 
@@ -122,6 +128,8 @@ test('XvizVariableBuilder#all types and multiple entry with ids', t => {
     expected,
     'XvizVariableBuilder all types and multiple entries with ids matches expected output'
   );
+  schemaValidator.validate('core/variable_state', data['/test']);
+  schemaValidator.validate('core/variable_state', data['/bar']);
   t.end();
 });
 

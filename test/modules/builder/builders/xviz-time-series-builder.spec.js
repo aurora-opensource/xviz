@@ -1,9 +1,12 @@
 /* eslint-disable camelcase */
 import test from 'tape-catch';
 import XVIZTimeSeriesBuilder from '@xviz/builder/builders/xviz-time-series-builder';
-import XVIZValidator from '@xviz/builder/builders/xviz-validator';
+import {default as XVIZBuilderValidator} from '@xviz/builder/builders/xviz-validator';
+import {XVIZValidator} from '@xviz/schema';
 
-const validator = new XVIZValidator({
+const schemaValidator = new XVIZValidator();
+
+const validator = new XVIZBuilderValidator({
   validateWarn: msg => {
     throw new Error(msg);
   },
@@ -43,6 +46,7 @@ test('XVIZTimeSeriesBuilder#single entry', t => {
   const data = builder.getData();
 
   t.deepEqual(data, expected, 'XVIZTimeSeriesBuilder single entry matches expected output');
+  data.forEach(d => schemaValidator.validate('core/timeseries_state', d));
   t.end();
 });
 
@@ -71,6 +75,7 @@ test('XVIZTimeSeriesBuilder#multiple entry same ts', t => {
     expected,
     'XVIZTimeSeriesBuilder multiple entry same ts matches expected output'
   );
+  data.forEach(d => schemaValidator.validate('core/timeseries_state', d));
   t.end();
 });
 
@@ -108,6 +113,7 @@ test('XVIZTimeSeriesBuilder#multiple entry different ts', t => {
     expected,
     'XVIZTimeSeriesBuilder multiple entry different ts matches expected output'
   );
+  data.forEach(d => schemaValidator.validate('core/timeseries_state', d));
   t.end();
 });
 
@@ -166,6 +172,7 @@ test('XVIZTimeSeriesBuilder#all types with id', t => {
     expected,
     'XVIZTimeSeriesBuilder multiple entry different ts matches expected output'
   );
+  data.forEach(d => schemaValidator.validate('core/timeseries_state', d));
   t.end();
 });
 
@@ -286,6 +293,7 @@ test('XVIZTimeSeriesBuilder#multiple entry id same ts', t => {
     expected,
     'XVIZTimeSeriesBuilder multiple entry id same ts matches expected output'
   );
+  data.forEach(d => schemaValidator.validate('core/timeseries_state', d));
   t.end();
 });
 
@@ -333,5 +341,6 @@ test('XVIZTimeSeriesBuilder#multiple entry different id ts', t => {
     expected,
     'XVIZTimeSeriesBuilder multiple entry different ts matches expected output'
   );
+  data.forEach(d => schemaValidator.validate('core/timeseries_state', d));
   t.end();
 });
