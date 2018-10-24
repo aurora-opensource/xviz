@@ -4,7 +4,6 @@
 
 Streams are named in accordance with a few simple rules.
 
-
 ### Use file system-like hierarchical names
 
 **Must** - uses path separators
@@ -26,7 +25,6 @@ All of the objects go on the same stream, using the `id` field to tell them apar
 This ignores the 'id' support of elements in XVIZ and provides no cross stream object linking.
 
 `/object/123`
-
 
 ## Stream Structure
 

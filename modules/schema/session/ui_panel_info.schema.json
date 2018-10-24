@@ -1,6 +1,6 @@
 {
-  "$id": "https://xviz.org/schema/session/ui_panel_info.json",
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "id": "https://xviz.org/schema/session/ui_panel_info.json",
+  "$schema": "http://json-schema.org/draft-04/schema#",
   "description": "XVIZ Session UI Panel Info",
   "type": "object",
   "properties": {

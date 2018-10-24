@@ -1,6 +1,6 @@
 {
-  "$id": "https://xviz.org/schema/session/stream_metadata.json",
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "id": "https://xviz.org/schema/session/stream_metadata.json",
+  "$schema": "http://json-schema.org/draft-04/schema#",
   "description": "XVIZ Stream Metadata",
   "type": "object",
   "properties": {
@@ -10,7 +10,33 @@
     "units": {
       "type": "string"
     },
-    "style_info": {
+    "coordinate": {},
+    "transform": {},
+    "category": {
+      "enum": [
+        "annotation",
+        "future_instance",
+        "pose",
+        "primitive",
+        "time_series",
+        "variable"
+      ]
+    },
+    "type": {
+      "enum": [
+        "circle",
+        "image",
+        "point",
+        "polygon",
+        "polyline",
+        "stadium",
+        "text"
+      ]
+    },
+    "stream_style": {
+        "$ref": "https://xviz.org/schema/style/stream_value.json"
+    },
+    "style_classes": {
       "type": "array",
       "items": {
         "$ref": "https://xviz.org/schema/style/class.json"
@@ -18,6 +44,61 @@
       "additionalItems": false
     }
   },
-  "required": [],
+  "allOf": [
+    {
+      "anyOf": [
+        {
+          "properties": {
+            "coordinate": {
+              "enum": [
+                "GEOGRAPHIC",
+                "IDENTITY"
+              ]
+            }
+          }
+        },
+        {
+          "properties": {
+            "coordinate": { "enum": ["VEHICLE_RELATIVE"] },
+            "transform": { "$ref": "https://xviz.org/schema/math/matrix4x4.json" }
+          }
+        },
+        {
+          "properties": {
+            "coordinate": { "enum": ["DYNAMIC"] },
+            "transform": { "type": "string" }
+          },
+          "required": ["transform"]
+        }
+      ]
+    },
+    {
+      "anyOf": [
+        {
+          "properties": {
+            "category": {
+              "enum": [
+                "future_instance",
+                "primitive"
+              ]
+            }
+          },
+          "required": ["type"]
+        },
+        {
+          "properties": {
+            "category": {
+              "enum": [
+                "annotation",
+                "pose",
+                "time_series",
+                "variable"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
   "additionalProperties": false
 }

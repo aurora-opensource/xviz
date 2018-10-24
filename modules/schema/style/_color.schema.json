@@ -1,0 +1,22 @@
+{
+  "id": "https://xviz.org/schema/style/_color.schema.json",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "Internal XVIZ RGBA color type",
+  "oneOf": [
+    {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "minimum": 0,
+      "maximum": 255,
+      "minItems": 3,
+      "maxItems": 4,
+      "additionalItems": false
+    },
+    {
+      "type": "string",
+      "pattern": "^#[0-9a-fA-F]{6,8}$"
+    }
+  ]
+}

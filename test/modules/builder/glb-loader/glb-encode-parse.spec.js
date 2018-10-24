@@ -80,7 +80,7 @@ test('GLBLoader#encode-and-parse#full', t => {
   const json = parseGLB(glbFileBuffer);
 
   // t.comment(JSON.stringify(TEST_JSON, null, 2));
-  // t.comment(JSON.stringify(json, null, 2))
+  // t.comment(JSON.stringify(json, null, 2));
 
   t.ok(Array.isArray(json.buffers), `${tcName} Encoded and parsed GLB - has JSON buffers field`);
   t.ok(
@@ -97,8 +97,8 @@ test('GLBLoader#encode-and-parse#full', t => {
   delete json.accessors;
 
   t.deepEqual(
-    json.state_updates[0].primitives.tracklets[0],
-    packJsonArrays(TEST_JSON.state_updates[0].primitives.tracklets[0]),
+    json.updates[0].primitives['/tracklets'].primitives[0],
+    packJsonArrays(TEST_JSON.updates[0].primitives['/tracklets'].primitives[0]),
     'Encoded and parsed GLB did not change data'
   );
 

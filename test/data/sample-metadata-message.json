@@ -1,9 +1,15 @@
 {
-  "map": {
-    "entry_point": "6b9d0916d69943c9d88d2703e72021f5",
-    "name": "phx"
+  "version": "2.0.0",
+  "streams": {},
+  "map_info": {
+    "map": {
+      "entry_point": "6b9d0916d69943c9d88d2703e72021f5",
+      "name": "phx"
+    }
   },
-  "start_time": 1194278450.6,
-  "end_time": 1194278451.6,
-  "type": "metadata"
+  "log_info": {
+    "start_time": 1194278450.6,
+    "end_time": 1194278451.6,
+    "type": "metadata"
+  }
 }

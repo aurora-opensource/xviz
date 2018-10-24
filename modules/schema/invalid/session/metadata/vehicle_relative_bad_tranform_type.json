@@ -1,0 +1,9 @@
+{
+  "version": "2.0.0",
+  "streams": {
+    "/sensors/lidar/points": {
+      "coordinate": "VEHICLE_RELATIVE",
+      "transform": "foo"
+    }
+  }
+}

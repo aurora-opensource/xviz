@@ -3,7 +3,7 @@
   "object_id": "{067a2faf-64b5-4b8f-8d7d-ed873630df4f}",
   "vertices": [[0, 0, 0], [1, 2, 0], [2, 3, 0]],
   "style": {
-    "thickness_m": 5,
-    "color": [0, 1, 2, 3]
+    "stroke_width": 5,
+    "fill_color": [0, 1, 2, 3]
   }
 }
