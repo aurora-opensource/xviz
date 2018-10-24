@@ -2,6 +2,9 @@
 import test from 'tape-catch';
 import {Matrix4} from 'math.gl';
 import {XVIZMetadataBuilder} from '@xviz/builder';
+import {XVIZValidator} from '@xviz/schema';
+
+const schemaValidator = new XVIZValidator();
 
 test('XVIZMetadataBuilder#default-ctor', t => {
   const xb = new XVIZMetadataBuilder();
@@ -18,8 +21,8 @@ test('XVIZMetadataBuilder#build-with-transformMatrix-array', t => {
     .type('circle')
     .coordinate('test-coordinate')
     .transformMatrix([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16])
-    .streamStyle({color: [255, 0, 0]})
-    .styleClass('test-style', {color: [0, 255, 0]});
+    .streamStyle({fill_color: [255, 0, 0]})
+    .styleClass('test-style', {fill_color: [0, 255, 0]});
 
   const metadata = xb.getMetadata();
 
@@ -29,18 +32,18 @@ test('XVIZMetadataBuilder#build-with-transformMatrix-array', t => {
     version: '2.0.0',
     streams: {
       '/test/stream': {
-        category: 'primitive',
-        type: 'circle',
+        stream_category: 'primitive',
+        stream_type: 'circle',
         coordinate: 'test-coordinate',
         transform: new Matrix4([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]),
         stream_style: {
-          color: [255, 0, 0]
+          fill_color: [255, 0, 0]
         },
         style_classes: [
           {
             name: 'test-style',
             style: {
-              color: [0, 255, 0]
+              fill_color: [0, 255, 0]
             }
           }
         ]
@@ -57,6 +60,7 @@ test('XVIZMetadataBuilder#build-with-transformMatrix-array', t => {
     expected,
     'XVIZMetadataBuilder build with transformMatrix matches expected output'
   );
+  schemaValidator.validate('session/metadata', metadata);
   t.end();
 });
 
@@ -79,8 +83,8 @@ test('XVIZMetadataBuilder#build-with-transformMatrix-matrix4', t => {
     version: '2.0.0',
     streams: {
       '/test/stream': {
-        category: 'primitive',
-        type: 'circle',
+        stream_category: 'primitive',
+        stream_type: 'circle',
         coordinate: 'test-coordinate',
         transform: new Matrix4([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 2, 3, 1])
       }
@@ -96,6 +100,7 @@ test('XVIZMetadataBuilder#build-with-transformMatrix-matrix4', t => {
     expected,
     'XVIZMetadataBuilder build with transformMatrix matches expected output'
   );
+  schemaValidator.validate('session/metadata', metadata);
   t.end();
 });
 
@@ -116,8 +121,8 @@ test('XVIZMetadataBuilder#build-with-pose', t => {
     version: '2.0.0',
     streams: {
       '/test/stream': {
-        category: 'primitive',
-        type: 'polygon',
+        stream_category: 'primitive',
+        stream_type: 'polygon',
         transform: new Matrix4([1, 0, -0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 2, 3, 1])
       }
     },
@@ -128,6 +133,7 @@ test('XVIZMetadataBuilder#build-with-pose', t => {
   };
 
   t.deepEqual(metadata, expected, 'XVIZMetadataBuilder build with pose matches expected output');
+  schemaValidator.validate('session/metadata', metadata);
   t.end();
 });
 
@@ -148,10 +154,10 @@ test('XVIZMetadataBuilder#multiple-streams', t => {
     version: '2.0.0',
     streams: {
       '/test-stream/1': {
-        category: 'primitive'
+        stream_category: 'primitive'
       },
       '/test-stream/2': {
-        category: 'variable'
+        stream_category: 'variable'
       }
     },
     log_info: {
@@ -165,6 +171,7 @@ test('XVIZMetadataBuilder#multiple-streams', t => {
     expected,
     'XVIZMetadataBuilder mulitple streams build matches expected output'
   );
+  schemaValidator.validate('session/metadata', metadata);
   t.end();
 });
 
@@ -192,5 +199,6 @@ test('XVIZMetadataBuilder#stylesheet', t => {
   };
 
   t.deepEqual(metadata, expected, 'XVIZMetadataBuilder build matches expected output');
+  schemaValidator.validate('session/metadata', metadata);
   t.end();
 });

@@ -32,15 +32,17 @@ const TestTimesliceMessageV1 = {
     {
       variables: null,
       primitives: {
-        '/test/stream': [
-          {
-            color: [255, 255, 255],
-            id: 1234,
-            radius: 0.01,
-            type: 'points3d',
-            vertices: [[1000, 1000, 200]]
-          }
-        ]
+        '/test/stream': {
+          primitives: [
+            {
+              color: [255, 255, 255],
+              id: 1234,
+              radius: 0.01,
+              type: 'points3d',
+              vertices: [[1000, 1000, 200]]
+            }
+          ]
+        }
       }
     }
   ],
@@ -57,31 +59,29 @@ const TestTimesliceMessageV2 = {
   update_type: 'snapshot',
   updates: [
     {
-      state_updates: [
-        {
+      timestamp: 1001.0,
+      poses: {
+        '/vehicle_pose': {
           timestamp: 1001.0,
-          poses: {
-            '/vehicle_pose': {
-              timestamp: 1001.0,
-              mapOrigin: [11.2, 33.4, 55.6],
-              position: [1.1, 2.2, 3.3],
-              orientation: [0.1, 0.2, 0.3]
-            }
-          },
-          variables: null,
-          primitives: {
-            '/test/stream': [
-              {
-                color: [255, 255, 255],
-                object_id: 1234,
-                radius: 0.01,
-                type: 'point',
-                points: [[1000, 1000, 200]]
-              }
-            ]
-          }
+          mapOrigin: [11.2, 33.4, 55.6],
+          position: [1.1, 2.2, 3.3],
+          orientation: [0.1, 0.2, 0.3]
         }
-      ]
+      },
+      variables: null,
+      primitives: {
+        '/test/stream': {
+          primitives: [
+            {
+              color: [255, 255, 255],
+              object_id: 1234,
+              radius: 0.01,
+              type: 'point',
+              points: [[1000, 1000, 200]]
+            }
+          ]
+        }
+      }
     }
   ]
 };
@@ -168,33 +168,28 @@ tape('parseStreamLogData timeslice INCOMPLETE', t => {
 
   metaMessage = parseStreamLogData({
     ...TestTimesliceMessageV2,
-    updates: [{state_updates: null}]
+    updates: [{updates: null}]
   });
-  t.equals(metaMessage.type, LOG_STREAM_MESSAGE.INCOMPLETE, 'Missing state_updates incomplete');
+  t.equals(metaMessage.type, LOG_STREAM_MESSAGE.INCOMPLETE, 'Missing updates incomplete');
 
   metaMessage = parseStreamLogData({
     ...TestTimesliceMessageV2,
     updates: [
       {
-        state_updates: [
-          {
-            poses: {
-              '/vehicle_pose': {
-                mapOrigin: [11.2, 33.4, 55.6]
-              }
-            }
+        poses: {
+          '/vehicle_pose': {
+            mapOrigin: [11.2, 33.4, 55.6]
           }
-        ]
+        }
       }
     ]
   });
-  t.equals(metaMessage.type, LOG_STREAM_MESSAGE.INCOMPLETE, 'Missing state_updates is incomplete');
+  t.equals(metaMessage.type, LOG_STREAM_MESSAGE.INCOMPLETE, 'Missing updates is incomplete');
 
   metaMessage = parseStreamLogData({
     ...TestTimesliceMessageV2,
     updates: [
       {
-        state_updates: [],
         timestamp: null
       }
     ]
@@ -211,7 +206,7 @@ tape('parseStreamLogData timeslice', t => {
   t.equals(metaMessage.type, LOG_STREAM_MESSAGE.TIMESLICE, 'Message type set for timeslice');
   t.equals(
     metaMessage.timestamp,
-    TestTimesliceMessageV2.updates[0].state_updates[0].poses['/vehicle_pose'].timestamp,
+    TestTimesliceMessageV2.updates[0].poses['/vehicle_pose'].timestamp,
     'Message timestamp set from vehicle_pose'
   );
   t.end();
@@ -236,30 +231,28 @@ tape('parseStreamLogData pointCloud timeslice', t => {
     update_type: 'snapshot',
     updates: [
       {
-        state_updates: [
-          {
+        timestamp: 1001.0,
+        poses: {
+          '/vehicle_pose': {
             timestamp: 1001.0,
-            poses: {
-              '/vehicle_pose': {
-                timestamp: 1001.0,
-                mapOrigin: [11.2, 33.4, 55.6],
-                position: [1.1, 2.2, 3.3],
-                orientation: [0.1, 0.2, 0.3]
-              }
-            },
-            primitives: {
-              '/test/stream': [
-                {
-                  color: [255, 255, 255],
-                  object_id: 1234,
-                  radius: 0.01,
-                  type: 'point',
-                  points: [[1000, 1000, 200]]
-                }
-              ]
-            }
+            mapOrigin: [11.2, 33.4, 55.6],
+            position: [1.1, 2.2, 3.3],
+            orientation: [0.1, 0.2, 0.3]
           }
-        ]
+        },
+        primitives: {
+          '/test/stream': {
+            primitives: [
+              {
+                color: [255, 255, 255],
+                object_id: 1234,
+                radius: 0.01,
+                type: 'point',
+                points: [[1000, 1000, 200]]
+              }
+            ]
+          }
+        }
       }
     ]
   };
@@ -283,30 +276,28 @@ tape('parseStreamLogData pointCloud timeslice TypedArray', t => {
     update_type: 'snapshot',
     updates: [
       {
-        state_updates: [
-          {
+        timestamp: 1001.0,
+        poses: {
+          '/vehicle_pose': {
             timestamp: 1001.0,
-            poses: {
-              '/vehicle_pose': {
-                timestamp: 1001.0,
-                mapOrigin: [11.2, 33.4, 55.6],
-                position: [1.1, 2.2, 3.3],
-                orientation: [0.1, 0.2, 0.3]
-              }
-            },
-            primitives: {
-              '/test/stream': [
-                {
-                  color: [255, 255, 255],
-                  object_id: 1234,
-                  radius: 0.01,
-                  type: 'point',
-                  points: new Float32Array([1000, 1000, 200])
-                }
-              ]
-            }
+            mapOrigin: [11.2, 33.4, 55.6],
+            position: [1.1, 2.2, 3.3],
+            orientation: [0.1, 0.2, 0.3]
           }
-        ]
+        },
+        primitives: {
+          '/test/stream': {
+            primitives: [
+              {
+                color: [255, 255, 255],
+                object_id: 1234,
+                radius: 0.01,
+                type: 'point',
+                points: new Float32Array([1000, 1000, 200])
+              }
+            ]
+          }
+        }
       }
     ]
   };
@@ -330,37 +321,35 @@ tape('parseStreamLogData pointCloud timeslice', t => {
     update_type: 'snapshot',
     updates: [
       {
-        state_updates: [
-          {
+        timestamp: 1001.0,
+        poses: {
+          '/vehicle_pose': {
             timestamp: 1001.0,
-            poses: {
-              '/vehicle_pose': {
-                timestamp: 1001.0,
-                mapOrigin: [11.2, 33.4, 55.6],
-                position: [1.1, 2.2, 3.3],
-                orientation: [0.1, 0.2, 0.3]
-              }
-            },
-            primitives: {
-              '/test/stream': [
-                {
-                  color: [255, 255, 255],
-                  object_id: 1234,
-                  radius: 0.01,
-                  type: 'point',
-                  points: [[1000, 1000, 200]]
-                },
-                {
-                  color: [255, 255, 255],
-                  object_id: 1235,
-                  radius: 0.01,
-                  type: 'point',
-                  points: new Float32Array([1000, 1000, 200])
-                }
-              ]
-            }
+            mapOrigin: [11.2, 33.4, 55.6],
+            position: [1.1, 2.2, 3.3],
+            orientation: [0.1, 0.2, 0.3]
           }
-        ]
+        },
+        primitives: {
+          '/test/stream': {
+            primitives: [
+              {
+                color: [255, 255, 255],
+                object_id: 1234,
+                radius: 0.01,
+                type: 'point',
+                points: [[1000, 1000, 200]]
+              },
+              {
+                color: [255, 255, 255],
+                object_id: 1235,
+                radius: 0.01,
+                type: 'point',
+                points: new Float32Array([1000, 1000, 200])
+              }
+            ]
+          }
+        }
       }
     ]
   };

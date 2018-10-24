@@ -1,8 +1,12 @@
 /* eslint-disable camelcase */
 import test from 'tape-catch';
 import {XVIZBuilder} from '@xviz/builder';
+import {XVIZValidator} from '@xviz/schema';
 
-const PRIMARY_POSE_STREAM = '/vehicle-pose';
+import base64js from 'base64-js';
+
+const schemaValidator = new XVIZValidator();
+const PRIMARY_POSE_STREAM = '/vehicle_pose';
 
 const DEFAULT_POSE = {
   timestamp: 1.0,
@@ -36,19 +40,17 @@ test('XVIZBuilder#single-pose', t => {
     update_type: 'snapshot',
     updates: [
       {
-        state_updates: [
-          {
-            timestamp: 1.0,
-            poses: {
-              [PRIMARY_POSE_STREAM]: DEFAULT_POSE
-            }
-          }
-        ]
+        timestamp: 1.0,
+        poses: {
+          [PRIMARY_POSE_STREAM]: DEFAULT_POSE
+        }
       }
     ]
   };
 
-  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder single pose matches expected output');
+  const frame = builder.getFrame();
+  t.deepEqual(frame, expected, 'XVIZBuilder single pose matches expected output');
+  schemaValidator.validate('session/state_update', frame);
   t.end();
 });
 
@@ -67,25 +69,23 @@ test('XVIZBuilder#multiple-poses', t => {
     update_type: 'snapshot',
     updates: [
       {
-        state_updates: [
-          {
-            timestamp: 1.0,
-            poses: {
-              [PRIMARY_POSE_STREAM]: DEFAULT_POSE,
-              '/vehicle-pose-2': {
-                timestamp: 2.0,
-                mapOrigin: {longitude: 4.4, latitude: 5.5, altitude: 6.6},
-                position: [44, 55, 66],
-                orientation: [0.44, 0.55, 0.66]
-              }
-            }
+        timestamp: 1.0,
+        poses: {
+          [PRIMARY_POSE_STREAM]: DEFAULT_POSE,
+          '/vehicle-pose-2': {
+            timestamp: 2.0,
+            mapOrigin: {longitude: 4.4, latitude: 5.5, altitude: 6.6},
+            position: [44, 55, 66],
+            orientation: [0.44, 0.55, 0.66]
           }
-        ]
+        }
       }
     ]
   };
 
-  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder single pose matches expected output');
+  const frame = builder.getFrame();
+  t.deepEqual(frame, expected, 'XVIZBuilder single pose matches expected output');
+  schemaValidator.validate('session/state_update', frame);
   t.end();
 });
 
@@ -100,36 +100,38 @@ test('XVIZBuilder#polygon', t => {
     .polygon(verts)
     .id('1')
     .style({
-      color: [255, 0, 0]
+      fill_color: [255, 0, 0]
     });
 
   const expected = {
     update_type: 'snapshot',
     updates: [
       {
-        state_updates: [
-          {
-            timestamp: 1.0,
-            poses: {
-              [PRIMARY_POSE_STREAM]: DEFAULT_POSE
-            },
-            primitives: {
-              '/test/polygon': [
-                {
-                  type: 'polygon',
-                  vertices: verts,
-                  color: [255, 0, 0],
-                  object_id: '1'
-                }
-              ]
-            }
+        timestamp: 1.0,
+        poses: {
+          [PRIMARY_POSE_STREAM]: DEFAULT_POSE
+        },
+        primitives: {
+          '/test/polygon': {
+            primitives: [
+              {
+                type: 'polygon',
+                vertices: verts,
+                style: {
+                  fill_color: [255, 0, 0]
+                },
+                object_id: '1'
+              }
+            ]
           }
-        ]
+        }
       }
     ]
   };
 
-  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder pose and polygon match expected output');
+  const frame = builder.getFrame();
+  t.deepEqual(frame, expected, 'XVIZBuilder pose and polygon match expected output');
+  schemaValidator.validate('session/state_update', frame);
   t.end();
 });
 
@@ -150,29 +152,29 @@ test('XVIZBuilder#points', t => {
     update_type: 'snapshot',
     updates: [
       {
-        state_updates: [
-          {
-            timestamp: 1.0,
-            poses: {
-              [PRIMARY_POSE_STREAM]: DEFAULT_POSE
-            },
-            primitives: {
-              '/test/points': [
-                {
-                  type: 'point',
-                  points,
-                  colors,
-                  object_id: '1'
-                }
-              ]
-            }
+        timestamp: 1.0,
+        poses: {
+          [PRIMARY_POSE_STREAM]: DEFAULT_POSE
+        },
+        primitives: {
+          '/test/points': {
+            primitives: [
+              {
+                type: 'point',
+                points,
+                colors,
+                object_id: '1'
+              }
+            ]
           }
-        ]
+        }
       }
     ]
   };
 
-  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder points match expected output');
+  const frame = builder.getFrame();
+  t.deepEqual(frame, expected, 'XVIZBuilder points match expected output');
+  schemaValidator.validate('session/state_update', frame);
   t.end();
 });
 
@@ -187,44 +189,48 @@ test('XVIZBuilder#single-stream-multiple-polygons', t => {
     .primitive('/test/polygon')
     .polygon(verts1)
     .style({
-      color: [255, 0, 0]
+      fill_color: [255, 0, 0]
     })
     .polygon(verts2)
     .style({
-      color: [0, 255, 0]
+      fill_color: [0, 255, 0]
     });
 
   const expected = {
     update_type: 'snapshot',
     updates: [
       {
-        state_updates: [
-          {
-            timestamp: 1.0,
-            poses: {
-              [PRIMARY_POSE_STREAM]: DEFAULT_POSE
-            },
-            primitives: {
-              '/test/polygon': [
-                {
-                  type: 'polygon',
-                  vertices: verts1,
-                  color: [255, 0, 0]
-                },
-                {
-                  type: 'polygon',
-                  vertices: verts2,
-                  color: [0, 255, 0]
+        timestamp: 1.0,
+        poses: {
+          [PRIMARY_POSE_STREAM]: DEFAULT_POSE
+        },
+        primitives: {
+          '/test/polygon': {
+            primitives: [
+              {
+                type: 'polygon',
+                vertices: verts1,
+                style: {
+                  fill_color: [255, 0, 0]
                 }
-              ]
-            }
+              },
+              {
+                type: 'polygon',
+                vertices: verts2,
+                style: {
+                  fill_color: [0, 255, 0]
+                }
+              }
+            ]
           }
-        ]
+        }
       }
     ]
   };
 
-  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder multiple polygon match expected output');
+  const frame = builder.getFrame();
+  t.deepEqual(frame, expected, 'XVIZBuilder multiple polygon match expected output');
+  schemaValidator.validate('session/state_update', frame);
   t.end();
 });
 
@@ -240,27 +246,27 @@ test('XVIZBuilder#polyline', t => {
     update_type: 'snapshot',
     updates: [
       {
-        state_updates: [
-          {
-            timestamp: 1.0,
-            poses: {
-              [PRIMARY_POSE_STREAM]: DEFAULT_POSE
-            },
-            primitives: {
-              '/test/polyline': [
-                {
-                  type: 'polyline',
-                  vertices: verts
-                }
-              ]
-            }
+        timestamp: 1.0,
+        poses: {
+          [PRIMARY_POSE_STREAM]: DEFAULT_POSE
+        },
+        primitives: {
+          '/test/polyline': {
+            primitives: [
+              {
+                type: 'polyline',
+                vertices: verts
+              }
+            ]
           }
-        ]
+        }
       }
     ]
   };
 
-  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder polyline matches expected output');
+  const frame = builder.getFrame();
+  t.deepEqual(frame, expected, 'XVIZBuilder polyline matches expected output');
+  schemaValidator.validate('session/state_update', frame);
   t.end();
 });
 
@@ -275,28 +281,28 @@ test('XVIZBuilder#circle', t => {
     update_type: 'snapshot',
     updates: [
       {
-        state_updates: [
-          {
-            timestamp: 1.0,
-            poses: {
-              [PRIMARY_POSE_STREAM]: DEFAULT_POSE
-            },
-            primitives: {
-              '/test/circle': [
-                {
-                  type: 'circle',
-                  center: pos,
-                  radius_m: 5
-                }
-              ]
-            }
+        timestamp: 1.0,
+        poses: {
+          [PRIMARY_POSE_STREAM]: DEFAULT_POSE
+        },
+        primitives: {
+          '/test/circle': {
+            primitives: [
+              {
+                type: 'circle',
+                center: pos,
+                radius_m: 5
+              }
+            ]
           }
-        ]
+        }
       }
     ]
   };
 
-  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder circle matches expected output');
+  const frame = builder.getFrame();
+  t.deepEqual(frame, expected, 'XVIZBuilder circle matches expected output');
+  schemaValidator.validate('session/state_update', frame);
   t.end();
 });
 
@@ -314,28 +320,28 @@ test('XVIZBuilder#text', t => {
     update_type: 'snapshot',
     updates: [
       {
-        state_updates: [
-          {
-            timestamp: 1.0,
-            poses: {
-              [PRIMARY_POSE_STREAM]: DEFAULT_POSE
-            },
-            primitives: {
-              '/test/text': [
-                {
-                  type: 'text',
-                  text: 'test message',
-                  position: pos
-                }
-              ]
-            }
+        timestamp: 1.0,
+        poses: {
+          [PRIMARY_POSE_STREAM]: DEFAULT_POSE
+        },
+        primitives: {
+          '/test/text': {
+            primitives: [
+              {
+                type: 'text',
+                text: 'test message',
+                position: pos
+              }
+            ]
           }
-        ]
+        }
       }
     ]
   };
 
-  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder text matches expected output');
+  const frame = builder.getFrame();
+  t.deepEqual(frame, expected, 'XVIZBuilder text matches expected output');
+  schemaValidator.validate('session/state_update', frame);
   t.end();
 });
 
@@ -351,29 +357,29 @@ test('XVIZBuilder#stadium', t => {
     update_type: 'snapshot',
     updates: [
       {
-        state_updates: [
-          {
-            timestamp: 1.0,
-            poses: {
-              [PRIMARY_POSE_STREAM]: DEFAULT_POSE
-            },
-            primitives: {
-              '/test/stadium': [
-                {
-                  type: 'stadium',
-                  start: pos[0],
-                  end: pos[1],
-                  radius_m: 5
-                }
-              ]
-            }
+        timestamp: 1.0,
+        poses: {
+          [PRIMARY_POSE_STREAM]: DEFAULT_POSE
+        },
+        primitives: {
+          '/test/stadium': {
+            primitives: [
+              {
+                type: 'stadium',
+                start: pos[0],
+                end: pos[1],
+                radius_m: 5
+              }
+            ]
           }
-        ]
+        }
       }
     ]
   };
 
-  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder stadium matches expected output');
+  const frame = builder.getFrame();
+  t.deepEqual(frame, expected, 'XVIZBuilder stadium matches expected output');
+  schemaValidator.validate('session/state_update', frame);
   t.end();
 });
 
@@ -381,11 +387,11 @@ test('XVIZBuilder#image', t => {
   const builder = new XVIZBuilder();
   setupPose(builder);
 
-  const imageData = Uint8Array.from([1, 2, 3, 4]);
+  const imageData = base64js.fromByteArray(Uint8Array.from([1, 2, 3, 4]));
 
   builder
     .primitive('/test/image')
-    .image(imageData, 'png')
+    .image(imageData)
     .dimensions(2, 2)
     .position([10, 10, 0]);
 
@@ -393,31 +399,30 @@ test('XVIZBuilder#image', t => {
     update_type: 'snapshot',
     updates: [
       {
-        state_updates: [
-          {
-            timestamp: 1.0,
-            poses: {
-              [PRIMARY_POSE_STREAM]: DEFAULT_POSE
-            },
-            primitives: {
-              '/test/image': [
-                {
-                  type: 'image',
-                  format: 'png',
-                  width_px: 2,
-                  height_px: 2,
-                  data: imageData,
-                  position: [10, 10, 0]
-                }
-              ]
-            }
+        timestamp: 1.0,
+        poses: {
+          [PRIMARY_POSE_STREAM]: DEFAULT_POSE
+        },
+        primitives: {
+          '/test/image': {
+            primitives: [
+              {
+                type: 'image',
+                width_px: 2,
+                height_px: 2,
+                data: imageData,
+                position: [10, 10, 0]
+              }
+            ]
           }
-        ]
+        }
       }
     ]
   };
 
-  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder image matches expected output');
+  const frame = builder.getFrame();
+  t.deepEqual(frame, expected, 'XVIZBuilder image matches expected output');
+  schemaValidator.validate('session/state_update', frame);
   t.end();
 });
 
@@ -431,28 +436,26 @@ test('XVIZBuilder#variable', t => {
     update_type: 'snapshot',
     updates: [
       {
-        state_updates: [
-          {
-            timestamp: 1.0,
-            poses: {
-              [PRIMARY_POSE_STREAM]: DEFAULT_POSE
-            },
-            variables: {
-              '/test/variables': {
-                variables: [
-                  {
-                    values: [1.1, 2.0]
-                  }
-                ]
+        timestamp: 1.0,
+        poses: {
+          [PRIMARY_POSE_STREAM]: DEFAULT_POSE
+        },
+        variables: {
+          '/test/variables': {
+            variables: [
+              {
+                values: [1.1, 2.0]
               }
-            }
+            ]
           }
-        ]
+        }
       }
     ]
   };
 
-  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder variable matches expected output');
+  const frame = builder.getFrame();
+  t.deepEqual(frame, expected, 'XVIZBuilder variable matches expected output');
+  schemaValidator.validate('session/state_update', frame);
   t.end();
 });
 
@@ -468,35 +471,33 @@ test('XVIZBuilder#multiple-variables', t => {
     update_type: 'snapshot',
     updates: [
       {
-        state_updates: [
-          {
-            timestamp: 1.0,
-            poses: {
-              [PRIMARY_POSE_STREAM]: DEFAULT_POSE
-            },
-            variables: {
-              '/test/variables_1': {
-                variables: [
-                  {
-                    values: [1.1, 2.0]
-                  }
-                ]
-              },
-              '/test/variables_2': {
-                variables: [
-                  {
-                    values: [2.0, 1.1]
-                  }
-                ]
+        timestamp: 1.0,
+        poses: {
+          [PRIMARY_POSE_STREAM]: DEFAULT_POSE
+        },
+        variables: {
+          '/test/variables_1': {
+            variables: [
+              {
+                values: [1.1, 2.0]
               }
-            }
+            ]
+          },
+          '/test/variables_2': {
+            variables: [
+              {
+                values: [2.0, 1.1]
+              }
+            ]
           }
-        ]
+        }
       }
     ]
   };
 
-  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder multiple variables match expected output');
+  const frame = builder.getFrame();
+  t.deepEqual(frame, expected, 'XVIZBuilder multiple variables match expected output');
+  schemaValidator.validate('session/state_update', frame);
   t.end();
 });
 
@@ -521,25 +522,23 @@ test('XVIZBuilder#time_series', t => {
     update_type: 'snapshot',
     updates: [
       {
-        state_updates: [
+        timestamp: 1.0,
+        poses: {
+          [PRIMARY_POSE_STREAM]: DEFAULT_POSE
+        },
+        time_series: [
           {
-            timestamp: 1.0,
-            poses: {
-              [PRIMARY_POSE_STREAM]: DEFAULT_POSE
-            },
-            time_series: [
-              {
-                timestamp: ts1,
-                values: [['/test/time_series_1', 1.0], ['/test/time_series_2', 2.0]]
-              }
-            ]
+            timestamp: ts1,
+            values: [['/test/time_series_1', 1.0], ['/test/time_series_2', 2.0]]
           }
         ]
       }
     ]
   };
 
-  t.deepEqual(builder.getFrame(), expected, 'XVIZBuilder variable matches expected output');
+  const frame = builder.getFrame();
+  t.deepEqual(frame, expected, 'XVIZBuilder variable matches expected output');
+  schemaValidator.validate('session/state_update', frame);
   t.end();
 });
 
@@ -560,37 +559,30 @@ test('XVIZBuilder#futures-single-primitive', t => {
     update_type: 'snapshot',
     updates: [
       {
-        state_updates: [
-          {
-            timestamp: 1.0,
-            poses: {
-              [PRIMARY_POSE_STREAM]: DEFAULT_POSE
-            },
-            future_instances: {
-              [streamId]: {
-                name: streamId,
-                timestamps: [ts],
-                primitives: [
-                  [
-                    {
-                      type: 'polygon',
-                      vertices: verts
-                    }
-                  ]
-                ]
-              }
-            }
+        timestamp: 1.0,
+        poses: {
+          [PRIMARY_POSE_STREAM]: DEFAULT_POSE
+        },
+        future_instances: {
+          [streamId]: {
+            timestamps: [ts],
+            primitives: [
+              [
+                {
+                  type: 'polygon',
+                  vertices: verts
+                }
+              ]
+            ]
           }
-        ]
+        }
       }
     ]
   };
 
-  t.deepEqual(
-    builder.getFrame(),
-    expected,
-    'XVIZBuilder single primitive futures matches expected output'
-  );
+  const frame = builder.getFrame();
+  t.deepEqual(frame, expected, 'XVIZBuilder single primitive futures matches expected output');
+  schemaValidator.validate('session/state_update', frame);
   t.end();
 });
 
@@ -609,7 +601,7 @@ test('XVIZBuilder#futures-multiple-primitive', t => {
     .timestamp(ts1)
     .polygon(verts1)
     .style({
-      color: [255, 0, 0]
+      fill_color: [255, 0, 0]
     })
     .polygon(verts2)
     .timestamp(ts2);
@@ -618,43 +610,38 @@ test('XVIZBuilder#futures-multiple-primitive', t => {
     update_type: 'snapshot',
     updates: [
       {
-        state_updates: [
-          {
-            timestamp: 1.0,
-            poses: {
-              [PRIMARY_POSE_STREAM]: DEFAULT_POSE
-            },
-            future_instances: {
-              [streamId]: {
-                name: streamId,
-                timestamps: [ts2, ts1],
-                primitives: [
-                  [
-                    {
-                      type: 'polygon',
-                      vertices: verts2
-                    }
-                  ],
-                  [
-                    {
-                      type: 'polygon',
-                      vertices: verts1,
-                      color: [255, 0, 0]
-                    }
-                  ]
-                ]
-              }
-            }
+        timestamp: 1.0,
+        poses: {
+          [PRIMARY_POSE_STREAM]: DEFAULT_POSE
+        },
+        future_instances: {
+          [streamId]: {
+            timestamps: [ts2, ts1],
+            primitives: [
+              [
+                {
+                  type: 'polygon',
+                  vertices: verts2
+                }
+              ],
+              [
+                {
+                  type: 'polygon',
+                  vertices: verts1,
+                  style: {
+                    fill_color: [255, 0, 0]
+                  }
+                }
+              ]
+            ]
           }
-        ]
+        }
       }
     ]
   };
 
-  t.deepEqual(
-    builder.getFrame(),
-    expected,
-    'XVIZBuilder multiple primitives futures matches expected output'
-  );
+  const frame = builder.getFrame();
+  t.deepEqual(frame, expected, 'XVIZBuilder multiple primitives futures matches expected output');
+  schemaValidator.validate('session/state_update', frame);
   t.end();
 });

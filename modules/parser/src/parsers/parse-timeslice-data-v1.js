@@ -4,7 +4,7 @@ import {parseStreamFutures, parseStreamPrimitive, parseStreamVariable} from './p
 
 export default function parseTimesliceData(data, convertPrimitive) {
   const {PRIMARY_POSE_STREAM} = getXvizConfig();
-  const {vehicle_pose: vehiclePose, state_updates: stateUpdates, ...otherInfo} = data;
+  const {vehicle_pose: vehiclePose, updates: stateUpdates, ...otherInfo} = data;
 
   let timestamp;
   if (vehiclePose) {

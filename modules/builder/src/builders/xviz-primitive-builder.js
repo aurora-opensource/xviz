@@ -25,21 +25,20 @@ export default class XVIZPrimitiveBuilder extends XVIZBaseBuilder {
     return this;
   }
 
-  image(data, format) {
+  image(data) {
     if (this._type) {
       this._flush();
     }
 
-    if (!(data instanceof Uint8Array)) {
-      this.validateError('An image data must be a Uint8Array.');
+    if (!(data instanceof Uint8Array || typeof data === 'string')) {
+      this.validateError('An image data must be a string or Uint8Array.');
     }
 
     this.validatePropSetOnce('_image');
     this._type = PRIMITIVE_TYPES.image;
 
     this._image = {
-      data,
-      format
+      data
     };
 
     return this;
@@ -244,7 +243,6 @@ export default class XVIZPrimitiveBuilder extends XVIZBaseBuilder {
   _flushFutures() {
     if (!this._futures[this._streamId]) {
       this._futures[this._streamId] = {
-        name: this._streamId,
         timestamps: [],
         primitives: []
       };
@@ -263,11 +261,11 @@ export default class XVIZPrimitiveBuilder extends XVIZBaseBuilder {
 
   _flushPrimitives() {
     if (!this._primitives[this._streamId]) {
-      this._primitives[this._streamId] = [];
+      this._primitives[this._streamId] = {primitives: []};
     }
 
     const primitive = this._formatPrimitive();
-    this._primitives[this._streamId].push(primitive);
+    this._primitives[this._streamId].primitives.push(primitive);
 
     this.reset();
   }
@@ -316,7 +314,7 @@ export default class XVIZPrimitiveBuilder extends XVIZBaseBuilder {
     }
 
     if (this._style) {
-      Object.assign(obj, this._style);
+      obj.style = this._style;
     }
 
     if (this._classes) {

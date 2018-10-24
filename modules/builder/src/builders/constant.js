@@ -95,4 +95,4 @@ export const PRIMITIVE_STYLE_MAP = {
   ]
 };
 
-export const PRIMARY_POSE_STREAM = '/vehicle-pose';
+export const PRIMARY_POSE_STREAM = '/vehicle_pose';

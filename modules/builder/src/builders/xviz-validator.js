@@ -44,7 +44,7 @@ export default class XVIZValidator {
       const streamMetadata = metadata.streams[streamId];
       if (!streamMetadata) {
         this._validateWarn(`${streamId} is not defined in metadata.`);
-      } else if (category !== streamMetadata.category) {
+      } else if (category !== streamMetadata.stream_category) {
         this._validateWarn(
           `Stream ${streamId} category '${category}' does not match metadata definition (${
             streamMetadata.category

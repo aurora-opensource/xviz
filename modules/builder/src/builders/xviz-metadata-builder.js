@@ -66,13 +66,13 @@ export default class XVIZMetadataBuilder {
 
   // Used for validation in XVIZBuilder
   category(category) {
-    this.tmp_stream.category = category;
+    this.tmp_stream.stream_category = category;
     return this;
   }
 
   // Used for validation in XVIZBuilder
   type(t) {
-    this.tmp_stream.type = t;
+    this.tmp_stream.stream_type = t;
     return this;
   }
 

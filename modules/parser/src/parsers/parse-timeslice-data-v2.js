@@ -28,8 +28,7 @@ export default function parseTimesliceData(data, convertPrimitive) {
     );
   }
 
-  const firstUpdate = updates[0];
-  const {state_updates: stateUpdates, ...otherInfo} = firstUpdate;
+  const stateUpdates = updates;
 
   let timestamp = data.timestamp;
   if (!timestamp && stateUpdates) {
@@ -45,7 +44,6 @@ export default function parseTimesliceData(data, convertPrimitive) {
 
   const newStreams = {};
   const result = {
-    ...otherInfo,
     type: LOG_STREAM_MESSAGE.TIMESLICE,
     streams: newStreams,
     timestamp
@@ -93,7 +91,7 @@ function parseStateUpdates(stateUpdates, timestamp, convertPrimitive) {
     .filter(streamName => !STREAM_BLACKLIST.has(streamName))
     .forEach(primitive => {
       newStreams[primitive] = parseStreamPrimitive(
-        primitives[primitive],
+        primitives[primitive].primitives,
         primitive,
         timestamp,
         convertPrimitive
@@ -103,7 +101,11 @@ function parseStateUpdates(stateUpdates, timestamp, convertPrimitive) {
   Object.keys(variables)
     .filter(streamName => !STREAM_BLACKLIST.has(streamName))
     .forEach(variable => {
-      newStreams[variable] = parseStreamVariable(variables[variable], variable, timestamp);
+      newStreams[variable] = parseStreamVariable(
+        variables[variable].variables,
+        variable,
+        timestamp
+      );
     });
 
   if (timeSeries.length) {

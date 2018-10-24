@@ -76,13 +76,11 @@ export default class XVIZBuilder {
   {
     update_type: 'snapshot',
     updates: [{
-      state_updates: [{
-        timestamp,
-        poses: {'/vehicle-pose': {}, ...},
-        primitives: {},
-        variables: {},
-        future_instances: {}
-      }]
+      timestamp,
+      poses: {'/vehicle-pose': {}, ...},
+      primitives: {},
+      variables: {},
+      future_instances: {}
     }]
   }
    */
@@ -117,11 +115,7 @@ export default class XVIZBuilder {
 
     const frame = {
       update_type: 'snapshot',
-      updates: [
-        {
-          state_updates: [data]
-        }
-      ]
+      updates: [data]
     };
 
     return frame;

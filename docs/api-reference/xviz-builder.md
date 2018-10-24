@@ -206,36 +206,50 @@ const frame = xvizBuider.getFrame();
 
 // frame data format
 {
-  'vehicle-pose': {
-    time: 123,
-    latitude: 12.345,
-    longitude: 12.345,
-    altitude: 12.345,
-    roll: 0.123,
-    pitch: 0.123,
-    yaw: 0.123
-  },
-  state_updates: [
+  update_type: 'snapshot',
+  updates: [
     {
+      poses: {
+        '/vehicle_pose': {
+          timestamp: 123,
+          mapOrigin: {
+            latitude: 12.345,
+            longitude: 12.345,
+            altitude: 12.345
+          }
+          orientation: [
+            0.123,
+            0.123,
+            0.123
+          ]
+        }
+      }
       primitives: {
-        '/point-cloud': [{
-          color: [255,0,0],
-          type: 'points',
-          vertices: [1.23, 0.45, 0.06]
-        }]
+        '/point-cloud': {
+          primitives: [
+            {
+              style: {
+                fill_color: [255,0,0]
+              },
+              type: 'points',
+              vertices: [1.23, 0.45, 0.06]
+            }
+          ]
+        }
       },
       variables: {
         '/velocity': {
-          timestamps: [123],
-          type: 'float',
-          values: [1.23]
+          variables: [
+            {
+              values: [1.23]
+            }
+          ]
         }
       },
-      futures: {
+      future_instances: {
         '/pedestrian-1-trajectory': {
-          name: '/pedestrian-1-trajectory',
-          type: 'polygon',
           timestamps: [123],
+          type: 'polygon',
           primitives: [
             [
               {
