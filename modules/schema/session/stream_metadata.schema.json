@@ -12,6 +12,27 @@
     },
     "coordinate": {},
     "transform": {},
+    "stream_category": {
+      "enum": [
+        "annotation",
+        "future_instance",
+        "pose",
+        "primitive",
+        "time_series",
+        "variable"
+      ]
+    },
+    "stream_type": {
+      "enum": [
+        "circle",
+        "image",
+        "point",
+        "polygon",
+        "polyline",
+        "stadium",
+        "text"
+      ]
+    },
     "stream_style": {
         "$ref": "https://xviz.org/schema/style/stream_value.json"
     },
@@ -23,29 +44,78 @@
       "additionalItems": false
     }
   },
-  "anyOf": [
+  "allOf": [
     {
-      "properties": {
-        "coordinate": {
-          "enum": [
-            "GEOGRAPHIC",
-            "IDENTITY"
-          ]
+      "anyOf": [
+        {
+          "properties": {
+            "coordinate": {
+              "enum": [
+                "GEOGRAPHIC",
+                "IDENTITY"
+              ]
+            }
+          }
+        },
+        {
+          "properties": {
+            "coordinate": { "enum": ["VEHICLE_RELATIVE"] },
+            "transform": { "$ref": "https://xviz.org/schema/math/matrix4x4.json" }
+          }
+        },
+        {
+          "properties": {
+            "coordinate": { "enum": ["DYNAMIC"] },
+            "transform": { "type": "string" }
+          },
+          "required": ["transform"]
+        },
+        {
+          "properties": {
+            "coordinate": { "type": "string" }
+          },
+          "required": ["coordinate"],
+          "not": {
+            "properties": {
+              "coordinate": {
+                "enum": [
+                  "DYNAMIC",
+                  "GEOGRAPHIC",
+                  "IDENTITY",
+                  "VEHICLE_RELATIVE"
+                ]
+              }
+            }
+          }
         }
-      }
+      ]
     },
     {
-      "properties": {
-        "coordinate": { "enum": ["VEHICLE_RELATIVE"] },
-        "transform": { "$ref": "https://xviz.org/schema/math/matrix4x4.json" }
-      }
-    },
-    {
-      "properties": {
-        "coordinate": { "enum": ["DYNAMIC"] },
-        "transform": { "type": "string" }
-      },
-      "required": ["transform"]
+      "anyOf": [
+        {
+          "properties": {
+            "stream_category": {
+              "enum": [
+                "future_instance",
+                "primitive"
+              ]
+            }
+          },
+          "required": ["stream_type"]
+        },
+        {
+          "properties": {
+            "stream_category": {
+              "enum": [
+                "annotation",
+                "pose",
+                "time_series",
+                "variable"
+              ]
+            }
+          }
+        }
+      ]
     }
   ],
   "additionalProperties": false

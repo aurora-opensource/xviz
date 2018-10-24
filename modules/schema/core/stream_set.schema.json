@@ -53,8 +53,39 @@
     }
   },
   "required": [
-    "timestamp",
-    "primitives"
+    "timestamp"
+  ],
+  "anyOf": [
+    {
+      "required": [
+        "annotations"
+      ]
+    },
+    {
+      "required": [
+        "future_instances"
+      ]
+    },
+    {
+      "required": [
+        "poses"
+      ]
+    },
+    {
+      "required": [
+        "primitives"
+      ]
+    },
+    {
+      "required": [
+        "time_series"
+      ]
+    },
+    {
+      "required": [
+        "variables"
+      ]
+    }
   ],
   "additionalProperties": false
 }

@@ -17,6 +17,9 @@
     },
     "/poi/markers": {
       "coordinate": "GEOGRAPHIC"
+    },
+    "/object/special": {
+      "coordinate": "custom"
     }
   }
 }

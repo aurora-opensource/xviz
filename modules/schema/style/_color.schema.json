@@ -10,7 +10,7 @@
       },
       "minimum": 0,
       "maximum": 255,
-      "minItems": 4,
+      "minItems": 3,
       "maxItems": 4,
       "additionalItems": false
     },

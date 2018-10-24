@@ -1,0 +1,16 @@
+{
+  "stream_style": {
+    "opacity": 1.0,
+    "fill_color": [25, 25, 25, 255]
+  },
+  "stream_category": "primitive",
+  "stream_type": "polygon",
+  "style_classes": [
+    {
+      "name": "fancy",
+      "style": {
+        "stroke_width": 2
+      }
+    }
+  ]
+}
