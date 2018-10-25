@@ -1,7 +1,7 @@
 {
   "name": "@xviz/builder",
   "description": "Utility library for encoding JSON objects into XVIZ messages",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/uber/xviz.git"

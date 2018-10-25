@@ -1,11 +1,23 @@
 {
-  "$id": "https://xviz.org/schema/math/point3d_list.schema.json",
-  "$schema": "http://json-schema.org/draft-07/schema#",
+  "id": "https://xviz.org/schema/math/point3d_list.schema.json",
+  "$schema": "http://json-schema.org/draft-04/schema#",
   "description": "XVIZ Point 3D list",
-  "type": "array",
-  "items": {
-    "$ref": "https://xviz.org/schema/math/vector3x1.json"
-  },
-  "minItems": 1,
-  "additionalItems": false
+  "oneOf": [
+    {
+      "type": "array",
+      "items": {
+        "$ref": "https://xviz.org/schema/math/vector3x1.json"
+      },
+      "minItems": 1,
+      "additionalItems": false
+    },
+    {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "minItems": 3,
+      "additionalItems": false
+    }
+  ]
 }

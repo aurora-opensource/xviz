@@ -1,0 +1,128 @@
+import {CATEGORY} from './constant';
+import XVIZBaseBuilder from './xviz-base-builder';
+
+/**
+ * XvizVariableBuilder manages a dictionary of streams -> variables, where
+ * variables is an array of objects with values & id.
+ *
+ * This is the shape returned from getData()
+ *
+ * {
+ *   /plan/time: {
+ *     variables: [
+ *       {
+ *         values: [1, 2, 3, 4],
+ *         object_id: '123'
+ *       }
+ *     ]
+ *   }
+ * }
+ */
+export default class XvizVariableBuilder extends XVIZBaseBuilder {
+  constructor(props) {
+    super({
+      ...props,
+      category: CATEGORY.variable
+    });
+
+    // Stores variable data by stream then id
+    // They will then be group when constructing final object
+    this._data = new Map();
+
+    // inflight builder data
+    this._id = null;
+    this._values = null;
+  }
+
+  id(identifier) {
+    this.validatePropSetOnce('_id');
+    this._id = identifier;
+    return this;
+  }
+
+  values(values) {
+    this.validatePropSetOnce('_values');
+
+    if (!(values instanceof Array)) {
+      this.validateError('Input `values` must be array');
+    }
+
+    this._values = values;
+    return this;
+  }
+
+  getData() {
+    this._flush();
+    if (this._data.size === 0) {
+      return null;
+    }
+
+    const variablesData = {};
+    for (const [streamId, ids] of this._data) {
+      const variables = [];
+      ids.forEach(entry => variables.push(entry));
+      variablesData[streamId] = {variables};
+    }
+
+    return variablesData;
+  }
+
+  // Lookup by stream, then id to store [values, id]]
+  _addVariableEntry() {
+    if (!this._dataPending()) {
+      return;
+    }
+
+    const entry = {values: this._values};
+    if (this._id) {
+      entry.object_id = this._id; // eslint-disable-line camelcase
+    }
+
+    const streamEntry = this._data.get(this._streamId);
+    if (streamEntry) {
+      // We have stream, now get id
+      const idEntry = streamEntry.get(this._id);
+      if (idEntry) {
+        // already have values for this objet
+        this.validateError(`Input \`values\` already set for id ${this._id}`);
+      } else {
+        // create new mapping of id -> entry
+        streamEntry.set(this._id, entry);
+      }
+    } else {
+      // No stream
+      // create new stream -> id
+      const idEntry = new Map();
+      idEntry.set(this._id, entry);
+      // create stream entry
+      this._data.set(this._streamId, idEntry);
+    }
+  }
+
+  _dataPending() {
+    return this._values !== null || this._id !== null;
+  }
+
+  _validate() {
+    if (this._dataPending()) {
+      super._validate();
+
+      if (this._values === null) {
+        this.validateWarn(`Stream${this._streamId} values are not provided.`);
+      }
+    }
+  }
+
+  _flush() {
+    this._validate();
+
+    this._addVariableEntry();
+    this._reset();
+  }
+
+  // reset the inflight values
+  _reset() {
+    this._id = null;
+    this._values = null;
+  }
+}

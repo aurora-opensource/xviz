@@ -1,0 +1,12 @@
+{
+  "id": "https://xviz.org/schema/core/_annotation_list.schema.json",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "Internal XVIZ annotation list",
+  "type": "array",
+  "items": {
+    "anyOf": [
+      {"$ref": "https://xviz.org/schema/core/annotation_visual.json"}
+    ]
+  },
+  "additionalItems": false
+}

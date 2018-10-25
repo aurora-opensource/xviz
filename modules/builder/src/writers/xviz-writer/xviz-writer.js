@@ -23,7 +23,7 @@ export default class XVIZWriter {
     xvizDirectory,
     frameNumber,
     xvizFrame,
-    options = {writeBinary: true, writeJson: false, precision: 9}
+    options = {writeBinary: true, writeJson: false}
   ) {
     const fs = module.require('fs');
     const path = module.require('path');
@@ -37,7 +37,7 @@ export default class XVIZWriter {
       // Limit precision to save space
       const numberRounder = (k, value) => {
         if (typeof value === 'number') {
-          return Number(value.toFixed(options.precision));
+          return Number(value.toFixed(10));
         }
 
         return value;

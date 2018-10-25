@@ -1,0 +1,12 @@
+{
+  "fill_color": [255, 0, 0, 255],
+  "stroke_color": [255, 0, 0, 255],
+  "stroke_width": 5,
+  "radius": 3,
+  "size": 12,
+  "angle": 45,
+  "text_anchor": "start",
+  "alignment_baseline": "top",
+  "height": 2.0,
+  "opacity": 0.4
+}

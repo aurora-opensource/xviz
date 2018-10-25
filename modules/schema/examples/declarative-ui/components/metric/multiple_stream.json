@@ -1,0 +1,8 @@
+{
+  "type": "metric",
+  "title": "Velocity vs. Accelerator Input",
+  "streams": [
+    "/vehicle/velocity",
+    "/vehicle/accelerator"
+  ]
+}
