@@ -1,0 +1,74 @@
+{
+  "type": "panel",
+  "layout": "vertical",
+  "name": "Example Panel",
+  "interactions": ["reorderable"],
+  "children": [
+    {
+      "type": "container",
+      "layout": "horizontal",
+      "name": "Example Container #1",
+      "interactions": ["dragout"],
+      "children": [
+        {
+          "type": "table",
+          "title": "A nested table showing something",
+          "description": "These are the details of this table",
+          "stream": "/some/table_stream",
+          "displayObjectId": false
+        },
+        {
+          "type": "plot",
+          "title": "A nested plot!",
+          "description": "The change in some streams as a function of the other one",
+          "independentVariable": "/some/stream",
+          "dependentVariable": [
+            "/some/other_stream",
+            "/some/second_other_stream"
+          ]
+        }
+      ]
+    },
+    {
+      "type": "table",
+      "title": "A table showing something",
+      "description": "These are the details of this table",
+      "displayObjectId": true,
+      "stream": "/prediction/some_table"
+    },
+    {
+      "type": "metric",
+      "title": "Some metric",
+      "description": "The actual vs commanded value for some variable",
+      "streams": [
+        "/some_value/actual",
+        "/some_value/commanded"
+      ]
+    },
+    {
+      "type": "plot",
+      "title": "Some Other Streams vs Some Stream",
+      "description": "The change in some streams as a function of the other one",
+      "independentVariable": "/some/stream",
+      "dependentVariable": [
+        "/some/other_stream",
+        "/some/second_other_stream"
+      ]
+    },
+    {
+      "type": "video",
+      "cameras": [
+        "front-center-roof-camera",
+        "rear-starboard-roof-camera",
+        "rear-port-roof-camera"
+      ]
+    },
+    {
+      "type": "treetable",
+      "title": "A TreeTable!",
+      "description": "These are the details of the TreeTable",
+      "displayObjectId": false,
+      "stream": "/some/stream/of/treetable/primmatives"
+    }
+  ]
+}

@@ -1,40 +1,22 @@
 # Styling XVIZ
 
-## Overview
+Styling in XVIZ happens at multiple levels.
 
-Stylesheets enables the application to control rendering properties of all XVIZ data.
+## Object inline styles
 
+Object styling is defined during conversion using the XVIZBuilder.style() method. Simply pass an object with the appropriate style properties and values.
 
-## Format
+## Stream style classes
 
-Stylesheets are is in the following shape:
+Using classes requires coordination at two places.
 
-```js
-{
-    '/object/shape':                          // channel name
-    [
-        {
-          strokeColor: '#FFFFFF'
-        },
-        {
-          class: 'label=OBJECT_LABEL',            // selector
-          strokeColor: '#9D9DA3'
-        },
-        {
-          class: 'label=OBJECT_LABEL selected',   // selector
-          strokeColor: '#FFC000',
-          fillColor: '#FFC00080'
-        }
-    ]
-}
-```
+1. XVIZMetadataBuilder.styleClass() definition of classes for a streamId
+2. Adding class selectors to the objects using XVIZBuilder.classes()
 
-## Selectors
+## Stream style defaults
 
-Each style object contains an optional `class` field that specifies the selector of the style. A style only applies to an object if the selector is matched. The default selector is `*`.
+Stream styles definition define the default style property values for all objects within a stream. They provide a single place to define styles for a stream and avoid unnecessary styling of individual element.
 
-* `<name>` matches an object if it contains the given field.
-* `<name>=<value>` matches an object if the given field is equal to the given value.
-* Space separate multiple selectors to match an objects that satisfies them all.
-* `*` matches all objects.
-* If an object matches multiple selectors in a stylesheet, the one that is defined last trumps.
+# Style Specification
+
+For more detailed information on styling refer to the style specification.

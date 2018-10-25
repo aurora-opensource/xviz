@@ -23,35 +23,40 @@ import TestMetadataMessage from 'test-data/sample-metadata-message';
 // Metadata missing normal start_time and end_time
 // but with the full log timing fields
 const metadataWithLogStartEnd = {
-  type: 'metadata',
-  log_start_time: 1194278450.6,
-  log_end_time: 1194278451.6,
+  version: '2.0.0',
+  log_info: {
+    log_start_time: 1194278450.6,
+    log_end_time: 1194278451.6
+  },
   streams: {},
   videos: {},
-  map: {
-    name: 'phx',
-    entry_point: '6b9d0916d69943c9d88d2703e72021f5'
+  map_info: {
+    map: {
+      name: 'phx',
+      entry_point: '6b9d0916d69943c9d88d2703e72021f5'
+    }
   }
 };
 
 // TODO replace with second message in stream
 // NOTE: the timestamp in 'primtives' is not required to match that of 'vehicle_pose'
-const TestTimesliceMessage = {
+const TestTimesliceMessageV1 = {
   timestamp: 1001.1,
   state_updates: [
     {
-      timestamp: 1001.0,
       variables: null,
       primitives: {
-        '/test/stream': [
-          {
-            color: [255, 255, 255],
-            id: 1234,
-            radius: 0.01,
-            type: 'point',
-            vertices: [[1000, 1000, 200]]
-          }
-        ]
+        '/test/stream': {
+          primitives: [
+            {
+              color: [255, 255, 255],
+              id: 1234,
+              radius: 0.01,
+              type: 'points3d',
+              vertices: [[1000, 1000, 200]]
+            }
+          ]
+        }
       }
     }
   ],
@@ -64,8 +69,38 @@ const TestTimesliceMessage = {
   }
 };
 
-// TOOD: blacklisted streams in xviz common
-//
+const TestTimesliceMessageV2 = {
+  update_type: 'snapshot',
+  updates: [
+    {
+      timestamp: 1001.0,
+      poses: {
+        '/vehicle_pose': {
+          timestamp: 1001.0,
+          mapOrigin: [11.2, 33.4, 55.6],
+          position: [1.1, 2.2, 3.3],
+          orientation: [0.1, 0.2, 0.3]
+        }
+      },
+      variables: null,
+      primitives: {
+        '/test/stream': {
+          primitives: [
+            {
+              color: [255, 255, 255],
+              object_id: 1234,
+              radius: 0.01,
+              type: 'point',
+              points: [[1000, 1000, 200]]
+            }
+          ]
+        }
+      }
+    }
+  ]
+};
+
+// TODO: blacklisted streams in xviz common
 tape('parseStreamLogData metadata', t => {
   setXvizConfig({});
   const metaMessage = parseStreamLogData(TestMetadataMessage);
@@ -74,10 +109,34 @@ tape('parseStreamLogData metadata', t => {
 
   t.equals(
     metaMessage.eventStartTime,
-    TestMetadataMessage.start_time,
+    TestMetadataMessage.log_info.start_time,
     'Metadata eventStartTime set'
   );
-  t.equals(metaMessage.eventEndTime, TestMetadataMessage.end_time, 'Metadata eventEndTime set');
+  t.equals(
+    metaMessage.eventEndTime,
+    TestMetadataMessage.log_info.end_time,
+    'Metadata eventEndTime set'
+  );
+
+  t.end();
+});
+
+tape('parseStreamLogData metadata v1', t => {
+  setXvizConfig({});
+  const metaMessage = parseStreamLogData(TestMetadataMessage);
+
+  t.equals(metaMessage.type, LOG_STREAM_MESSAGE.METADATA, 'Metadata type set');
+
+  t.equals(
+    metaMessage.eventStartTime,
+    TestMetadataMessage.log_info.start_time,
+    'Metadata eventStartTime set'
+  );
+  t.equals(
+    metaMessage.eventEndTime,
+    TestMetadataMessage.log_info.end_time,
+    'Metadata eventEndTime set'
+  );
 
   t.end();
 });
@@ -90,10 +149,14 @@ tape('parseStreamLogData metadata with full log time only', t => {
 
   t.equals(
     metaMessage.logStartTime,
-    metadataWithLogStartEnd.log_start_time,
+    metadataWithLogStartEnd.log_info.log_start_time,
     'Metadata logStartTime set'
   );
-  t.equals(metaMessage.logEndTime, metadataWithLogStartEnd.log_end_time, 'Metadata logEndTime set');
+  t.equals(
+    metaMessage.logEndTime,
+    metadataWithLogStartEnd.log_info.log_end_time,
+    'Metadata logEndTime set'
+  );
 
   t.end();
 });
@@ -101,7 +164,7 @@ tape('parseStreamLogData metadata with full log time only', t => {
 tape('parseStreamLogData error', t => {
   setXvizConfig({});
   const metaMessage = parseStreamLogData({
-    ...TestMetadataMessage,
+    ...TestTimesliceMessageV2,
     type: 'error'
   });
   t.equals(metaMessage.type, LOG_STREAM_MESSAGE.ERROR, 'Metadata type set to error');
@@ -112,23 +175,40 @@ tape('parseStreamLogData timeslice INCOMPLETE', t => {
   setXvizConfig({});
   // NOTE: no explicit type for this message yet.
   let metaMessage = parseStreamLogData({
-    ...TestTimesliceMessage,
+    ...TestTimesliceMessageV2,
     timestamp: null
   });
   t.equals(metaMessage.type, LOG_STREAM_MESSAGE.TIMESLICE, 'Missing timestamp is ok');
 
   metaMessage = parseStreamLogData({
-    ...TestTimesliceMessage,
-    state_updates: null
+    ...TestTimesliceMessageV2,
+    updates: [{updates: null}]
   });
-  t.equals(metaMessage.type, LOG_STREAM_MESSAGE.TIMESLICE, 'Missing state_updates is ok');
+  t.equals(metaMessage.type, LOG_STREAM_MESSAGE.INCOMPLETE, 'Missing updates incomplete');
 
   metaMessage = parseStreamLogData({
-    ...TestTimesliceMessage,
-    state_updates: [],
-    timestamp: null
+    ...TestTimesliceMessageV2,
+    updates: [
+      {
+        poses: {
+          '/vehicle_pose': {
+            mapOrigin: [11.2, 33.4, 55.6]
+          }
+        }
+      }
+    ]
   });
-  t.equals(metaMessage.type, LOG_STREAM_MESSAGE.INCOMPLETE, 'Missing time is incomplete');
+  t.equals(metaMessage.type, LOG_STREAM_MESSAGE.INCOMPLETE, 'Missing updates is incomplete');
+
+  metaMessage = parseStreamLogData({
+    ...TestTimesliceMessageV2,
+    updates: [
+      {
+        timestamp: null
+      }
+    ]
+  });
+  t.equals(metaMessage.type, LOG_STREAM_MESSAGE.INCOMPLETE, 'Missing timestamp is incomplete');
 
   t.end();
 });
@@ -136,11 +216,24 @@ tape('parseStreamLogData timeslice INCOMPLETE', t => {
 tape('parseStreamLogData timeslice', t => {
   setXvizConfig({});
   // NOTE: no explicit type for this message yet.
-  const metaMessage = parseStreamLogData({...TestTimesliceMessage});
+  const metaMessage = parseStreamLogData({...TestTimesliceMessageV2});
   t.equals(metaMessage.type, LOG_STREAM_MESSAGE.TIMESLICE, 'Message type set for timeslice');
   t.equals(
     metaMessage.timestamp,
-    TestTimesliceMessage.timestamp,
+    TestTimesliceMessageV2.updates[0].poses['/vehicle_pose'].timestamp,
+    'Message timestamp set from vehicle_pose'
+  );
+  t.end();
+});
+
+tape('parseStreamLogData timeslice (v1)', t => {
+  setXvizConfig({version: 1, PRIMARY_POSE_STREAM: '/vehicle_pose'});
+  // NOTE: no explicit type for this message yet.
+  const metaMessage = parseStreamLogData({...TestTimesliceMessageV1});
+  t.equals(metaMessage.type, LOG_STREAM_MESSAGE.TIMESLICE, 'Message type set for timeslice');
+  t.equals(
+    metaMessage.timestamp,
+    TestTimesliceMessageV1.vehicle_pose.time,
     'Message timestamp set from timeslice'
   );
   t.end();
@@ -149,19 +242,30 @@ tape('parseStreamLogData timeslice', t => {
 tape('parseStreamLogData pointCloud timeslice', t => {
   setXvizConfig({});
   const PointCloudTestTimesliceMessage = {
-    state_updates: [
+    update_type: 'snapshot',
+    updates: [
       {
         timestamp: 1001.0,
+        poses: {
+          '/vehicle_pose': {
+            timestamp: 1001.0,
+            mapOrigin: [11.2, 33.4, 55.6],
+            position: [1.1, 2.2, 3.3],
+            orientation: [0.1, 0.2, 0.3]
+          }
+        },
         primitives: {
-          '/test/stream': [
-            {
-              color: [255, 255, 255],
-              id: 1234,
-              radius: 0.01,
-              type: 'point',
-              vertices: [[1000, 1000, 200]]
-            }
-          ]
+          '/test/stream': {
+            primitives: [
+              {
+                color: [255, 255, 255],
+                object_id: 1234,
+                radius: 0.01,
+                type: 'point',
+                points: [[1000, 1000, 200]]
+              }
+            ]
+          }
         }
       }
     ]
@@ -183,19 +287,30 @@ tape('parseStreamLogData pointCloud timeslice', t => {
 tape('parseStreamLogData pointCloud timeslice TypedArray', t => {
   setXvizConfig({});
   const PointCloudTestTimesliceMessage = {
-    state_updates: [
+    update_type: 'snapshot',
+    updates: [
       {
         timestamp: 1001.0,
+        poses: {
+          '/vehicle_pose': {
+            timestamp: 1001.0,
+            mapOrigin: [11.2, 33.4, 55.6],
+            position: [1.1, 2.2, 3.3],
+            orientation: [0.1, 0.2, 0.3]
+          }
+        },
         primitives: {
-          '/test/stream': [
-            {
-              color: [255, 255, 255],
-              id: 1234,
-              radius: 0.01,
-              type: 'point',
-              vertices: new Float32Array([1000, 1000, 200])
-            }
-          ]
+          '/test/stream': {
+            primitives: [
+              {
+                color: [255, 255, 255],
+                object_id: 1234,
+                radius: 0.01,
+                type: 'point',
+                points: new Float32Array([1000, 1000, 200])
+              }
+            ]
+          }
         }
       }
     ]
@@ -217,26 +332,37 @@ tape('parseStreamLogData pointCloud timeslice TypedArray', t => {
 tape('parseStreamLogData pointCloud timeslice', t => {
   setXvizConfig({});
   const PointCloudTestTimesliceMessage = {
-    state_updates: [
+    update_type: 'snapshot',
+    updates: [
       {
         timestamp: 1001.0,
+        poses: {
+          '/vehicle_pose': {
+            timestamp: 1001.0,
+            mapOrigin: [11.2, 33.4, 55.6],
+            position: [1.1, 2.2, 3.3],
+            orientation: [0.1, 0.2, 0.3]
+          }
+        },
         primitives: {
-          '/test/stream': [
-            {
-              color: [255, 255, 255],
-              id: 1234,
-              radius: 0.01,
-              type: 'point',
-              vertices: [[1000, 1000, 200]]
-            },
-            {
-              color: [255, 255, 255],
-              id: 1235,
-              radius: 0.01,
-              type: 'point',
-              vertices: new Float32Array([1000, 1000, 200])
-            }
-          ]
+          '/test/stream': {
+            primitives: [
+              {
+                color: [255, 255, 255],
+                object_id: 1234,
+                radius: 0.01,
+                type: 'point',
+                points: [[1000, 1000, 200]]
+              },
+              {
+                color: [255, 255, 255],
+                object_id: 1235,
+                radius: 0.01,
+                type: 'point',
+                points: new Float32Array([1000, 1000, 200])
+              }
+            ]
+          }
         }
       }
     ]

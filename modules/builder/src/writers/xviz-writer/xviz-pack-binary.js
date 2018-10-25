@@ -27,7 +27,7 @@ export function packXVIZ(xvizJson, opts) {
   const xvizTopKeys = Object.keys(xvizJson);
   for (const key of xvizTopKeys) {
     switch (key) {
-      case 'state_updates':
+      case 'updates':
         packedXviz[key] = packXVIZStateUpdates(xvizJson[key], bufferPacker, opts);
         break;
       default:
@@ -52,7 +52,7 @@ function packXVIZStateUpdates(stateUpdates, bufferPacker, opts) {
         case 'primitives':
           newUpdate[key] = packXVIZPrimitives(xvizUpdate[key], bufferPacker, opts);
           break;
-        case 'futures':
+        case 'future_instances':
         case 'timestamp':
         case 'variables':
         default:
@@ -77,7 +77,7 @@ function packXVIZPrimitives(primitives, bufferPacker, opts) {
   for (const key in primitives) {
     if (streams.includes(key)) {
       const newPrimitive = [];
-      for (const element of primitives[key]) {
+      for (const element of primitives[key].primitives) {
         const elem = {...element};
         // eslint-disable-next-line max-depth
         if (elem.vertices.length > 3) {
@@ -85,7 +85,7 @@ function packXVIZPrimitives(primitives, bufferPacker, opts) {
         }
         newPrimitive.push(elem);
       }
-      newPrimitives[key] = newPrimitive;
+      newPrimitives[key] = {primitives: newPrimitive};
     } else {
       newPrimitives[key] = primitives[key];
     }

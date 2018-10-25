@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/* eslint-disable camelcase */
 import Color from 'color';
 
 /* Utils for type check */
@@ -73,21 +74,21 @@ const PROPERTY_FORMATTERS = {
   wireframe: getBool,
   height: getNumber,
 
-  strokeColor: getColor,
-  fillColor: getColor,
+  stroke_color: getColor,
+  fill_color: getColor,
 
   size: getNumber,
   angle: getNumber,
-  textAnchor: String,
-  alignmentBaseline: String,
+  text_anchor: String,
+  alignment_baseline: String,
 
   radius: getNumber,
-  radiusMinPixels: getNumber,
-  radiusMaxPixels: getNumber,
+  radius_min_pixels: getNumber,
+  radius_max_pixels: getNumber,
 
-  strokeWidth: getNumber,
-  strokeWidthMinPixels: getNumber,
-  strokeWidthMaxPixels: getNumber
+  stroke_width: getNumber,
+  stroke_width_min_pixels: getNumber,
+  stroke_width_max_pixels: getNumber
 };
 
 const DEFAULT_STYLES = {
@@ -99,21 +100,21 @@ const DEFAULT_STYLES = {
   wireframe: false,
   height: 0,
 
-  strokeColor: [255, 255, 255],
-  fillColor: [255, 255, 255],
+  stroke_color: [255, 255, 255],
+  fill_color: [255, 255, 255],
 
   size: 12,
   angle: 0,
-  textAnchor: 'middle',
-  alignmentBaseline: 'center',
+  text_anchor: 'middle',
+  alignment_baseline: 'center',
 
   radius: 1,
-  radiusMinPixels: 0,
-  radiusMaxPixels: Number.MAX_SAFE_INTEGER,
+  radius_min_pixels: 0,
+  radius_max_pixels: Number.MAX_SAFE_INTEGER,
 
-  strokeWidth: 1,
-  strokeWidthMinPixels: 0,
-  strokeWidthMaxPixels: Number.MAX_SAFE_INTEGER
+  stroke_width: 1,
+  stroke_width_min_pixels: 0,
+  stroke_width_max_pixels: Number.MAX_SAFE_INTEGER
 };
 
 export default class XvizStyleProperty {

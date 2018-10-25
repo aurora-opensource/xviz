@@ -70,7 +70,7 @@ export function parseXvizStream(data, convertPrimitive) {
   return {};
 }
 
-/* eslint-disable max-depth, max-statements */
+/* eslint-disable max-depth, max-statements, complexity, camelcase */
 
 /* Processes an individual primitive time sample and converts the
  * data to UI elements.
@@ -84,7 +84,8 @@ export function parseStreamPrimitive(objects, streamName, time, convertPrimitive
 
   if (isMainThread && streamName === OBJECT_STREAM) {
     for (const object of objects) {
-      XvizObject.observe(object.id, time);
+      // v1: id, v2: object_id
+      XvizObject.observe(object.id || object.object_id, time);
     }
   }
   const primitiveMap = createPrimitiveMap();
@@ -144,8 +145,6 @@ export function parseStreamPrimitive(objects, streamName, time, convertPrimitive
   return primitiveMap;
 }
 
-/* eslint-enable max-depth, max-statements */
-
 /* Processes the futures and converts the
  * data to UI elements.
  */
@@ -198,7 +197,7 @@ export function parseStreamVariable(objects, streamName, time) {
   }
 
   let variable;
-  const {timestamps, values} = objects;
+  const {timestamps, values, object_id} = objects;
   if (values.length === 1) {
     variable = values[0];
   } else if (timestamps) {
@@ -208,10 +207,50 @@ export function parseStreamVariable(objects, streamName, time) {
     variable = values;
   }
 
-  return {
+  const entry = {
     time,
     variable
   };
+
+  if (objects) {
+    entry.id = object_id;
+  }
+
+  return entry;
+}
+
+/* Processes a time_series sample and converts the
+ * data to UI elements.
+ */
+export function parseStreamTimeSeries(seriesArray, streamBlackList) {
+  if (!Array.isArray(seriesArray)) {
+    return {};
+  }
+
+  const timeSeriesStreams = {};
+  seriesArray.forEach(timeSeriesEntry => {
+    const {timestamp, values, object_id} = timeSeriesEntry;
+
+    values.forEach(streamValue => {
+      const [streamName, variable] = streamValue;
+
+      if (!streamBlackList.has(streamName)) {
+        const entry = {time: timestamp, variable};
+        if (object_id) {
+          entry.id = object_id;
+        }
+
+        const tsStream = timeSeriesStreams[streamName];
+        if (tsStream) {
+          throw new Error('Unexpected time_series duplicate');
+        } else {
+          timeSeriesStreams[streamName] = entry;
+        }
+      }
+    });
+  });
+
+  return timeSeriesStreams;
 }
 
 function getVertexCount(vertices) {
@@ -243,6 +282,25 @@ function joinObjectPointCloudsToTypedArrays(objects) {
   objects.forEach(object => {
     const vertexCount = getVertexCount(object.vertices);
 
+    // Setup for per-point color
+    let vertexColors = object.colors;
+    let vertexColorStride = null;
+    if (vertexColors) {
+      if (vertexColors.length / 4 === vertexCount) {
+        vertexColorStride = 4;
+      } else if (vertexColors.length / 3 === vertexCount) {
+        vertexColorStride = 4;
+      } else {
+        vertexColors = null;
+      }
+    }
+
+    const isColorFlattenedArray = object.colors instanceof Float32Array;
+    const vertexColorTyped = isColorFlattenedArray && vertexColorStride === 4;
+    if (vertexColorTyped) {
+      colors.set(object.colors, i * 4);
+    }
+
     const isPositionFlattenedArray = object.vertices instanceof Float32Array;
     if (isPositionFlattenedArray) {
       positions.set(object.vertices, i * 3);
@@ -258,11 +316,17 @@ function joinObjectPointCloudsToTypedArrays(objects) {
         positions[i * 3 + 2] = vertex[2];
       }
 
-      const color = object.color || DEFAULT_COLOR;
-      colors[i * 4 + 0] = color[0];
-      colors[i * 4 + 1] = color[1];
-      colors[i * 4 + 2] = color[2];
-      colors[i * 4 + 3] = color[3] || 255;
+      if (!vertexColorTyped) {
+        let color = object.color || DEFAULT_COLOR;
+        if (vertexColors) {
+          color = vertexColors[j * vertexColorStride];
+        }
+
+        colors[i * 4 + 0] = color[0];
+        colors[i * 4 + 1] = color[1];
+        colors[i * 4 + 2] = color[2];
+        colors[i * 4 + 3] = color[3] || 255;
+      }
     }
   });
 

@@ -1,8 +1,8 @@
 {
   "lidar-points": {
     "*": {
-      "fillColor": "#00a",
-      "radiusPixels": 2
+      "fill_color": "#00a",
+      "radius_pixels": 2
     }
   },
   "tracklets": {
@@ -10,41 +10,41 @@
       "extruded": true,
       "wireframe": true,
       "height": 1.5,
-      "fillColor": "#00000080"
+      "fill_color": "#00000080"
     },
     "objectType=Car": {
-      "fillColor": "#7DDDD780",
-      "strokeColor": "#7DDDD7"
+      "fill_color": "#7DDDD780",
+      "stroke_color": "#7DDDD7"
     },
     "objectType=Cyclist": {
-      "fillColor": "#DA70BF80",
-      "strokeColor": "#DA70BF"
+      "fill_color": "#DA70BF80",
+      "stroke_color": "#DA70BF"
     },
     "objectType=Pedestrian": {
-      "fillColor": "#FEC56480",
-      "strokeColor": "#FEC564"
+      "fill_color": "#FEC56480",
+      "stroke_color": "#FEC564"
     },
     "objectType=Van": {
-      "fillColor": "#267E6380",
-      "strokeColor": "#267E63"
+      "fill_color": "#267E6380",
+      "stroke_color": "#267E63"
     },
     "objectType=Unknown": {
-      "fillColor": "#D6A00080",
-      "strokeColor": "#D6A000"
+      "fill_color": "#D6A00080",
+      "stroke_color": "#D6A000"
     }
   },
   "tracklets-trajectory": {
     "*": {
-      "strokeColor": "#FEC557",
-      "strokeWidth": 0.3,
-      "strokeWidthMinPixels": 1
+      "stroke_color": "#FEC557",
+      "stroke_width": 0.3,
+      "stroke_width_min_pixels": 1
     }
   },
   "vehicle-pose-trajectory": {
     "*": {
-      "strokeColor": "#57AD57AA",
-      "strokeWidth": 1.4,
-      "strokeWidthMinPixels": 1
+      "stroke_color": "#57AD57AA",
+      "stroke_width": 1.4,
+      "stroke_width_min_pixels": 1
     }
   }
 }

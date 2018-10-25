@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/* eslint-disable no-console no-undef */
 import XvizStyleProperty from './xviz-style-property';
 
 const SELECTOR_REGEX = /\S+/g;
@@ -26,7 +27,7 @@ export default class Stylesheet {
       // Newer rules override older ones
       .reverse()
       .map(rule => {
-        const {selectors, validate} = this._parseSelector(rule.class || '*');
+        const {selectors, validate} = this._parseSelector(rule.name || '*');
         const properties = this._parseProperties(rule);
         return {selectors, validate, properties};
       });
@@ -134,11 +135,9 @@ export default class Stylesheet {
   // Parses property values
   _parseProperties(properties) {
     const result = {};
-    for (const key in properties) {
-      // class is the selector not a property
-      if (key !== 'class') {
-        result[key] = new XvizStyleProperty(key, properties[key]);
-      }
+
+    for (const key in properties.style) {
+      result[key] = new XvizStyleProperty(key, properties.style[key]);
     }
     return result;
   }

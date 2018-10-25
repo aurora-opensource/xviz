@@ -15,17 +15,18 @@
 /**
  * This file contains parsers for XVIZ log stream protocol.
  * Naming conventions:
- * `message` refers to the raw message received via webSocket.onmessage
+  `message` refers to the raw message received via webSocket.onmessage
  * `data` refers to pre-processed data objects (blob, arraybuffer, JSON object)
  */
 /* global Blob, Uint8Array */
 import {LOG_STREAM_MESSAGE} from '../constants';
-import {getXvizConfig} from '../config/xviz-config';
 import {parseBinaryXVIZ, isBinaryXVIZ} from '../loaders/xviz-loader/xviz-binary-loader';
 import {parseLogMetadata} from './parse-log-metadata';
-import {parseStreamPrimitive, parseStreamVariable, parseStreamFutures} from './parse-xviz-stream';
 import {parseStreamVideoMessage} from './parse-stream-video-message';
 import {TextDecoder} from 'text-encoding'; // Node.js < 9 polyfills
+import parseTimesliceDataV1 from './parse-timeslice-data-v1';
+import parseTimesliceDataV2 from './parse-timeslice-data-v2';
+import {getXvizConfig} from '..';
 
 function isJSON(encodedString) {
   const firstChar = String.fromCharCode(encodedString[0]);
@@ -75,10 +76,22 @@ export function parseStreamDataMessage(message, onResult, onError, opts) {
   }
 }
 
+function checkV2MetadataFields(data) {
+  // Check for version 2.0.0
+  // TODO(twojtasz): proper semver parsing
+  if (data.streams && data.version && data.version === '2.0.0') {
+    data.type = 'metadata';
+  }
+}
+
 export function parseStreamLogData(data, opts = {}) {
+  // Handle v2 metadata that lacks a 'type'
+  // Plan is an envelope will wrap and replace this field check
+  checkV2MetadataFields(data);
+
   // TODO(twojtasz): this data.message is due an
   // uncoordinated change on the XVIZ server, temporary.
-  switch (data.type || data.message) {
+  switch (data.type || data.message || data.update_type) {
     case 'metadata':
       return {
         ...parseLogMetadata(data),
@@ -89,87 +102,20 @@ export function parseStreamLogData(data, opts = {}) {
       return {...data, message: 'Stream server error', type: LOG_STREAM_MESSAGE.ERROR};
     case 'done':
       return {...data, type: LOG_STREAM_MESSAGE.DONE};
+    case 'ack':
+      return null;
+    // v2 update types
+    case 'snapshot':
+    case 'incremental':
     default:
       //  TODO(twojtasz): XVIZ should be tagging this with a type
       return parseTimesliceData(data, opts.convertPrimitive);
   }
 }
 
-// Extracts a TIMESLICE message
 function parseTimesliceData(data, convertPrimitive) {
-  const {PRIMARY_POSE_STREAM} = getXvizConfig();
-  const {vehicle_pose: vehiclePose, state_updates: stateUpdates, ...otherInfo} = data;
-
-  let timestamp = data.timestamp;
-  if (!timestamp && stateUpdates) {
-    timestamp = stateUpdates.reduce((t, stateUpdate) => {
-      return Math.max(t, stateUpdate.timestamp);
-    }, 0);
-  }
-
-  if (!timestamp) {
-    // Incomplete stream message, just tag it accordingly so client can ignore it
-    return {type: LOG_STREAM_MESSAGE.INCOMPLETE};
-  }
-
-  const newStreams = {};
-  const result = {
-    ...otherInfo,
-    type: LOG_STREAM_MESSAGE.TIMESLICE,
-    streams: newStreams,
-    channels: newStreams, // TODO -remove, backwards compatibility
-    timestamp
-  };
-
-  if (stateUpdates) {
-    const xvizStreams = parseStateUpdates(stateUpdates, timestamp, convertPrimitive);
-    Object.assign(newStreams, xvizStreams);
-  }
-
-  if (vehiclePose) {
-    // v1 -> v2
-    newStreams[PRIMARY_POSE_STREAM] = vehiclePose;
-  }
-
-  return result;
-}
-
-function parseStateUpdates(stateUpdates, timestamp, convertPrimitive) {
-  const {STREAM_BLACKLIST} = getXvizConfig();
-
-  const newStreams = {};
-  const primitives = {};
-  const variables = {};
-  const futures = {};
-
-  for (const stateUpdate of stateUpdates) {
-    Object.assign(primitives, stateUpdate.primitives);
-    Object.assign(variables, stateUpdate.variables);
-    Object.assign(futures, stateUpdate.futures);
-  }
-
-  Object.keys(primitives)
-    .filter(streamName => !STREAM_BLACKLIST.has(streamName))
-    .forEach(primitive => {
-      newStreams[primitive] = parseStreamPrimitive(
-        primitives[primitive],
-        primitive,
-        timestamp,
-        convertPrimitive
-      );
-    });
-
-  Object.keys(variables)
-    .filter(streamName => !STREAM_BLACKLIST.has(streamName))
-    .forEach(variable => {
-      newStreams[variable] = parseStreamVariable(variables[variable], variable, timestamp);
-    });
-
-  Object.keys(futures)
-    .filter(streamName => !STREAM_BLACKLIST.has(streamName))
-    .forEach(future => {
-      newStreams[future] = parseStreamFutures(futures[future], future, timestamp, convertPrimitive);
-    });
-
-  return newStreams;
+  const {version} = getXvizConfig();
+  return version === 1
+    ? parseTimesliceDataV1(data, convertPrimitive)
+    : parseTimesliceDataV2(data, convertPrimitive);
 }
