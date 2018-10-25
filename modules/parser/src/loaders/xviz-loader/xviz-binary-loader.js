@@ -22,5 +22,6 @@ export function parseBinaryXVIZ(arrayBuffer) {
 }
 
 export function isBinaryXVIZ(arrayBuffer) {
-  return isGLB(arrayBuffer, {magic: MAGIC_XVIZ});
+  const isArrayBuffer = arrayBuffer instanceof ArrayBuffer;
+  return isArrayBuffer && isGLB(arrayBuffer, {magic: MAGIC_XVIZ});
 }
