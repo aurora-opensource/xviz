@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+import "options.proto";
+import "style.proto";
+
+package xviz.v2.annotation;
+
+message Base
+{
+    option (xviz_json_schema) = "core/annotation_base";
+    
+    string object_id = 1;
+}
+
+message Visual
+{
+    option (xviz_json_schema) = "core/annotation_visual";
+    
+    Base base = 1;
+    
+    repeated string style_classes = 2;
+
+    style.ObjectValue inline_style = 3;
+}

@@ -1,13 +1,14 @@
 {
-  "primitives": [
+  "points": [
     {
-      "type": "point",
-      "object_id": "{067a2faf-64b5-4b8f-8d7d-ed873630df4f}",
-      "points": [[1, 2, 3], [2, 0, 1], [1, 2, 3]],
-      "style": {
-        "stroke_width": 5,
-        "fill_color": [0, 1, 2, 3]
-      }
+      "base": {
+        "object_id": "{067a2faf-64b5-4b8f-8d7d-ed873630df4f}",
+        "style": {
+          "stroke_width": 5,
+          "fill_color": [0, 1, 2, 3]
+        }
+      },
+      "points": [0, 0, 0, 1, 2, 0, 2, 3, 0]
     }
   ]
 }

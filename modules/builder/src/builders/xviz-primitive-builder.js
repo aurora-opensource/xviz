@@ -260,21 +260,34 @@ export default class XVIZPrimitiveBuilder extends XVIZBaseBuilder {
   }
 
   _flushPrimitives() {
-    if (!this._primitives[this._streamId]) {
-      this._primitives[this._streamId] = {primitives: []};
+    let stream = this._primitives[this._streamId];
+    if (!stream) {
+      stream = {};
+      this._primitives[this._streamId] = stream;
     }
 
     const primitive = this._formatPrimitive();
-    this._primitives[this._streamId].primitives.push(primitive);
+
+    // Each type like "image" has an "images" array, this hack saves a
+    // big switch statement.
+    const arrayFieldName = `${this._type}s`;
+    let array = stream[arrayFieldName];
+
+    // Make sure array exists
+    if (array === undefined) {
+      array = [];
+      stream[arrayFieldName] = array;
+    }
+
+    // Now add the primitive to it
+    array.push(primitive);
 
     this.reset();
   }
 
   /* eslint-disable complexity */
   _formatPrimitive() {
-    const obj = {
-      type: this._type
-    };
+    const obj = {};
 
     switch (this._type) {
       case 'polygon':
@@ -309,16 +322,26 @@ export default class XVIZPrimitiveBuilder extends XVIZBaseBuilder {
       default:
     }
 
+    let haveBase = false;
+    const base = {};
+
     if (this._id) {
-      obj.object_id = this._id;
+      haveBase = true;
+      base.object_id = this._id;
     }
 
     if (this._style) {
-      obj.style = this._style;
+      haveBase = true;
+      base.style = this._style;
     }
 
     if (this._classes) {
-      obj.classes = this._classes;
+      haveBase = true;
+      base.classes = this._classes;
+    }
+
+    if (haveBase) {
+      obj.base = base;
     }
 
     return obj;

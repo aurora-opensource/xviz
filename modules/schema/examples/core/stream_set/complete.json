@@ -24,37 +24,43 @@
   },
   "primitives": {
     "/object/points": {
-      "primitives": [
+      "points": [
         {
-          "points": [[9, 15, 3], [20, 13, 3], [20, 5, 3]]
+          "points": [9, 15, 3, 20, 13, 3, 20, 5, 3]
         }
       ]
     },
     "/sample/styled": {
-      "primitives": [
+      "points": [
         {
-          "points": [[1, 2, 3], [2, 0, 1], [1, 2, 3]],
-          "style": {
-            "stroke_width": 5,
-            "fill_color": [0, 1, 2, 3]
-          }
+          "base": {
+            "style": {
+              "stroke_width": 5,
+              "fill_color": [0, 1, 2, 3]
+            }
+          },
+          "points": [1, 2, 3, 2, 0, 1, 1, 2, 3]
         }
       ]
     },
     "/sample/multiple": {
-      "primitives": [
+      "points": [
         {
-          "object_id": "{067a2faf-64b5-4b8f-8d7d-ed873630df4f}",
-          "points": [[9, 15, 3], [20, 13, 3], [20, 5, 3]]
+          "base": {
+            "object_id": "{067a2faf-64b5-4b8f-8d7d-ed873630df4f}"
+          },
+          "points": [9, 15, 3, 20, 13, 3, 20, 5, 3]
         },
         {
-          "object_id": "{317d719e-f95a-49a7-91fc-3706b2eeb5c2}",
-          "points": [[1, 2, 3], [2, 0, 1], [1, 2, 3]]
+          "base": {
+            "object_id": "{317d719e-f95a-49a7-91fc-3706b2eeb5c2}"
+          },
+          "points": [1, 2, 3, 2, 0, 1, 1, 2, 3]
         }
       ]
     },
     "/sample/circle": {
-      "primitives": [
+      "circles": [
         {
           "center": [1, 2, 3],
           "radius_m": 1.2
@@ -62,7 +68,7 @@
       ]
     },
     "/sample/image": {
-      "primitives": [
+      "images": [
         {
           "position": [9, 15, 3],
           "data": "/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=",
@@ -72,21 +78,21 @@
       ]
     },
     "/sample/polygon": {
-      "primitives": [
+      "polygons": [
         {
-          "vertices": [[0, 0, 0], [1, 2, 0], [2, 3, 0]]
+          "vertices": [0, 0, 0, 1, 2, 0, 2, 3, 0]
         }
       ]
     },
     "/sample/polyline": {
-      "primitives": [
+      "polylines": [
         {
-          "vertices": [[0, 0, 4], [1, 2, 0], [2, 3, 0]]
+          "vertices": [0, 0, 4, 1, 2, 0, 2, 3, 0]
         }
       ]
     },
     "/sample/stadium": {
-      "primitives": [
+      "stadiums": [
         {
           "start": [9, 15, 3],
           "end": [20, 13, 3],
@@ -95,7 +101,7 @@
       ]
     },
     "/sample/text": {
-      "primitives": [
+      "texts": [
         {
           "position": [9, 15, 3],
           "text": "Location of interest"
@@ -125,17 +131,17 @@
       "primitives": [
         [
           {
-            "points": [[1, 2, 3]]
+            "points": [1, 2, 3]
           }
         ],
         [
           {
-            "points": [[1.5, 2, 3]]
+            "points": [1.5, 2, 3]
           }
         ],
         [
           {
-            "points": [[2, 2, 3]]
+            "points": [2, 2, 3]
           }
         ]
       ]
@@ -166,9 +172,11 @@
   },
   "annotations": {
     "/object/highlights": {
-      "annotations": [
+      "visuals": [
         {
-          "object_id": "{067a2faf-64b5-4b8f-8d7d-ed873630df4f}",
+          "base": {
+            "object_id": "{067a2faf-64b5-4b8f-8d7d-ed873630df4f}"
+          },
           "style_classes": [
             "highlighted"
           ],
@@ -177,7 +185,9 @@
           }
         },
         {
-          "object_id": "{317d719e-f95a-49a7-91fc-3706b2eeb5c2}",
+          "base": {
+            "object_id": "{317d719e-f95a-49a7-91fc-3706b2eeb5c2}"
+          },
           "style_classes": [
             "unimportant"
           ],

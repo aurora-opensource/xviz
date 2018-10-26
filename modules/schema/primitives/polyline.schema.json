@@ -2,13 +2,10 @@
   "id": "https://xviz.org/schema/primitives/polyline.json",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "description": "XVIZ Polyline primitive",
-  "allOf": [{ "$ref": "https://xviz.org/schema/core/primitive_base.json" }],
+  "type": "object",
   "properties": {
-    "object_id": {},
-    "style": {},
-    "classes": {},
-    "type": {
-      "enum": ["polyline"]
+    "base": {
+      "$ref": "https://xviz.org/schema/core/primitive_base.json"
     },
     "vertices": {
       "$ref": "https://xviz.org/schema/math/point3d_list.schema.json"

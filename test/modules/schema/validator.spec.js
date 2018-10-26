@@ -177,7 +177,9 @@ test('validateAnnotation', t => {
     'visual',
     JSON.parse(`
 {
-  "object_id": "{317d719e-f95a-49a7-91fc-3706b2eeb5c2}",
+  "base": {
+    "object_id": "{317d719e-f95a-49a7-91fc-3706b2eeb5c2}"
+  },
   "style_classes": [
     "unimportant"
   ]
