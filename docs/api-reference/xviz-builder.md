@@ -226,12 +226,13 @@ const frame = xvizBuider.getFrame();
       }
       primitives: {
         '/point-cloud': {
-          primitives: [
+          points: [
             {
-              style: {
-                fill_color: [255,0,0]
+              base: {
+                style: {
+                  fill_color: [255,0,0]
+                }
               },
-              type: 'points',
               vertices: [1.23, 0.45, 0.06]
             }
           ]
