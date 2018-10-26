@@ -1,0 +1,43 @@
+{
+  "id": "https://xviz.org/schema/core/values.schema.json",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "XVIZ Values",
+  "type": "object",
+  "properties": {
+    "doubles": {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "additionalItems": false
+    },
+    "int32s": {
+      "type": "array",
+      "items": {
+        "type": "integer"
+      },
+      "additionalItems": false
+    },
+    "bools": {
+      "type": "array",
+      "items": {
+        "type": "boolean"
+      },
+      "additionalItems": false
+    },
+    "strings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "additionalItems": false
+    }
+  },
+  "additionalProperties": false,
+  "anyOf": [
+    {"required": ["doubles"]},
+    {"required": ["int32s"]},
+    {"required": ["bools"]},
+    {"required": ["strings"]}
+  ]
+}

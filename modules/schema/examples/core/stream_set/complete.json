@@ -112,17 +112,31 @@
   "time_series": [
     {
       "timestamp": 12345.5,
-      "values": [
-        ["/vehicle/torque/commanded", 5],
-        ["/vehicle/torque/actual", 4.8]
-      ]
+      "streams": [
+        "/vehicle/torque/commanded",
+        "/vehicle/torque/actual"
+      ],
+      "values": {
+        "doubles": [5, 4.8]
+      }
     },
     {
       "timestamp": 12345.5,
-      "values": [
-        ["/vehicle/break_on", false],
-        ["/vehicle/gear", "drive"]
-      ]
+      "streams": [
+        "/vehicle/break_on"
+      ],
+      "values": {
+        "bools": [true]
+      }
+    },
+    {
+      "timestamp": 12345.5,
+      "streams": [
+        "/vehicle/gear"
+      ],
+      "values": {
+        "strings": ["drive"]
+      }
     }
   ],
   "future_instances": {
