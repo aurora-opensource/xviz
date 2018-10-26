@@ -11,8 +11,10 @@ import XVIZBaseBuilder from './xviz-base-builder';
  *   /plan/time: {
  *     variables: [
  *       {
+ *         base: {
+ *           object_id: '123'
+ *         },
  *         values: [1, 2, 3, 4],
- *         object_id: '123'
  *       }
  *     ]
  *   }
@@ -73,9 +75,18 @@ export default class XvizVariableBuilder extends XVIZBaseBuilder {
       return;
     }
 
-    const entry = {values: this._values};
+    // Lookup where to put the value
+    let fieldName = 'doubles';
+    const value = this._values[0];
+    if (typeof value === 'string' || value instanceof String) {
+      fieldName = 'strings';
+    } else if (typeof value === 'boolean') {
+      fieldName = 'bools';
+    }
+
+    const entry = {values: {[fieldName]: this._values}};
     if (this._id) {
-      entry.object_id = this._id; // eslint-disable-line camelcase
+      entry.base = {object_id: this._id}; // eslint-disable-line camelcase
     }
 
     const streamEntry = this._data.get(this._streamId);

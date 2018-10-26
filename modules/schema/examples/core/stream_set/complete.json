@@ -171,21 +171,27 @@
     "/plan/time": {
       "variables": [
         {
-          "values": [1001.3, 1002.3, 1003.3]
+          "values": {
+            "doubles": [1001.3, 1002.3, 1003.3]
+          }
         }
       ]
     },
     "/plan/valid": {
       "variables": [
         {
-          "values": [true, true, false]
+          "values": {
+            "bools": [true, true, false]
+          }
         }
       ]
     },
     "/plan/meta": {
       "variables": [
         {
-          "values": ["varying", "constant", "constant"]
+          "values": {
+            "strings": ["varying", "constant", "constant"]
+          }
         }
       ]
     }

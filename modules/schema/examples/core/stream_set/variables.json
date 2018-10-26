@@ -4,7 +4,9 @@
     "/object/variables": {
       "variables": [
         {
-          "values": [9, 15, 3]
+          "values": {
+            "doubles": [9, 15, 3]
+          }
         }
       ]
     }

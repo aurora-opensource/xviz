@@ -38,7 +38,7 @@ test('XvizVariableBuilder#single entry', t => {
     '/test': {
       variables: [
         {
-          values: [20]
+          values: {doubles: [20]}
         }
       ]
     }
@@ -60,14 +60,14 @@ test('XvizVariableBuilder#multiple entry', t => {
     '/test': {
       variables: [
         {
-          values: [100, 200]
+          values: {doubles: [100, 200]}
         }
       ]
     },
     '/foo': {
       variables: [
         {
-          values: [300, 400]
+          values: {doubles: [300, 400]}
         }
       ]
     }
@@ -100,22 +100,22 @@ test('XvizVariableBuilder#all types and multiple entry with ids', t => {
     '/test': {
       variables: [
         {
-          values: [1, 2, 3]
+          values: {doubles: [1, 2, 3]}
         },
         {
-          values: ['a', 'b', 'c'],
-          object_id: '1'
+          base: {object_id: '1'},
+          values: {strings: ['a', 'b', 'c']}
         },
         {
-          values: [true, true, false],
-          object_id: '2'
+          base: {object_id: '2'},
+          values: {bools: [true, true, false]}
         }
       ]
     },
     '/bar': {
       variables: [
         {
-          values: [1.1, 1.2, 1.3]
+          values: {doubles: [1.1, 1.2, 1.3]}
         }
       ]
     }
