@@ -154,8 +154,12 @@ test('validateFutureInstances', t => {
 {
   "timestamps": [1.0, 1.1],
   "primitives": [
-    [{"points": [[1, 2, 3]]}],
-    [{"points": [[1.5, 2, 3]]}]
+    {
+      "points": [{"points": [[1, 2, 3]]}]
+    },
+    {
+      "points": [{"points": [[1.5, 2, 3]]}]
+    }
   ]
 }`)
   );

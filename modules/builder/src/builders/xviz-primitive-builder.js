@@ -255,20 +255,26 @@ export default class XVIZPrimitiveBuilder extends XVIZBaseBuilder {
   }
 
   _flushFutures() {
-    if (!this._futures[this._streamId]) {
-      this._futures[this._streamId] = {
+    let future = this._futures[this._streamId];
+    if (!future) {
+      future = {
         timestamps: [],
         primitives: []
       };
+      this._futures[this._streamId] = future;
     }
 
-    const future = this._futures[this._streamId];
     const primitive = this._formatPrimitive();
 
     const {timestamps, primitives} = future;
 
+    // Each type like "image" has an "images" array, this hack saves a
+    // big switch statement.
+    const update = {};
+    update[`${this._type}s`] = [primitive];
+
     // insert ts and primitive to the position based on timestamp order
-    insertTimestamp(timestamps, primitives, this._timestamps[0], [primitive]);
+    insertTimestamp(timestamps, primitives, this._timestamps[0], update);
 
     this.reset();
   }

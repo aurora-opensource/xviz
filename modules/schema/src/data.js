@@ -21,7 +21,6 @@ import coreAnnotationVisualSchemaJson from '../core/annotation_visual.schema.jso
 import coreFutureInstancesSchemaJson from '../core/future_instances.schema.json';
 import corePoseSchemaJson from '../core/pose.schema.json';
 import corePrimitiveBaseSchemaJson from '../core/primitive_base.schema.json';
-import corePrimitiveListSchemaJson from '../core/_primitive_list.schema.json';
 import corePrimitiveStateSchemaJson from '../core/primitive_state.schema.json';
 import coreStreamSetSchemaJson from '../core/stream_set.schema.json';
 import coreTimeseriesStateSchemaJson from '../core/timeseries_state.schema.json';
@@ -66,7 +65,6 @@ export const SCHEMA_DATA = {
   'core/future_instances.schema.json': coreFutureInstancesSchemaJson,
   'core/pose.schema.json': corePoseSchemaJson,
   'core/primitive_base.schema.json': corePrimitiveBaseSchemaJson,
-  'core/_primitive_list.schema.json': corePrimitiveListSchemaJson,
   'core/primitive_state.schema.json': corePrimitiveStateSchemaJson,
   'core/stream_set.schema.json': coreStreamSetSchemaJson,
   'core/timeseries_state.schema.json': coreTimeseriesStateSchemaJson,

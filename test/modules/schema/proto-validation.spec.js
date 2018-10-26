@@ -51,7 +51,9 @@ const SUPPORTED_EXAMPLE_STRINGS = [
   'core/annotation_visual',
   'core/annotation_state',
   'core/primitive_state',
+  'core/future_instances',
   'core/stream_set/primitives',
+  'core/stream_set/future_instances',
   'session/state_update'
 ];
 
@@ -124,7 +126,7 @@ test('stringifyEnums', t => {
   t.end();
 });
 
-test.only('protosCorrect', t => {
+test('protosCorrect', t => {
   const schemaDir = path.join(__dirname, '..', '..', '..', 'modules', 'schema');
   const protoDir = path.join(schemaDir, 'proto', 'v2');
   const protoRoot = loadProtos(protoDir);
@@ -169,6 +171,10 @@ function validateAgainstExample(t, validator, protoType, examplePath) {
 
   stringifyEnums(protoType, jsonExample);
 
+  // Sanity check out input data
+  const schemaName = protoType.options[EXTENSION_PROPERTY];
+  validator.validate(schemaName, originalJsonExample);
+
   // Verify content "works" as protobuf
   const err = protoType.verify(jsonExample);
   t.ok(err === null, `No, err: ${err} for: ${examplePath}`);
@@ -185,7 +191,6 @@ function validateAgainstExample(t, validator, protoType, examplePath) {
   const fromProtoObject = protoType.toObject(protoData, options);
 
   // Validate JSON with JSON schema (compare?)
-  const schemaName = protoType.options[EXTENSION_PROPERTY];
   try {
     validator.validate(schemaName, fromProtoObject);
   } catch (e) {
