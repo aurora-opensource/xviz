@@ -12,15 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export {SCHEMA_DATA} from './data';
+/* eslint no-console: off */
+/* eslint-env node, browser */
 
-export {
-  validateExampleFiles,
-  validateInvalidFiles,
-  loadValidator,
-  parseJSONFile
-} from './file-validation';
+import * as path from 'path';
+import * as fs from 'fs';
 
-export {default as XVIZValidator} from './validator';
+import {Root} from 'protobufjs';
 
-export {loadProtos} from './proto-validation';
+export function loadProtos(protoDir) {
+  // Gather up all the protobuf files
+  const protos = fs.readdirSync(protoDir).map(f => path.join(protoDir, f));
+
+  // Create our namespace
+  const protoRoot = new Root();
+
+  // Load in all the protobuf files at once
+
+  protoRoot.loadSync(protos, {keepCase: true});
+
+  return protoRoot;
+}

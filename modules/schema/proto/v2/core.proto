@@ -1,0 +1,114 @@
+syntax = "proto3";
+
+import "annotation.proto";
+import "options.proto";
+import "pose.proto";
+import "primitives.proto";
+
+package xviz.v2.core;
+
+message StreamSet
+{
+    option (xviz_json_schema) = "core/stream_set";
+    
+    double timestamp = 1;
+
+    map<string, Pose> poses = 2;
+
+    map<string, PrimitiveState> primitives = 3;
+
+    map<string, TimeSeriesState> time_series = 4;
+
+    map<string, FutureInstances> future_instances = 6;
+    
+    map<string, VariableState> variables = 7;
+    
+    map<string, AnnotationState> annotations = 8;
+}
+
+
+message PrimitiveState
+{
+    option (xviz_json_schema) = "core/primitive_state";
+    
+    repeated primitive.Polygon polygons = 1;
+    
+    repeated primitive.Polyline polylines = 2;
+
+    repeated primitive.Text texts = 3;
+    
+    repeated primitive.Circle circles = 4;
+
+    repeated primitive.Point points = 5;
+    
+    repeated primitive.Stadium stadiums = 6;
+    
+    repeated primitive.Image images = 7;
+}
+
+message TimeSeriesState
+{
+    option (xviz_json_schema) = "core/timeseries_state";
+    
+    double timestamp = 1;
+    
+    string object_id = 2;
+
+    // In the old JSON it's: [["stream", 1], ["stream", 2]]
+    // protobuf makes us do parallel lists
+    repeated string stream_id = 3;
+    Values values = 4;
+}
+
+message FutureInstances
+{
+    option (xviz_json_schema) = "core/future_instances";
+    
+    repeated double timestamp = 1;
+    
+    repeated PrimitiveState primitives = 2;
+}
+    
+message VariableState
+{
+    option (xviz_json_schema) = "core/variable_state";
+    
+    repeated Variable variables = 1;
+}
+    
+message AnnotationState
+{
+    option (xviz_json_schema) = "core/annotation_state";
+    
+    repeated annotation.Visual visuals = 1;
+}
+
+message Variable
+{
+    option (xviz_json_schema) = "core/variable";
+    
+    string object_id = 1;
+
+    Values values = 2;
+}
+
+message Values
+{
+    // TODO: create this
+    // option (xviz_json_schema) = "core/values";
+    
+    // Protobuf does not support variants, so do a crappy
+    // tagged union thing
+    enum DataType {
+        NONE = 0;
+        INT = 1;
+        BOOL = 2;
+        STRING = 3;
+    }
+
+    DataType type = 1;
+    repeated int64 ints = 2;
+    repeated bool bools = 3;
+    repeated string strings = 4;
+
+}

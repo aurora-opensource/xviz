@@ -2,13 +2,10 @@
   "id": "https://xviz.org/schema/primitives/stadium.json",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "description": "XVIZ Point primitive",
-  "allOf": [{ "$ref": "https://xviz.org/schema/core/primitive_base.json" }],
+  "type": "object",
   "properties": {
-    "object_id": {},
-    "style": {},
-    "classes": {},
-    "type": {
-      "enum": ["stadium"]
+    "base": {
+      "$ref": "https://xviz.org/schema/core/primitive_base.json"
     },
     "start": {
       "$ref": "https://xviz.org/schema/math/vector3x1.json"

@@ -190,7 +190,7 @@ function validateFile(validator, examplesDir, examplePath, expectGood) {
   return !valid;
 }
 
-function parseJSONFile(filePath) {
+export function parseJSONFile(filePath) {
   const contents = fs.readFileSync(filePath, 'utf8');
 
   let data;

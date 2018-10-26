@@ -1,0 +1,117 @@
+syntax = "proto3";
+
+import "options.proto";
+
+package xviz.v2.style;
+
+message Class
+{
+    option (xviz_json_schema) = "style/class";
+    
+    string name = 1;
+
+    ObjectValue style = 2;
+}
+
+message ObjectValue
+{
+    option (xviz_json_schema) = "style/object_value";
+
+    repeated uint32 fill_color = 1;
+
+    repeated uint32 stroke_color = 2;
+
+    double stroke_width = 3;
+
+    double radius = 4;
+
+    double size = 5;
+
+    /// Angle in radians
+    double angle = 6;
+
+    enum TextAnchor {
+        // yeah enums are message scoped, thanks C++98
+        text_anchor_not_set = 0;
+        start = 1;
+        middle = 2;
+        end = 3;
+    }
+    
+    TextAnchor text_anchor = 7;
+
+    enum AlignmentBaseline
+    {
+        alignment_baseline_not_set = 0;
+        top = 1;
+        center = 2;
+        bottom = 3;
+    }
+    
+    AlignmentBaseline alignment_baseline = 8;
+
+    double height = 9;
+}
+
+message StreamValue
+{
+    option (xviz_json_schema) = "style/stream_value";
+
+    repeated uint32 fill_color = 1;
+
+    repeated uint32 stroke_color = 2;
+
+    double stroke_width = 3;
+
+    double radius = 4;
+
+    double size = 5;
+
+    double angle = 6;
+
+        enum TextAnchor {
+        // yeah enums are message scoped, thanks C++98
+        text_anchor_not_set = 0;
+        start = 1;
+        middle = 2;
+        end = 3;
+    }
+    
+    TextAnchor text_anchor = 7;
+
+    enum AlignmentBaseline
+    {
+        alignment_baseline_not_set = 0;
+        top = 1;
+        center = 2;
+        bottom = 3;
+    }
+    
+    AlignmentBaseline alignment_baseline = 8;
+
+    double height = 9;
+
+    uint32 radius_min_pixels = 10;
+
+    uint32 radius_max_pixels = 11;
+
+    uint32 stroke_width_min_pixels = 12;
+
+    uint32 stroke_width_max_pixels = 13;
+    
+    double opacity = 14;
+
+    bool stroked = 15;
+
+    bool filled = 16;
+
+    bool extruded = 17;
+
+    bool wireframe = 18;
+}
+
+message Color
+{
+    /// Always 3 or 4 values, (r, g, b) or (r, g, b, a)
+    repeated uint32 values = 1;
+}

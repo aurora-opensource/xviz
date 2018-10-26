@@ -4,12 +4,41 @@
   "description": "XVIZ Primitive State",
   "type": "object",
   "properties": {
-    "primitives": {
-      "$ref": "https://xviz.org/schema/core/_primitive_list.schema.json"
+    "circles" : {
+      "type": "array",
+      "items": {"$ref": "https://xviz.org/schema/primitives/circle.json"},
+      "additionalItems": false
+    },
+    "images" : {
+      "type": "array",
+      "items": {"$ref": "https://xviz.org/schema/primitives/image.json"},
+      "additionalItems": false
+    },
+    "points" : {
+      "type": "array",
+      "items": {"$ref": "https://xviz.org/schema/primitives/point.json"},
+      "additionalItems": false
+    },
+    "polygons" : {
+      "type": "array",
+      "items": {"$ref": "https://xviz.org/schema/primitives/polygon.json"},
+      "additionalItems": false
+    },
+    "polylines" : {
+      "type": "array",
+      "items": {"$ref": "https://xviz.org/schema/primitives/polyline.json"},
+      "additionalItems": false
+    },
+    "stadiums" : {
+      "type": "array",
+      "items": {"$ref": "https://xviz.org/schema/primitives/stadium.json"},
+      "additionalItems": false
+    },
+    "texts" : {
+      "type": "array",
+      "items": {"$ref": "https://xviz.org/schema/primitives/text.json"},
+      "additionalItems": false
     }
   },
-  "required": [
-    "primitives"
-  ],
   "additionalProperties": false
 }

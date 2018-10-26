@@ -1,15 +1,16 @@
 {
-  "primitives": [
+  "stadiums": [
     {
-      "type": "stadium",
-      "object_id": "{067a2faf-64b5-4b8f-8d7d-ed873630df4f}",
+      "base": {
+        "object_id": "{067a2faf-64b5-4b8f-8d7d-ed873630df4f}",
+        "style": {
+          "stroke_width": 5,
+          "fill_color": [0, 1, 2, 3]
+        }
+      },
       "start": [9, 15, 3],
       "end": [20, 13, 3],
-      "radius_m": 2.5,
-      "style": {
-        "stroke_width": 5,
-        "fill_color": [0, 1, 2, 3]
-      }
+      "radius_m": 2.5
     }
   ]
 }

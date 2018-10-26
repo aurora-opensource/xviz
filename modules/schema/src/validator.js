@@ -90,7 +90,7 @@ export default class XVIZValidator {
     const valid = schemaValidator(data);
 
     if (!valid) {
-      const errorDescription = JSON.stringify(schemaValidator.errors);
+      const errorDescription = JSON.stringify(schemaValidator.errors, null, '  ');
       throw new ValidationError(`Validation errors: ${errorDescription}`);
     }
   }

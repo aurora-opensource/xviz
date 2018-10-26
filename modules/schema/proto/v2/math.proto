@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+import "options.proto";
+
+package xviz.v2.math;
+
+message Vector3
+{
+    option (xviz_json_schema) = "math/vector3x1";
+    
+    /// Always 3 values, x, y, z
+    repeated double values = 1;
+}
+
+// 3x3 Matrix
+message Matrix3
+{
+    option (xviz_json_schema) = "math/matrix3x3";
+    
+    /// Always 9 values
+    repeated double values = 1;    
+}
+
+// 4x4 Matrix
+message Matrix4
+{
+    option (xviz_json_schema) = "math/matrix4x4";
+    
+    /// Always 16 values
+    repeated double values = 1;    
+}
