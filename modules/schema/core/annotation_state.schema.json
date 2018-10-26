@@ -4,12 +4,13 @@
   "description": "XVIZ Annotation State",
   "type": "object",
   "properties": {
-    "annotations": {
-      "$ref": "https://xviz.org/schema/core/_annotation_list.schema.json"
+    "visuals": {
+      "type": "array",
+      "items": {
+        "$ref": "https://xviz.org/schema/core/annotation_visual.json"
+      },
+      "additionalItems": false
     }
   },
-  "required": [
-    "annotations"
-  ],
   "additionalProperties": false
 }

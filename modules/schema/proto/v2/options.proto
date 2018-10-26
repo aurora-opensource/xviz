@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+import "google/protobuf/descriptor.proto";
+
+extend google.protobuf.MessageOptions {
+  string xviz_json_schema = 54200;
+}

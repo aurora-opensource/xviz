@@ -2,9 +2,11 @@
   "id": "https://xviz.org/schema/core/annotation_visual.json",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "description": "XVIZ Visual Annotation",
-  "allOf": [{ "$ref": "https://xviz.org/schema/core/annotation_base.json" }],
+  "type": "object",
   "properties": {
-    "object_id": {},
+    "base": {
+      "$ref": "https://xviz.org/schema/core/annotation_base.json"
+    },
     "style_classes": {
       "type": "array",
       "items": {
@@ -18,7 +20,7 @@
   },
   "additionalProperties": false,
   "anyOf": [
-    {"required": ["inline_style"]},
-    {"required": ["style_classes"]}
+    {"required": ["base", "inline_style"]},
+    {"required": ["base", "style_classes"]}
   ]
 }

@@ -113,14 +113,15 @@ test('XVIZBuilder#polygon', t => {
         },
         primitives: {
           '/test/polygon': {
-            primitives: [
+            polygons: [
               {
-                type: 'polygon',
-                vertices: verts,
-                style: {
-                  fill_color: [255, 0, 0]
+                base: {
+                  style: {
+                    fill_color: [255, 0, 0]
+                  },
+                  object_id: '1'
                 },
-                object_id: '1'
+                vertices: verts
               }
             ]
           }
@@ -158,12 +159,13 @@ test('XVIZBuilder#points', t => {
         },
         primitives: {
           '/test/points': {
-            primitives: [
+            points: [
               {
-                type: 'point',
+                base: {
+                  object_id: '1'
+                },
                 points,
-                colors,
-                object_id: '1'
+                colors
               }
             ]
           }
@@ -206,20 +208,22 @@ test('XVIZBuilder#single-stream-multiple-polygons', t => {
         },
         primitives: {
           '/test/polygon': {
-            primitives: [
+            polygons: [
               {
-                type: 'polygon',
-                vertices: verts1,
-                style: {
-                  fill_color: [255, 0, 0]
-                }
+                base: {
+                  style: {
+                    fill_color: [255, 0, 0]
+                  }
+                },
+                vertices: verts1
               },
               {
-                type: 'polygon',
-                vertices: verts2,
-                style: {
-                  fill_color: [0, 255, 0]
-                }
+                base: {
+                  style: {
+                    fill_color: [0, 255, 0]
+                  }
+                },
+                vertices: verts2
               }
             ]
           }
@@ -252,9 +256,8 @@ test('XVIZBuilder#polyline', t => {
         },
         primitives: {
           '/test/polyline': {
-            primitives: [
+            polylines: [
               {
-                type: 'polyline',
                 vertices: verts
               }
             ]
@@ -287,9 +290,8 @@ test('XVIZBuilder#circle', t => {
         },
         primitives: {
           '/test/circle': {
-            primitives: [
+            circles: [
               {
-                type: 'circle',
                 center: pos,
                 radius_m: 5
               }
@@ -326,9 +328,8 @@ test('XVIZBuilder#text', t => {
         },
         primitives: {
           '/test/text': {
-            primitives: [
+            texts: [
               {
-                type: 'text',
                 text: 'test message',
                 position: pos
               }
@@ -363,9 +364,8 @@ test('XVIZBuilder#stadium', t => {
         },
         primitives: {
           '/test/stadium': {
-            primitives: [
+            stadiums: [
               {
-                type: 'stadium',
                 start: pos[0],
                 end: pos[1],
                 radius_m: 5
@@ -405,9 +405,8 @@ test('XVIZBuilder#image', t => {
         },
         primitives: {
           '/test/image': {
-            primitives: [
+            images: [
               {
-                type: 'image',
                 width_px: 2,
                 height_px: 2,
                 data: imageData,
@@ -569,7 +568,6 @@ test('XVIZBuilder#futures-single-primitive', t => {
             primitives: [
               [
                 {
-                  type: 'polygon',
                   vertices: verts
                 }
               ]
@@ -620,17 +618,17 @@ test('XVIZBuilder#futures-multiple-primitive', t => {
             primitives: [
               [
                 {
-                  type: 'polygon',
                   vertices: verts2
                 }
               ],
               [
                 {
-                  type: 'polygon',
-                  vertices: verts1,
-                  style: {
-                    fill_color: [255, 0, 0]
-                  }
+                  base: {
+                    style: {
+                      fill_color: [255, 0, 0]
+                    }
+                  },
+                  vertices: verts1
                 }
               ]
             ]
