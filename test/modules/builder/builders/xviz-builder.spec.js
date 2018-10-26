@@ -566,11 +566,13 @@ test('XVIZBuilder#futures-single-primitive', t => {
           [streamId]: {
             timestamps: [ts],
             primitives: [
-              [
-                {
-                  vertices: verts
-                }
-              ]
+              {
+                polygons: [
+                  {
+                    vertices: verts
+                  }
+                ]
+              }
             ]
           }
         }
@@ -616,21 +618,25 @@ test('XVIZBuilder#futures-multiple-primitive', t => {
           [streamId]: {
             timestamps: [ts2, ts1],
             primitives: [
-              [
-                {
-                  vertices: verts2
-                }
-              ],
-              [
-                {
-                  base: {
-                    style: {
-                      fill_color: [255, 0, 0]
-                    }
-                  },
-                  vertices: verts1
-                }
-              ]
+              {
+                polygons: [
+                  {
+                    vertices: verts2
+                  }
+                ]
+              },
+              {
+                polygons: [
+                  {
+                    base: {
+                      style: {
+                        fill_color: [255, 0, 0]
+                      }
+                    },
+                    vertices: verts1
+                  }
+                ]
+              }
             ]
           }
         }

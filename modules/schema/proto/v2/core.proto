@@ -64,7 +64,7 @@ message FutureInstances
 {
     option (xviz_json_schema) = "core/future_instances";
     
-    repeated double timestamp = 1;
+    repeated double timestamps = 1;
     
     repeated PrimitiveState primitives = 2;
 }

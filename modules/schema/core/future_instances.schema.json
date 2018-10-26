@@ -17,7 +17,7 @@
       "type": "array",
       "minItems": 1,
       "items": {
-        "$ref": "https://xviz.org/schema/core/_primitive_list.schema.json"
+        "$ref": "https://xviz.org/schema/core/primitive_state.json"
       }
     }
   },

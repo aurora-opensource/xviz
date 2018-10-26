@@ -1,0 +1,31 @@
+{
+  "timestamp": 1001.3,
+  "future_instances": {
+    "/prediction/points": {
+      "timestamps": [1.0, 1.1, 1.2],
+      "primitives": [
+        {
+          "points": [
+            {
+              "points": [1, 2, 3]
+            }
+          ]
+        },
+        {
+          "points": [
+            {
+              "points": [1.5, 2, 3]
+            }
+          ]
+        },
+        {
+          "points": [
+            {
+              "points": [2, 2, 3]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
