@@ -282,9 +282,10 @@ As an example in JSON of a `point` primitive using style classes:
 
 ```js
 {
-    "type": "polygon",
-    "id": "178beda89169420cbb876c14acdba7f8",
-    "classes": ["car", "important"]
+    "base": {
+      "object_id": "178beda89169420cbb876c14acdba7f8",
+      "classes": ["car", "important"]
+    },
     "vertices": [[9, 15, 3], [20, 13, 3], [20, 5, 3]]
 }
 ```
@@ -294,11 +295,12 @@ information for each object over and over. Here is what it looks like to use an 
 
 ```js
 {
-    "type": "polygon",
-    "id": "178beda89169420cbb876c14acdba7f8",
-    "style": {
-        "fill_color": "#FF0000",
-        "stroke_color": "#000080"
+    "base": {
+      "object_id": "178beda89169420cbb876c14acdba7f8",
+      "style": {
+          "fill_color": "#FF0000",
+          "stroke_color": "#000080"
+      }
     },
     "vertices": [[9, 15, 3], [20, 13, 3], [20, 5, 3]]
 }

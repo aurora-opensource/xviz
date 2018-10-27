@@ -14,6 +14,7 @@
 
 /* eslint-disable no-console no-undef */
 import XvizStyleProperty from './xviz-style-property';
+import {get} from 'dotty';
 
 const SELECTOR_REGEX = /\S+/g;
 const OPERATOR_REGEX = /([=:~\*\^]+)/;
@@ -107,9 +108,12 @@ export default class Stylesheet {
     switch (operator) {
       case '=':
         return object => object && object[name] === value;
-      default:
-        return object =>
-          object && ((object.classes && object.classes.includes(name)) || object[name]);
+      default: {
+        return object => {
+          const classes = get(object, 'base.classes');
+          return object && ((classes && classes.includes(name)) || object[name]);
+        };
+      }
     }
   }
 

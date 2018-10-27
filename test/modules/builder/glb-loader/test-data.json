@@ -17,10 +17,11 @@
       },
       "primitives": {
         "/tracklets": {
-          "primitives": [
+          "polygons": [
               {
-                "type": "polygon",
-                "object_id": "f06700e3-e9a9-4d61-aeb5-fdd3dd1113d2",
+                "base": {
+                  "object_id": "f06700e3-e9a9-4d61-aeb5-fdd3dd1113d2"
+                },
                 "vertices": [
                   [
                     12.458602928956001,
@@ -50,7 +51,9 @@
                 ]
               },
               {
-                "object_id": "fac9bc35-b887-41da-9e4d-70e51243df34",
+                "base": {
+                  "object_id": "fac9bc35-b887-41da-9e4d-70e51243df34"
+                },
                 "vertices": [
                   [
                     5.218574751495583,
@@ -68,8 +71,7 @@
                     6.9959912573834435,
                     -2.011472543533862
                   ]
-                ],
-                "type": "polyline"
+                ]
               }
             ]
         }

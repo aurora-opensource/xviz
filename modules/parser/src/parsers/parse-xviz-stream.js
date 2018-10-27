@@ -16,6 +16,7 @@ import {getXvizConfig} from '../config/xviz-config';
 import {normalizeXvizPrimitive} from './parse-xviz-primitive';
 import XvizObject from '../objects/xviz-object';
 import {isMainThread} from '../utils/globals';
+import {getPrimitiveData} from './xviz-v2-common';
 
 export const PRIMITIVE_CAT = {
   LOOKAHEAD: 'lookAheads',
@@ -75,17 +76,21 @@ export function parseXvizStream(data, convertPrimitive) {
 /* Processes an individual primitive time sample and converts the
  * data to UI elements.
  */
-export function parseStreamPrimitive(objects, streamName, time, convertPrimitive) {
+export function parseStreamPrimitive(primitives, streamName, time, convertPrimitive) {
   const {OBJECT_STREAM, preProcessPrimitive, PRIMITIVE_SETTINGS} = getXvizConfig();
 
-  if (!Array.isArray(objects)) {
+  const primitiveData = getPrimitiveData(primitives);
+
+  if (!primitiveData || !Array.isArray(primitiveData.primitives)) {
     return {};
   }
 
+  const {type: primType, primitives: objects} = primitiveData;
+
   if (isMainThread && streamName === OBJECT_STREAM) {
     for (const object of objects) {
-      // v1: id, v2: object_id
-      XvizObject.observe(object.id || object.object_id, time);
+      // v1: id, v2: base.object_id
+      XvizObject.observe(object.id || (object.base && object.base.object_id), time);
     }
   }
   const primitiveMap = createPrimitiveMap();
@@ -110,6 +115,7 @@ export function parseStreamPrimitive(objects, streamName, time, convertPrimitive
           object[j],
           objectIndex,
           streamName,
+          primType,
           time,
           convertPrimitive
         );
@@ -124,12 +130,13 @@ export function parseStreamPrimitive(objects, streamName, time, convertPrimitive
       preProcessPrimitive({primitive: object, streamName, time});
 
       // normalize primitive
-      category = PRIMITIVE_SETTINGS[object.type].category;
+      category = PRIMITIVE_SETTINGS[primType].category;
       const primitive = normalizeXvizPrimitive(
         PRIMITIVE_SETTINGS,
         object,
         objectIndex,
         streamName,
+        primType,
         time,
         convertPrimitive
       );
@@ -154,31 +161,29 @@ export function parseStreamFutures(objects, streamName, time, convertPrimitive) 
   // objects = array of objects
   // [{timestamp, primitives[]}, ...]
 
-  // Futures are an array of array of primitives
-  // TODO(twojtasz): objects indexes represent the
-  //     represent an index into time, so they cannot be removed
-  //     if empty.
+  // Futures are an array of array of primitives and
+  // the objectIndex is used to find the timestamp associated
+  // with the set of primitives.
   objects.forEach((object, objectIndex) => {
-    const {primitives} = object;
-
-    // TODO(twojtasz): only geometric primitives are supported
-    // for now.  Text and point clouds are not handled
-    // TODO(twojtasz): addThickness is temporary to use XVIZ thickness
-    //                 on polygons.
-    const future = primitives
-      .map(primitive =>
-        normalizeXvizPrimitive(
-          PRIMITIVE_SETTINGS,
-          primitive,
-          objectIndex,
-          streamName,
-          time,
-          convertPrimitive
+    const data = getPrimitiveData(object);
+    if (data) {
+      const {type, primitives} = data;
+      const future = primitives
+        .map(primitive =>
+          normalizeXvizPrimitive(
+            PRIMITIVE_SETTINGS,
+            primitive,
+            objectIndex,
+            streamName,
+            type,
+            time,
+            convertPrimitive
+          )
         )
-      )
-      .filter(Boolean);
+        .filter(Boolean);
 
-    futures.push(future);
+      futures.push(future);
+    }
   });
 
   return {

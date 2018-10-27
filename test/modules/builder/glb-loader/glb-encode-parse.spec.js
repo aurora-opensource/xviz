@@ -111,8 +111,8 @@ test('GLBLoader#encode-and-parse#full', t => {
   delete json.accessors;
 
   t.deepEqual(
-    json.updates[0].primitives['/tracklets'].primitives[0],
-    packJsonArrays(TEST_JSON.updates[0].primitives['/tracklets'].primitives[0]),
+    json.updates[0].primitives['/tracklets'].polygons[0],
+    packJsonArrays(TEST_JSON.updates[0].primitives['/tracklets'].polygons[0]),
     'Encoded and parsed GLB did not change data'
   );
 

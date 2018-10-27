@@ -85,12 +85,15 @@ const TestTimesliceMessageV2 = {
       variables: null,
       primitives: {
         '/test/stream': {
-          primitives: [
+          points: [
             {
-              color: [255, 255, 255],
-              object_id: 1234,
+              base: {
+                object_id: '1234',
+                style: {
+                  fill_color: [255, 255, 255]
+                }
+              },
               radius: 0.01,
-              type: 'point',
               points: [[1000, 1000, 200]]
             }
           ]
@@ -256,12 +259,15 @@ tape('parseStreamLogData pointCloud timeslice', t => {
         },
         primitives: {
           '/test/stream': {
-            primitives: [
+            points: [
               {
-                color: [255, 255, 255],
-                object_id: 1234,
+                base: {
+                  object_id: 1234,
+                  style: {
+                    fill_color: [255, 255, 255]
+                  }
+                },
                 radius: 0.01,
-                type: 'point',
                 points: [[1000, 1000, 200]]
               }
             ]
@@ -301,12 +307,15 @@ tape('parseStreamLogData pointCloud timeslice TypedArray', t => {
         },
         primitives: {
           '/test/stream': {
-            primitives: [
+            points: [
               {
-                color: [255, 255, 255],
-                object_id: 1234,
+                base: {
+                  object_id: '1234',
+                  style: {
+                    fill_color: [255, 255, 255]
+                  }
+                },
                 radius: 0.01,
-                type: 'point',
                 points: new Float32Array([1000, 1000, 200])
               }
             ]
@@ -346,19 +355,25 @@ tape('parseStreamLogData pointCloud timeslice', t => {
         },
         primitives: {
           '/test/stream': {
-            primitives: [
+            points: [
               {
-                color: [255, 255, 255],
-                object_id: 1234,
+                object_id: '1234',
+                base: {
+                  style: {
+                    fill_color: [255, 255, 255]
+                  }
+                },
                 radius: 0.01,
-                type: 'point',
                 points: [[1000, 1000, 200]]
               },
               {
-                color: [255, 255, 255],
-                object_id: 1235,
+                object_id: '1235',
+                base: {
+                  style: {
+                    fill_color: [255, 255, 255]
+                  }
+                },
                 radius: 0.01,
-                type: 'point',
                 points: new Float32Array([1000, 1000, 200])
               }
             ]

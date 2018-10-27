@@ -17,15 +17,19 @@ import {filterVertices} from './filter-vertices';
 import {PRIMITIVE_CAT} from './parse-xviz-stream';
 import base64js from 'base64-js';
 
+function aliasId(primitive) {
+  if (primitive && primitive.base && primitive.base.object_id) {
+    primitive.id = primitive.base.object_id;
+  }
+}
+
 // TODO - tests for all primitive types
 export default {
   text: {
     category: PRIMITIVE_CAT.FEATURE,
     validate: primitive => true,
     normalize: primitive => {
-      if (primitive.object_id) {
-        primitive.id = primitive.object_id;
-      }
+      aliasId(primitive);
     }
   },
   // eslint-disable-next-line camelcase
@@ -33,18 +37,14 @@ export default {
     category: PRIMITIVE_CAT.COMPONENT,
     validate: primitive => true,
     normalize: primitive => {
-      if (primitive.object_id) {
-        primitive.id = primitive.object_id;
-      }
+      aliasId(primitive);
     }
   },
   circle: {
     category: PRIMITIVE_CAT.FEATURE,
     validate: (primitive, streamName, time) => primitive.center,
     normalize: primitive => {
-      if (primitive.object_id) {
-        primitive.id = primitive.object_id;
-      }
+      aliasId(primitive);
     }
   },
   polyline: {
@@ -59,9 +59,7 @@ export default {
       // in the path layer
       // TODO - handle this directly in deck.gl PathLayer
       primitive.vertices = filterVertices(primitive.vertices);
-      if (primitive.object_id) {
-        primitive.id = primitive.object_id;
-      }
+      aliasId(primitive);
     }
   },
   polygon: {
@@ -74,9 +72,7 @@ export default {
       // from XVIS is never closed - worst case we end up with a duplicate end vertex,
       // which will not break the polygon layer.
       primitive.vertices.push(primitive.vertices[0]);
-      if (primitive.object_id) {
-        primitive.id = primitive.object_id;
-      }
+      aliasId(primitive);
     }
   },
   point: {
@@ -85,9 +81,7 @@ export default {
     normalize: primitive => {
       // Alias XVIZ 2.0 to normalized vertices field.
       primitive.vertices = primitive.points;
-      if (primitive.object_id) {
-        primitive.id = primitive.object_id;
-      }
+      aliasId(primitive);
     }
   },
   image: {
@@ -98,15 +92,14 @@ export default {
       if (typeof primitive.data === 'string') {
         imageData = base64js.toByteArray(imageData);
       }
+      // format is not part of v2 spec
       const imgType = primitive.format ? `image/${primitive.format}` : null;
       const blob = new Blob([imageData], {type: imgType});
       primitive.imageUrl = URL.createObjectURL(blob);
-      if (primitive.object_id) {
-        primitive.id = primitive.object_id;
-      }
       if (primitive.position) {
         primitive.vertices = primitive.position;
       }
+      aliasId(primitive);
     }
   }
 };

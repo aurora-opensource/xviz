@@ -18,6 +18,7 @@ export function normalizeXvizPrimitive(
   primitive,
   objectIndex,
   streamName,
+  type,
   time,
   postProcessPrimitive
 ) {
@@ -25,16 +26,17 @@ export function normalizeXvizPrimitive(
   // it is intentional to mutate the primitive in place
   // to avoid frequent allocate/discard and improve performance
 
+  // Type could come set (v2 metadata or object, or v1 inline)
+  const primitiveType = type || primitive.type;
+
   const {
-    // common
-    type,
     // line2d, polygon2d
     vertices,
     // circle2d
     center
   } = primitive;
 
-  const {enableZOffset, validate, normalize} = PRIMITIVE_PROCCESSOR[type];
+  const {enableZOffset, validate, normalize} = PRIMITIVE_PROCCESSOR[primitiveType];
 
   // Apply a small offset to 2d geometries to battle z fighting
   if (enableZOffset) {
@@ -51,6 +53,11 @@ export function normalizeXvizPrimitive(
     if (center && center.length === 2) {
       center[2] = zOffset;
     }
+  }
+
+  // add 'type' if not present at root level of primitive
+  if (primitiveType) {
+    primitive.type = primitiveType;
   }
 
   // validate

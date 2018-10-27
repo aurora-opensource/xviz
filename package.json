@@ -63,5 +63,8 @@
   "pre-commit": [
     "test"
   ],
-  "private": true
+  "private": true,
+  "dependencies": {
+    "protobufjs": "^6.8.8"
+  }
 }
