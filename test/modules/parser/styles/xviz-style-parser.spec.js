@@ -49,7 +49,7 @@ const BIKE = {type: 'bike'};
 const CAR = {type: 'car'};
 const TRACKED_CAR = {type: 'car', state: {tracked: true}};
 const TRACKED_BIKE = {type: 'bike', state: {tracked: true}};
-const FANCY_BUS = {type: 'bus', classes: ['fancy']};
+const FANCY_BUS = {type: 'bus', base: {classes: ['fancy']}};
 const GET_PROPERTY_TEST_CASES = [
   {
     propertyName: 'height',

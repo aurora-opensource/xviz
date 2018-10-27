@@ -20,11 +20,11 @@ test('GLBLoader#encode-and-decode', t => {
 
   const glbFileBuffer = GLBEncoder.createGlbBuffer(json, arrayBuffer);
 
-  t.equal(glbFileBuffer.byteLength, 1272, 'should be equal');
+  t.equal(glbFileBuffer.byteLength, 1252, 'should be equal');
 
   const parsedData = GLBDecoder.parseGlbBuffer(glbFileBuffer);
 
-  t.equal(parsedData.binaryByteOffset, 1244);
+  t.equal(parsedData.binaryByteOffset, 1224);
   t.deepEqual(parsedData.json, json, 'JSON is equal');
 
   const buffers2 = unpackGLBBuffers(arrayBuffer, json);

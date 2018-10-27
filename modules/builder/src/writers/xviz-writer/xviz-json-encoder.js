@@ -6,7 +6,7 @@ import base64js from 'base64-js';
 /* eslint-disable complexity */
 export function xvizConvertJson(object, keyName) {
   if (Array.isArray(object)) {
-    return object.map(element => xvizConvertJson(element));
+    return object.map(element => xvizConvertJson(element, keyName));
   }
 
   // Typed arrays become normal arrays
@@ -36,7 +36,7 @@ export function xvizConvertJson(object, keyName) {
   if (object !== null && typeof object === 'object') {
     // Handle XVIZ Image Primitive
     const properties = Object.keys(object);
-    if (['type', 'data'].every(prop => properties.includes(prop)) && object.type === 'image') {
+    if (properties.includes('data') && keyName === 'images') {
       return {
         ...object,
         data: base64js.fromByteArray(object.data)
@@ -46,7 +46,7 @@ export function xvizConvertJson(object, keyName) {
     // Handle all other objects
     const newObject = {};
     for (const key in object) {
-      newObject[key] = xvizConvertJson(object[key], key);
+      newObject[key] = xvizConvertJson(object[key], key, keyName);
     }
     return newObject;
   }

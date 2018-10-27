@@ -33,7 +33,6 @@ Example:
 
 ```
 {
-    "type": "point",
     "points": [[9, 15, 3], [20, 13, 3], [20, 5, 3]]
 }
 ```
@@ -50,7 +49,6 @@ JSON example using style class for styling:
 
 ```
 {
-    "type": "polygon",
     "vertices": [[9, 15, 3], [20, 13, 3], [20, 5, 3]]
 }
 ```
@@ -67,7 +65,6 @@ JSON example using style class for styling:
 
 ```
 {
-    "type": "polyline",
     "vertices": [[9, 15, 3], [20, 13, 3], [20, 5, 3]]
 }
 ```
@@ -85,7 +82,6 @@ Example:
 
 ```
 {
-    "type": "circle",
     "center": [9, 15, 3],
     "radius_m": 2.5
 }
@@ -106,7 +102,6 @@ Example:
 
 ```
 {
-    "type": "stadium",
     "start": [9, 15, 3],
     "end": [20, 13, 3],
     "radius_m": 2.5
@@ -127,7 +122,6 @@ Example:
 
 ```
 {
-    "type": "text",
     "position": [9, 15, 3],
     "text": "Location of interest"
 }
@@ -149,7 +143,6 @@ stores the raw image directly instead of needing to base64 encode it.
 
 ```
 {
-    "type": "image,
     "position": [9, 15, 3],
     "data": "/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=",
     "width_px": 1280,

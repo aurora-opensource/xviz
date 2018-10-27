@@ -91,7 +91,7 @@ function parseStateUpdates(stateUpdates, timestamp, convertPrimitive) {
     .filter(streamName => !STREAM_BLACKLIST.has(streamName))
     .forEach(primitive => {
       newStreams[primitive] = parseStreamPrimitive(
-        primitives[primitive].primitives,
+        primitives[primitive],
         primitive,
         timestamp,
         convertPrimitive
