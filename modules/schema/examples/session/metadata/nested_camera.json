@@ -1,10 +1,5 @@
 {
   "version": "2.0.0",
-  "streams": {
-    "/velocity": {
-      "units": "m/s"
-    }
-  },
   "cameras": {
     "front_wide": {
       "human_name": "Front Wide",
@@ -28,19 +23,6 @@
         [0, 0, -1, 0],
         [0, 2, 3, 1]
       ]
-    }
-  },
-  "stream_aliases": {
-    "/data/velocity": "/velocity"
-  },
-  "ui_config": {
-    "Metrics": {
-      "name": "Metrics",
-      "needed_streams": [
-        "/velocity"
-      ],
-      "config": {
-      }
     }
   }
 }

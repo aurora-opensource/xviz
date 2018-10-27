@@ -3,7 +3,7 @@
   "streams": {
     "/sensors/lidar/points": {
       "coordinate": "VEHICLE_RELATIVE",
-      "transform": [[0, 1, 2, 3], [0, 1, 2, 3], [0, 1, 2, 3], [0, 1, 2, 3]]
+      "transform": [0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3]
     },
     "/sensors/lidar/radar": {
       "coordinate": "VEHICLE_RELATIVE"
@@ -13,7 +13,7 @@
     },
     "/map/state": {
       "coordinate": "DYNAMIC",
-      "transform": "map_base"
+      "transform_callback": "map_base"
     },
     "/poi/markers": {
       "coordinate": "GEOGRAPHIC"

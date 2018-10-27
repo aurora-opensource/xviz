@@ -15,7 +15,10 @@
       "additionalItems": false
     },
     "config": {
-      "type": "object"
+      "oneOf": [
+        {"type": "object"},
+        {"type": "string"}
+      ]
     }
   },
   "required": [

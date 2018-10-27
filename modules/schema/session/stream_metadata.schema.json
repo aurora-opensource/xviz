@@ -11,7 +11,12 @@
       "type": "string"
     },
     "coordinate": {},
-    "transform": {},
+    "transform": {
+      "$ref": "https://xviz.org/schema/math/matrix4x4.json"
+    },
+    "transform_callback": {
+      "type": "string"
+    },
     "category": {
       "enum": [
         "annotation",
@@ -59,16 +64,14 @@
         },
         {
           "properties": {
-            "coordinate": { "enum": ["VEHICLE_RELATIVE"] },
-            "transform": { "$ref": "https://xviz.org/schema/math/matrix4x4.json" }
+            "coordinate": { "enum": ["VEHICLE_RELATIVE"] }
           }
         },
         {
           "properties": {
-            "coordinate": { "enum": ["DYNAMIC"] },
-            "transform": { "type": "string" }
+            "coordinate": { "enum": ["DYNAMIC"] }
           },
-          "required": ["transform"]
+          "required": ["transform_callback"]
         }
       ]
     },
