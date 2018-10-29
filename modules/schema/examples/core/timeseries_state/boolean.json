@@ -1,7 +1,10 @@
 {
-    "timestamp": 12345.5,
-    "values": [
-        ["/vehicle/stationary", false],
-        ["/vehicle/active", true]
-    ]
+  "timestamp": 12345.5,
+  "streams": [
+    "/vehicle/stationary",
+    "/vehicle/active"
+  ],
+  "values": {
+    "bools": [false, true]
+  }
 }

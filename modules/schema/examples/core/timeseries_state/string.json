@@ -1,6 +1,7 @@
 {
-    "timestamp": 12345.5,
-    "values": [
-        ["/vehicle/mode", "moving"]
-    ]
+  "timestamp": 12345.5,
+  "streams": ["/vehicle/mode"],
+  "values": {
+    "strings": ["moving"]
+  }
 }

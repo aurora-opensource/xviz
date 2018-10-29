@@ -11,6 +11,7 @@ import corePrimitiveStateSchemaJson from '../core/primitive_state.schema.json';
 import coreStreamSetSchemaJson from '../core/stream_set.schema.json';
 import coreTimeseriesStateSchemaJson from '../core/timeseries_state.schema.json';
 import coreValueSchemaJson from '../core/value.schema.json';
+import coreValuesSchemaJson from '../core/values.schema.json';
 import coreVariableSchemaJson from '../core/variable.schema.json';
 import coreVariableStateSchemaJson from '../core/variable_state.schema.json';
 import declarativeUiComponentBaseSchemaJson from '../declarative-ui/component_base.schema.json';
@@ -55,6 +56,7 @@ export const SCHEMA_DATA = {
   'core/stream_set.schema.json': coreStreamSetSchemaJson,
   'core/timeseries_state.schema.json': coreTimeseriesStateSchemaJson,
   'core/value.schema.json': coreValueSchemaJson,
+  'core/values.schema.json': coreValuesSchemaJson,
   'core/variable.schema.json': coreVariableSchemaJson,
   'core/variable_state.schema.json': coreVariableStateSchemaJson,
   'declarative-ui/component_base.schema.json': declarativeUiComponentBaseSchemaJson,

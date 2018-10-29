@@ -95,20 +95,12 @@ message Variable
 message Values
 {
     // TODO: create this
-    // option (xviz_json_schema) = "core/values";
-    
-    // Protobuf does not support variants, so do a crappy
-    // tagged union thing
-    enum DataType {
-        NONE = 0;
-        INT = 1;
-        BOOL = 2;
-        STRING = 3;
-    }
+    option (xviz_json_schema) = "core/values";
 
-    DataType type = 1;
-    repeated int64 ints = 2;
-    repeated bool bools = 3;
-    repeated string strings = 4;
-
+    /// ONLY SET ONE OF THESE (protobuf does not all oneof
+    // repeated fields)
+    repeated double doubles = 2;
+    repeated int32 int32s = 3;
+    repeated bool bools = 4;
+    repeated string strings = 5;
 }
