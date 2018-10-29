@@ -130,7 +130,10 @@ test('validateTimeSeries', t => {
 
   validator.validateTimeSeries({
     timestamp: 12345.5,
-    values: [['/vehicle/torque/commanded', 5], ['/vehicle/torque/actual', 4.8]]
+    streams: ['/vehicle/torque/commanded', '/vehicle/torque/actual'],
+    values: {
+      doubles: [5, 4.8]
+    }
   });
 
   t.throws(

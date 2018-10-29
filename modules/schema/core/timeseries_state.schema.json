@@ -8,28 +8,24 @@
       "type": "number",
       "minimum": 0
     },
-    "values": {
+    "streams": {
       "type": "array",
       "items": {
-        "type": "array",
-        "items": [
-          {
-            "type": "string"
-          },
-          {
-            "$ref": "https://xviz.org/schema/core/value.schema.json"
-          }
-        ],
-        "minItems": 2,
-        "maxItems": 2,
-        "additionalItems": false
+        "type": "string"
       },
       "additionalItems": false
+    },
+    "values": {
+      "$ref": "https://xviz.org/schema/core/values.schema.json"
     },
     "object_id": {
       "type": "string"
     }
   },
-  "required": [ "timestamp", "values" ],
+  "required": [
+    "timestamp",
+    "streams",
+    "values"
+  ],
   "additionalProperties": false
 }

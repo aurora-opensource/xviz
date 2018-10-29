@@ -48,6 +48,7 @@ const EXTRA_FIELDS_EXAMPLES = ['schema/examples/core/pose/extrafields.json'];
 const SUPPORTED_EXAMPLE_STRINGS = [
   'examples/primitives',
   'core/pose',
+  'core/values',
   'core/annotation_visual',
   'core/annotation_state',
   'core/primitive_state',
@@ -190,11 +191,12 @@ function validateAgainstExample(t, validator, protoType, examplePath) {
   };
   const fromProtoObject = protoType.toObject(protoData, options);
 
-  // Validate JSON with JSON schema (compare?)
+  // Validate JSON with JSON schema
   try {
     validator.validate(schemaName, fromProtoObject);
   } catch (e) {
-    t.error(e, `failed to validate: ${examplePath}`);
+    const protoString = stringify(fromProtoObject);
+    t.error(e, `failed to validate(${schemaName}): ${protoString}`);
   }
 
   // Now lets make sure we handled all fields

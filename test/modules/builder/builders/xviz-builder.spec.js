@@ -542,7 +542,10 @@ test('XVIZBuilder#time_series', t => {
         time_series: [
           {
             timestamp: ts1,
-            values: [['/test/time_series_1', 1.0], ['/test/time_series_2', 2.0]]
+            streams: ['/test/time_series_1', '/test/time_series_2'],
+            values: {
+              doubles: [1.0, 2.0]
+            }
           }
         ]
       }

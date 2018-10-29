@@ -24,18 +24,14 @@ import XVIZBaseBuilder from './xviz-base-builder';
  * [
  *   {
  *     timestamp: x,
- *     values: [
- *       ['a', 1]
- *       ['b', 2]
- *     ],
+ *     streams: ['a', 'b'],
+ *     values: {doubles: [1, 2]},
  *     object_id: '123'
  *   },
  *   {
  *     timestamp: y,
- *     values: [
- *       ['a', 1]
- *       ['b', 4]
- *     ]
+ *     streams: ['a', 'b'],
+ *     values: {doubles: [1, 2]},
  *   }
  * ]
  */
@@ -92,10 +88,11 @@ export default class XVIZTimeSeriesBuilder extends XVIZBaseBuilder {
 
     const timeSeriesData = [];
     for (const [timestamp, ids] of this._data) {
-      for (const [id, values] of ids) {
+      for (const [id, tsdata] of ids) {
         const entry = {
           timestamp,
-          values
+          streams: tsdata.streams,
+          values: tsdata.values
         };
 
         if (id !== null) {
@@ -115,24 +112,38 @@ export default class XVIZTimeSeriesBuilder extends XVIZBaseBuilder {
       return;
     }
 
-    const entry = [this._streamId, this._value];
+    // Lookup where to put the value
+    let fieldName = 'doubles';
+    if (typeof this._value === 'string' || this._value instanceof String) {
+      fieldName = 'strings';
+    } else if (typeof this._value === 'boolean') {
+      fieldName = 'bools';
+    }
 
+    // Building up the [(stream, value)] list
     const tsEntry = this._data.get(this._timestamp);
     if (tsEntry) {
       // We have timestamp, now get id
       const idEntry = tsEntry.get(this._id);
       if (idEntry) {
         // append entry to existing array
-        idEntry.push(entry);
+        idEntry.streams.push(this._streamId);
+        idEntry.values[fieldName].push(this._value);
       } else {
         // create new mapping of id -> array of entries
-        tsEntry.set(this._id, [entry]);
+        tsEntry.set(this._id, {
+          streams: [this._streamId],
+          values: {[fieldName]: [this._value]}
+        });
       }
     } else {
       // No timestamp entry
       // create new id -> arrry of entries
       const idEntry = new Map();
-      idEntry.set(this._id, [entry]);
+      idEntry.set(this._id, {
+        streams: [this._streamId],
+        values: {[fieldName]: [this._value]}
+      });
       // create timestamp entry
       this._data.set(this._timestamp, idEntry);
     }

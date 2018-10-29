@@ -54,7 +54,8 @@ test('XVIZTimeSeriesBuilder#single entry', t => {
   const expected = [
     {
       timestamp: 20,
-      values: [['/test', 1]]
+      streams: ['/test'],
+      values: {doubles: [1]}
     }
   ];
   const data = builder.getData();
@@ -79,7 +80,10 @@ test('XVIZTimeSeriesBuilder#multiple entry same ts', t => {
   const expected = [
     {
       timestamp: 20,
-      values: [['/test', 1], ['/foo', 2]]
+      streams: ['/test', '/foo'],
+      values: {
+        doubles: [1, 2]
+      }
     }
   ];
   const data = builder.getData();
@@ -113,11 +117,17 @@ test('XVIZTimeSeriesBuilder#multiple entry different ts', t => {
   const expected = [
     {
       timestamp: 20,
-      values: [['/test', 1], ['/bar', 3]]
+      streams: ['/test', '/bar'],
+      values: {
+        doubles: [1, 3]
+      }
     },
     {
       timestamp: 30,
-      values: [['/foo', 2]]
+      streams: ['/foo'],
+      values: {
+        doubles: [2]
+      }
     }
   ];
   const data = builder.getData();
@@ -160,23 +170,37 @@ test('XVIZTimeSeriesBuilder#all types with id', t => {
   const expected = [
     {
       timestamp: 20,
-      values: [['/int', 1]],
-      object_id: '1'
+      object_id: '1',
+      streams: ['/int'],
+      values: {
+        // TODO: figure out to support ints the first, a user could
+        // supply 1, then 1.5, and that would be double.
+        doubles: [1]
+      }
     },
     {
       timestamp: 20,
-      values: [['/string', 'good']],
-      object_id: '2'
+      object_id: '2',
+      streams: ['/string'],
+      values: {
+        strings: ['good']
+      }
     },
     {
       timestamp: 20,
-      values: [['/number', 100.1]],
-      object_id: '3'
+      object_id: '3',
+      streams: ['/number'],
+      values: {
+        doubles: [100.1]
+      }
     },
     {
       timestamp: 20,
-      values: [['/bool', false]],
-      object_id: '4'
+      object_id: '4',
+      streams: ['/bool'],
+      values: {
+        bools: [false]
+      }
     }
   ];
   const data = builder.getData();
@@ -269,8 +293,11 @@ test('XVIZTimeSeriesBuilder#single entry id', t => {
   const expected = [
     {
       timestamp: 20,
-      values: [['/test', 1]],
-      object_id: '123'
+      object_id: '123',
+      streams: ['/test'],
+      values: {
+        doubles: [1]
+      }
     }
   ];
   const data = builder.getData();
@@ -296,8 +323,11 @@ test('XVIZTimeSeriesBuilder#multiple entry id same ts', t => {
   const expected = [
     {
       timestamp: 20,
-      values: [['/test', 1], ['/foo', 2]],
-      object_id: '123'
+      object_id: '123',
+      streams: ['/test', '/foo'],
+      values: {
+        doubles: [1, 2]
+      }
     }
   ];
   const data = builder.getData();
@@ -334,18 +364,27 @@ test('XVIZTimeSeriesBuilder#multiple entry different id ts', t => {
   const expected = [
     {
       timestamp: 20,
-      values: [['/test', 1]],
-      object_id: '123'
+      object_id: '123',
+      streams: ['/test'],
+      values: {
+        doubles: [1]
+      }
     },
     {
       timestamp: 20,
-      values: [['/bar', 3]],
-      object_id: '987'
+      object_id: '987',
+      streams: ['/bar'],
+      values: {
+        doubles: [3]
+      }
     },
     {
       timestamp: 30,
-      values: [['/foo', 2]],
-      object_id: '123'
+      object_id: '123',
+      streams: ['/foo'],
+      values: {
+        doubles: [2]
+      }
     }
   ];
   const data = builder.getData();
