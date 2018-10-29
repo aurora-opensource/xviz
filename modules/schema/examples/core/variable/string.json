@@ -1,3 +1,5 @@
 {
-  "values": ["straight", "left", "right"]
+  "values": {
+    "strings": ["straight", "left", "right"]
+  }
 }

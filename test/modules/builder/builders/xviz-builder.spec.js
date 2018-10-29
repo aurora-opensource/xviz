@@ -457,7 +457,7 @@ test('XVIZBuilder#variable', t => {
           '/test/variables': {
             variables: [
               {
-                values: [1.1, 2.0]
+                values: {doubles: [1.1, 2.0]}
               }
             ]
           }
@@ -492,14 +492,14 @@ test('XVIZBuilder#multiple-variables', t => {
           '/test/variables_1': {
             variables: [
               {
-                values: [1.1, 2.0]
+                values: {doubles: [1.1, 2.0]}
               }
             ]
           },
           '/test/variables_2': {
             variables: [
               {
-                values: [2.0, 1.1]
+                values: {doubles: [2.0, 1.1]}
               }
             ]
           }

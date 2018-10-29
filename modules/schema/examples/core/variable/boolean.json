@@ -1,3 +1,5 @@
 {
-  "values": [true, true, false]
+  "values": {
+    "bools": [true, true, false]
+  }
 }

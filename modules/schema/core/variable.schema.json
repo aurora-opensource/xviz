@@ -4,19 +4,21 @@
   "description": "XVIZ Variable State",
   "type": "object",
   "properties": {
-    "values": {
-      "type": "array",
-      "items": {
-        "$ref": "https://xviz.org/schema/core/value.schema.json"
+    "base": {
+      "type": "object",
+      "properties": {
+        "object_id": {
+          "type": "string"
+        }
       },
-      "additionalItems": false
+      "additionalProperties": false
     },
-    "object_id": {
-      "type": "string"
+    "values": {
+      "$ref": "https://xviz.org/schema/core/values.schema.json"
     }
   },
   "required": [
-          "values"
+    "values"
   ],
   "additionalProperties": false
 }

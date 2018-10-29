@@ -49,12 +49,12 @@ const SUPPORTED_EXAMPLE_STRINGS = [
   'examples/primitives',
   'core/pose',
   'core/values',
+  'core/variable',
   'core/annotation_visual',
   'core/annotation_state',
   'core/primitive_state',
   'core/future_instances',
-  'core/stream_set/primitives',
-  'core/stream_set/future_instances',
+  'core/stream_set',
   'session/state_update'
 ];
 
@@ -174,7 +174,12 @@ function validateAgainstExample(t, validator, protoType, examplePath) {
 
   // Sanity check out input data
   const schemaName = protoType.options[EXTENSION_PROPERTY];
-  validator.validate(schemaName, originalJsonExample);
+  try {
+    validator.validate(schemaName, originalJsonExample);
+  } catch (e) {
+    const originalString = stringify(originalJsonExample);
+    t.error(e, `failed to validate(${schemaName}): ${originalString}`);
+  }
 
   // Verify content "works" as protobuf
   const err = protoType.verify(jsonExample);

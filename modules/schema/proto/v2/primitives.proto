@@ -2,7 +2,6 @@ syntax = "proto3";
 
 import "options.proto";
 import "style.proto";
-import "math.proto";
 
 package xviz.v2.primitive;
 
