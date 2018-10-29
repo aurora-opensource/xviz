@@ -162,7 +162,7 @@ test('validateVariable', t => {
   const validator = new XVIZValidator();
 
   validator.validateVariable({
-    values: [1, 2, 3]
+    values: {doubles: [1, 2, 3]}
   });
 
   t.throws(

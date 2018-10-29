@@ -1,8 +1,8 @@
 syntax = "proto3";
 
 import "core.proto";
-import "math.proto";
 import "style.proto";
+import "options.proto";
 
 package xviz.v2.session;
 
@@ -55,7 +55,7 @@ message Metadata
 
     string version = 1;
 
-    map<string, StreamMetdata> streams = 2;
+    map<string, StreamMetadata> streams = 2;
 
     map<string, CameraInfo> cameras = 3;
 
@@ -123,17 +123,21 @@ message CameraInfo
 
     double source = 2;
 
-    math.Vector3 vehicle_position = 3;
+    /// (x,y,z) vehicle position as 3 elements
+    repeated double vehicle_position = 3;
 
-    math.Matrix3 vehicle_orientation = 4;
+    /// 3x3 matrix, flattened into 9 elements
+    repeated double vehicle_orientation = 4;
 
     double pixel_width = 5;
 
     double pixel_height = 6;
 
-    math.Matrix3 rectification_projection = 7;
+    /// 3x3 matrix, flattened into 9 elements
+    repeated double rectification_projection = 7;
 
-    math.Matrix4 gl_projection = 8;
+    /// 4x4 matrix, flattened into 9 elements
+    repeated double gl_projection = 8;
 }
 
 

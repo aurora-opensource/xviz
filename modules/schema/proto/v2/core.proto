@@ -2,7 +2,6 @@ syntax = "proto3";
 
 import "annotation.proto";
 import "options.proto";
-import "pose.proto";
 import "primitives.proto";
 
 package xviz.v2.core;
@@ -17,13 +16,38 @@ message StreamSet
 
     map<string, PrimitiveState> primitives = 3;
 
-    map<string, TimeSeriesState> time_series = 4;
+    repeated TimeSeriesState time_series = 4;
 
     map<string, FutureInstances> future_instances = 6;
     
     map<string, VariableState> variables = 7;
     
     map<string, AnnotationState> annotations = 8;
+}
+
+message Pose
+{
+    option (xviz_json_schema) = "core/pose";
+    
+    double timestamp = 1;
+
+    MapOrigin mapOrigin = 2;
+
+    /// 3 element x, y, z
+    repeated double position = 3;
+    
+    // 4 element quaternion
+    repeated double orientation = 4;
+}
+
+
+message MapOrigin
+{
+    double longitude = 1;
+    
+    double latitude = 2;
+    
+    double altitude = 3;
 }
 
 
@@ -46,6 +70,7 @@ message PrimitiveState
     repeated primitive.Image images = 7;
 }
 
+
 message TimeSeriesState
 {
     option (xviz_json_schema) = "core/timeseries_state";
@@ -56,9 +81,10 @@ message TimeSeriesState
 
     // In the old JSON it's: [["stream", 1], ["stream", 2]]
     // protobuf makes us do parallel lists
-    repeated string stream_id = 3;
+    repeated string streams = 3;
     Values values = 4;
 }
+
 
 message FutureInstances
 {
@@ -68,14 +94,16 @@ message FutureInstances
     
     repeated PrimitiveState primitives = 2;
 }
-    
+
+
 message VariableState
 {
     option (xviz_json_schema) = "core/variable_state";
     
     repeated Variable variables = 1;
 }
-    
+
+
 message AnnotationState
 {
     option (xviz_json_schema) = "core/annotation_state";
@@ -83,13 +111,21 @@ message AnnotationState
     repeated annotation.Visual visuals = 1;
 }
 
+
 message Variable
 {
     option (xviz_json_schema) = "core/variable";
     
-    string object_id = 1;
+    VariableBase base = 1;
 
     Values values = 2;
+}
+
+// Incase we introduce different kinds of variables and to match
+// annotations and primitives
+message VariableBase
+{
+    string object_id = 1;
 }
 
 message Values
