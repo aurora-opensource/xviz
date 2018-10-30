@@ -105,14 +105,23 @@ Metadata provides information about the structure of a stream. Ideally redundant
 removed from streams and put into metadata packets that are sent at the start of streaming or when a
 reconfiguration happens.
 
-| Name         | Type                              | Description                                                                                                                                                |
-| ------------ | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `source`     | `string`                          | URL for where this stream comes from. Allowing you to fetch the data from S3 for example. An empty string means it comes through the standard XVIZ stream. |
-| `coordinate` | `optional<enum{ frames }>`        | Defaults to IDENTITY, defines the coordinate frame for the data in the stream                                                                              |
-| `transform`  | `string, 4x4`                     | String for IDENTITY, 4x4 matrix for `VEHICLE_RELATIVE`                                                                                                     |
-| `units`      | `string`                          | For variable and time series data this lets the user know what kind of data they are looking at.                                                           |
-| `value_map`  | `optional<enum{ stream values }>` | A list of all of the values that will be sent on the stream. The indexes of the values are used to translate them into numeric values for plotting.        |
-| `style_info` | `map<class_id, style>`            | Describes how the data should be rendered.                                                                                                                 |
+| Name                 | Type                              | Description                                                                                                                                                |
+| -------------------- | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `source`             | `string`                          | URL for where this stream comes from. Allowing you to fetch the data from S3 for example. An empty string means it comes through the standard XVIZ stream. |
+| `coordinate`         | `optional<enum{ frames }>`        | Defaults to IDENTITY, defines the coordinate frame for the data in the stream                                                                              |
+| `transform`          | `4x4`                             | 4x4 matrix for `VEHICLE_RELATIVE`                                                                                                                          |
+| `transform_callback` | `string`                          | Callback function name for `DYNAMIC`                                                                                                                       |
+| `units`              | `string`                          | For variable and time series data this lets the user know what kind of data they are looking at.                                                           |
+| `value_map`          | `optional<enum{ stream values }>` | A list of all of the values that will be sent on the stream. The indexes of the values are used to translate them into numeric values for plotting.        |
+| `style_info`         | `map<class_id, style>`            | Describes how the data should be rendered.                                                                                                                 |
+
+Frames:
+
+- `IDENTITY` - data in meters, apply no transform to the data before display
+- `GEOGRAPHIC` - data in lat/lon/altitude
+- `VEHICLE_RELATIVE` - the data is relative to primary vehicle, with an optional additional
+  transform
+- `DYNAMIC` -
 
 ### Camera Info
 
@@ -133,10 +142,10 @@ Everything you need to display and deeply integrate video into a 3D application.
 
 UI configuration that comes with the data explaining how best to display it.
 
-| Name             | Type              | Description                                     |
-| ---------------- | ----------------- | ----------------------------------------------- |
-| `name`           | `string`          | Unique name for the panel                       |
-| `needed_streams` | `list<stream_id>` | What streams are needed to populate this panel. |
-| `config`         | `declarative_ui`  | Declarative UI panel configuration              |
+| Name             | Type                     | Description                                     |
+| ---------------- | ------------------------ | ----------------------------------------------- |
+| `name`           | `string`                 | Unique name for the panel                       |
+| `needed_streams` | `list<stream_id>`        | What streams are needed to populate this panel. |
+| `config`         | `string, declarative ui` | Declarative UI panel configuration              |
 
-**declarative_ui** - currently unspecified
+See [declarative ui specification](/docs/protocol-schema/declarative-ui.md) to learn more.

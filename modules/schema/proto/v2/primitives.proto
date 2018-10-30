@@ -1,3 +1,7 @@
+// --------------------------------------------------------
+// WARNING: XVIZ Protobuf files are unstable, do not use
+// --------------------------------------------------------
+
 syntax = "proto3";
 
 import "options.proto";
