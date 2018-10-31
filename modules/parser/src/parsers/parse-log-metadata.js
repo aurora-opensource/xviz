@@ -16,7 +16,7 @@ export function parseLogMetadata(data) {
   }
 
   if (!currentMajorVersion) {
-    throw new Error('XVIZ version is unable to be detected.');
+    throw new Error('Unable to detect the XVIZ version.');
   } else {
     setXvizSettings({currentMajorVersion});
   }

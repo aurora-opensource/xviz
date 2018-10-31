@@ -182,7 +182,7 @@ tape('parseStreamLogData undetectable version', t => {
 
   t.throws(
     () => parseStreamLogData({...TestMetadataMessage, version: 'abc'}),
-    /XVIZ version is unable to be detected/,
+    /Unable to detect the XVIZ version/,
     'Throws if version exists but cannot parse major version'
   );
   t.end();
