@@ -26,7 +26,7 @@ import {parseStreamVideoMessage} from './parse-stream-video-message';
 import {TextDecoder} from 'text-encoding'; // Node.js < 9 polyfills
 import parseTimesliceDataV1 from './parse-timeslice-data-v1';
 import parseTimesliceDataV2 from './parse-timeslice-data-v2';
-import {getXvizConfig} from '..';
+import {getXvizSettings} from '..';
 
 function isJSON(encodedString) {
   const firstChar = String.fromCharCode(encodedString[0]);
@@ -114,8 +114,9 @@ export function parseStreamLogData(data, opts = {}) {
 }
 
 function parseTimesliceData(data, convertPrimitive) {
-  const {version} = getXvizConfig();
-  return version === 1
+  const {currentMajorVersion} = getXvizSettings();
+
+  return currentMajorVersion === 1
     ? parseTimesliceDataV1(data, convertPrimitive)
     : parseTimesliceDataV2(data, convertPrimitive);
 }

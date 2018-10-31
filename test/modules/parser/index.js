@@ -24,6 +24,7 @@ import './parsers/parse-stream-data-message.spec';
 import './parsers/parse-stream-message.spec';
 import './parsers/parse-vehicle-pose.spec';
 import './parsers/serialize.spec';
+import './parsers/xviz-v2-common.spec';
 
 import './styles/xviz-style-property.spec';
 import './styles/xviz-style-parser.spec';
