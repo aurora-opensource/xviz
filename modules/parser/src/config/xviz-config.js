@@ -5,8 +5,8 @@ import XvizObjectCollection from '../objects/xviz-object-collection';
 import XvizObject from '../objects/xviz-object';
 
 const DEFAULT_XVIZ_CONFIG = {
-  // Config
-  version: 2,
+  // Supported major XVIZ versions
+  supportedVersions: [1, 2],
 
   PRIMARY_POSE_STREAM: '/vehicle_pose',
   // TODO - support multiple?
@@ -18,6 +18,9 @@ const DEFAULT_XVIZ_CONFIG = {
 };
 
 const DEFAULT_XVIZ_SETTINGS = {
+  currentMajorVersion: 1, // Number set upon parsing metadata
+  PRIMITIVE_SETTINGS: XvizPrimitiveSettingsV1,
+
   TIME_WINDOW: 0.4,
   hiTimeResolution: 1 / 10, // Update pose and lightweight geometry up to 60Hz
   loTimeResolution: 1 / 10, // Throttle expensive geometry updates to 10Hz
@@ -33,9 +36,6 @@ XvizObject.setDefaultCollection(new XvizObjectCollection());
 export function setXvizConfig(config) {
   xvizConfig = Object.assign({}, DEFAULT_XVIZ_CONFIG, config);
 
-  xvizConfig.PRIMITIVE_SETTINGS =
-    xvizConfig.version === 1 ? XvizPrimitiveSettingsV1 : XvizPrimitiveSettingsV2;
-
   if (Array.isArray(xvizConfig.STREAM_BLACKLIST)) {
     xvizConfig.STREAM_BLACKLIST = new Set(xvizConfig.STREAM_BLACKLIST);
   }
@@ -49,6 +49,9 @@ export function getXvizConfig() {
 export function setXvizSettings(config) {
   // TODO/OSS - offer a way to subscribe to settings changes
   Object.assign(xvizSettings, config);
+
+  xvizSettings.PRIMITIVE_SETTINGS =
+    xvizSettings.currentMajorVersion === 1 ? XvizPrimitiveSettingsV1 : XvizPrimitiveSettingsV2;
 }
 
 export function getXvizSettings() {

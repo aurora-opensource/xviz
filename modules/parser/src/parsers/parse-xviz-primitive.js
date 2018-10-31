@@ -13,7 +13,7 @@ export function normalizeXvizPrimitive(
   // to avoid frequent allocate/discard and improve performance
 
   // Type could come set (v2 metadata or object, or v1 inline)
-  const primitiveType = type || primitive.type;
+  const primitiveType = primitive.type || type;
 
   const {
     // line2d, polygon2d
