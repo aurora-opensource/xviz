@@ -1,10 +1,20 @@
-import {setXvizConfig, parseStreamLogData, LOG_STREAM_MESSAGE} from '@xviz/parser';
+import {
+  setXvizConfig,
+  getXvizSettings,
+  setXvizSettings,
+  parseStreamLogData,
+  LOG_STREAM_MESSAGE
+} from '@xviz/parser';
 
 import tape from 'tape-catch';
 import TestMetadataMessage from 'test-data/sample-metadata-message';
+import TestMetadataMessageV1 from 'test-data/sample-metadata-message-v1';
+import TestFuturesMessageV1 from 'test-data/sample-frame-futures-v1';
 
 // xviz data uses snake_case
 /* eslint-disable camelcase */
+
+const defaultXvizSettings = getXvizSettings();
 
 // Metadata missing normal start_time and end_time
 // but with the full log timing fields
@@ -32,17 +42,15 @@ const TestTimesliceMessageV1 = {
     {
       variables: null,
       primitives: {
-        '/test/stream': {
-          primitives: [
-            {
-              color: [255, 255, 255],
-              id: 1234,
-              radius: 0.01,
-              type: 'points3d',
-              vertices: [[1000, 1000, 200]]
-            }
-          ]
-        }
+        '/test/stream': [
+          {
+            color: [255, 255, 255],
+            id: 1234,
+            radius: 0.01,
+            type: 'points3d',
+            vertices: [[1000, 1000, 200]]
+          }
+        ]
       }
     }
   ],
@@ -92,9 +100,16 @@ const TestTimesliceMessageV2 = {
 // TODO: blacklisted streams in xviz common
 tape('parseStreamLogData metadata', t => {
   setXvizConfig({});
+  setXvizSettings(defaultXvizSettings);
+
   const metaMessage = parseStreamLogData(TestMetadataMessage);
 
   t.equals(metaMessage.type, LOG_STREAM_MESSAGE.METADATA, 'Metadata type set');
+  t.equals(
+    getXvizSettings().currentMajorVersion,
+    2,
+    'Metadata currentMajorVersion set after parsing'
+  );
 
   t.equals(
     metaMessage.eventStartTime,
@@ -111,10 +126,17 @@ tape('parseStreamLogData metadata', t => {
 });
 
 tape('parseStreamLogData metadata v1', t => {
-  setXvizConfig({});
-  const metaMessage = parseStreamLogData(TestMetadataMessage);
+  setXvizConfig({supportedVersions: [1]});
+  setXvizSettings(defaultXvizSettings);
+
+  const metaMessage = parseStreamLogData(TestMetadataMessageV1);
 
   t.equals(metaMessage.type, LOG_STREAM_MESSAGE.METADATA, 'Metadata type set');
+  t.equals(
+    getXvizSettings().currentMajorVersion,
+    1,
+    'Metadata currentMajorVersion set after parsing'
+  );
 
   t.equals(
     metaMessage.eventStartTime,
@@ -130,11 +152,54 @@ tape('parseStreamLogData metadata v1', t => {
   t.end();
 });
 
+tape('parseStreamLogData unsupported version v1', t => {
+  setXvizConfig({supportedVersions: [2]});
+  setXvizSettings(defaultXvizSettings);
+
+  t.throws(
+    () => parseStreamLogData(TestMetadataMessageV1),
+    /XVIZ version 1 is not supported/,
+    'Throws if supportedVersions does not match currentMajorVersion'
+  );
+  t.end();
+});
+
+tape('parseStreamLogData unsupported version v2', t => {
+  setXvizConfig({supportedVersions: [1]});
+  setXvizSettings(defaultXvizSettings);
+
+  t.throws(
+    () => parseStreamLogData(TestMetadataMessage),
+    /XVIZ version 2 is not supported/,
+    'Throws if supportedVersions does not match currentMajorVersion'
+  );
+  t.end();
+});
+
+tape('parseStreamLogData undetectable version', t => {
+  setXvizConfig({supportedVersions: [2]});
+  setXvizSettings(defaultXvizSettings);
+
+  t.throws(
+    () => parseStreamLogData({...TestMetadataMessage, version: 'abc'}),
+    /XVIZ version is unable to be detected/,
+    'Throws if version exists but cannot parse major version'
+  );
+  t.end();
+});
+
 tape('parseStreamLogData metadata with full log time only', t => {
   setXvizConfig({});
+  setXvizSettings(defaultXvizSettings);
+
   const metaMessage = parseStreamLogData(metadataWithLogStartEnd);
 
   t.equals(metaMessage.type, LOG_STREAM_MESSAGE.METADATA, 'Metadata type set');
+  t.equals(
+    getXvizSettings().currentMajorVersion,
+    2,
+    'Metadata currentMajorVersion set after parsing'
+  );
 
   t.equals(
     metaMessage.logStartTime,
@@ -151,17 +216,22 @@ tape('parseStreamLogData metadata with full log time only', t => {
 });
 
 tape('parseStreamLogData error', t => {
-  setXvizConfig({});
+  setXvizSettings({currentMajorVersion: 2});
+  setXvizSettings(defaultXvizSettings);
+
   const metaMessage = parseStreamLogData({
     ...TestTimesliceMessageV2,
     type: 'error'
   });
   t.equals(metaMessage.type, LOG_STREAM_MESSAGE.ERROR, 'Metadata type set to error');
+
   t.end();
 });
 
 tape('parseStreamLogData timeslice INCOMPLETE', t => {
-  setXvizConfig({});
+  setXvizSettings({currentMajorVersion: 2});
+  setXvizSettings(defaultXvizSettings);
+
   // NOTE: no explicit type for this message yet.
   let metaMessage = parseStreamLogData({
     ...TestTimesliceMessageV2,
@@ -203,7 +273,9 @@ tape('parseStreamLogData timeslice INCOMPLETE', t => {
 });
 
 tape('parseStreamLogData timeslice', t => {
-  setXvizConfig({});
+  setXvizSettings({currentMajorVersion: 2});
+  setXvizSettings(defaultXvizSettings);
+
   // NOTE: no explicit type for this message yet.
   const metaMessage = parseStreamLogData({...TestTimesliceMessageV2});
   t.equals(metaMessage.type, LOG_STREAM_MESSAGE.TIMESLICE, 'Message type set for timeslice');
@@ -212,11 +284,16 @@ tape('parseStreamLogData timeslice', t => {
     TestTimesliceMessageV2.updates[0].poses['/vehicle_pose'].timestamp,
     'Message timestamp set from vehicle_pose'
   );
+
   t.end();
 });
 
-tape('parseStreamLogData timeslice (v1)', t => {
-  setXvizConfig({version: 1, PRIMARY_POSE_STREAM: '/vehicle_pose'});
+tape('parseStreamLogData timeslice without parsing metadata (v1)', t => {
+  // NOTE: this is the the teleassist case where they don't have metadata
+  // before they start sending log data
+  setXvizConfig({PRIMARY_POSE_STREAM: '/vehicle_pose'});
+  setXvizSettings({currentMajorVersion: 1});
+
   // NOTE: no explicit type for this message yet.
   const metaMessage = parseStreamLogData({...TestTimesliceMessageV1});
   t.equals(metaMessage.type, LOG_STREAM_MESSAGE.TIMESLICE, 'Message type set for timeslice');
@@ -225,11 +302,42 @@ tape('parseStreamLogData timeslice (v1)', t => {
     TestTimesliceMessageV1.vehicle_pose.time,
     'Message timestamp set from timeslice'
   );
+  t.notEqual(
+    metaMessage.streams['/test/stream'].pointCloud,
+    null,
+    'v1 pointCloud is parsed even if metadata was not seen'
+  );
+  t.end();
+});
+
+tape('parseStreamLogData preProcessPrimitive type change', t => {
+  let calledPreProcess = false;
+  setXvizSettings({currentMajorVersion: 1});
+  setXvizConfig({
+    PRIMARY_POSE_STREAM: '/vehicle_pose',
+    preProcessPrimitive: ({primitive, streamName, time}) => {
+      calledPreProcess = true;
+      primitive.type = 'circle2d';
+    }
+  });
+
+  // NOTE: no explicit type for this message yet.
+  const metaMessage = parseStreamLogData({...TestTimesliceMessageV1});
+
+  t.ok(calledPreProcess, 'Called preProcessPrimitive callback');
+  t.equals(
+    metaMessage.streams['/test/stream'].pointCloud,
+    null,
+    'There are no pointClouds in parsed object'
+  );
+
+  // reset so preProcessPrimitive does not affect the subsequent tests.
+  setXvizConfig({});
   t.end();
 });
 
 tape('parseStreamLogData pointCloud timeslice', t => {
-  setXvizConfig({});
+  setXvizSettings({currentMajorVersion: 2});
   const PointCloudTestTimesliceMessage = {
     update_type: 'snapshot',
     updates: [
@@ -277,7 +385,8 @@ tape('parseStreamLogData pointCloud timeslice', t => {
 });
 
 tape('parseStreamLogData pointCloud timeslice TypedArray', t => {
-  setXvizConfig({});
+  setXvizSettings({currentMajorVersion: 2});
+
   const PointCloudTestTimesliceMessage = {
     update_type: 'snapshot',
     updates: [
@@ -325,7 +434,8 @@ tape('parseStreamLogData pointCloud timeslice TypedArray', t => {
 });
 
 tape('parseStreamLogData pointCloud timeslice', t => {
-  setXvizConfig({});
+  setXvizSettings({currentMajorVersion: 2});
+
   const PointCloudTestTimesliceMessage = {
     update_type: 'snapshot',
     updates: [
@@ -378,6 +488,20 @@ tape('parseStreamLogData pointCloud timeslice', t => {
   t.equals(pointCloud.numInstances, 2, 'Has 2 instance');
   t.equals(pointCloud.positions.length, 6, 'Has 6 values in positions');
   t.equals(pointCloud.colors.length, 8, 'Has 8 values in colors');
+
+  t.end();
+});
+
+tape('parseStreamLogData futures timeslice v1', t => {
+  setXvizConfig({});
+  setXvizSettings({currentMajorVersion: 1});
+
+  const slice = parseStreamLogData({...TestFuturesMessageV1});
+  t.equals(slice.type, LOG_STREAM_MESSAGE.TIMESLICE, 'Message type set for timeslice');
+  t.ok(slice.streams['/test/polygon'].lookAheads, 'has lookAheads field');
+
+  const lookAheads = slice.streams['/test/polygon'].lookAheads;
+  t.equals(lookAheads.length, 2, 'Has 2 primitive sets in lookAheads');
 
   t.end();
 });

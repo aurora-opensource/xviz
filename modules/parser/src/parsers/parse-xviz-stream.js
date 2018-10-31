@@ -1,4 +1,4 @@
-import {getXvizConfig} from '../config/xviz-config';
+import {getXvizConfig, getXvizSettings} from '../config/xviz-config';
 import {normalizeXvizPrimitive} from './parse-xviz-primitive';
 import XvizObject from '../objects/xviz-object';
 import {isMainThread} from '../utils/globals';
@@ -63,7 +63,8 @@ export function parseXvizStream(data, convertPrimitive) {
  * data to UI elements.
  */
 export function parseStreamPrimitive(primitives, streamName, time, convertPrimitive) {
-  const {OBJECT_STREAM, preProcessPrimitive, PRIMITIVE_SETTINGS} = getXvizConfig();
+  const {OBJECT_STREAM, preProcessPrimitive} = getXvizConfig();
+  const {PRIMITIVE_SETTINGS} = getXvizSettings();
 
   const primitiveData = getPrimitiveData(primitives);
 
@@ -116,7 +117,6 @@ export function parseStreamPrimitive(primitives, streamName, time, convertPrimit
       preProcessPrimitive({primitive: object, streamName, time});
 
       // normalize primitive
-      category = PRIMITIVE_SETTINGS[primType].category;
       const primitive = normalizeXvizPrimitive(
         PRIMITIVE_SETTINGS,
         object,
@@ -126,6 +126,9 @@ export function parseStreamPrimitive(primitives, streamName, time, convertPrimit
         time,
         convertPrimitive
       );
+
+      // Allow for v1 inline type to override primitive type
+      category = PRIMITIVE_SETTINGS[object.type || primType].category;
       if (primitive) {
         primitiveMap[category].push(primitive);
       }
@@ -142,7 +145,15 @@ export function parseStreamPrimitive(primitives, streamName, time, convertPrimit
  * data to UI elements.
  */
 export function parseStreamFutures(objects, streamName, time, convertPrimitive) {
-  const {PRIMITIVE_SETTINGS} = getXvizConfig();
+  const {currentMajorVersion} = getXvizSettings();
+
+  return currentMajorVersion === 1
+    ? parseStreamFuturesV1(objects, streamName, time, convertPrimitive)
+    : parseStreamFuturesV2(objects, streamName, time, convertPrimitive);
+}
+
+export function parseStreamFuturesV1(objects, streamName, time, convertPrimitive) {
+  const {PRIMITIVE_SETTINGS} = getXvizSettings();
   const futures = [];
   // objects = array of objects
   // [{timestamp, primitives[]}, ...]
@@ -151,25 +162,67 @@ export function parseStreamFutures(objects, streamName, time, convertPrimitive) 
   // the objectIndex is used to find the timestamp associated
   // with the set of primitives.
   objects.forEach((object, objectIndex) => {
-    const data = getPrimitiveData(object);
-    if (data) {
-      const {type, primitives} = data;
-      const future = primitives
-        .map(primitive =>
-          normalizeXvizPrimitive(
-            PRIMITIVE_SETTINGS,
-            primitive,
-            objectIndex,
-            streamName,
-            type,
-            time,
-            convertPrimitive
-          )
-        )
-        .filter(Boolean);
+    const {primitives} = object;
 
-      futures.push(future);
-    }
+    const future = primitives
+      .map(primitive =>
+        normalizeXvizPrimitive(
+          PRIMITIVE_SETTINGS,
+          primitive,
+          objectIndex,
+          streamName,
+          primitive.type,
+          time,
+          convertPrimitive
+        )
+      )
+      .filter(Boolean);
+
+    futures.push(future);
+  });
+
+  return {
+    time,
+    lookAheads: futures
+  };
+}
+
+export function parseStreamFuturesV2(objects, streamName, time, convertPrimitive) {
+  const {PRIMITIVE_SETTINGS} = getXvizSettings();
+  const futures = [];
+
+  // objects = {
+  //   timestamps: [1, 2, 3],
+  //   primitives: [
+  //    { <type>: [ <objects for ts[1]> ] },
+  //    { <type>: [ <objects for ts[2]> ] },
+  //    { <type>: [ <objects for ts[3]> ] }
+  //   ]
+  // }
+
+  const timestamps = objects.timestamps;
+  objects.primitives.forEach((future_set, futureIndex) => {
+    // Get the underlying primitive array
+    const data = getPrimitiveData(future_set);
+
+    const future = data.primitives
+      .map(primitive => {
+        const normalizedPrimitive = normalizeXvizPrimitive(
+          primitive,
+          PRIMITIVE_SETTINGS,
+          futureIndex,
+          streamName,
+          data.type,
+          time,
+          convertPrimitive
+        );
+
+        normalizedPrimitive.timestamp = timestamps[futureIndex];
+        return normalizedPrimitive;
+      })
+      .filter(Boolean);
+
+    futures.push(future);
   });
 
   return {
@@ -203,7 +256,7 @@ export function parseStreamVariable(objects, streamName, time) {
     variable
   };
 
-  if (objects) {
+  if (object_id) {
     entry.id = object_id;
   }
 
