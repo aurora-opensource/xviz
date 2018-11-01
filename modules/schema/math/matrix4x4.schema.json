@@ -2,17 +2,30 @@
   "id": "https://xviz.org/schema/math/matrix4x4.json",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "description": "XVIZ Point primitive",
-  "type": "array",
-  "items": {
-    "type": "array",
-    "items": {
-      "type": "number"
+  "oneOf": [
+    {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        },
+        "minItems": 4,
+        "maxItems": 4,
+        "additionalItems": false
+      },
+      "minItems": 4,
+      "maxItems": 4,
+      "additionalItems": false
     },
-    "minItems": 4,
-    "maxItems": 4,
-    "additionalItems": false
-  },
-  "minItems": 4,
-  "maxItems": 4,
-  "additionalItems": false
+    {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "minItems": 16,
+      "maxItems": 16,
+      "additionalItems": false
+    }
+  ]
 }

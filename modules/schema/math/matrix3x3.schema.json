@@ -2,11 +2,24 @@
   "id": "https://xviz.org/schema/math/matrix3x3.json",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "description": "XVIZ Point primitive",
-  "type": "array",
-  "items": {
-    "$ref": "https://xviz.org/schema/math/vector3x1.json"
-  },
-  "minItems": 3,
-  "maxItems": 3,
-  "additionalItems": false
+  "oneOf": [
+    {
+      "type": "array",
+      "items": {
+        "$ref": "https://xviz.org/schema/math/vector3x1.json"
+      },
+      "minItems": 3,
+      "maxItems": 3,
+      "additionalItems": false
+    },
+    {
+      "type": "array",
+      "items": {
+        "type": "number"
+      },
+      "minItems": 9,
+      "maxItems": 9,
+      "additionalItems": false
+    }
+  ]
 }
