@@ -109,9 +109,16 @@ message StreamMetadata
         NOT_SET = 0;
         GEOGRAPHIC = 1;
         IDENTITY = 2;
+        DYNAMIC = 3;
+        VEHICLE_RELATIVE = 4;
     }
 
     CoordinateType coordinate = 7;
+
+    /// 4x4 matrix flattened into 16 elements
+    repeated double transform = 8;
+
+    string transform_callback = 9;
 }
 
 
@@ -119,9 +126,9 @@ message CameraInfo
 {
     option (xviz_json_schema) = "session/camera_info";    
 
-    double human_name = 1;
+    string human_name = 1;
 
-    double source = 2;
+    string source = 2;
 
     /// (x,y,z) vehicle position as 3 elements
     repeated double vehicle_position = 3;
