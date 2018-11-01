@@ -281,16 +281,47 @@ export function parseStreamVariable(objects, streamName, time) {
  * data to UI elements.
  */
 export function parseStreamTimeSeries(seriesArray, streamBlackList) {
+  const {currentMajorVersion} = getXvizSettings();
+
+  if (currentMajorVersion === 2) {
+    return parseStreamTimeSeriesV2(seriesArray, streamBlackList);
+  }
+
+  throw new Error(`Invalid time_series data in XVIZ version ${currentMajorVersion}`);
+}
+
+const VariableValueTypes = ['doubles', 'int32s', 'bools', 'strings'];
+
+function getVariableData(valuesObject) {
+  // Primitives have the type as the first key
+  const keys = Object.keys(valuesObject);
+
+  for (const type of keys) {
+    if (VariableValueTypes.includes(type)) {
+      return {type, values: valuesObject[type]};
+    }
+  }
+
+  // TODO(twojtasz): a more informative error path that doesn't abort processing
+  return {};
+}
+
+function parseStreamTimeSeriesV2(seriesArray, streamBlackList) {
   if (!Array.isArray(seriesArray)) {
     return {};
   }
 
   const timeSeriesStreams = {};
   seriesArray.forEach(timeSeriesEntry => {
-    const {timestamp, values, object_id} = timeSeriesEntry;
+    const {timestamp, streams, values, object_id} = timeSeriesEntry;
+    const valueData = getVariableData(values);
 
-    values.forEach(streamValue => {
-      const [streamName, variable] = streamValue;
+    if (!valueData || valueData.values.length !== streams.length) {
+      return null;
+    }
+
+    valueData.values.forEach((variable, entryIndex) => {
+      const streamName = streams[entryIndex];
 
       if (!streamBlackList.has(streamName)) {
         const entry = {time: timestamp, variable};
@@ -306,6 +337,10 @@ export function parseStreamTimeSeries(seriesArray, streamBlackList) {
         }
       }
     });
+
+    // eslint consistent-return warning
+    // This for loop we do not need to return any value
+    return timeSeriesStreams;
   });
 
   return timeSeriesStreams;
