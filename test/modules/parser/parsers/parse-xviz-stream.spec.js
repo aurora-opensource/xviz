@@ -14,7 +14,7 @@
 
 /* eslint-disable camelcase */
 import {setXvizSettings} from '@xviz/parser';
-import {parseStreamTimeSeries} from '@xviz/parser/parsers/parse-xviz-stream';
+import {parseStreamTimeSeries, parseStreamVariable} from '@xviz/parser/parsers/parse-xviz-stream';
 import {XVIZValidator} from '@xviz/schema';
 
 import tape from 'tape-catch';
@@ -84,6 +84,117 @@ tape('parseStreamTimeSeries#simple', t => {
 
   const result = parseStreamTimeSeries(testData, new Map());
   t.deepEquals(result, expected, 'time_series parsed properly');
+
+  t.end();
+});
+
+tape('parseStreamVariable#simple v2', t => {
+  setXvizSettings({currentMajorVersion: 2});
+
+  const time = 1001;
+  const testData = {
+    variables: [
+      {
+        values: {
+          doubles: [10, 11, 12]
+        }
+      },
+      {
+        values: {
+          int32s: [10, 11, 12]
+        }
+      },
+      {
+        values: {
+          bools: [true, false, true]
+        }
+      },
+      {
+        values: {
+          strings: ['one', 'two', 'three']
+        },
+        base: {
+          object_id: '123'
+        }
+      }
+    ]
+  };
+
+  const expected = [
+    {
+      time: 1001,
+      variable: [10, 11, 12]
+    },
+    {
+      time: 1001,
+      variable: [10, 11, 12]
+    },
+    {
+      time: 1001,
+      variable: [true, false, true]
+    },
+    {
+      time: 1001,
+      variable: ['one', 'two', 'three'],
+      id: '123'
+    }
+  ];
+
+  schemaValidator.validate('core/variable_state', testData);
+
+  const result = parseStreamVariable(testData, '/test', time);
+  t.deepEquals(result, expected, 'variables parsed properly');
+
+  t.end();
+});
+
+tape('parseStreamVariable#simple v1', t => {
+  setXvizSettings({currentMajorVersion: 1});
+
+  const time = 1001;
+  const testSet = [
+    {
+      xviz: {
+        timestamps: [1011, 1021],
+        type: 'string',
+        values: ['Right', 'Left']
+      },
+      expected: {
+        time: 1001,
+        variable: [[1011, 'Right'], [1021, 'Left']]
+      },
+      name: 'string'
+    },
+    {
+      xviz: {
+        timestamps: [1011, 1021],
+        type: 'bool',
+        values: [true, false]
+      },
+      expected: {
+        time: 1001,
+        variable: [[1011, true], [1021, false]]
+      },
+      name: 'bool'
+    },
+    {
+      xviz: {
+        timestamps: [1011, 1021],
+        type: 'float',
+        values: [100.1, 100.2]
+      },
+      expected: {
+        time: 1001,
+        variable: [[1011, 100.1], [1021, 100.2]]
+      },
+      name: 'float'
+    }
+  ];
+
+  testSet.forEach(testCase => {
+    const result = parseStreamVariable(testCase.xviz, '/test', time);
+    t.deepEquals(result, testCase.expected, `variables type ${testCase.name} parsed properly`);
+  });
 
   t.end();
 });
