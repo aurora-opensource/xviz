@@ -235,17 +235,23 @@ export function parseStreamFuturesV2(objects, streamName, time, convertPrimitive
  * data to UI elements.
  */
 export function parseStreamVariable(objects, streamName, time) {
-  const isVar = !Array.isArray(objects);
-  if (!isVar) {
+  const {currentMajorVersion} = getXvizSettings();
+
+  return currentMajorVersion === 1
+    ? parseStreamVariableV1(objects, streamName, time)
+    : parseStreamVariableV2(objects, streamName, time);
+}
+
+export function parseStreamVariableV1(objects, streamName, time) {
+  if (Array.isArray(objects)) {
     return {};
   }
 
   let variable;
-  const {timestamps, values, object_id} = objects;
+  const {timestamps, values} = objects;
   if (values.length === 1) {
     variable = values[0];
   } else if (timestamps) {
-    // v1
     variable = values.map((v, i) => [timestamps[i], v]);
   } else {
     variable = values;
@@ -256,11 +262,40 @@ export function parseStreamVariable(objects, streamName, time) {
     variable
   };
 
-  if (object_id) {
-    entry.id = object_id;
+  return entry;
+}
+
+export function parseStreamVariableV2(objects, streamName, time) {
+  if (Array.isArray(objects)) {
+    return {};
   }
 
-  return entry;
+  const variables = objects.variables;
+  if (!variables || !Array.isArray(variables)) {
+    return {};
+  }
+
+  const entries = variables.map(entry => {
+    const {base, values} = entry;
+
+    const valueData = getVariableData(values);
+    if (!valueData) {
+      return null;
+    }
+
+    const result = {
+      time,
+      variable: valueData.values
+    };
+
+    if (base && base.object_id) {
+      result.id = base.object_id;
+    }
+
+    return result;
+  });
+
+  return entries.filter(Boolean);
 }
 
 /* Processes a time_series sample and converts the
@@ -276,14 +311,14 @@ export function parseStreamTimeSeries(seriesArray, streamBlackList) {
   throw new Error(`Invalid time_series data in XVIZ version ${currentMajorVersion}`);
 }
 
-const VariableValueTypes = ['doubles', 'int32s', 'bools', 'strings'];
+const ValueTypes = ['doubles', 'int32s', 'bools', 'strings'];
 
 function getVariableData(valuesObject) {
   // Primitives have the type as the first key
   const keys = Object.keys(valuesObject);
 
   for (const type of keys) {
-    if (VariableValueTypes.includes(type)) {
+    if (ValueTypes.includes(type)) {
       return {type, values: valuesObject[type]};
     }
   }
