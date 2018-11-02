@@ -409,13 +409,13 @@ function joinObjectPointCloudsToTypedArrays(objects) {
       }
     }
 
-    const isColorFlattenedArray = object.colors instanceof Float32Array;
+    const isColorFlattenedArray = ArrayBuffer.isView(object.colors);
     const vertexColorTyped = isColorFlattenedArray && vertexColorStride === 4;
     if (vertexColorTyped) {
       colors.set(object.colors, i * 4);
     }
 
-    const isPositionFlattenedArray = object.vertices instanceof Float32Array;
+    const isPositionFlattenedArray = ArrayBuffer.isView(object.vertices);
     if (isPositionFlattenedArray) {
       positions.set(object.vertices, i * 3);
     }
