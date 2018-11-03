@@ -5,10 +5,10 @@
   "type": "object",
   "properties": {
     "fill_color": {
-      "$ref": "https://xviz.org/schema/style/_color.schema.json"
+      "$ref": "https://xviz.org/schema/style/_color.json"
     },
     "stroke_color": {
-      "$ref": "https://xviz.org/schema/style/_color.schema.json"
+      "$ref": "https://xviz.org/schema/style/_color.json"
     },
     "stroke_width": {
       "type": "number"
