@@ -1,5 +1,5 @@
 {
-  "id": "https://xviz.org/schema/style/_color.schema.json",
+  "id": "https://xviz.org/schema/style/_color.json",
   "$schema": "http://json-schema.org/draft-04/schema#",
   "description": "Internal XVIZ RGBA color type",
   "oneOf": [
