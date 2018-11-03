@@ -14,6 +14,9 @@ Set log start time.
 ###### endTime(time : Number)
 Set log end time.
 
+###### ui(uiBuilder : XvizUIBuilder)
+Set the configuration of declarative UI.
+
 ###### stream(streamId : String)
 Add a stream.
 

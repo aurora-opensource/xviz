@@ -18,6 +18,7 @@ export default class XVIZMetadataBuilder {
     };
 
     this.streamId = null;
+    this.tmp_ui_builder = null;
     this.tmp_stream = {};
     this.tmp_matrix_transform = null;
     this.tmp_pose_transform = null;
@@ -41,6 +42,9 @@ export default class XVIZMetadataBuilder {
     if (Object.keys(this.tmp_log_info).length > 0) {
       metadata.log_info = this.tmp_log_info;
     }
+    if (this.tmp_ui_builder) {
+      metadata.ui_config = this.tmp_ui_builder.getUI();
+    }
 
     return metadata;
   }
@@ -52,6 +56,11 @@ export default class XVIZMetadataBuilder {
 
   endTime(time) {
     this.tmp_log_info.end_time = time;
+    return this;
+  }
+
+  ui(xvizUIBuilder) {
+    this.tmp_ui_builder = xvizUIBuilder;
     return this;
   }
 

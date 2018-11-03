@@ -47,7 +47,11 @@ export default class XVIZUIBuilder {
   }
 
   getUI() {
-    return this._children.map(child => child.getUI());
+    return this._children.reduce((ui, child) => {
+      const childConfig = child.getUI();
+      ui[childConfig.name] = childConfig;
+      return ui;
+    }, {});
   }
 
   child(child) {
