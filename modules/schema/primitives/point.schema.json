@@ -18,7 +18,7 @@
       "oneOf": [
         {
           "items": {
-            "$ref": "https://xviz.org/schema/style/_color.schema.json"
+            "$ref": "https://xviz.org/schema/style/_color.json"
           }
         },
         {
