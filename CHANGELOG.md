@@ -4,6 +4,8 @@ All notable changes to XVIZ will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
 ## [Unreleased]
+- Add `XVIZWriter.writeFrameIndex` to write out a timestamp index file to be used
+  by the Streetscape.gl XVIZ file server
 
 ## [0.1.0] - 2018-10-24
 ### Changes
