@@ -15,7 +15,7 @@
 /* eslint-disable camelcase */
 import test from 'tape-catch';
 import {Matrix4} from 'math.gl';
-import {XVIZMetadataBuilder} from '@xviz/builder';
+import {XVIZMetadataBuilder, XVIZUIBuilder} from '@xviz/builder';
 import {XVIZValidator} from '@xviz/schema';
 
 const schemaValidator = new XVIZValidator();
@@ -243,5 +243,24 @@ test('XVIZMetadataBuilder#stylesheet', t => {
   };
 
   t.deepEqual(metadata, expected, 'XVIZMetadataBuilder build matches expected output');
+  t.end();
+});
+
+test('XVIZMetadataBuilder#ui', t => {
+  const xb = new XVIZMetadataBuilder();
+  const uiBuilder = new XVIZUIBuilder({});
+  xb.ui(uiBuilder);
+
+  const panel = uiBuilder.panel({name: 'Metrics'});
+  uiBuilder.child(panel);
+
+  const metadata = xb.getMetadata();
+  const expected = {
+    version: '2.0.0',
+    streams: {},
+    ui_config: {Metrics: {type: 'panel', name: 'Metrics'}}
+  };
+  t.deepEqual(metadata, expected, 'XVIZMetadataBuilder build matches expected output');
+
   t.end();
 });

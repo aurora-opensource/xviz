@@ -33,8 +33,8 @@ test('XvizBaseUIBuilder', t => {
   panel.child(container);
   builder.child(panel);
 
-  const expected = [
-    {
+  const expected = {
+    'Metrics Panel': {
       type: 'panel',
       children: [
         {
@@ -56,7 +56,7 @@ test('XvizBaseUIBuilder', t => {
       ],
       name: 'Metrics Panel'
     }
-  ];
+  };
 
   const actual = builder.getUI();
   t.deepEqual(actual, expected, 'XVIZUIBuilder should match expectation');
