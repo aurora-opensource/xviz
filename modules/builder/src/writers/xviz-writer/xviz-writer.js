@@ -70,7 +70,7 @@ export default class XVIZWriter {
     const frameTimings = {startTime, endTime};
 
     // Sort frames by index before writing out as an array
-    const frameTimes = Array.from(frames.keys()).sort((a, b) => (a > b ? 1 : b > a ? -1 : 0));
+    const frameTimes = Array.from(frames.keys()).sort((a, b) => a - b);
 
     const timing = [];
     frameTimes.forEach((value, index) => {
