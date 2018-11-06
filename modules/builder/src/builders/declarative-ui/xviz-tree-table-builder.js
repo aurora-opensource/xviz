@@ -2,15 +2,7 @@ import XvizBaseUiBuilder from './xviz-base-ui-builder';
 import {UI_TYPES} from './constants';
 
 export default class XvizTreeTableBuilder extends XvizBaseUiBuilder {
-  constructor({
-    stream,
-    description,
-    title,
-    displayObjectId,
-    interactions,
-    validateWarn,
-    validateError
-  }) {
+  constructor({stream, description, title, displayObjectId, validateWarn, validateError}) {
     super({
       type: UI_TYPES.METRIC,
       validateWarn,
@@ -20,7 +12,6 @@ export default class XvizTreeTableBuilder extends XvizBaseUiBuilder {
     this._description = description;
     this._title = title;
     this._displayObjectId = displayObjectId;
-    this._interactions = interactions;
 
     this._validate();
   }
@@ -45,10 +36,6 @@ export default class XvizTreeTableBuilder extends XvizBaseUiBuilder {
 
     if (this._displayObjectId) {
       obj.displayObjectId = this._displayObjectId;
-    }
-
-    if (this._interactions) {
-      obj.interactions = this._interactions;
     }
 
     return obj;
