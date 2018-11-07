@@ -120,25 +120,24 @@ tape('parseStreamVariable#simple v2', t => {
     ]
   };
 
-  const expected = [
-    {
-      time: 1001,
-      variable: [10, 11, 12]
-    },
-    {
-      time: 1001,
-      variable: [10, 11, 12]
-    },
-    {
-      time: 1001,
-      variable: [true, false, true]
-    },
-    {
-      time: 1001,
-      variable: ['one', 'two', 'three'],
-      id: '123'
-    }
-  ];
+  const expected = {
+    time: 1001,
+    variable: [
+      {
+        values: [10, 11, 12]
+      },
+      {
+        values: [10, 11, 12]
+      },
+      {
+        values: [true, false, true]
+      },
+      {
+        values: ['one', 'two', 'three'],
+        id: '123'
+      }
+    ]
+  };
 
   schemaValidator.validate('core/variable_state', testData);
 
