@@ -87,6 +87,13 @@ class PLYElement {
 const data_buffer = new Uint8Array(8);
 const float_view = new Float32Array(data_buffer.buffer);
 const double_view = new Float64Array(data_buffer.buffer);
+let bufferToString = buffer => buffer.toString();
+
+if (typeof Buffer === 'undefined') {
+  // browser
+  self.Buffer = Uint8Array;
+  bufferToString = buffer => String.fromCharCode.apply(null, buffer);
+}
 
 const TRAIL_EOL = new Buffer(1);
 TRAIL_EOL[0] = 10;
@@ -128,7 +135,7 @@ export default class PLYParser {
           this.last_line = prefix.join('');
           return this.last_line;
         } else {
-          this.last_line = this.buffers[0].slice(this.offset, ptr).toString();
+          this.last_line = bufferToString(this.buffers[0].slice(this.offset, ptr));
           this.offset = ptr + 1;
           if (this.offset >= this.buffers[cbuf].length) {
             this.offset = 0;
