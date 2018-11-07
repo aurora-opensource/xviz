@@ -78,7 +78,7 @@ let bufferToString = buffer => buffer.toString();
 if (typeof Buffer === 'undefined') {
   // browser
   self.Buffer = Uint8Array;
-  bufferToString = buffer => String.fromCharCode.apply('', buffer);
+  bufferToString = buffer => String.fromCharCode.apply(null, buffer);
 }
 
 const TRAIL_EOL = new Buffer(1);
