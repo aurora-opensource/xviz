@@ -101,11 +101,7 @@ function parseStateUpdates(stateUpdates, timestamp, convertPrimitive) {
   Object.keys(variables)
     .filter(streamName => !STREAM_BLACKLIST.has(streamName))
     .forEach(variable => {
-      newStreams[variable] = parseStreamVariable(
-        variables[variable].variables,
-        variable,
-        timestamp
-      );
+      newStreams[variable] = parseStreamVariable(variables[variable], variable, timestamp);
     });
 
   if (timeSeries.length) {
