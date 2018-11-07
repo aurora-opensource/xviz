@@ -4,7 +4,7 @@ import {UI_TYPES} from './constants';
 export default class XvizTreeTableBuilder extends XvizBaseUiBuilder {
   constructor({stream, description, title, displayObjectId, validateWarn, validateError}) {
     super({
-      type: UI_TYPES.METRIC,
+      type: UI_TYPES.TREE_TABLE,
       validateWarn,
       validateError
     });
