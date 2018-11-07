@@ -19,11 +19,14 @@ import {
   parseStreamLogData,
   LOG_STREAM_MESSAGE
 } from '@xviz/parser';
+import {XVIZValidator} from '@xviz/schema';
 
 import tape from 'tape-catch';
 import TestMetadataMessage from 'test-data/sample-metadata-message';
 import TestMetadataMessageV1 from 'test-data/sample-metadata-message-v1';
 import TestFuturesMessageV1 from 'test-data/sample-frame-futures-v1';
+
+const schemaValidator = new XVIZValidator();
 
 // xviz data uses snake_case
 /* eslint-disable camelcase */
@@ -85,12 +88,12 @@ const TestTimesliceMessageV2 = {
       poses: {
         '/vehicle_pose': {
           timestamp: 1001.0,
-          mapOrigin: [11.2, 33.4, 55.6],
+          mapOrigin: {longitude: 11.2, latitude: 33.4, altitude: 55.6},
           position: [1.1, 2.2, 3.3],
           orientation: [0.1, 0.2, 0.3]
         }
       },
-      variables: null,
+      variables: {},
       primitives: {
         '/test/stream': {
           points: [
@@ -101,7 +104,6 @@ const TestTimesliceMessageV2 = {
                   fill_color: [255, 255, 255]
                 }
               },
-              radius: 0.01,
               points: [[1000, 1000, 200]]
             }
           ]
@@ -229,6 +231,58 @@ tape('parseStreamLogData metadata with full log time only', t => {
   t.end();
 });
 
+tape('parseStreamLogData validate test data', t => {
+  schemaValidator.validate('session/state_update', TestTimesliceMessageV2);
+  t.end();
+});
+
+tape('parseStreamLogData validate result when missing updates', t => {
+  setXvizSettings({currentMajorVersion: 2});
+  setXvizSettings(defaultXvizSettings);
+
+  const metaMessage = parseStreamLogData({
+    update_type: 'snapshot'
+  });
+
+  t.equals(metaMessage.type, LOG_STREAM_MESSAGE.INCOMPLETE, 'Type after parse set to error');
+  t.ok(/Missing required/.test(metaMessage.message), 'Message details on what is missing');
+
+  t.end();
+});
+
+tape('parseStreamLogData validate result when updates is empty', t => {
+  setXvizSettings({currentMajorVersion: 2});
+  setXvizSettings(defaultXvizSettings);
+
+  const metaMessage = parseStreamLogData({
+    update_type: 'snapshot',
+    updates: []
+  });
+
+  t.equals(metaMessage.type, LOG_STREAM_MESSAGE.INCOMPLETE, 'Type after parse set to error');
+  t.ok(/"updates" has length of 0/.test(metaMessage.message), 'Message details length is 0');
+
+  t.end();
+});
+
+tape('parseStreamLogData validate result when missing timestamp in updates', t => {
+  setXvizSettings({currentMajorVersion: 2});
+  setXvizSettings(defaultXvizSettings);
+
+  const metaMessage = parseStreamLogData({
+    update_type: 'snapshot',
+    updates: [{}]
+  });
+
+  t.equals(metaMessage.type, LOG_STREAM_MESSAGE.INCOMPLETE, 'Type after parse set to error');
+  t.ok(
+    /Missing timestamp in "updates"/.test(metaMessage.message),
+    'Message details missing timestamp'
+  );
+
+  t.end();
+});
+
 tape('parseStreamLogData error', t => {
   setXvizSettings({currentMajorVersion: 2});
   setXvizSettings(defaultXvizSettings);
@@ -265,7 +319,7 @@ tape('parseStreamLogData timeslice INCOMPLETE', t => {
       {
         poses: {
           '/vehicle_pose': {
-            mapOrigin: [11.2, 33.4, 55.6]
+            mapOrigin: {longitude: 11.2, latitude: 33.4, altitude: 55.6}
           }
         }
       }
@@ -360,7 +414,7 @@ tape('parseStreamLogData pointCloud timeslice', t => {
         poses: {
           '/vehicle_pose': {
             timestamp: 1001.0,
-            mapOrigin: [11.2, 33.4, 55.6],
+            mapOrigin: {longitude: 11.2, latitude: 33.4, altitude: 55.6},
             position: [1.1, 2.2, 3.3],
             orientation: [0.1, 0.2, 0.3]
           }
@@ -375,7 +429,6 @@ tape('parseStreamLogData pointCloud timeslice', t => {
                     fill_color: [255, 255, 255]
                   }
                 },
-                radius: 0.01,
                 points: [[1000, 1000, 200]]
               }
             ]
@@ -409,7 +462,7 @@ tape('parseStreamLogData pointCloud timeslice TypedArray', t => {
         poses: {
           '/vehicle_pose': {
             timestamp: 1001.0,
-            mapOrigin: [11.2, 33.4, 55.6],
+            mapOrigin: {longitude: 11.2, latitude: 33.4, altitude: 55.6},
             position: [1.1, 2.2, 3.3],
             orientation: [0.1, 0.2, 0.3]
           }
@@ -424,7 +477,6 @@ tape('parseStreamLogData pointCloud timeslice TypedArray', t => {
                     fill_color: [255, 255, 255]
                   }
                 },
-                radius: 0.01,
                 points: new Float32Array([1000, 1000, 200])
               }
             ]
@@ -458,7 +510,7 @@ tape('parseStreamLogData pointCloud timeslice', t => {
         poses: {
           '/vehicle_pose': {
             timestamp: 1001.0,
-            mapOrigin: [11.2, 33.4, 55.6],
+            mapOrigin: {longitude: 11.2, latitude: 33.4, altitude: 55.6},
             position: [1.1, 2.2, 3.3],
             orientation: [0.1, 0.2, 0.3]
           }
@@ -473,7 +525,6 @@ tape('parseStreamLogData pointCloud timeslice', t => {
                     fill_color: [255, 255, 255]
                   }
                 },
-                radius: 0.01,
                 points: [[1000, 1000, 200]]
               },
               {
@@ -483,7 +534,6 @@ tape('parseStreamLogData pointCloud timeslice', t => {
                     fill_color: [255, 255, 255]
                   }
                 },
-                radius: 0.01,
                 points: new Float32Array([1000, 1000, 200])
               }
             ]

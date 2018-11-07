@@ -34,6 +34,17 @@ export default function parseTimesliceData(data, convertPrimitive) {
     );
   }
 
+  if (!updates) {
+    return {type: LOG_STREAM_MESSAGE.INCOMPLETE, message: 'Missing required "updates" property'};
+  }
+
+  if (updates && updates.length === 0) {
+    return {
+      type: LOG_STREAM_MESSAGE.INCOMPLETE,
+      message: 'Property "updates" has length of 0, no data?'
+    };
+  }
+
   if (updates.length > 1) {
     throw new Error(
       `Only XVIZ first update of "snapshot" is currently supported. Current updates has "${
@@ -44,7 +55,7 @@ export default function parseTimesliceData(data, convertPrimitive) {
 
   const stateUpdates = updates;
 
-  let timestamp = data.timestamp;
+  let timestamp = null;
   if (!timestamp && stateUpdates) {
     timestamp = stateUpdates.reduce((t, stateUpdate) => {
       return Math.max(t, stateUpdate.timestamp);
@@ -53,7 +64,7 @@ export default function parseTimesliceData(data, convertPrimitive) {
 
   if (!timestamp) {
     // Incomplete stream message, just tag it accordingly so client can ignore it
-    return {type: LOG_STREAM_MESSAGE.INCOMPLETE};
+    return {type: LOG_STREAM_MESSAGE.INCOMPLETE, message: 'Missing timestamp in "updates"'};
   }
 
   const newStreams = {};
