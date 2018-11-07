@@ -1,6 +1,8 @@
 import {writeBinaryXVIZtoFile} from './xviz-binary-writer';
 import {xvizConvertJson} from './xviz-json-encoder.js';
 
+const frameName = index => `${index + 2}-frame`;
+
 export default class XVIZWriter {
   constructor() {
     this.frameTimings = {
@@ -39,7 +41,7 @@ export default class XVIZWriter {
     const fs = module.require('fs');
     const path = module.require('path');
     // +2 is because 1 is metadata, so we start with 2
-    const frameFilePath = path.join(xvizDirectory, `${frameNumber + 2}-frame`);
+    const frameFilePath = path.join(xvizDirectory, frameName(frameNumber));
     if (options.writeBinary) {
       writeBinaryXVIZtoFile(frameFilePath, xvizFrame, {flattenArrays: false});
     }
@@ -102,7 +104,7 @@ export default class XVIZWriter {
       const min = Math.min(updates.map(update => update.timestamp));
       const max = Math.min(updates.map(update => update.timestamp));
 
-      this.frameTimings.frames.set(index, [min, max]);
+      this.frameTimings.frames.set(index, [min, max, index, frameName(index)]);
     } else {
       throw new Error('Cannot find timestamp');
     }
