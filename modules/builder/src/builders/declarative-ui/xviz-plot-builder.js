@@ -7,7 +7,6 @@ export default class XvizPlotBuilder extends XvizBaseUiBuilder {
     dependentVariable,
     description,
     title,
-    interactions,
     validateWarn,
     validateError
   }) {
@@ -20,7 +19,6 @@ export default class XvizPlotBuilder extends XvizBaseUiBuilder {
     this._dependentVariable = dependentVariable;
     this._description = description;
     this._title = title;
-    this._interactions = interactions;
 
     this._validate();
   }
@@ -42,10 +40,6 @@ export default class XvizPlotBuilder extends XvizBaseUiBuilder {
 
     if (this._description) {
       obj.description = this._description;
-    }
-
-    if (this._interactions) {
-      obj.interactions = this._interactions;
     }
 
     return obj;

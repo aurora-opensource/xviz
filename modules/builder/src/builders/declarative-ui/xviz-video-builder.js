@@ -9,7 +9,6 @@ export default class XvizVideoBuilder extends XvizBaseUiBuilder {
       validateError
     });
     this._cameras = cameras;
-    this._interactions = interactions;
 
     this._validate();
   }
@@ -23,10 +22,6 @@ export default class XvizVideoBuilder extends XvizBaseUiBuilder {
   getUI() {
     const obj = super.getUI();
     obj.cameras = this._cameras;
-
-    if (this._interactions) {
-      obj.interactions = this._interactions;
-    }
 
     return obj;
   }

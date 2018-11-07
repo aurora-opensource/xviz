@@ -275,27 +275,30 @@ export function parseStreamVariableV2(objects, streamName, time) {
     return {};
   }
 
-  const entries = variables.map(entry => {
-    const {base, values} = entry;
+  const result = {time};
 
-    const valueData = getVariableData(values);
-    if (!valueData) {
-      return null;
-    }
+  result.variable = variables
+    .map(entry => {
+      const {base, values} = entry;
 
-    const result = {
-      time,
-      variable: valueData.values
-    };
+      const valueData = getVariableData(values);
+      if (!valueData || !valueData.values) {
+        return null;
+      }
 
-    if (base && base.object_id) {
-      result.id = base.object_id;
-    }
+      const datum = {
+        values: valueData.values
+      };
 
-    return result;
-  });
+      if (base && base.object_id) {
+        datum.id = base.object_id;
+      }
 
-  return entries.filter(Boolean);
+      return datum;
+    })
+    .filter(Boolean);
+
+  return result;
 }
 
 /* Processes a time_series sample and converts the

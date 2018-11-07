@@ -492,6 +492,53 @@ tape('parseStreamLogData pointCloud timeslice', t => {
   t.end();
 });
 
+tape('parseStreamLogData variable timeslice', t => {
+  setXvizSettings({currentMajorVersion: 2});
+  const VariableTestTimesliceMessage = {
+    update_type: 'snapshot',
+    updates: [
+      {
+        timestamp: 1001.0,
+        poses: {
+          '/vehicle_pose': {
+            timestamp: 1001.0,
+            mapOrigin: [11.2, 33.4, 55.6],
+            position: [1.1, 2.2, 3.3],
+            orientation: [0.1, 0.2, 0.3]
+          }
+        },
+        variables: {
+          '/foo': {
+            variables: [
+              {
+                base: {
+                  object_id: 'A'
+                },
+                values: {doubles: [300, 400]}
+              },
+              {
+                values: {doubles: [100, 200]}
+              }
+            ]
+          }
+        }
+      }
+    ]
+  };
+
+  // NOTE: no explicit type for this message yet.
+  const slice = parseStreamLogData({...VariableTestTimesliceMessage});
+  t.equals(slice.type, LOG_STREAM_MESSAGE.TIMESLICE, 'Message type set for timeslice');
+  t.ok(slice.streams['/foo'].variable, 'has variable');
+
+  const variable = slice.streams['/foo'].variable;
+  t.equals(variable.length, 2, 'Has 2 instances');
+  t.equals(variable[0].id, 'A', 'Has correct id');
+  t.deepEquals(variable[0].values, [300, 400], 'Has correct values');
+
+  t.end();
+});
+
 tape('parseStreamLogData futures timeslice v1', t => {
   setXvizConfig({});
   setXvizSettings({currentMajorVersion: 1});
