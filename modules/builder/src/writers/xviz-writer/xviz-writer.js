@@ -102,7 +102,7 @@ export default class XVIZWriter {
       const min = Math.min(updates.map(update => update.timestamp));
       const max = Math.min(updates.map(update => update.timestamp));
 
-      this.frameTimings.frames.set(index, [min, max]);
+      this.frameTimings.frames.set(index, [min, max, index, `${index + 2}-frame`]);
     } else {
       throw new Error('Cannot find timestamp');
     }
