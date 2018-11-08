@@ -1,0 +1,64 @@
+{
+  "id": "https://xviz.org/schema/ui-primitives/treetable.json",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "XVIZ Treetable",
+  "type": "object",
+  "properties": {
+    "columns": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "display_text": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "integer",
+              "double",
+              "string",
+              "boolean"
+            ]
+          },
+          "unit": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "display_text",
+          "type"
+        ],
+        "additionalProperties": false
+      },
+      "additionalItems": false
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "parent": {
+          "type": "integer"
+          },
+          "column_values": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "additionalItems": false
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": false
+      },
+      "additionalItems": false
+    }
+  },
+  "additionalProperties": false
+}

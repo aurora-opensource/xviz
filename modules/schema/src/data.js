@@ -10,6 +10,7 @@ import corePrimitiveBaseSchemaJson from '../core/primitive_base.schema.json';
 import corePrimitiveStateSchemaJson from '../core/primitive_state.schema.json';
 import coreStreamSetSchemaJson from '../core/stream_set.schema.json';
 import coreTimeseriesStateSchemaJson from '../core/timeseries_state.schema.json';
+import coreUiPrimitiveStateSchemaJson from '../core/ui_primitive_state.schema.json';
 import coreValueSchemaJson from '../core/value.schema.json';
 import coreValuesSchemaJson from '../core/values.schema.json';
 import coreVariableSchemaJson from '../core/variable.schema.json';
@@ -43,6 +44,7 @@ import styleClassSchemaJson from '../style/class.schema.json';
 import styleColorSchemaJson from '../style/_color.schema.json';
 import styleObjectValueSchemaJson from '../style/object_value.schema.json';
 import styleStreamValueSchemaJson from '../style/stream_value.schema.json';
+import uiPrimitivesTreetableSchemaJson from '../ui-primitives/treetable.schema.json';
 
 export const SCHEMA_DATA = {
   'core/annotation_base.schema.json': coreAnnotationBaseSchemaJson,
@@ -55,6 +57,7 @@ export const SCHEMA_DATA = {
   'core/primitive_state.schema.json': corePrimitiveStateSchemaJson,
   'core/stream_set.schema.json': coreStreamSetSchemaJson,
   'core/timeseries_state.schema.json': coreTimeseriesStateSchemaJson,
+  'core/ui_primitive_state.schema.json': coreUiPrimitiveStateSchemaJson,
   'core/value.schema.json': coreValueSchemaJson,
   'core/values.schema.json': coreValuesSchemaJson,
   'core/variable.schema.json': coreVariableSchemaJson,
@@ -87,5 +90,6 @@ export const SCHEMA_DATA = {
   'style/class.schema.json': styleClassSchemaJson,
   'style/_color.schema.json': styleColorSchemaJson,
   'style/object_value.schema.json': styleObjectValueSchemaJson,
-  'style/stream_value.schema.json': styleStreamValueSchemaJson
+  'style/stream_value.schema.json': styleStreamValueSchemaJson,
+  'ui-primitives/treetable.schema.json': uiPrimitivesTreetableSchemaJson
 };

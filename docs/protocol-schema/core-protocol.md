@@ -124,15 +124,16 @@ float, boolean
 This is a single cohesive set of streams which all happened at the same time and be associated with
 a single system frame. This is what an XVIZ extractor produces.
 
-| Name            | Type                               | Description                                                                                                                 |
-| --------------- | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `timestamp`     | `timestamp`                        | The vehicle/log transmission_time associated with this data.                                                                |
-| `primitives`    | `map<stream_id, primitive_state>`  | Streams containing list of primitives.                                                                                      |
-| `poses`         | `map<stream_id, pose>`             | Related vehicle poses                                                                                                       |
-| `time_series`   | `list<time_series_state>`          |                                                                                                                             |
-| `future_states` | `map<stream_id, future_instances>` | Streams containing This represents a collection of primitives at different timestamps, for the current stream set timestamp |
-| `variables`     | `map<stream_id, variable_state>`   | Streams containing list of values.                                                                                          |
-| `annotations`   | `map<stream_id, annotation_state>` | Streams containing annotations                                                                                              |
+| Name            | Type                                 | Description                                                                                                                 |
+| --------------- | ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| `timestamp`     | `timestamp`                          | The vehicle/log transmission_time associated with this data.                                                                |
+| `primitives`    | `map<stream_id, primitive_state>`    | Streams containing list of primitives.                                                                                      |
+| `ui_primitives` | `map<stream_id, ui_primitive_state>` | Streams containing list of UI specific primitives.                                                                          |
+| `poses`         | `map<stream_id, pose>`               | Related vehicle poses                                                                                                       |
+| `time_series`   | `list<time_series_state>`            |                                                                                                                             |
+| `future_states` | `map<stream_id, future_instances>`   | Streams containing This represents a collection of primitives at different timestamps, for the current stream set timestamp |
+| `variables`     | `map<stream_id, variable_state>`     | Streams containing list of values.                                                                                          |
+| `annotations`   | `map<stream_id, annotation_state>`   | Streams containing annotations                                                                                              |
 
 This is what a full stream set would look like populated with a basic example of each element:
 
@@ -182,6 +183,37 @@ streams, `stream_set` or future points in time, `future_instances` to applicable
             "points": [[1, 2, 3]]
         }
     ]
+}
+```
+
+## UI Primitive State
+
+This holds a lists of UI primitives XVIZ. It's used by higher level to map streams, `stream_set`.
+
+| Name        | Type        | Description                   |
+| ----------- | ----------- | ----------------------------- |
+| `treetable` | `treetable` | table/tree to display in a UI |
+
+```js
+{
+    "treetable": {
+        "columns": [
+            {
+                "display_text": "Age",
+                "type": "integer"
+            }
+        ],
+        "nodes": [
+            {
+                "id": 0
+            },
+            {
+                "id": 1,
+                "parent": 0,
+                "column_values": [10]
+            }
+        ]
+    }
 }
 ```
 
