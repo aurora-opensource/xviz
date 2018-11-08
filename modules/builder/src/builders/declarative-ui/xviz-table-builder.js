@@ -18,7 +18,7 @@ import {UI_TYPES} from './constants';
 export default class XvizTableBuilder extends XvizBaseUiBuilder {
   constructor({stream, description, title, displayObjectId, validateWarn, validateError}) {
     super({
-      type: UI_TYPES.METRIC,
+      type: UI_TYPES.TABLE,
       validateWarn,
       validateError
     });
