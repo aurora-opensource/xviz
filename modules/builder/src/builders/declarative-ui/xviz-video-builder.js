@@ -4,7 +4,7 @@ import {UI_TYPES} from './constants';
 export default class XvizVideoBuilder extends XvizBaseUiBuilder {
   constructor({cameras, interactions, validateWarn, validateError}) {
     super({
-      type: UI_TYPES.METRIC,
+      type: UI_TYPES.VIDEO,
       validateWarn,
       validateError
     });
