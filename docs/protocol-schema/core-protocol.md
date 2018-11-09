@@ -128,7 +128,7 @@ a single system frame. This is what an XVIZ extractor produces.
 | --------------- | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | `timestamp`     | `timestamp`                        | The vehicle/log transmission_time associated with this data.                                                                |
 | `primitives`    | `map<stream_id, primitive_state>`  | Streams containing list of primitives.                                                                                      |
-| `poses`         | `list<pose>`                       | Related vehicle poses                                                                                                       |
+| `poses`         | `map<stream_id, pose>`             | Related vehicle poses                                                                                                       |
 | `time_series`   | `list<time_series_state>`          |                                                                                                                             |
 | `future_states` | `map<stream_id, future_instances>` | Streams containing This represents a collection of primitives at different timestamps, for the current stream set timestamp |
 | `variables`     | `map<stream_id, variable_state>`   | Streams containing list of values.                                                                                          |
@@ -141,7 +141,7 @@ This is what a full stream set would look like populated with a basic example of
     "timestamp": 1001.3,
     "primitives": {
         "/object/polygon": {
-            "primitives": [
+            "polygons": [
                 {
                   "vertices": [[9, 15, 3], [20, 13, 3], [20, 5, 3]]
                 }
@@ -150,9 +150,38 @@ This is what a full stream set would look like populated with a basic example of
     },
     "variables": [
         "/plan/time": {
-            "values": [1001.3, 1002.3, 1003.3]
+            "values": {
+              "doubles": [1001.3, 1002.3, 1003.3]
+            }
         }
     }
+}
+```
+
+## Primitive State
+
+This holds a lists of primitives of each type XVIZ supports. It's used by higher level to map
+streams, `stream_set` or future points in time, `future_instances` to applicable primitives.
+
+/object/bounds -> [<polygon>, <polygon>]
+
+| Name        | Type              | Description       |
+| ----------- | ----------------- | ----------------- |
+| `polygons`  | `list<polygons>`  | polygons to draw  |
+| `polylines` | `list<polylines>` | polylines to draw |
+| `texts`     | `list<texts>`     | texts to draw     |
+| `circles`   | `list<circles>`   | circles to draw   |
+| `points`    | `list<points>`    | points to draw    |
+| `stadiums`  | `list<stadiums>`  | stadiums to draw  |
+| `images`    | `list<images>`    | images to draw    |
+
+```js
+{
+    "points": [
+        {
+            "points": [[1, 2, 3]]
+        }
+    ]
 }
 ```
 
@@ -165,46 +194,28 @@ instant. These are not for normal time ordered primitives.
 | Name         | Type                    | Description                             |
 | ------------ | ----------------------- | --------------------------------------- |
 | `timestamps` | `list<timestamp>`       | A list of timestamps in the future      |
-| `primitives` | `list<list<primitive>>` | A list of primitives for each timestamp |
+| `primitives` | `list<primitive_state>` | A list of primitives for each timestamp |
 
 ```js
 {
   "timestamps": [1.0, 1.1, 1.2],
   "primitives": [
-    [
-      {
+    {
+      "points": {
         "points": [[1, 2, 3]]
       }
-    ],
-    [
-      {
+    },
+    {
+      "points": {
         "points": [[1.5, 2, 3]]
       }
-    ],
-    [
-      {
+    },
+    {
+      "points": {
         "points": [[2, 2, 3]]
       }
-    ]
+    }
   ]
-}
-```
-
-## Primitive State
-
-/object/bounds -> [<polygon>, <polygon>]
-
-| Name         | Type              | Description        |
-| ------------ | ----------------- | ------------------ |
-| `primitives` | `list<primitive>` | Primitives to draw |
-
-```js
-{
-    "primitives": [
-        {
-            "points": [[1, 2, 3]]
-        }
-    ]
 }
 ```
 
@@ -213,15 +224,18 @@ instant. These are not for normal time ordered primitives.
 Maps a stream like `/constraints` to a single or multiple item list of variables. Multiple items
 indicate each object refers to a different variable.
 
-| Name        | Type              | Description          |
-| ----------- | ----------------- | -------------------- |
-| `variables` | `list<variables>` | Variables to display |
+| Name        | Type             | Description          |
+| ----------- | ---------------- | -------------------- |
+| `variables` | `list<variable>` | Variables to display |
 
 ```js
 {
     "variables": [
         {
-            "values": [1001.3, 1002.3, 1003.3]
+            "values":
+            {
+                "doubles": [1001.3, 1002.3, 1003.3]
+            }
         }
     ]
 }
@@ -233,21 +247,28 @@ This models a set of values that changes each time a data is transformed. These 
 instantaneous data for a moment in time. These are not used for representing the values of functions
 in the future. For that you would want to use Variable States.
 
-| Name        | Type                       | Description                                                  |
-| ----------- | -------------------------- | ------------------------------------------------------------ |
-| `timestamp` | `timestamp`                | The vehicle/log transmission_time associated with this data. |
-| `values`    | `list<{stream_id, value}>` | Number/string/whatever                                       |
-| `object_id` | `optional<object_id>`      | Associated object, optional                                  |
+| Name        | Type                  | Description                                                    |
+| ----------- | --------------------- | -------------------------------------------------------------- |
+| `timestamp` | `timestamp`           | The vehicle/log transmission_time associated with this data.   |
+| `object_id` | `optional<object_id>` | Associated object, optional                                    |
+| `streams`   | `list<stream_id>`     | The stream for each element of the `values` list               |
+| `values`    | `value`               | Holds a list of Number/string/whatever, same size as `streams` |
 
 Here is an example `time_series_state` for a system producing multiple values at a specific time:
 
 ```js
 {
     "timestamp": 12345.5,
-    "values": [
-        ["/vehicle/torque/commanded", 5],
-        ["/vehicle/torque/actual", 4.8]
-    ]
+    "streams": [
+        "/vehicle/torque/commanded",
+        "/vehicle/torque/actual"
+    ],
+    "values": {
+        "doubles": [
+            5,
+            4.8
+        ]
+    }
 }
 ```
 
@@ -261,17 +282,16 @@ y, and z respectively.
 | ------------- | ----------------- | --------------------------- |
 | `coordinates` | `array<float>(3)` | What kind of object is this |
 
-## Primitive
+## Base Primitive
 
 Primitives are the most basic units of rendering data sent across the network. Every primitives has
 all the following fields:
 
-| Name      | Type                  | Description                                    |
-| --------- | --------------------- | ---------------------------------------------- |
-| `type`    | `primitive_type`      | What kind of object is this                    |
-| `style`   | `optional<style>`     | Optional inline style                          |
-| `classes` | `list<class_id>`      | Semantic/visualize classes.                    |
-| `id`      | `optional<object_id>` | Which object is this primitive associated with |
+| Name            | Type                  | Description                                    |
+| --------------- | --------------------- | ---------------------------------------------- |
+| `object_id`     | `optional<object_id>` | Which object is this primitive associated with |
+| `inline_style`  | `optional<style>`     | Optional inline style                          |
+| `style_classes` | `list<class_id>`      | Semantic/visualize classes.                    |
 
 To see all the primitives see:
 
@@ -323,17 +343,28 @@ Each stream would contain the same number of values and then the velocity and je
 plotted as a function of the time stream. For more details on how to plot see the UI Metadata
 section.
 
+The base variable fields:
+
 | Name        | Type                  | Description                 |
 | ----------- | --------------------- | --------------------------- |
-| `values`    | `list<values>`        | The values                  |
 | `object_id` | `optional<object_id>` | Associated object, optional |
+
+The full variable object:
+
+| Name     | Type                      | Description                 |
+| -------- | ------------------------- | --------------------------- |
+| `values` | `values`                  | The values                  |
+| `base`   | `optional<variable_base>` | Associated object, optional |
 
 As an example a complete [`stream_set`](/docs/protocol-schema/core-protocol.md#stream-set),
 containing the above variables would look like:
 
 ```js
 {
-    "values": [1001.3, 1002.3, 1003.3]
+    "values":
+    {
+        "doubles": [1001.3, 1002.3, 1003.3]
+    }
 }
 ```
 
@@ -346,10 +377,9 @@ Annotations must be produced in the stream set for as long as that annotation is
 
 ### Base
 
-| Name     | Type              | Description                                                                                |
-| -------- | ----------------- | ------------------------------------------------------------------------------------------ |
-| `type`   | `annotation_type` | One of the possible annotation types, what action to take when the annotation is triggered |
-| `object` | `object_id`       | The object the annotation corresponds to                                                   |
+| Name     | Type        | Description                              |
+| -------- | ----------- | ---------------------------------------- |
+| `object` | `object_id` | The object the annotation corresponds to |
 
 ### Visual
 
@@ -357,5 +387,6 @@ Visual annotations are change how things are rendered.
 
 | Name            | Type                     | Description                                                     |
 | --------------- | ------------------------ | --------------------------------------------------------------- |
+| `base`          | `optional<base>`         | The common annotation fields                                    |
 | `style_classes` | `optional<list<string>>` | A list of style classes to apply                                |
 | `style_info`    | `optional<style>`        | A block of style information as outlined in the "Style" section |

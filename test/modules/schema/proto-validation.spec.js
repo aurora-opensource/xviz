@@ -1,32 +1,17 @@
 /* eslint no-multi-str: off */
 import {loadProtos} from '@xviz/schema';
-import {XVIZValidator, parseJSONFile} from '@xviz/schema';
-import {Type, parse} from 'protobufjs';
+import {
+  XVIZValidator,
+  parseJSONFile,
+  protoEnumsToInts,
+  getXVIZProtoTypes,
+  EXTENSION_PROPERTY
+} from '@xviz/schema';
 
 import stringify from 'json-stable-stringify';
 import test from 'tape-catch';
 import * as path from 'path';
 import * as fs from 'fs';
-
-const EXTENSION_PROPERTY = '(xviz_json_schema)';
-
-const PRIMITIVE_PROTO_TYPES = new Set([
-  'double',
-  'float',
-  'int32',
-  'int64',
-  'uint32',
-  'uint64',
-  'sint32',
-  'sint64',
-  'fixed32',
-  'fixed64',
-  'sfixed32',
-  'sfixed64',
-  'bool',
-  'string',
-  'bytes'
-]);
 
 // Protobuf has a primitive type system, while it produces valid XVIZ JSON
 // it does not consume all the variations
@@ -55,121 +40,6 @@ test('loadProtos', t => {
 
   const protoRoot = loadProtos(protoDir);
   t.ok(protoRoot.files.length > 5, 'Loaded protofiles');
-
-  t.end();
-});
-
-test('stringifyEnumField', t => {
-  const values = {zip: 0, zap: 1};
-
-  const goodObj = {
-    foo: 'zip'
-  };
-
-  const expObj = {
-    foo: 0
-  };
-
-  stringifyEnumField(values, 'foo', goodObj);
-  t.ok(JSON.stringify(goodObj) === JSON.stringify(expObj), 'Converted correct');
-
-  const badObj = {
-    foo: 'doesnotexist'
-  };
-
-  t.throws(() => stringifyEnumField(values, 'foo', badObj), /Error/, 'Should throw error');
-
-  t.end();
-});
-
-test('stringifyEnums', t => {
-  const protoRoot = parse(
-    'syntax = "proto3";\n' +
-      'message Test {\n' +
-      '  enum Enum {\n' +
-      '    zip   = 0;\n' +
-      '    zap   = 1;\n' +
-      '    sog   = 2;\n' +
-      '  }\n' +
-      '  Enum foo = 1;\n' +
-      '  uint32 other = 2;\n' +
-      '}\n' +
-      'message Nested {\n' +
-      '  Test sub = 1;\n' +
-      '  map<string, Test> mapped = 2;\n' +
-      '  map<string, uint32> primMap = 3;\n' +
-      '  map<string, Test> emptyMap = 4;\n' +
-      '  repeated Test list = 5;\n' +
-      '  repeated string primList = 6;\n' +
-      '  repeated Test emptyList = 7;\n' +
-      '}'
-  ).root;
-
-  const protoType = protoRoot.lookupType('Test');
-
-  const goodObj = {
-    foo: 'zip',
-    other: 42
-  };
-
-  const expObj = {
-    foo: 0,
-    other: 42
-  };
-
-  stringifyEnums(protoType, goodObj);
-  t.ok(JSON.stringify(goodObj) === JSON.stringify(expObj), 'Converted enum');
-
-  const badObj = {
-    foo: 'doesnotexist',
-    other: 42
-  };
-
-  t.throws(() => stringifyEnums(protoType, badObj), /Error/, 'Should throw error');
-
-  // Test nesting
-  const nestedType = protoRoot.lookupType('Nested');
-
-  const nestedObj = {
-    sub: {
-      foo: 'sog'
-    },
-    mapped: {
-      foo: {
-        foo: 'zap',
-        other: 42
-      }
-    },
-    list: [
-      {
-        foo: 'zip'
-      }
-    ],
-    primMap: {a: 4, b: 2},
-    primList: ['a', 'b']
-  };
-
-  const expectedObj = {
-    sub: {
-      foo: 2
-    },
-    mapped: {
-      foo: {
-        foo: 1,
-        other: 42
-      }
-    },
-    list: [
-      {
-        foo: 0
-      }
-    ],
-    primMap: {a: 4, b: 2},
-    primList: ['a', 'b']
-  };
-
-  stringifyEnums(nestedType, nestedObj);
-  t.deepEqual(nestedObj, expectedObj, 'Converted nested and mapped enums');
 
   t.end();
 });
@@ -217,7 +87,7 @@ function validateAgainstExample(t, validator, protoType, examplePath) {
   const jsonExample = parseJSONFile(examplePath);
   const originalJsonExample = parseJSONFile(examplePath);
 
-  stringifyEnums(protoType, jsonExample);
+  protoEnumsToInts(protoType, jsonExample);
 
   // Sanity check out input data
   const schemaName = protoType.options[EXTENSION_PROPERTY];
@@ -269,82 +139,6 @@ function validateXVIZJSON(t, validator, schemaName, object, description) {
   }
 }
 
-function stringifyEnums(protoType, jsonObject) {
-  const enumTypes = {};
-
-  protoType.nestedArray.map(function store(e) {
-    enumTypes[e.name] = e.values;
-    return e;
-  });
-
-  const fields = protoType.fields;
-
-  // Fix up fields
-  for (const fieldName in fields) {
-    if (fields.hasOwnProperty(fieldName)) {
-      const field = fields[fieldName];
-      const fieldValue = jsonObject[fieldName];
-
-      const values = enumTypes[field.type];
-
-      if (values !== undefined) {
-        stringifyEnumField(values, fieldName, jsonObject);
-      } else if (field.map) {
-        stringifyMapField(field, jsonObject[fieldName]);
-      } else if (field.repeated) {
-        stringifyRepeatedField(field, jsonObject[fieldName]);
-      } else if (typeof fieldValue === 'object') {
-        stringifyMessageField(field, fieldValue);
-      }
-    }
-  }
-}
-
-function stringifyEnumField(values, fieldName, jsonObject) {
-  const originalValue = jsonObject[fieldName];
-
-  if (originalValue !== undefined) {
-    const newValue = values[originalValue];
-
-    if (newValue === undefined) {
-      const msg = `Error: ${fieldName} not present on object`;
-      throw msg;
-    }
-
-    jsonObject[fieldName] = newValue;
-  }
-}
-
-function stringifyMessageField(field, jsonObject) {
-  if (!PRIMITIVE_PROTO_TYPES.has(field.type) && jsonObject !== undefined) {
-    const subType = field.parent.lookupType(field.type);
-    stringifyEnums(subType, jsonObject);
-  }
-}
-
-function stringifyMapField(field, jsonObject) {
-  if (!PRIMITIVE_PROTO_TYPES.has(field.type) && jsonObject !== undefined) {
-    const subType = field.parent.lookupType(field.type);
-
-    for (const propertyName in jsonObject) {
-      if (jsonObject.hasOwnProperty(propertyName)) {
-        const propertyValue = jsonObject[propertyName];
-        stringifyEnums(subType, propertyValue);
-      }
-    }
-  }
-}
-
-function stringifyRepeatedField(field, jsonArray) {
-  if (!PRIMITIVE_PROTO_TYPES.has(field.type) && jsonArray !== undefined) {
-    const subType = field.parent.lookupType(field.type);
-
-    for (let i = 0; i < jsonArray.length; i++) {
-      stringifyEnums(subType, jsonArray[i]);
-    }
-  }
-}
-
 function isSupportedExample(examplePath) {
   for (let i = 0; i < UNSUPPORTED_EXAMPLES.length; i++) {
     if (examplePath.endsWith(UNSUPPORTED_EXAMPLES[i])) {
@@ -362,19 +156,6 @@ function exampleHasExtraFields(examplePath) {
   }
 
   return false;
-}
-function getXVIZProtoTypes(protoRoot) {
-  const protoTypes = [];
-
-  traverseTypes(protoRoot, function walk(type) {
-    if (type.options !== undefined) {
-      if (type.options[EXTENSION_PROPERTY] !== undefined) {
-        protoTypes.push(type);
-      }
-    }
-  });
-
-  return protoTypes;
 }
 
 function getSchemaExamplePath(t, examplesDir, schemaName) {
@@ -395,14 +176,4 @@ function getSchemaExamplePath(t, examplesDir, schemaName) {
   }
 
   return exampleFiles;
-}
-
-function traverseTypes(current, fn) {
-  if (current instanceof Type)
-    // and/or protobuf.Enum, protobuf.Service etc.
-    fn(current);
-  if (current.nestedArray)
-    current.nestedArray.forEach(function eachType(nested) {
-      traverseTypes(nested, fn);
-    });
 }

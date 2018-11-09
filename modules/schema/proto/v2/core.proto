@@ -1,3 +1,7 @@
+// --------------------------------------------------------
+// WARNING: XVIZ Protobuf files are unstable, do not use
+// --------------------------------------------------------
+
 syntax = "proto3";
 
 import "annotation.proto";
@@ -5,6 +9,7 @@ import "options.proto";
 import "primitives.proto";
 
 package xviz.v2.core;
+
 
 message StreamSet
 {
@@ -24,6 +29,7 @@ message StreamSet
     
     map<string, AnnotationState> annotations = 8;
 }
+
 
 message Pose
 {
@@ -79,9 +85,8 @@ message TimeSeriesState
     
     string object_id = 2;
 
-    // In the old JSON it's: [["stream", 1], ["stream", 2]]
-    // protobuf makes us do parallel lists
     repeated string streams = 3;
+    
     Values values = 4;
 }
 
@@ -130,7 +135,6 @@ message VariableBase
 
 message Values
 {
-    // TODO: create this
     option (xviz_json_schema) = "core/values";
 
     /// ONLY SET ONE OF THESE (protobuf does not all oneof

@@ -1,5 +1,8 @@
 import test from 'tape-catch';
 import {XVIZUIBuilder} from '@xviz/builder';
+import {XVIZValidator} from '@xviz/schema';
+
+const schemaValidator = new XVIZValidator();
 
 test('XvizBaseUIBuilder', t => {
   const builder = new XVIZUIBuilder({});
@@ -45,7 +48,14 @@ test('XvizBaseUIBuilder', t => {
   };
 
   const actual = builder.getUI();
+
   t.deepEqual(actual, expected, 'XVIZUIBuilder should match expectation');
+
+  for (const name in actual) {
+    if (actual.hasOwnProperty(name)) {
+      schemaValidator.validate('declarative-ui/panel', actual[name]);
+    }
+  }
 
   t.end();
 });
