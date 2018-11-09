@@ -368,7 +368,7 @@ _TODO: screenshot: streetscape.gl demo app showing treetable data_
   "components": [
     {
       "display_object_id": false,
-      "type": "tree_table",
+      "type": "treetable",
       "description": "These are the details of the TreeTable",
       "stream": "/some/stream/of/treetable/primmatives",
       "title": "A TreeTable!"
@@ -385,7 +385,7 @@ components:
     display_object_id: false
     stream: /some/stream/of/treetable/primmatives
     title: A TreeTable!
-    type: tree_table
+    type: treetable
 ```
 
 ## Complete Example
@@ -502,7 +502,7 @@ components:
     display_object_id: false
     stream: /some/stream/of/treetable/primmatives
     title: A TreeTable!
-    type: tree_table
+    type: treetable
 containers:
   - components:
       - description: These are the details of this table
