@@ -4,18 +4,23 @@ export const CATEGORY = {
   future_instance: 'future_instance',
   pose: 'pose',
   primitive: 'primitive',
+  ui_primitive: 'ui_primitive',
   time_series: 'time_series',
   variable: 'variable'
 };
 
 export const PRIMITIVE_TYPES = {
+  // Geometry primitives
   circle: 'circle',
   image: 'image',
   point: 'point',
   polygon: 'polygon',
   polyline: 'polyline',
   stadium: 'stadium',
-  text: 'text'
+  text: 'text',
+
+  // UI primitives
+  treetable: 'treetable'
 };
 
 export const STYLES = {
