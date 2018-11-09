@@ -243,6 +243,7 @@ test('XVIZMetadataBuilder#stylesheet', t => {
   };
 
   t.deepEqual(metadata, expected, 'XVIZMetadataBuilder build matches expected output');
+  schemaValidator.validate('session/metadata', metadata);
   t.end();
 });
 

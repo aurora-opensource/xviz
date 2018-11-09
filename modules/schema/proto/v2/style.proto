@@ -1,3 +1,7 @@
+// --------------------------------------------------------
+// WARNING: XVIZ Protobuf files are unstable, do not use
+// --------------------------------------------------------
+
 syntax = "proto3";
 
 import "options.proto";
@@ -69,7 +73,7 @@ message StreamValue
 
     double angle = 6;
 
-        enum TextAnchor {
+    enum TextAnchor {
         // yeah enums are message scoped, thanks C++98
         text_anchor_not_set = 0;
         start = 1;

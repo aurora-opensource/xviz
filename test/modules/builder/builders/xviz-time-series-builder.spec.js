@@ -303,6 +303,7 @@ test('XVIZTimeSeriesBuilder#single entry id', t => {
   const data = builder.getData();
 
   t.deepEqual(data, expected, 'XVIZTimeSeriesBuilder single entry id matches expected output');
+  data.forEach(d => schemaValidator.validate('core/timeseries_state', d));
   t.end();
 });
 
