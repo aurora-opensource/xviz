@@ -120,7 +120,7 @@ Returns a new [`XvizMetricBuilder`](#XvizMetricBuilder) instance with the specif
 ##### table(options)
 Returns a new [`XvizTableBuilder`](#XvizTableBuilder) instance with the specified options.
 
-##### treeTable(options)
+##### treetable(options)
 Returns a new [`XvizTreeTableBuilder`](#XvizTreeTableBuilder) instance with the specified options.
 
 ##### plot(options)
