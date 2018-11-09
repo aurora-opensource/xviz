@@ -73,12 +73,13 @@ class PLYElement {
 const data_buffer = new Uint8Array(8);
 const float_view = new Float32Array(data_buffer.buffer);
 const double_view = new Float64Array(data_buffer.buffer);
-let bufferToString = buffer => buffer.toString();
+let bufferToString;
 let BufferClass;
 
 if (typeof Buffer !== 'undefined' && Buffer.prototype.utf8Write) {
   // use Buffer class from node
   BufferClass = Buffer;
+  bufferToString = buffer => buffer.toString();
 } else {
   // browser
   BufferClass = Uint8Array;
