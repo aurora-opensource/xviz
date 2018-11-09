@@ -142,11 +142,20 @@ check `xviz-stylesheet` for supported style properties
 
 # XVIZUIPrimitiveBuilder
 
-##### columns(columns : Array)
+##### treetable(columns : Array)
+
+Initialize a treetable primitive.
 * `columns` should be an array of descriptors of table columns.
 
-##### row(parent: String | null, id: String, column_values: Array)
-* add a row to the table
+##### row(id: String, column_values: Array)
+
+Add a row to the table. Returns a `XVIZTreeTableRowBuilder` instance that represents the new row.
+
+## XVIZTreeTableRowBuilder
+
+##### child(id: String, column_values: Array)
+
+Append a row as a child of this row. Returns a `XVIZTreeTableRowBuilder` instance that represents the new row.
 
 
 ## Example

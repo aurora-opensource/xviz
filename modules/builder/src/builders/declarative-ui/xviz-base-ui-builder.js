@@ -12,7 +12,7 @@ export default class XvizBaseUiBuilder {
       this._children = [];
     }
     this._children.push(child);
-    return this;
+    return child;
   }
 
   _validate() {}

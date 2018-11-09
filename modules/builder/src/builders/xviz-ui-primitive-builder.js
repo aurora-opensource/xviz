@@ -2,6 +2,33 @@
 import XVIZBaseBuilder from './xviz-base-builder';
 import {CATEGORY, PRIMITIVE_TYPES} from './constant';
 
+class XVIZTreeTableRowBuilder {
+  constructor(id, values, parent = null) {
+    this._parent = parent;
+    this._id = id;
+    this._values = values;
+    this._children = [];
+  }
+
+  child(id, values) {
+    const row = new XVIZTreeTableRowBuilder(id, values, this._id);
+    this._children.push(row);
+    return row;
+  }
+
+  getData() {
+    const obj = {id: this._id};
+    if (this._values) {
+      obj.column_values = this._values;
+    }
+    if (this._parent !== null) {
+      obj.parent = this._parent;
+    }
+
+    return [].concat.apply([obj], this._children.map(row => row.getData()));
+  }
+}
+
 export default class XVIZUIPrimitiveBuilder extends XVIZBaseBuilder {
   constructor(props) {
     super({
@@ -14,7 +41,7 @@ export default class XVIZUIPrimitiveBuilder extends XVIZBaseBuilder {
     this._primitives = {};
   }
 
-  columns(columns) {
+  treetable(columns) {
     if (this._type) {
       this._flush();
     }
@@ -27,20 +54,17 @@ export default class XVIZUIPrimitiveBuilder extends XVIZBaseBuilder {
     return this;
   }
 
-  row(parentId, id, values) {
+  row(id, values) {
     if (this._type) {
       this._flush();
     }
 
     this.validatePropSetOnce('_id');
 
-    this._rowParent = parentId;
-    this._rowId = id;
-    this._rowValues = values;
-
+    this._row = new XVIZTreeTableRowBuilder(id, values);
     this._type = PRIMITIVE_TYPES.treetable;
 
-    return this;
+    return this._row;
   }
 
   _validate() {
@@ -93,45 +117,34 @@ export default class XVIZUIPrimitiveBuilder extends XVIZBaseBuilder {
       default:
     }
 
-    const primitive = this._formatPrimitive();
-    if (primitive) {
-      primitiveArray.push(primitive);
+    const primitives = this._formatPrimitives();
+    if (primitives) {
+      for (const primitive of primitives) {
+        primitiveArray.push(primitive);
+      }
     }
 
     this.reset();
   }
 
-  _formatPrimitive() {
-    const obj = {};
-
+  _formatPrimitives() {
     switch (this._type) {
       case PRIMITIVE_TYPES.treetable:
-        if (this._rowId !== null) {
-          obj.id = this._rowId;
-        } else {
-          // missing required fields
-          return null;
-        }
-        if (this._rowValues) {
-          obj.column_values = this._rowValues;
-        }
-        if (this._rowParent !== null) {
-          obj.parent = this._rowParent;
+        if (this._row !== null) {
+          return this._row.getData();
         }
         break;
 
       default:
     }
 
-    return obj;
+    return null;
   }
 
   reset() {
     this._type = null;
 
     this._columns = null;
-    this._rowId = null;
-    this._rowParent = null;
-    this._rowValues = null;
+    this._row = null;
   }
 }

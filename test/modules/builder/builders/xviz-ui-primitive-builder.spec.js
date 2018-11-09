@@ -32,9 +32,9 @@ test('XvizUIPrimitiveBuilder#null getData', t => {
   t.end();
 });
 
-test('XvizUIPrimitiveBuilder#columns, row', t => {
+test('XvizUIPrimitiveBuilder#treetable', t => {
   let builder = new XvizUIPrimitiveBuilder({validator});
-  builder.stream('/test').columns(TEST_COLUMNS);
+  builder.stream('/test').treetable(TEST_COLUMNS);
   t.deepEquals(
     builder.getData(),
     {
@@ -51,7 +51,7 @@ test('XvizUIPrimitiveBuilder#columns, row', t => {
   builder = new XvizUIPrimitiveBuilder({validator});
   t.throws(
     () => {
-      builder.stream('/test').row(null, '0', ['row0']);
+      builder.stream('/test').row(0, ['row0']);
       return builder.getData();
     },
     /columns/i,
@@ -59,12 +59,14 @@ test('XvizUIPrimitiveBuilder#columns, row', t => {
   );
 
   builder = new XvizUIPrimitiveBuilder({validator});
-  builder
+  let row = builder
     .stream('/test')
-    .columns(TEST_COLUMNS)
-    .row(null, '0', ['row0'])
-    .row('0', '1', ['row1'])
-    .row('0', '2', null);
+    .treetable(TEST_COLUMNS)
+    .row(0, ['row0']);
+  row.child(1, ['row1']);
+  row = builder.row(2, null);
+  row.child(3, ['row3']);
+
   t.deepEquals(
     builder.getData(),
     {
@@ -72,9 +74,10 @@ test('XvizUIPrimitiveBuilder#columns, row', t => {
         treetable: {
           columns: TEST_COLUMNS,
           nodes: [
-            {id: '0', column_values: ['row0']},
-            {id: '1', parent: '0', column_values: ['row1']},
-            {id: '2', parent: '0'}
+            {id: 0, column_values: ['row0']},
+            {id: 1, parent: 0, column_values: ['row1']},
+            {id: 2},
+            {id: 3, parent: 2, column_values: ['row3']}
           ]
         }
       }

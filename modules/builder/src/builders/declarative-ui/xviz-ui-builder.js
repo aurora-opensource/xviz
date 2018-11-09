@@ -59,7 +59,7 @@ export default class XVIZUIBuilder {
       this._validateError('Top level UI element should be `Panel`');
     }
     this._children.push(child);
-    return this;
+    return child;
   }
 
   _createUIBuilder(type, props) {
