@@ -87,15 +87,20 @@ class PLYElement {
 const data_buffer = new Uint8Array(8);
 const float_view = new Float32Array(data_buffer.buffer);
 const double_view = new Float64Array(data_buffer.buffer);
-let bufferToString = buffer => buffer.toString();
+let bufferToString;
+let BufferClass;
 
-if (typeof Buffer === 'undefined') {
+if (typeof Buffer !== 'undefined' && Buffer.prototype.utf8Write) {
+  // use Buffer class from node
+  BufferClass = Buffer;
+  bufferToString = buffer => buffer.toString();
+} else {
   // browser
-  self.Buffer = Uint8Array;
+  BufferClass = Uint8Array;
   bufferToString = buffer => String.fromCharCode.apply(null, buffer);
 }
 
-const TRAIL_EOL = new Buffer(1);
+const TRAIL_EOL = new BufferClass(1);
 TRAIL_EOL[0] = 10;
 
 export default class PLYParser {
@@ -585,10 +590,10 @@ export default class PLYParser {
     if (this.state === PARSER_STATE.ERROR) {
       return;
     }
-    if (data instanceof Buffer) {
+    if (data instanceof BufferClass) {
       this.buffers.push(data);
     } else {
-      this.buffers.push(new Buffer(data));
+      this.buffers.push(new BufferClass(data));
     }
     while (this.processToken()) {}
   }
