@@ -20,7 +20,8 @@ import {
   parseStreamFutures,
   parseStreamPrimitive,
   parseStreamVariable,
-  parseStreamTimeSeries
+  parseStreamTimeSeries,
+  parseStreamUIPrimitives
 } from './parse-xviz-stream';
 
 /* eslint-disable camelcase */
@@ -83,6 +84,7 @@ export default function parseTimesliceData(data, convertPrimitive) {
   return result;
 }
 
+/* eslint-disable max-statements */
 function parseStateUpdates(stateUpdates, timestamp, convertPrimitive) {
   const {STREAM_BLACKLIST} = getXvizConfig();
 
@@ -92,12 +94,14 @@ function parseStateUpdates(stateUpdates, timestamp, convertPrimitive) {
   const variables = {};
   const timeSeries = [];
   const futures = {};
+  const uiPrimitives = {};
 
   for (const stateUpdate of stateUpdates) {
     Object.assign(poses, stateUpdate.poses);
     Object.assign(primitives, stateUpdate.primitives);
     Object.assign(variables, stateUpdate.variables);
     Object.assign(futures, stateUpdate.future_instances);
+    Object.assign(uiPrimitives, stateUpdate.ui_primitives);
 
     if (stateUpdate.time_series) {
       if (timeSeries) {
@@ -140,5 +144,16 @@ function parseStateUpdates(stateUpdates, timestamp, convertPrimitive) {
       newStreams[future] = parseStreamFutures(futures[future], future, timestamp, convertPrimitive);
     });
 
+  Object.keys(uiPrimitives)
+    .filter(streamName => !STREAM_BLACKLIST.has(streamName))
+    .forEach(primitive => {
+      newStreams[primitive] = parseStreamUIPrimitives(
+        uiPrimitives[primitive],
+        primitive,
+        timestamp
+      );
+    });
+
   return newStreams;
 }
+/* eslint-enable max-statements */

@@ -14,7 +14,11 @@
 
 /* eslint-disable camelcase */
 import {setXvizSettings} from '@xviz/parser';
-import {parseStreamTimeSeries, parseStreamVariable} from '@xviz/parser/parsers/parse-xviz-stream';
+import {
+  parseStreamTimeSeries,
+  parseStreamVariable,
+  parseStreamUIPrimitives
+} from '@xviz/parser/parsers/parse-xviz-stream';
 import {XVIZValidator} from '@xviz/schema';
 
 import tape from 'tape-catch';
@@ -142,6 +146,33 @@ tape('parseStreamVariable#simple v2', t => {
   schemaValidator.validate('core/variable_state', testData);
 
   const result = parseStreamVariable(testData, '/test', time);
+  t.deepEquals(result, expected, 'variables parsed properly');
+
+  t.end();
+});
+
+tape('parseStreamUIPrimitives#simple v2', t => {
+  setXvizSettings({currentMajorVersion: 2});
+
+  const time = 1001;
+  const testData = {
+    treetable: {
+      columns: [{display_text: 'Name', type: 'string'}],
+      nodes: []
+    }
+  };
+
+  const expected = {
+    time: 1001,
+    treetable: {
+      columns: [{display_text: 'Name', type: 'string'}],
+      nodes: []
+    }
+  };
+
+  // TODO - validate against schema
+
+  const result = parseStreamUIPrimitives(testData, '/test', time);
   t.deepEquals(result, expected, 'variables parsed properly');
 
   t.end();

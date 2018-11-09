@@ -32,9 +32,9 @@ test('XvizBaseUIBuilder', t => {
     title: 'Acceleration'
   });
 
-  container.child(metrics1).child(metrics2);
-  panel.child(container);
-  builder.child(panel);
+  container.child(metrics1);
+  container.child(metrics2);
+  builder.child(panel).child(container);
 
   const expected = {
     'Metrics Panel': {

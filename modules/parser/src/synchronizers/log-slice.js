@@ -107,7 +107,7 @@ export default class LogSlice {
 
     this.setLabelsOnXvizObjects(datum.labels);
 
-    const {features = [], lookAheads = [], variable, pointCloud = null, components = []} = datum;
+    const {features = [], lookAheads = [], variable, pointCloud = null} = datum;
 
     // Future data is separate from features so we can control independently
     if (lookAheads.length) {
@@ -117,10 +117,6 @@ export default class LogSlice {
     // Combine data from current datums
     if (features.length) {
       this.features[streamName] = features;
-    }
-
-    if (components.length) {
-      this.components[streamName] = components;
     }
 
     // Point cloud

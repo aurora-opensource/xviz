@@ -21,11 +21,6 @@ export default {
     category: PRIMITIVE_CAT.LABEL,
     validate: primitive => true
   },
-  // eslint-disable-next-line camelcase
-  treetable: {
-    category: PRIMITIVE_CAT.COMPONENT,
-    validate: primitive => true
-  },
   points3d: {
     category: PRIMITIVE_CAT.POINTCLOUD,
     validate: (primitive, streamName, time) => primitive.vertices && primitive.vertices.length > 0

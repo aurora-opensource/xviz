@@ -23,7 +23,6 @@ export const PRIMITIVE_CAT = {
   FEATURE: 'features',
   LABEL: 'labels',
   POINTCLOUD: 'pointCloud',
-  COMPONENT: 'components',
   IMAGE: 'images'
 };
 
@@ -35,13 +34,14 @@ function createPrimitiveMap() {
   return result;
 }
 
+/* eslint-disable max-depth, max-statements, complexity, camelcase */
 // Handle stream-sliced data, via the ETL flow.
 export function parseXvizStream(data, convertPrimitive) {
   // data is an array of objects
   // Each object is [{primitives, variables, timestamp},...]
   // Each object represents a timestamp and array of objects
 
-  const {primitives, variables, futures} = data[0];
+  const {primitives, ui_primitives, variables, futures} = data[0];
   // At this point, we either have one or the other.
   // TODO(twojtasz): BUG: there is an assumption that
   // streamNames will be unique.  Need to put in a detection if
@@ -66,12 +66,15 @@ export function parseXvizStream(data, convertPrimitive) {
     return data.map(datum =>
       parseStreamFutures(datum.futures[streamName], streamName, datum.timestamp, convertPrimitive)
     );
+  } else if (ui_primitives) {
+    const streamName = Object.keys(ui_primitives)[0];
+    return data.map(datum =>
+      parseStreamUIPrimitives(datum.ui_primitives[streamName], streamName, datum.timestamp)
+    );
   }
 
   return {};
 }
-
-/* eslint-disable max-depth, max-statements, complexity, camelcase */
 
 /* Processes an individual primitive time sample and converts the
  * data to UI elements.
@@ -468,4 +471,8 @@ function joinObjectPointCloudsToTypedArrays(objects) {
     colors,
     ids
   };
+}
+
+export function parseStreamUIPrimitives(components, streamName, time) {
+  return Object.assign({time}, components);
 }

@@ -49,9 +49,9 @@ const metrics2 = builder
   .metric({streams: ['/vehicle/acceleration']})
   .title('Acceleration');
 
-container.child(metrics1).child(metrics2);
-panel.child(container);
-builder.child(panel);
+container.child(metrics1)
+container.child(metrics2);
+builder.child(panel).child(container);
 ```
 
 Output:
@@ -103,7 +103,7 @@ Parameters:
 ### Methods
 
 ##### child(panel)
-Append a [`XvizPannelBuilder`](#XvizPannelBuilder) instance to the root.
+Append a [`XvizPannelBuilder`](#XvizPannelBuilder) instance to the root. Returns the child.
 
 ##### getUI()
 Returns a JSON descriptor of all UI components.
@@ -120,7 +120,7 @@ Returns a new [`XvizMetricBuilder`](#XvizMetricBuilder) instance with the specif
 ##### table(options)
 Returns a new [`XvizTableBuilder`](#XvizTableBuilder) instance with the specified options.
 
-##### treeTable(options)
+##### treetable(options)
 Returns a new [`XvizTreeTableBuilder`](#XvizTreeTableBuilder) instance with the specified options.
 
 ##### plot(options)
@@ -147,8 +147,8 @@ Parameters:
 
 ### Methods
 
-##### child(panel)
-Append a container or a component to the panel.
+##### child(node)
+Append a container or a component to the panel. Returns the child.
 
 ##### getUI()
 Returns a JSON descriptor of this panel.
