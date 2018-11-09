@@ -18,14 +18,6 @@ export default {
       aliasId(primitive);
     }
   },
-  // eslint-disable-next-line camelcase
-  treetable: {
-    category: PRIMITIVE_CAT.COMPONENT,
-    validate: primitive => true,
-    normalize: primitive => {
-      aliasId(primitive);
-    }
-  },
   circle: {
     category: PRIMITIVE_CAT.FEATURE,
     validate: (primitive, streamName, time) => primitive.center,

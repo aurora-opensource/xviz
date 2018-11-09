@@ -66,6 +66,11 @@ Examples:
    - `/vehicle/velocity`
    - `/object/car-1`
 
+##### uiPrimitive(streamId : String) : XVIZUIPrimitiveBuilder
+* Start building a `ui_primitive` stream.
+* Return `XVIZUIPrimitiveBuilder` instance
+
+
 # XVIZPoseBuilder
 
 ##### mapOrigin(longitude : Number, latitude : Number, altitude : Number)
@@ -133,6 +138,24 @@ check `xviz-stylesheet` for supported style properties
 
 ##### value(value : Any)
 * Value has to be one of `Number`, `String`, or `boolean`.
+
+
+# XVIZUIPrimitiveBuilder
+
+##### treetable(columns : Array)
+
+Initialize a treetable primitive.
+* `columns` should be an array of descriptors of table columns.
+
+##### row(id: String, column_values: Array)
+
+Add a row to the table. Returns a `XVIZTreeTableRowBuilder` instance that represents the new row.
+
+## XVIZTreeTableRowBuilder
+
+##### child(id: String, column_values: Array)
+
+Append a row as a child of this row. Returns a `XVIZTreeTableRowBuilder` instance that represents the new row.
 
 
 ## Example

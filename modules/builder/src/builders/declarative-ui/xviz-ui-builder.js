@@ -7,7 +7,7 @@ import XvizContainerBuilder from './xviz-container-builder';
 import XvizMetricBuilder from './xviz-metric-builder';
 import XvizPlotBuilder from './xviz-plot-builder';
 import XvizTableBuilder from './xviz-table-builder';
-import XvizTreeTableBuilder from './xviz-table-builder';
+import XvizTreeTableBuilder from './xviz-tree-table-builder';
 import XvizVideoBuilder from './xviz-video-builder';
 
 import {snakeToCamel} from './utils';
@@ -59,7 +59,7 @@ export default class XVIZUIBuilder {
       this._validateError('Top level UI element should be `Panel`');
     }
     this._children.push(child);
-    return this;
+    return child;
   }
 
   _createUIBuilder(type, props) {

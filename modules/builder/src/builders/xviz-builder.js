@@ -2,6 +2,7 @@
 /* eslint-disable camelcase */
 import XVIZPoseBuilder from './xviz-pose-builder';
 import XVIZPrimitiveBuilder from './xviz-primitive-builder';
+import XVIZUIPrimitiveBuilder from './xviz-ui-primitive-builder';
 import XVIZTimeSeriesBuilder from './xviz-time-series-builder';
 import XVIZValidator from './xviz-validator';
 import XvizVariableBuilder from './xviz-variable-builder';
@@ -45,6 +46,10 @@ export default class XVIZBuilder {
       metadata: this.metadata,
       validator: this._validator
     });
+    this._uiPrimitivesBuilder = new XVIZUIPrimitiveBuilder({
+      metadata: this.metadata,
+      validator: this._validator
+    });
     this._timeSeriesBuilder = new XVIZTimeSeriesBuilder({
       metadata: this.metadata,
       validator: this._validator
@@ -63,6 +68,11 @@ export default class XVIZBuilder {
 
   primitive(streamId) {
     this._streamBuilder = this._primitivesBuilder.stream(streamId);
+    return this._streamBuilder;
+  }
+
+  uiPrimitive(streamId) {
+    this._streamBuilder = this._uiPrimitivesBuilder.stream(streamId);
     return this._streamBuilder;
   }
 
@@ -94,6 +104,7 @@ export default class XVIZBuilder {
     const {primitives, futures} = this._primitivesBuilder.getData();
     const variables = this._variablesBuilder.getData();
     const timeSeries = this._timeSeriesBuilder.getData();
+    const uiPrimitives = this._uiPrimitivesBuilder.getData();
 
     const data = {
       timestamp: poses[PRIMARY_POSE_STREAM].timestamp,
@@ -111,6 +122,9 @@ export default class XVIZBuilder {
     }
     if (timeSeries) {
       data.time_series = timeSeries;
+    }
+    if (uiPrimitives) {
+      data.ui_primitives = uiPrimitives;
     }
 
     const frame = {
