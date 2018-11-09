@@ -24,7 +24,7 @@ const UI_BUILDER_MAP = {
   [UI_TYPES.METRIC]: XvizMetricBuilder,
   [UI_TYPES.PLOT]: XvizPlotBuilder,
   [UI_TYPES.TABLE]: XvizTableBuilder,
-  [UI_TYPES.TREE_TABLE]: XvizTreeTableBuilder,
+  [UI_TYPES.TREETABLE]: XvizTreeTableBuilder,
   [UI_TYPES.VIDEO]: XvizVideoBuilder
 };
 

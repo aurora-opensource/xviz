@@ -7,6 +7,6 @@ export const UI_TYPES = {
   METRIC: 'metric',
   PLOT: 'plot',
   TABLE: 'table',
-  TREE_TABLE: 'tree_table',
+  TREETABLE: 'treetable',
   VIDEO: 'video'
 };
