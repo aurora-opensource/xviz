@@ -37,11 +37,25 @@ Since everything is explicitly typed now we have:
 
  - Removed type tags from annotations and primitives
 
+`@xviz/parser` exports:
+
+- Renaming:
+  + `setXvizConfig` -> `setXVIZConfig`
+  + `getXvizConfig` -> `getXVIZConfig`
+  + `setXvizSettings` -> `setXVIZSettings`
+  + `getXvizSettings` -> `getXVIZSettings`
+  + `XvizStreamBuffer` -> `XVIZStreamBuffer`
+  + `XvizStyleParser` -> `XVIZStyleParser`
+  + `XvizObject` -> `XVIZObject`
+  + `XvizObjectCollection` -> `XVIZObjectCollection`
+
 #### Non-Breaking changes
 
  - Unstable Protobuf 3 IDL files are in `modules/schema/proto/v2`
  - The 3x3 and 4x4 Matrix types can now be passed flat, because that that is how they are represented in protobuf
  - `ui_panel_info` can now represent the declarative UI content as raw string because that is how protobuf will pass the JSON format of the declarative UI files
+ - New XVIZ setting `PLAYBACK_FRAME_RATE`
+ - New XVIZ config `TIMESTAMP_FORMAT`
 
 
 ## [0.1.0] - 2018-10-24
