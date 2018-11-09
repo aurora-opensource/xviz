@@ -19,7 +19,7 @@ export default {
     }
   },
   // eslint-disable-next-line camelcase
-  tree_table: {
+  treetable: {
     category: PRIMITIVE_CAT.COMPONENT,
     validate: primitive => true,
     normalize: primitive => {
