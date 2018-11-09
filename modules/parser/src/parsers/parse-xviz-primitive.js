@@ -1,3 +1,11 @@
+export const PRIMITIVE_CAT = {
+  LOOKAHEAD: 'lookAheads',
+  FEATURE: 'features',
+  LABEL: 'labels',
+  POINTCLOUD: 'pointCloud',
+  IMAGE: 'images'
+};
+
 // eslint-disable-next-line max-params
 export function normalizeXVIZPrimitive(
   PRIMITIVE_PROCCESSOR,

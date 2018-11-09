@@ -1,4 +1,4 @@
-import {StreamSynchronizer, XVIZStreamBuffer} from '@xviz/parser';
+import {StreamSynchronizer, XVIZStreamBuffer, setXVIZSettings} from '@xviz/parser';
 import tape from 'tape-catch';
 
 // xviz data uses snake_case
@@ -72,6 +72,7 @@ tape('StreamSynchronizer#setTime', t => {
 });
 
 tape('StreamSynchronizer#getData', t => {
+  setXVIZSettings({TIME_WINDOW: 0.4});
   const logSynchronizer = new StreamSynchronizer(LOG_START_TIME, TEST_BUFFER);
 
   for (const tc of TEST_CASES) {
