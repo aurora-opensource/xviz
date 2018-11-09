@@ -1,16 +1,11 @@
 import {getXVIZConfig, getXVIZSettings} from '../config/xviz-config';
-import {normalizeXVIZPrimitive} from './parse-xviz-primitive';
+import {PRIMITIVE_CAT, normalizeXVIZPrimitive} from './parse-xviz-primitive';
 import XVIZObject from '../objects/xviz-object';
 import {isMainThread} from '../utils/globals';
 import {getPrimitiveData} from './xviz-v2-common';
 
-export const PRIMITIVE_CAT = {
-  LOOKAHEAD: 'lookAheads',
-  FEATURE: 'features',
-  LABEL: 'labels',
-  POINTCLOUD: 'pointCloud',
-  IMAGE: 'images'
-};
+import XVIZPrimitiveSettingsV1 from './xviz-primitives-v1';
+import XVIZPrimitiveSettingsV2 from './xviz-primitives-v2';
 
 function createPrimitiveMap() {
   const result = {};
@@ -67,7 +62,8 @@ export function parseXVIZStream(data, convertPrimitive) {
  */
 export function parseStreamPrimitive(primitives, streamName, time, convertPrimitive) {
   const {OBJECT_STREAM, preProcessPrimitive} = getXVIZConfig();
-  const {PRIMITIVE_SETTINGS} = getXVIZSettings();
+  const PRIMITIVE_SETTINGS =
+    getXVIZSettings().currentMajorVersion === 1 ? XVIZPrimitiveSettingsV1 : XVIZPrimitiveSettingsV2;
 
   const primitiveData = getPrimitiveData(primitives);
 
@@ -156,7 +152,6 @@ export function parseStreamFutures(objects, streamName, time, convertPrimitive) 
 }
 
 export function parseStreamFuturesV1(objects, streamName, time, convertPrimitive) {
-  const {PRIMITIVE_SETTINGS} = getXVIZSettings();
   const futures = [];
   // objects = array of objects
   // [{timestamp, primitives[]}, ...]
@@ -170,7 +165,7 @@ export function parseStreamFuturesV1(objects, streamName, time, convertPrimitive
     const future = primitives
       .map(primitive =>
         normalizeXVIZPrimitive(
-          PRIMITIVE_SETTINGS,
+          XVIZPrimitiveSettingsV1,
           primitive,
           objectIndex,
           streamName,
@@ -191,7 +186,6 @@ export function parseStreamFuturesV1(objects, streamName, time, convertPrimitive
 }
 
 export function parseStreamFuturesV2(objects, streamName, time, convertPrimitive) {
-  const {PRIMITIVE_SETTINGS} = getXVIZSettings();
   const futures = [];
 
   // objects = {
@@ -212,7 +206,7 @@ export function parseStreamFuturesV2(objects, streamName, time, convertPrimitive
       .map(primitive => {
         const normalizedPrimitive = normalizeXVIZPrimitive(
           primitive,
-          PRIMITIVE_SETTINGS,
+          XVIZPrimitiveSettingsV2,
           futureIndex,
           streamName,
           data.type,

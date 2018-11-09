@@ -13,10 +13,8 @@ test('setXVIZConfig setXVIZSettings', t => {
     postProcessFrame,
     'XVIZ config postProcessFrame is not changed after setXVIZSettings'
   );
-  t.notOk(getXVIZSettings().PRIMITIVE_SETTINGS.line2d, 'XVIZ primitive settings is v2');
 
-  setXVIZSettings({currentMajorVersion: 1});
-  t.ok(getXVIZSettings().PRIMITIVE_SETTINGS.line2d, 'XVIZ primitive settings is v1');
+  t.is(getXVIZSettings().currentMajorVersion, 2, 'XVIZ settings is set');
 
   t.end();
 });

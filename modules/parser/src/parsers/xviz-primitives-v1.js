@@ -1,5 +1,5 @@
 import {filterVertices} from './filter-vertices';
-import {PRIMITIVE_CAT} from './parse-xviz-stream';
+import {PRIMITIVE_CAT} from './parse-xviz-primitive';
 
 // TODO - tests for all primitive types
 export default {

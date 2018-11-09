@@ -1,12 +1,11 @@
-import XVIZPrimitiveSettingsV1 from '../parsers/xviz-primitives-v1';
-import XVIZPrimitiveSettingsV2 from '../parsers/xviz-primitives-v2';
-
 import XVIZObjectCollection from '../objects/xviz-object-collection';
 import XVIZObject from '../objects/xviz-object';
 
 const DEFAULT_XVIZ_CONFIG = {
   // Supported major XVIZ versions
   supportedVersions: [1, 2],
+
+  TIMESTAMP_FORMAT: 'milliseconds',
 
   PRIMARY_POSE_STREAM: '/vehicle_pose',
   // TODO - support multiple?
@@ -19,11 +18,11 @@ const DEFAULT_XVIZ_CONFIG = {
 
 const DEFAULT_XVIZ_SETTINGS = {
   currentMajorVersion: 1, // Number set upon parsing metadata
-  PRIMITIVE_SETTINGS: XVIZPrimitiveSettingsV1,
 
-  TIME_WINDOW: 0.4,
-  hiTimeResolution: 1 / 10, // Update pose and lightweight geometry up to 60Hz
-  loTimeResolution: 1 / 10, // Throttle expensive geometry updates to 10Hz
+  TIME_WINDOW: 400,
+
+  PLAYBACK_FRAME_RATE: 10, // The number of log frames to generate per second
+
   pathDistanceThreshold: 0.1 // Filters out close vertices (work around for PathLayer issue)
 };
 
@@ -49,9 +48,6 @@ export function getXVIZConfig() {
 export function setXVIZSettings(config) {
   // TODO/OSS - offer a way to subscribe to settings changes
   Object.assign(xvizSettings, config);
-
-  xvizSettings.PRIMITIVE_SETTINGS =
-    xvizSettings.currentMajorVersion === 1 ? XVIZPrimitiveSettingsV1 : XVIZPrimitiveSettingsV2;
 }
 
 export function getXVIZSettings() {

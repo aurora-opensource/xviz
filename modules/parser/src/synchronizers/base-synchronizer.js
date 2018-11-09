@@ -41,7 +41,6 @@ export default class BaseSynchronizer {
     this.opts = opts;
 
     this.time = 0;
-    this.hiResTime = 0;
     this.loResTime = 0;
     this.lookAheadIndex = 0;
 
@@ -57,8 +56,8 @@ export default class BaseSynchronizer {
       return null;
     }
 
-    // Gets pose by hiResTime frequency
-    const vehiclePose = this._getVehiclePose(logSlice);
+    const {PRIMARY_POSE_STREAM} = getXVIZConfig();
+    const vehiclePose = logSlice.getStream(PRIMARY_POSE_STREAM, null);
 
     if (vehiclePose !== this._lastVehiclePose) {
       xvizStats.bump('vehiclePose');
@@ -78,11 +77,6 @@ export default class BaseSynchronizer {
     return this.time;
   }
 
-  // The high resolution time rounded to smaller intervals, allowing more fine grained updates
-  getHiResTime() {
-    return this.hiResTime;
-  }
-
   // The low resolution time is rounded to bigger intervals, throttling updates
   getLoResTime() {
     return this.loResTime;
@@ -93,10 +87,9 @@ export default class BaseSynchronizer {
    * @return {StreamSynchronizer} - returns itself for chaining.
    */
   setTime(time) {
-    const {loTimeResolution, hiTimeResolution} = getXVIZSettings();
+    const {PLAYBACK_FRAME_RATE} = getXVIZSettings();
     this.time = time;
-    this.loResTime = Math.round(time / loTimeResolution) * loTimeResolution;
-    this.hiResTime = Math.round(time / hiTimeResolution) * hiTimeResolution;
+    this.loResTime = Math.round(time * PLAYBACK_FRAME_RATE) / PLAYBACK_FRAME_RATE;
     assert(Number.isFinite(this.time), 'Invalid time');
     return this;
   }
@@ -149,10 +142,6 @@ export default class BaseSynchronizer {
     assert(false);
   }
 
-  getHiResDatum() {
-    return null;
-  }
-
   /**
    * Find and process stream data in the range (start, end] for process
    * Returns a list of streams sorted by descending time
@@ -163,16 +152,5 @@ export default class BaseSynchronizer {
    */
   _getTimeRangeInReverse(startTime, endTime) {
     assert(false);
-  }
-
-  // PRIVATE HELPER METHODS
-
-  // Get pose, pose and trackedObjectId
-  _getVehiclePose(logSlice) {
-    const {PRIMARY_POSE_STREAM} = getXVIZConfig();
-    return (
-      this.getHiResDatum('/interpolated_vehicle_pose') ||
-      logSlice.getStream(PRIMARY_POSE_STREAM, null)
-    );
   }
 }
