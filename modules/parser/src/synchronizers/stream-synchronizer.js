@@ -8,7 +8,7 @@ export default class StreamSynchronizer extends BaseSynchronizer {
    *
    * @class
    * @param Number startTime - The starting GPS time
-   * @param {XvizStreamBuffer} streamBuffer - The stream buffer
+   * @param {XVIZStreamBuffer} streamBuffer - The stream buffer
    * - Each timeslice object must contain a GPS timestamp
    */
   constructor(startTime, streamBuffer, opts) {

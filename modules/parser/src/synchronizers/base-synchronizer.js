@@ -1,4 +1,4 @@
-import {getXvizConfig, getXvizSettings} from '../config/xviz-config';
+import {getXVIZConfig, getXVIZSettings} from '../config/xviz-config';
 import xvizStats from '../utils/stats';
 import LogSlice from './log-slice';
 
@@ -93,7 +93,7 @@ export default class BaseSynchronizer {
    * @return {StreamSynchronizer} - returns itself for chaining.
    */
   setTime(time) {
-    const {loTimeResolution, hiTimeResolution} = getXvizSettings();
+    const {loTimeResolution, hiTimeResolution} = getXVIZSettings();
     this.time = time;
     this.loResTime = Math.round(time / loTimeResolution) * loTimeResolution;
     this.hiResTime = Math.round(time / hiTimeResolution) * hiTimeResolution;
@@ -128,7 +128,7 @@ export default class BaseSynchronizer {
     }
 
     // Find the right timeslices
-    const {TIME_WINDOW} = getXvizSettings();
+    const {TIME_WINDOW} = getXVIZSettings();
     this._lastLoResTime = this.loResTime;
     this._streamsByReverseTime = this._getTimeRangeInReverse(
       this.loResTime - TIME_WINDOW,
@@ -169,7 +169,7 @@ export default class BaseSynchronizer {
 
   // Get pose, pose and trackedObjectId
   _getVehiclePose(logSlice) {
-    const {PRIMARY_POSE_STREAM} = getXvizConfig();
+    const {PRIMARY_POSE_STREAM} = getXVIZConfig();
     return (
       this.getHiResDatum('/interpolated_vehicle_pose') ||
       logSlice.getStream(PRIMARY_POSE_STREAM, null)

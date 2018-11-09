@@ -1,9 +1,9 @@
-# XvizObject
+# XVIZObject
 
-The `XvizObject` class tracks the status of each Xviz object in a log.
+The `XVIZObject` class tracks the status of each XVIZ object in a log.
 
 ```js
-import {XvizObject} from 'viz';
+import {XVIZObject} from 'viz';
 ```
 
 
@@ -11,22 +11,22 @@ import {XvizObject} from 'viz';
 
 ##### `get(id)`
 
-Returns an `XvizObject` instance for the given `id`.
+Returns an `XVIZObject` instance for the given `id`.
 
 ##### `getAll()`
 
-Returns all Xviz objects in the current log. Keys are ids and values are `XvizObject` instances.
+Returns all XVIZ objects in the current log. Keys are ids and values are `XVIZObject` instances.
 
 ##### `getAllInCurrentFrame()`
 
-Returns all Xviz objects in the current frame. Keys are ids and values are `XvizObject` instances.
+Returns all XVIZ objects in the current frame. Keys are ids and values are `XVIZObject` instances.
 
 
 ## Properties
 
 ##### `id` (string)
 
-The Xviz object id.
+The XVIZ object id.
 
 ##### `state` (object)
 
@@ -47,4 +47,4 @@ The coordinates of the tracking point of the object. `undefined` if the object d
 
 ## Methods
 
-Apps should not directly call any methods on the XvizObject objects.
+Apps should not directly call any methods on the XVIZObject objects.

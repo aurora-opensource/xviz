@@ -1,7 +1,7 @@
-import XvizBaseUiBuilder from './xviz-base-ui-builder';
+import XVIZBaseUiBuilder from './xviz-base-ui-builder';
 import {UI_TYPES} from './constants';
 
-export default class XvizPlotBuilder extends XvizBaseUiBuilder {
+export default class XVIZPlotBuilder extends XVIZBaseUiBuilder {
   constructor({
     independentVariable,
     dependentVariable,

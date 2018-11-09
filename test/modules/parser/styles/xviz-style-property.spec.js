@@ -1,14 +1,14 @@
-import XvizStyleProperty from '@xviz/parser/styles/xviz-style-property';
+import XVIZStyleProperty from '@xviz/parser/styles/xviz-style-property';
 import tape from 'tape-catch';
 
-tape('XvizStyleProperty#getDefault', t => {
-  t.ok(Number.isFinite(XvizStyleProperty.getDefault('opacity')), 'gets default opacity');
-  t.ok(Array.isArray(XvizStyleProperty.getDefault('stroke_color')), 'gets default stroke color');
+tape('XVIZStyleProperty#getDefault', t => {
+  t.ok(Number.isFinite(XVIZStyleProperty.getDefault('opacity')), 'gets default opacity');
+  t.ok(Array.isArray(XVIZStyleProperty.getDefault('stroke_color')), 'gets default stroke color');
 
   t.end();
 });
 
-tape('XvizStyleProperty', t => {
+tape('XVIZStyleProperty', t => {
   const testCases = [
     {
       key: 'height',
@@ -119,12 +119,12 @@ tape('XvizStyleProperty', t => {
   testCases.forEach(testCase => {
     if (testCase.shouldThrow) {
       t.throws(
-        () => new XvizStyleProperty(testCase.key, testCase.value),
+        () => new XVIZStyleProperty(testCase.key, testCase.value),
         /illegal/i,
         testCase.message
       );
     } else {
-      const property = new XvizStyleProperty(testCase.key, testCase.value);
+      const property = new XVIZStyleProperty(testCase.key, testCase.value);
       t.deepEquals(property.getValue(testCase.context || {}), testCase.output, testCase.message);
     }
   });

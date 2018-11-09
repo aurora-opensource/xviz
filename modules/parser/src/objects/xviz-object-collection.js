@@ -1,7 +1,7 @@
-import XvizObject from './xviz-object';
+import XVIZObject from './xviz-object';
 
-export default class XvizObjectCollection {
-  constructor({ObjectType = XvizObject} = {}) {
+export default class XVIZObjectCollection {
+  constructor({ObjectType = XVIZObject} = {}) {
     // A map of all XVIZ objects, across time
     this.objects = new Map();
     this.ObjectType = ObjectType;

@@ -1,8 +1,8 @@
-import XvizPrimitiveSettingsV1 from '../parsers/xviz-primitives-v1';
-import XvizPrimitiveSettingsV2 from '../parsers/xviz-primitives-v2';
+import XVIZPrimitiveSettingsV1 from '../parsers/xviz-primitives-v1';
+import XVIZPrimitiveSettingsV2 from '../parsers/xviz-primitives-v2';
 
-import XvizObjectCollection from '../objects/xviz-object-collection';
-import XvizObject from '../objects/xviz-object';
+import XVIZObjectCollection from '../objects/xviz-object-collection';
+import XVIZObject from '../objects/xviz-object';
 
 const DEFAULT_XVIZ_CONFIG = {
   // Supported major XVIZ versions
@@ -19,7 +19,7 @@ const DEFAULT_XVIZ_CONFIG = {
 
 const DEFAULT_XVIZ_SETTINGS = {
   currentMajorVersion: 1, // Number set upon parsing metadata
-  PRIMITIVE_SETTINGS: XvizPrimitiveSettingsV1,
+  PRIMITIVE_SETTINGS: XVIZPrimitiveSettingsV1,
 
   TIME_WINDOW: 0.4,
   hiTimeResolution: 1 / 10, // Update pose and lightweight geometry up to 60Hz
@@ -30,10 +30,10 @@ const DEFAULT_XVIZ_SETTINGS = {
 let xvizConfig = Object.assign({}, DEFAULT_XVIZ_CONFIG);
 const xvizSettings = Object.assign({}, DEFAULT_XVIZ_SETTINGS);
 
-XvizObject.setDefaultCollection(new XvizObjectCollection());
+XVIZObject.setDefaultCollection(new XVIZObjectCollection());
 
 // CONFIG contains the static configuration of XVIZ (streams, how to postprocess etc)
-export function setXvizConfig(config) {
+export function setXVIZConfig(config) {
   xvizConfig = Object.assign({}, DEFAULT_XVIZ_CONFIG, config);
 
   if (Array.isArray(xvizConfig.STREAM_BLACKLIST)) {
@@ -41,19 +41,19 @@ export function setXvizConfig(config) {
   }
 }
 
-export function getXvizConfig() {
+export function getXVIZConfig() {
   return xvizConfig;
 }
 
 // SETTINGS are dynamic settings that can be changed during runtime by apps
-export function setXvizSettings(config) {
+export function setXVIZSettings(config) {
   // TODO/OSS - offer a way to subscribe to settings changes
   Object.assign(xvizSettings, config);
 
   xvizSettings.PRIMITIVE_SETTINGS =
-    xvizSettings.currentMajorVersion === 1 ? XvizPrimitiveSettingsV1 : XvizPrimitiveSettingsV2;
+    xvizSettings.currentMajorVersion === 1 ? XVIZPrimitiveSettingsV1 : XVIZPrimitiveSettingsV2;
 }
 
-export function getXvizSettings() {
+export function getXVIZSettings() {
   return xvizSettings;
 }

@@ -56,8 +56,8 @@ export default class XVIZWriter {
         return value;
       };
 
-      const jsonXvizFrame = xvizConvertJson(xvizFrame);
-      fs.writeFileSync(`${frameFilePath}.json`, JSON.stringify(jsonXvizFrame, numberRounder), {
+      const jsonXVIZFrame = xvizConvertJson(xvizFrame);
+      fs.writeFileSync(`${frameFilePath}.json`, JSON.stringify(jsonXVIZFrame, numberRounder), {
         flag: 'w'
       });
     }

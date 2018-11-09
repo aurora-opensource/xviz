@@ -1,2 +1,2 @@
-# XvizLogSlice
+# XVIZLogSlice
 

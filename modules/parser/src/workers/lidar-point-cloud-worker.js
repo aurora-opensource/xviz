@@ -1,9 +1,9 @@
-import {setXvizConfig} from '../config/xviz-config';
-import {parseXvizStream} from '../parsers/parse-xviz-stream';
+import {setXVIZConfig} from '../config/xviz-config';
+import {parseXVIZStream} from '../parsers/parse-xviz-stream';
 import {TextDecoder} from 'text-encoding'; // Node.js < 9 polyfills
 
 export default config => self => {
-  setXvizConfig(config);
+  setXVIZConfig(config);
 
   self.onmessage = e => {
     const dataView = new DataView(e.data);
@@ -12,7 +12,7 @@ export default config => self => {
 
     try {
       let data = JSON.parse(decodedString);
-      data = parseXvizStream(data);
+      data = parseXVIZStream(data);
 
       const transfers = [];
 

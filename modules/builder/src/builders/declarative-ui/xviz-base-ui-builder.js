@@ -1,4 +1,4 @@
-export default class XvizBaseUiBuilder {
+export default class XVIZBaseUiBuilder {
   constructor({type, validateError, validateWarn}) {
     this._type = type;
     this._children = null;

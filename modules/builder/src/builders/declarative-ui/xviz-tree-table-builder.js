@@ -1,7 +1,7 @@
-import XvizBaseUiBuilder from './xviz-base-ui-builder';
+import XVIZBaseUiBuilder from './xviz-base-ui-builder';
 import {UI_TYPES} from './constants';
 
-export default class XvizTreeTableBuilder extends XvizBaseUiBuilder {
+export default class XVIZTreeTableBuilder extends XVIZBaseUiBuilder {
   constructor({stream, description, title, displayObjectId, validateWarn, validateError}) {
     super({
       type: UI_TYPES.TREETABLE,

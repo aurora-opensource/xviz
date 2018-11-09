@@ -8,24 +8,24 @@ const MAGIC_XVIZ = 0x5856495a; // XVIZ in Big-Endian ASCII
 
 export function packXVIZ(xvizJson, opts) {
   const bufferPacker = new GLBBufferPacker();
-  const packedXviz = {};
+  const packedXVIZ = {};
 
   const xvizTopKeys = Object.keys(xvizJson);
   for (const key of xvizTopKeys) {
     switch (key) {
       case 'updates':
-        packedXviz[key] = packXVIZStateUpdates(xvizJson[key], bufferPacker, opts);
+        packedXVIZ[key] = packXVIZStateUpdates(xvizJson[key], bufferPacker, opts);
         break;
       default:
-        packedXviz[key] = xvizJson[key];
+        packedXVIZ[key] = xvizJson[key];
         break;
     }
   }
 
   const {json, arrayBuffer} = bufferPacker.packBuffers();
-  packedXviz.buffers = json;
+  packedXVIZ.buffers = json;
 
-  return GLBEncoder.createGlbBuffer(packedXviz, arrayBuffer, MAGIC_XVIZ);
+  return GLBEncoder.createGlbBuffer(packedXVIZ, arrayBuffer, MAGIC_XVIZ);
 }
 
 function packXVIZStateUpdates(stateUpdates, bufferPacker, opts) {

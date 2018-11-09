@@ -1,9 +1,9 @@
-# Xviz Configuration and Settings
+# XVIZ Configuration and Settings
 
 
 ## Functions
 
-### setXvizConfig(config)
+### setXVIZConfig(config)
 
 Constants:
 
@@ -15,12 +15,12 @@ Parser plugins:
 
 - `preProcessPrimitive` (Function) - Pre process a primitive. This can be used to change the type of a primitive (e.g. from `point` to `text`) and/or modify their properties.
 
-### getXvizConfig(config)
+### getXVIZConfig(config)
 
-Returns the current Xviz config.
+Returns the current XVIZ config.
 
 
-### setXvizSettings(config)
+### setXVIZSettings(config)
 
 Sets the XVIZ settings. The default settings are:
 
@@ -30,6 +30,6 @@ Sets the XVIZ settings. The default settings are:
 - `pathDistanceThreshold` (Number) - Filters out close vertices (work around for PathLayer issue) Default `0.1`.
 
 
-### getXvizSettings(config)
+### getXVIZSettings(config)
 
 Returns the current xviz settings.

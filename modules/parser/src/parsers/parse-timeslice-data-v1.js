@@ -1,9 +1,9 @@
 // Extracts a TIMESLICE message v1
-import {getXvizConfig, LOG_STREAM_MESSAGE} from '..';
+import {getXVIZConfig, LOG_STREAM_MESSAGE} from '..';
 import {parseStreamFutures, parseStreamPrimitive, parseStreamVariable} from './parse-xviz-stream';
 
 export default function parseTimesliceData(data, convertPrimitive) {
-  const {PRIMARY_POSE_STREAM} = getXvizConfig();
+  const {PRIMARY_POSE_STREAM} = getXVIZConfig();
   const {vehicle_pose: vehiclePose, state_updates: stateUpdates, ...otherInfo} = data;
 
   let timestamp;
@@ -42,7 +42,7 @@ export default function parseTimesliceData(data, convertPrimitive) {
 }
 
 function parseStateUpdates(stateUpdates, timestamp, convertPrimitive) {
-  const {STREAM_BLACKLIST} = getXvizConfig();
+  const {STREAM_BLACKLIST} = getXVIZConfig();
 
   const newStreams = {};
   const primitives = {};
