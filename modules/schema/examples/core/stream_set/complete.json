@@ -1,5 +1,6 @@
 {
   "timestamp": 1001.3,
+
   "poses": {
     "/vehicle_pose": {
       "timestamp": 1001.3,
@@ -22,6 +23,7 @@
       "orientation": [1.5, 95.0, 24.5]
     }
   },
+
   "primitives": {
     "/object/points": {
       "points": [
@@ -109,6 +111,35 @@
       ]
     }
   },
+
+  "ui_primitives": {
+    "/ui/pred/objects": {
+      "treetable": {
+        "columns": [
+          {
+            "display_text": "Age",
+            "type": "integer",
+            "unit": "Years"
+          },
+          {
+            "display_text": "Name",
+            "type": "string"
+            }
+        ],
+        "nodes": [
+          {
+            "id": 0,
+            "column_values": ["10", "Jim"]
+          },
+          {
+            "id": 1,
+            "column_values": ["22", "Bob"]
+          }
+        ]
+      }
+    }
+  },
+
   "time_series": [
     {
       "timestamp": 12345.5,
@@ -139,6 +170,7 @@
       }
     }
   ],
+
   "future_instances": {
     "/prediction/points": {
       "timestamps": [1.0, 1.1, 1.2],
@@ -167,6 +199,7 @@
       ]
     }
   },
+
   "variables": {
     "/plan/time": {
       "variables": [
@@ -196,6 +229,7 @@
       ]
     }
   },
+
   "annotations": {
     "/object/highlights": {
       "visuals": [

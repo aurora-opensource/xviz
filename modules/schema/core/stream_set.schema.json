@@ -25,6 +25,12 @@
         "$ref": "https://xviz.org/schema/core/primitive_state.json"
       }
     },
+    "ui_primitives": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "https://xviz.org/schema/core/ui_primitive_state.json"
+      }
+    },
     "time_series": {
       "type": "array",
       "items": {

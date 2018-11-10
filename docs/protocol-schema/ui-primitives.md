@@ -33,35 +33,43 @@ TreeTable nodes act like nodes in a tree or rows in a table. Note that columns a
 have a value at every node. An example of this would be how many file browsers don’t list a size for
 folders.
 
-| Name            | Type                            | Description                                                     |
-| --------------- | ------------------------------- | --------------------------------------------------------------- |
-| `id`            | `treetable_node_id`             | The ID of this node within the TreeTable                        |
-| `parent`        | `treetable_node_id`             | The ID of the parent, essentially a pointer to parent           |
-| `column_values` | `list<optional<value_variant>>` | A list of the column values with index corresponding to column. |
+| Name            | Type                          | Description                                                                       |
+| --------------- | ----------------------------- | --------------------------------------------------------------------------------- |
+| `id`            | `treetable_node_id`           | The ID of this node within the TreeTable                                          |
+| `parent`        | `optional<treetable_node_id>` | The ID of the parent, essentially a pointer to parent, not present in root nodes. |
+| `column_values` | `list<string>`                | A list of the column values with index corresponding to column.                   |
 
-### Error Handling in TreeTables
+## Example
 
-When parsing TreeTable values into JSON representations there is a possibility that an unparsable
-value or a value with an incorrect data type is present. To prevent a single bad value from crashing
-the entire TreeTable conversion, these values will be represented as null and an error message will
-be included in a special errors field in the TreeTable’s JSON representation.
+Here is an example tree table with two columns "Age" and "Name".
 
-#### The Errors Field
-
-The errors field is used to send additional information about any errors that came up while
-converting the TreeTable from its server side representation into JSON.
-
-| Name     | Type                    | Description                                                         |
-| -------- | ----------------------- | ------------------------------------------------------------------- |
-| `errors` | `list<treetable_error>` | A list of errors with more detailed information about what happened |
-
-#### The TreeTable Error Type
-
-The TreeTable error type includes information about the location within the treetable where the
-error occurred along with a description of what error has occurred.
-
-| Name      | Type                  | Description                                |
-| --------- | --------------------- | ------------------------------------------ |
-| `message` | `string`              | Details of what error has occurred and why |
-| `column`  | `treetable_column_id` | The column with the error value            |
-| `node`    | `treetable_node_id`   | The node/row with the error value          |
+```javascript
+{
+  "columns": [
+    {
+      "display_text": "Age",
+      "type": "integer",
+      "unit": "Years"
+    },
+    {
+      "display_text": "Name",
+      "type": "string"
+    }
+  ],
+  "nodes": [
+    {
+      "id": 0
+    },
+    {
+      "id": 1,
+      "parent": 0,
+      "column_values": ["10", "Jim"]
+    },
+    {
+      "id": 2,
+      "parent": 0,
+      "column_values": ["22", "Bob"]
+    }
+  ]
+}
+```

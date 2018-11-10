@@ -1,0 +1,28 @@
+{
+  "columns": [
+    {
+      "display_text": "Age",
+      "type": "integer",
+      "unit": "Years"
+    },
+    {
+      "display_text": "Name",
+      "type": "string"
+    }
+  ],
+  "nodes": [
+    {
+      "id": 0
+    },
+    {
+      "id": 1,
+      "parent": 0,
+      "column_values": ["10", "Jim"]
+    },
+    {
+      "id": 2,
+      "parent": 0,
+      "column_values": ["22", "Bob"]
+    }
+  ]
+}
