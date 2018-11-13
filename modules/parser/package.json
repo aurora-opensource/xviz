@@ -13,6 +13,9 @@
     "dist",
     "src"
   ],
+  "browser": {
+    "text-encoding": false
+  },
   "dependencies": {
     "base64-js": "^1.3.0",
     "color": "^3.0.0",
