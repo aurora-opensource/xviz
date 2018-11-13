@@ -1,6 +1,5 @@
 /* eslint-disable camelcase */
 import XVIZBaseBuilder from './xviz-base-builder';
-import {insertTimestamp} from '../utils';
 import {CATEGORY, PRIMITIVE_TYPES} from './constant';
 
 export default class XVIZPrimitiveBuilder extends XVIZBaseBuilder {
@@ -11,18 +10,8 @@ export default class XVIZPrimitiveBuilder extends XVIZBaseBuilder {
     });
 
     this.reset();
-    // futures: {[streamId]: {...,timestamps: [], primitives: []}}
-    this._futures = {};
     // primitives: {[streamId]: []}
     this._primitives = {};
-  }
-
-  timestamp(timestamp) {
-    if (!this._timestamps) {
-      this._timestamps = [];
-    }
-    this._timestamps.push(timestamp);
-    return this;
   }
 
   image(data) {
@@ -205,12 +194,6 @@ export default class XVIZPrimitiveBuilder extends XVIZBaseBuilder {
 
   _flush() {
     this._validate();
-
-    if (this._isFuture()) {
-      this._flushFutures();
-      return;
-    }
-
     this._flushPrimitives();
   }
 
@@ -219,50 +202,17 @@ export default class XVIZPrimitiveBuilder extends XVIZBaseBuilder {
       this._flush();
     }
 
-    const data = {};
-    if (Object.keys(this._primitives).length) {
-      data.primitives = this._primitives;
-    }
-    if (Object.keys(this._futures).length) {
-      data.futures = this._futures;
+    if (Object.keys(this._primitives).length === 0) {
+      return null;
     }
 
-    return data;
+    return this._primitives;
   }
 
   _validatePrerequisite() {
     if (!this._type) {
       this.validateError('Start from a primitive first, e.g polygon(), image(), etc.');
     }
-  }
-
-  _isFuture() {
-    return this._timestamps && this._vertices;
-  }
-
-  _flushFutures() {
-    let future = this._futures[this._streamId];
-    if (!future) {
-      future = {
-        timestamps: [],
-        primitives: []
-      };
-      this._futures[this._streamId] = future;
-    }
-
-    const primitive = this._formatPrimitive();
-
-    const {timestamps, primitives} = future;
-
-    // Each type like "image" has an "images" array, this hack saves a
-    // big switch statement.
-    const update = {};
-    update[`${this._type}s`] = [primitive];
-
-    // insert ts and primitive to the position based on timestamp order
-    insertTimestamp(timestamps, primitives, this._timestamps[0], update);
-
-    this.reset();
   }
 
   _flushPrimitives() {
@@ -360,7 +310,6 @@ export default class XVIZPrimitiveBuilder extends XVIZBaseBuilder {
 
   reset() {
     this._type = null;
-    this._timestamps = null;
 
     this._image = null;
     this._vertices = null;
