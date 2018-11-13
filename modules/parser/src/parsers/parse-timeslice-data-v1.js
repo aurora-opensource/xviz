@@ -1,5 +1,6 @@
 // Extracts a TIMESLICE message v1
-import {getXVIZConfig, LOG_STREAM_MESSAGE} from '..';
+import {getXVIZConfig} from '../config/xviz-config';
+import {LOG_STREAM_MESSAGE} from '../constants';
 import {parseStreamFutures, parseStreamPrimitive, parseStreamVariable} from './parse-xviz-stream';
 
 export default function parseTimesliceData(data, convertPrimitive) {
