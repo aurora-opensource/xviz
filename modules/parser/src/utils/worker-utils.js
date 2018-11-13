@@ -68,10 +68,14 @@ function getTransferList(object, recursive = true, transfers = []) {
  * A worker in the WorkerFarm
  */
 class WorkerThread {
-  constructor({url, metadata}) {
+  constructor({url, metadata, initialMessage}) {
     this.worker = new Worker(url);
     this.isBusy = false;
     this.metadata = metadata;
+
+    if (initialMessage) {
+      this.worker.postMessage(initialMessage, getTransferList(initialMessage));
+    }
   }
 
   process(data) {
@@ -107,7 +111,7 @@ export class WorkerFarm {
    * @param processor {function | string} - worker function
    * @param maxConcurrency {number} - max count of workers
    */
-  constructor({processor, maxConcurrency = 1, debug = () => {}}) {
+  constructor({processor, maxConcurrency = 1, debug = () => {}, initialMessage = null}) {
     this.workerURL = getWorkerURL(processor);
     this.workers = [];
     this.queue = [];
@@ -116,7 +120,8 @@ export class WorkerFarm {
     for (let i = 0; i < maxConcurrency; i++) {
       this.workers[i] = new WorkerThread({
         url: this.workerURL,
-        metadata: {name: `${i}/${maxConcurrency}`}
+        metadata: {name: `${i}/${maxConcurrency}`},
+        initialMessage
       });
     }
   }
