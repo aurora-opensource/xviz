@@ -1,37 +1,4 @@
-/* global Worker, URL */
-import createWorker from 'webworkify';
-
-// Cache result of webworkify
-const cache = new Map();
-
-function getWorkerURL(processor) {
-  let workerURL = cache.get(processor);
-
-  if (!workerURL) {
-    const blob = createWorker(processor, {bare: true});
-    workerURL = URL.createObjectURL(blob);
-    cache.set(processor, workerURL);
-  }
-
-  return workerURL;
-}
-
-/**
- * Process binary data in a worker
- * @param processor {function | string} - worker function.
- * @returns a Promise creator
- */
-export function processWithWorker(processor) {
-  const workerURL = getWorkerURL(processor);
-
-  return arrayBuffer =>
-    new Promise((resolve, reject) => {
-      const worker = new Worker(workerURL);
-      worker.onmessage = message => resolve(message.data);
-      worker.onerror = error => reject(error);
-      worker.postMessage(arrayBuffer, [arrayBuffer]);
-    });
-}
+/* global Worker */
 
 function getTransferList(object, recursive = true, transfers = []) {
   if (!object) {
@@ -94,11 +61,11 @@ class WorkerThread {
  */
 export class WorkerFarm {
   /**
-   * @param processor {function | string} - worker function
+   * @param workerURL {function | string} - worker function
    * @param maxConcurrency {number} - max count of workers
    */
-  constructor({processor, maxConcurrency = 1, debug = () => {}, initialMessage = null}) {
-    this.workerURL = getWorkerURL(processor);
+  constructor({workerURL, maxConcurrency = 1, debug = () => {}, initialMessage = null}) {
+    this.workerURL = workerURL;
     this.workers = [];
     this.queue = [];
     this.debug = debug;

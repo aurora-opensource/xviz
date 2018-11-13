@@ -12,7 +12,7 @@ import {parseStreamVideoMessage} from './parse-stream-video-message';
 import {TextDecoder} from 'text-encoding'; // Node.js < 9 polyfills
 import parseTimesliceDataV1 from './parse-timeslice-data-v1';
 import parseTimesliceDataV2 from './parse-timeslice-data-v2';
-import {getXVIZSettings} from '..';
+import {getXVIZSettings} from '../config/xviz-config';
 
 function isJSON(encodedString) {
   const firstChar = String.fromCharCode(encodedString[0]);
