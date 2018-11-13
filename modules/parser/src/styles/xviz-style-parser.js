@@ -17,7 +17,7 @@ import Stylesheet from './stylesheet';
 const EMPTY_STYLESHEET = new Stylesheet();
 
 /* Parser for multiple stylesheets */
-export default class XvizStyleParser {
+export default class XVIZStyleParser {
   /**
    * @constructor
    * @param {Object} data - a map from stream name to stylesheet definition

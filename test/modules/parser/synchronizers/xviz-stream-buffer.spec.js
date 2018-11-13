@@ -14,7 +14,7 @@
 
 import test from 'tape-catch';
 
-import {XvizStreamBuffer} from '@xviz/parser';
+import {XVIZStreamBuffer} from '@xviz/parser';
 
 const TEST_TIMESLICES = [
   {
@@ -53,25 +53,25 @@ const TEST_TIMESLICES_SORTED = TEST_TIMESLICES.slice(0, 5).sort(
   (ts1, ts2) => ts1.timestamp - ts2.timestamp
 );
 
-test('XvizStreamBuffer#constructor', t => {
-  const xvizStreamBuffer = new XvizStreamBuffer();
-  t.ok(xvizStreamBuffer instanceof XvizStreamBuffer, 'constructor does not throw error');
+test('XVIZStreamBuffer#constructor', t => {
+  const xvizStreamBuffer = new XVIZStreamBuffer();
+  t.ok(xvizStreamBuffer instanceof XVIZStreamBuffer, 'constructor does not throw error');
   t.not(xvizStreamBuffer.isLimited, 'buffer is unlimited');
 
-  const xvizStreamBufferLimited = new XvizStreamBuffer({
+  const xvizStreamBufferLimited = new XVIZStreamBuffer({
     startOffset: -1,
     endOffset: 5
   });
-  t.ok(xvizStreamBufferLimited instanceof XvizStreamBuffer, 'constructor does not throw error');
+  t.ok(xvizStreamBufferLimited instanceof XVIZStreamBuffer, 'constructor does not throw error');
   t.is(xvizStreamBufferLimited.bufferType, 1, 'buffer is limited');
 
-  t.throws(() => new XvizStreamBuffer({startOffset: 1, endOffset: 5}), 'validates parameters');
+  t.throws(() => new XVIZStreamBuffer({startOffset: 1, endOffset: 5}), 'validates parameters');
 
   t.end();
 });
 
-test('XvizStreamBuffer#getLoadedTimeRange', t => {
-  const xvizStreamBuffer = new XvizStreamBuffer();
+test('XVIZStreamBuffer#getLoadedTimeRange', t => {
+  const xvizStreamBuffer = new XVIZStreamBuffer();
   t.is(xvizStreamBuffer.getLoadedTimeRange(), null, 'returns null when buffer is empty');
 
   xvizStreamBuffer.timeslices = TEST_TIMESLICES_SORTED.slice();
@@ -84,8 +84,8 @@ test('XvizStreamBuffer#getLoadedTimeRange', t => {
   t.end();
 });
 
-test('XvizStreamBuffer#size, getTimeslices', t => {
-  const xvizStreamBuffer = new XvizStreamBuffer();
+test('XVIZStreamBuffer#size, getTimeslices', t => {
+  const xvizStreamBuffer = new XVIZStreamBuffer();
   t.is(xvizStreamBuffer.size, 0, 'returns correct size');
 
   xvizStreamBuffer.timeslices = TEST_TIMESLICES_SORTED.slice();
@@ -109,8 +109,8 @@ test('XvizStreamBuffer#size, getTimeslices', t => {
   t.end();
 });
 
-test('XvizStreamBuffer#insert, getStreams', t => {
-  const xvizStreamBuffer = new XvizStreamBuffer();
+test('XVIZStreamBuffer#insert, getStreams', t => {
+  const xvizStreamBuffer = new XVIZStreamBuffer();
   let timeslices;
   let {lastUpdate} = xvizStreamBuffer;
 
@@ -146,10 +146,10 @@ test('XvizStreamBuffer#insert, getStreams', t => {
   t.end();
 });
 
-test('XvizStreamBuffer#setCurrentTime', t => {
+test('XVIZStreamBuffer#setCurrentTime', t => {
   let lastUpdate;
 
-  const xvizStreamBufferNoLimit = new XvizStreamBuffer();
+  const xvizStreamBufferNoLimit = new XVIZStreamBuffer();
   xvizStreamBufferNoLimit.timeslices = TEST_TIMESLICES_SORTED.slice();
 
   lastUpdate = xvizStreamBufferNoLimit.lastUpdate;
@@ -158,7 +158,7 @@ test('XvizStreamBuffer#setCurrentTime', t => {
   t.is(xvizStreamBufferNoLimit.size, 5, 'should not drop timeslices');
   t.is(lastUpdate, xvizStreamBufferNoLimit.lastUpdate, 'lastUpdate timestamp should not change');
 
-  const xvizStreamBufferLimited = new XvizStreamBuffer({
+  const xvizStreamBufferLimited = new XVIZStreamBuffer({
     startOffset: -2,
     endOffset: 2
   });
@@ -184,8 +184,8 @@ test('XvizStreamBuffer#setCurrentTime', t => {
   t.end();
 });
 
-test('XvizStreamBuffer#hasBuffer', t => {
-  const xvizStreamBuffer = new XvizStreamBuffer();
+test('XVIZStreamBuffer#hasBuffer', t => {
+  const xvizStreamBuffer = new XVIZStreamBuffer();
 
   TEST_TIMESLICES.forEach(sample => xvizStreamBuffer.insert(sample));
 
@@ -193,8 +193,8 @@ test('XvizStreamBuffer#hasBuffer', t => {
   t.end();
 });
 
-test('XvizStreamBuffer#updateFixedBuffer contraction, removes invalid data', t => {
-  const xvizStreamBuffer = new XvizStreamBuffer();
+test('XVIZStreamBuffer#updateFixedBuffer contraction, removes invalid data', t => {
+  const xvizStreamBuffer = new XVIZStreamBuffer();
   xvizStreamBuffer.updateFixedBuffer(1000, 1010);
   TEST_TIMESLICES.forEach(sample => xvizStreamBuffer.insert(sample));
   const {start, end, oldStart, oldEnd} = xvizStreamBuffer.updateFixedBuffer(1002, 1003);
@@ -210,8 +210,8 @@ test('XvizStreamBuffer#updateFixedBuffer contraction, removes invalid data', t =
   t.end();
 });
 
-test('XvizStreamBuffer#updateFixedBuffer uncapped expansion', t => {
-  const xvizStreamBuffer = new XvizStreamBuffer();
+test('XVIZStreamBuffer#updateFixedBuffer uncapped expansion', t => {
+  const xvizStreamBuffer = new XVIZStreamBuffer();
   xvizStreamBuffer.updateFixedBuffer(1002, 1004);
   const {start, end, oldStart, oldEnd} = xvizStreamBuffer.updateFixedBuffer(1000, 1010);
 
@@ -223,8 +223,8 @@ test('XvizStreamBuffer#updateFixedBuffer uncapped expansion', t => {
   t.end();
 });
 
-test('XvizStreamBuffer#updateFixedBuffer small forward slides', t => {
-  const xvizStreamBuffer = new XvizStreamBuffer({maxLength: 30});
+test('XVIZStreamBuffer#updateFixedBuffer small forward slides', t => {
+  const xvizStreamBuffer = new XVIZStreamBuffer({maxLength: 30});
   xvizStreamBuffer.updateFixedBuffer(990, 1004);
   const {start, end} = xvizStreamBuffer.updateFixedBuffer(1008, 1030);
 
@@ -233,8 +233,8 @@ test('XvizStreamBuffer#updateFixedBuffer small forward slides', t => {
   t.end();
 });
 
-test('XvizStreamBuffer#updateFixedBuffer large forward jumps', t => {
-  const xvizStreamBuffer = new XvizStreamBuffer({maxLength: 30});
+test('XVIZStreamBuffer#updateFixedBuffer large forward jumps', t => {
+  const xvizStreamBuffer = new XVIZStreamBuffer({maxLength: 30});
   xvizStreamBuffer.updateFixedBuffer(1000, 1004);
   const {start, end} = xvizStreamBuffer.updateFixedBuffer(1050, 1090);
 
@@ -243,8 +243,8 @@ test('XvizStreamBuffer#updateFixedBuffer large forward jumps', t => {
   t.end();
 });
 
-test('XvizStreamBuffer#updateFixedBuffer large backwards jumps', t => {
-  const xvizStreamBuffer = new XvizStreamBuffer({maxLength: 30});
+test('XVIZStreamBuffer#updateFixedBuffer large backwards jumps', t => {
+  const xvizStreamBuffer = new XVIZStreamBuffer({maxLength: 30});
   xvizStreamBuffer.updateFixedBuffer(1000, 1010);
   const {start, end} = xvizStreamBuffer.updateFixedBuffer(900, 920);
 

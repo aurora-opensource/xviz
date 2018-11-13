@@ -14,13 +14,13 @@
 
 import tape from 'tape-catch';
 import {filterVertices} from '@xviz/parser/parsers/filter-vertices';
-import {setXvizSettings} from '@xviz/parser';
+import {setXVIZSettings} from '@xviz/parser';
 import PROBLEMATIC_PATH from 'test-data/meter-trajectory-duplicates';
 
 tape('filterVertices', t => {
-  setXvizSettings({pathDistanceThreshold: 0.01});
+  setXVIZSettings({pathDistanceThreshold: 0.01});
   const path = filterVertices(PROBLEMATIC_PATH);
-  setXvizSettings({pathDistanceThreshold: 0.1});
+  setXVIZSettings({pathDistanceThreshold: 0.1});
 
   // Check that path has been reduced, close vertices dropped
   t.equal(path.length, 22, 'filtered length correct');

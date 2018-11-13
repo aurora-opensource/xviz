@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {LogSynchronizer} from '@xviz/parser';
+import {LogSynchronizer, setXVIZSettings} from '@xviz/parser';
 import tape from 'tape-catch';
 
 // xviz data uses snake_case
@@ -58,6 +58,7 @@ tape('LogSynchronizer#setTime', t => {
 });
 
 tape('LogSynchronizer#getData', t => {
+  setXVIZSettings({TIME_WINDOW: 0.4});
   const logSynchronizer = new LogSynchronizer(LOG_START_TIME, LOGS);
 
   for (const tc of TEST_CASES) {

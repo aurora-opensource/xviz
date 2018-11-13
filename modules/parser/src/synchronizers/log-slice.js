@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {getXvizConfig} from '../config/xviz-config';
-import XvizObject from '../objects/xviz-object';
+import {getXVIZConfig} from '../config/xviz-config';
+import XVIZObject from '../objects/xviz-object';
 
 import {getTransformsFromPose} from '../parsers/parse-vehicle-pose';
 
@@ -40,9 +40,9 @@ export default class LogSlice {
       return null;
     }
 
-    const {OBJECT_STREAM} = getXvizConfig();
+    const {OBJECT_STREAM} = getXVIZConfig();
 
-    const objects = XvizObject.getAllInCurrentFrame(); // Map of XVIZ ids in current slice
+    const objects = XVIZObject.getAllInCurrentFrame(); // Map of XVIZ ids in current slice
 
     const frame = {
       ...params,
@@ -58,7 +58,7 @@ export default class LogSlice {
     };
 
     // OBJECTS
-    XvizObject.resetAll();
+    XVIZObject.resetAll();
     if (postProcessFrame) {
       postProcessFrame(frame);
     }
@@ -66,7 +66,7 @@ export default class LogSlice {
     const objectFeatures = this.features[OBJECT_STREAM] || [];
 
     objectFeatures.forEach(feature => {
-      const xvizObject = XvizObject.get(feature.id);
+      const xvizObject = XVIZObject.get(feature.id);
       if (xvizObject) {
         xvizObject._setLabel(feature.label);
         // Populate feature with information from other streams
@@ -105,7 +105,7 @@ export default class LogSlice {
   addStreamDatum(datum, streamName, lookAheadIndex) {
     this.streams[streamName] = datum;
 
-    this.setLabelsOnXvizObjects(datum.labels);
+    this.setLabelsOnXVIZObjects(datum.labels);
 
     const {features = [], lookAheads = [], variable, pointCloud = null} = datum;
 
@@ -132,10 +132,10 @@ export default class LogSlice {
     }
   }
 
-  setLabelsOnXvizObjects(labels = []) {
+  setLabelsOnXVIZObjects(labels = []) {
     // Sort labels by id
     labels.forEach(label => {
-      const object = XvizObject.get(label.id);
+      const object = XVIZObject.get(label.id);
       if (object && label.labelName) {
         // Extract label name (acceleration, velocity etc.) from stream name
 

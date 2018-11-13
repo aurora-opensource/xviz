@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import XvizBaseUiBuilder from './xviz-base-ui-builder';
+import XVIZBaseUiBuilder from './xviz-base-ui-builder';
 import {UI_TYPES} from './constants';
 
-export default class XvizTreeTableBuilder extends XvizBaseUiBuilder {
+export default class XVIZTreeTableBuilder extends XVIZBaseUiBuilder {
   constructor({stream, description, title, displayObjectId, validateWarn, validateError}) {
     super({
       type: UI_TYPES.TREETABLE,

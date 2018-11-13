@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import XvizObject from '../objects/xviz-object';
+import XVIZObject from '../objects/xviz-object';
 import assert from '../utils/assert';
 
 // Insert positions
@@ -24,7 +24,7 @@ const UNLIMITED = 0;
 const OFFSET = 1;
 const FIXED = 2;
 
-export default class XvizStreamBuffer {
+export default class XVIZStreamBuffer {
   /**
    * constructor
    * @param {object} options
@@ -252,7 +252,7 @@ export default class XvizStreamBuffer {
 
   /**
    * Override Object.prototype.valueOf
-   * This is used to trigger a selector update without creating a new XvizStreamBuffer instance
+   * This is used to trigger a selector update without creating a new XVIZStreamBuffer instance
    */
   valueOf() {
     return this.lastUpdate;
@@ -294,7 +294,7 @@ export default class XvizStreamBuffer {
       const startIndex = this._indexOf(this.bufferStart, LEFT);
       const endIndex = this._indexOf(this.bufferEnd, RIGHT);
 
-      XvizObject.prune(this.bufferStart, this.bufferEnd);
+      XVIZObject.prune(this.bufferStart, this.bufferEnd);
 
       if (startIndex > 0 || endIndex < timeslices.length) {
         // Drop frames that are outside of the buffer

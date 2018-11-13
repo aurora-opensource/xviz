@@ -22,7 +22,7 @@ let serialIndex = 0;
 /**
  * Contains metadata and state of each XVIZ object
  */
-export default class XvizObject extends BaseObject {
+export default class XVIZObject extends BaseObject {
   static setDefaultCollection(collection) {
     defaultCollection = collection;
   }

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export default class XvizBaseUiBuilder {
+export default class XVIZBaseUiBuilder {
   constructor({type, validateError, validateWarn}) {
     this._type = type;
     this._children = null;

@@ -12,8 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+export const PRIMITIVE_CAT = {
+  LOOKAHEAD: 'lookAheads',
+  FEATURE: 'features',
+  LABEL: 'labels',
+  POINTCLOUD: 'pointCloud',
+  IMAGE: 'images'
+};
+
 // eslint-disable-next-line max-params
-export function normalizeXvizPrimitive(
+export function normalizeXVIZPrimitive(
   PRIMITIVE_PROCCESSOR,
   primitive,
   objectIndex,
@@ -22,7 +30,7 @@ export function normalizeXvizPrimitive(
   time,
   postProcessPrimitive
 ) {
-  // as normalizeXvizPrimitive is called for each primitive of every frame
+  // as normalizeXVIZPrimitive is called for each primitive of every frame
   // it is intentional to mutate the primitive in place
   // to avoid frequent allocate/discard and improve performance
 

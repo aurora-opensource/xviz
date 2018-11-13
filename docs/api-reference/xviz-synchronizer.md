@@ -1,4 +1,4 @@
-# XvizSynchronizer class
+# XVIZSynchronizer class
 
 This class is constructed with a map of logs, and enables the application
 to set a timestamp and retrieve one datums from every log that "matches"

@@ -18,9 +18,9 @@ import xvizStylesheet from 'test-data/xviz-style-sheet.json';
 const TestMetadataMessage = xvizStreamMessages[0];
 const TestMessage = xvizStreamMessages[1];
 
-import {XvizStyleParser, parseStreamLogData, XvizObject} from 'xviz';
+import {XVIZStyleParser, parseStreamLogData, XVIZObject} from 'xviz';
 
-const xvizObject = new XvizObject({id: 1, index: 0});
+const xvizObject = new XVIZObject({id: 1, index: 0});
 
 export default function xvizBench(bench) {
   return bench
@@ -33,10 +33,10 @@ export default function xvizBench(bench) {
       xvizStreamMessages.forEach(message => parseStreamLogData(message))
     )
 
-    .add('xviz#parseStylesheet', () => new XvizStyleParser(xvizStylesheet))
+    .add('xviz#parseStylesheet', () => new XVIZStyleParser(xvizStylesheet))
 
     .add(
-      'XvizObject#_getSemanticColor',
+      'XVIZObject#_getSemanticColor',
       // setLabel triggers a call to _getSemanticColor
       () => {
         xvizObject._setLabel('OBJECT_LABEL_VEHICLE');

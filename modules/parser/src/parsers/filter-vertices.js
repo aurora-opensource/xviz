@@ -14,7 +14,7 @@
 
 import {Vector3} from 'math.gl';
 
-import {getXvizSettings} from '../config/xviz-config';
+import {getXVIZSettings} from '../config/xviz-config';
 
 // filter out identical vertices from a list
 // Ensure points at least a certain distance away from each other
@@ -25,7 +25,7 @@ export function filterVertices(vertices) {
     return vertices;
   }
 
-  const THRESHOLD = getXvizSettings().pathDistanceThreshold;
+  const THRESHOLD = getXVIZSettings().pathDistanceThreshold;
 
   const newVertices = [];
   let lastEmittedVertex = -1;

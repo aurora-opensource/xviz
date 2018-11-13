@@ -19,7 +19,7 @@ import XVIZPrimitiveBuilder from './xviz-primitive-builder';
 import XVIZUIPrimitiveBuilder from './xviz-ui-primitive-builder';
 import XVIZTimeSeriesBuilder from './xviz-time-series-builder';
 import XVIZValidator from './xviz-validator';
-import XvizVariableBuilder from './xviz-variable-builder';
+import XVIZVariableBuilder from './xviz-variable-builder';
 import {PRIMARY_POSE_STREAM} from './constant';
 
 /* global console */
@@ -52,7 +52,7 @@ export default class XVIZBuilder {
       metadata: this.metadata,
       validator: this._validator
     });
-    this._variablesBuilder = new XvizVariableBuilder({
+    this._variablesBuilder = new XVIZVariableBuilder({
       metadata: this.metadata,
       validator: this._validator
     });

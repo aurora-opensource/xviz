@@ -14,7 +14,7 @@
 
 // Extracts a TIMESLICE message v2
 import {LOG_STREAM_MESSAGE} from '../constants';
-import {getXvizConfig} from '../config/xviz-config';
+import {getXVIZConfig} from '../config/xviz-config';
 import {parseXVIZPose} from './parse-xviz-pose';
 import {
   parseStreamFutures,
@@ -86,7 +86,7 @@ export default function parseTimesliceData(data, convertPrimitive) {
 
 /* eslint-disable max-statements */
 function parseStateUpdates(stateUpdates, timestamp, convertPrimitive) {
-  const {STREAM_BLACKLIST} = getXvizConfig();
+  const {STREAM_BLACKLIST} = getXVIZConfig();
 
   const newStreams = {};
   const poses = {};

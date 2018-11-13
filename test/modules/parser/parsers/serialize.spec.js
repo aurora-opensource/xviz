@@ -14,7 +14,7 @@
 
 import tape from 'tape-catch';
 import {preSerialize, postDeserialize} from '@xviz/parser/parsers/serialize';
-import {setXvizConfig, LOG_STREAM_MESSAGE} from '@xviz/parser';
+import {setXVIZConfig, LOG_STREAM_MESSAGE} from '@xviz/parser';
 
 const MESSAGE = {
   type: LOG_STREAM_MESSAGE.TIMESLICE,
@@ -29,7 +29,7 @@ tape('preSerialize', t => {
 });
 
 tape('postDeserialize', t => {
-  setXvizConfig({});
+  setXVIZConfig({});
   const result = postDeserialize(MESSAGE);
   t.deepEquals(result, MESSAGE, 'postDeserialize returned expected result');
   t.end();

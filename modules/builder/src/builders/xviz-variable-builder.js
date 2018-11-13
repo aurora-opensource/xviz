@@ -16,7 +16,7 @@ import {CATEGORY} from './constant';
 import XVIZBaseBuilder from './xviz-base-builder';
 
 /**
- * XvizVariableBuilder manages a dictionary of streams -> variables, where
+ * XVIZVariableBuilder manages a dictionary of streams -> variables, where
  * variables is an array of objects with values & id.
  *
  * This is the shape returned from getData()
@@ -34,7 +34,7 @@ import XVIZBaseBuilder from './xviz-base-builder';
  *   }
  * }
  */
-export default class XvizVariableBuilder extends XVIZBaseBuilder {
+export default class XVIZVariableBuilder extends XVIZBaseBuilder {
   constructor(props) {
     super({
       ...props,

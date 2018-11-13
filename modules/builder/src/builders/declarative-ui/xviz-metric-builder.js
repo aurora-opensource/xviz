@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import XvizBaseUiBuilder from './xviz-base-ui-builder';
+import XVIZBaseUiBuilder from './xviz-base-ui-builder';
 import {UI_TYPES} from './constants';
 
-export default class XvizMetricBuilder extends XvizBaseUiBuilder {
+export default class XVIZMetricBuilder extends XVIZBaseUiBuilder {
   constructor({streams, description, title, validateWarn, validateError}) {
     super({
       type: UI_TYPES.METRIC,

@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {StreamSynchronizer, XvizStreamBuffer} from '@xviz/parser';
+import {StreamSynchronizer, XVIZStreamBuffer, setXVIZSettings} from '@xviz/parser';
 import tape from 'tape-catch';
 
 // xviz data uses snake_case
 /* eslint-disable camelcase */
 
 const LOG_START_TIME = 0;
-const TEST_BUFFER = new XvizStreamBuffer();
+const TEST_BUFFER = new XVIZStreamBuffer();
 TEST_BUFFER.timeslices = [
   {
     timestamp: 50,
@@ -86,6 +86,7 @@ tape('StreamSynchronizer#setTime', t => {
 });
 
 tape('StreamSynchronizer#getData', t => {
+  setXVIZSettings({TIME_WINDOW: 0.4});
   const logSynchronizer = new StreamSynchronizer(LOG_START_TIME, TEST_BUFFER);
 
   for (const tc of TEST_CASES) {

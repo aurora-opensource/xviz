@@ -12,25 +12,23 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {setXvizConfig, getXvizConfig, getXvizSettings, setXvizSettings} from '@xviz/parser';
+import {setXVIZConfig, getXVIZConfig, getXVIZSettings, setXVIZSettings} from '@xviz/parser';
 import test from 'tape-catch';
 
-test('setXvizConfig setXvizSettings', t => {
+test('setXVIZConfig setXVIZSettings', t => {
   const postProcessFrame = () => {};
-  setXvizConfig({postProcessFrame});
-  t.is(getXvizConfig().postProcessFrame, postProcessFrame, 'XVIZ config is set');
-  t.deepEquals(getXvizConfig().supportedVersions, [1, 2], 'XVIZ default config is used');
+  setXVIZConfig({postProcessFrame});
+  t.is(getXVIZConfig().postProcessFrame, postProcessFrame, 'XVIZ config is set');
+  t.deepEquals(getXVIZConfig().supportedVersions, [1, 2], 'XVIZ default config is used');
 
-  setXvizSettings({currentMajorVersion: 2});
+  setXVIZSettings({currentMajorVersion: 2});
   t.is(
-    getXvizConfig().postProcessFrame,
+    getXVIZConfig().postProcessFrame,
     postProcessFrame,
-    'XVIZ config postProcessFrame is not changed after setXvizSettings'
+    'XVIZ config postProcessFrame is not changed after setXVIZSettings'
   );
-  t.notOk(getXvizSettings().PRIMITIVE_SETTINGS.line2d, 'XVIZ primitive settings is v2');
 
-  setXvizSettings({currentMajorVersion: 1});
-  t.ok(getXvizSettings().PRIMITIVE_SETTINGS.line2d, 'XVIZ primitive settings is v1');
+  t.is(getXVIZSettings().currentMajorVersion, 2, 'XVIZ settings is set');
 
   t.end();
 });

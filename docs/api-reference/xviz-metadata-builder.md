@@ -1,6 +1,6 @@
-# XvizMetadataBuilder
+# XVIZMetadataBuilder
 
-`XvizMetadataBuilder` class helps generate metadata object
+`XVIZMetadataBuilder` class helps generate metadata object
 
 
 ## Methods
@@ -14,7 +14,7 @@ Set log start time.
 ###### endTime(time : Number)
 Set log end time.
 
-###### ui(uiBuilder : XvizUIBuilder)
+###### ui(uiBuilder : XVIZUIBuilder)
 Set the configuration of declarative UI.
 
 ###### stream(streamId : String)
@@ -81,4 +81,4 @@ Define a style class with style object.
 
 Refer `style-specification` for supported style properties.
 
-Refer the example in `XvizBuilder`
+Refer the example in `XVIZBuilder`

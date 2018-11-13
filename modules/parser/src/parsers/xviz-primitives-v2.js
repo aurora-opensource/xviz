@@ -14,7 +14,7 @@
 
 /* global URL, Blob */
 import {filterVertices} from './filter-vertices';
-import {PRIMITIVE_CAT} from './parse-xviz-stream';
+import {PRIMITIVE_CAT} from './parse-xviz-primitive';
 import base64js from 'base64-js';
 
 function aliasId(primitive) {

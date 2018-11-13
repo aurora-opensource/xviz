@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {getXvizConfig, setXvizSettings} from '../config/xviz-config';
+import {getXVIZConfig, setXVIZSettings} from '../config/xviz-config';
 import {parseVersionString} from './xviz-v2-common';
 import {get} from 'dotty';
 
 // Post-processes log metadata
 export function parseLogMetadata(data) {
-  const {supportedVersions} = getXvizConfig();
+  const {supportedVersions} = getXVIZConfig();
   const {version: versionString} = data;
 
   let currentMajorVersion = null;
@@ -32,7 +32,7 @@ export function parseLogMetadata(data) {
   if (!currentMajorVersion) {
     throw new Error('Unable to detect the XVIZ version.');
   } else {
-    setXvizSettings({currentMajorVersion});
+    setXVIZSettings({currentMajorVersion});
   }
 
   if (supportedVersions && !supportedVersions.includes(currentMajorVersion)) {
@@ -49,7 +49,7 @@ export function parseLogMetadataV1(data) {
   const originalStreams = get(data, 'streams') || [];
 
   // Use XVIZ configuration to filter out unwanted / blacklisted streams
-  const {STREAM_BLACKLIST} = getXvizConfig();
+  const {STREAM_BLACKLIST} = getXVIZConfig();
   const streams = {};
   Object.keys(originalStreams).forEach(streamName => {
     if (!STREAM_BLACKLIST.has(streamName)) {
@@ -83,7 +83,7 @@ export function parseLogMetadataV2(data) {
   const originalStreams = get(data, 'streams');
 
   // Use XVIZ configuration to filter out unwanted / blacklisted streams
-  const {STREAM_BLACKLIST} = getXvizConfig();
+  const {STREAM_BLACKLIST} = getXVIZConfig();
   const streams = {};
   Object.keys(originalStreams).forEach(streamName => {
     if (!STREAM_BLACKLIST.has(streamName)) {

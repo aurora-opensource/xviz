@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /* eslint-disable camelcase */
-import {setXvizSettings} from '@xviz/parser';
+import {setXVIZSettings} from '@xviz/parser';
 import {
   parseStreamTimeSeries,
   parseStreamVariable,
@@ -26,7 +26,7 @@ import tape from 'tape-catch';
 const schemaValidator = new XVIZValidator();
 
 tape('parseStreamTimeSeries#simple', t => {
-  setXvizSettings({currentMajorVersion: 2});
+  setXVIZSettings({currentMajorVersion: 2});
 
   const testData = [
     {
@@ -93,7 +93,7 @@ tape('parseStreamTimeSeries#simple', t => {
 });
 
 tape('parseStreamVariable#simple v2', t => {
-  setXvizSettings({currentMajorVersion: 2});
+  setXVIZSettings({currentMajorVersion: 2});
 
   const time = 1001;
   const testData = {
@@ -152,7 +152,7 @@ tape('parseStreamVariable#simple v2', t => {
 });
 
 tape('parseStreamUIPrimitives#simple v2', t => {
-  setXvizSettings({currentMajorVersion: 2});
+  setXVIZSettings({currentMajorVersion: 2});
 
   const time = 1001;
   const testData = {
@@ -179,7 +179,7 @@ tape('parseStreamUIPrimitives#simple v2', t => {
 });
 
 tape('parseStreamVariable#simple v1', t => {
-  setXvizSettings({currentMajorVersion: 1});
+  setXVIZSettings({currentMajorVersion: 1});
 
   const time = 1001;
   const testSet = [

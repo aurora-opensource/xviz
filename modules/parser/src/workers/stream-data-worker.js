@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {setXvizConfig} from '../config/xviz-config';
+import {setXVIZConfig} from '../config/xviz-config';
 import {parseStreamDataMessage} from '../parsers/parse-stream-data-message';
 import {preSerialize} from '../parsers/serialize';
 
 export default config => self => {
-  setXvizConfig(config);
+  setXVIZConfig(config);
 
   function onResult(message) {
     const transfers = [];

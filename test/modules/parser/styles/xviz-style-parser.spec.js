@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /* eslint-disable camelcase */
-import {XvizStyleParser, Stylesheet} from '@xviz/parser';
+import {XVIZStyleParser, Stylesheet} from '@xviz/parser';
 import tape from 'tape-catch';
 
 const TEST_STYLESHEETS = [
@@ -126,19 +126,19 @@ const GET_DEPS_TEST_CASES = [
   }
 ];
 
-tape('XvizStyleParser', t => {
-  const styleParser = new XvizStyleParser();
+tape('XVIZStyleParser', t => {
+  const styleParser = new XVIZStyleParser();
 
-  t.ok(styleParser, 'XvizStyleParser constructor does not throw error');
+  t.ok(styleParser, 'XVIZStyleParser constructor does not throw error');
   t.ok(
     styleParser.getStylesheet('stream') instanceof Stylesheet,
-    'XvizStyleParser.getStylesheet returns a Stylesheet'
+    'XVIZStyleParser.getStylesheet returns a Stylesheet'
   );
 
   t.end();
 });
 
-tape('XvizStyleParser#Stylesheet', t => {
+tape('XVIZStyleParser#Stylesheet', t => {
   for (const testData of TEST_STYLESHEETS) {
     t.comment(testData.title);
     const stylesheet = new Stylesheet(testData.stylesheet);

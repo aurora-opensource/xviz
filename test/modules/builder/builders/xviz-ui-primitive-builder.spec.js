@@ -14,7 +14,7 @@
 
 /* eslint-disable camelcase */
 import test from 'tape-catch';
-import XvizUIPrimitiveBuilder from '@xviz/builder/builders/xviz-ui-primitive-builder';
+import XVIZUIPrimitiveBuilder from '@xviz/builder/builders/xviz-ui-primitive-builder';
 import {default as XVIZBuilderValidator} from '@xviz/builder/builders/xviz-validator';
 // import {XVIZValidator} from '@xviz/schema';
 
@@ -31,23 +31,23 @@ const validator = new XVIZBuilderValidator({
 
 const TEST_COLUMNS = [{display_text: 'Name', type: 'string'}];
 
-test('XvizUIPrimitiveBuilder#default-ctor', t => {
+test('XVIZUIPrimitiveBuilder#default-ctor', t => {
   /* eslint-disable no-unused-vars */
-  const builder = new XvizUIPrimitiveBuilder({});
+  const builder = new XVIZUIPrimitiveBuilder({});
   t.end();
   /* eslint-enable no-unused-vars */
 });
 
-test('XvizUIPrimitiveBuilder#null getData', t => {
-  const builder = new XvizUIPrimitiveBuilder({validator});
+test('XVIZUIPrimitiveBuilder#null getData', t => {
+  const builder = new XVIZUIPrimitiveBuilder({validator});
   const data = builder.stream('/test').getData();
 
-  t.equal(data, null, 'XvizUIPrimitiveBuilder returns null if no data');
+  t.equal(data, null, 'XVIZUIPrimitiveBuilder returns null if no data');
   t.end();
 });
 
-test('XvizUIPrimitiveBuilder#treetable', t => {
-  let builder = new XvizUIPrimitiveBuilder({validator});
+test('XVIZUIPrimitiveBuilder#treetable', t => {
+  let builder = new XVIZUIPrimitiveBuilder({validator});
   builder.stream('/test').treetable(TEST_COLUMNS);
   t.deepEquals(
     builder.getData(),
@@ -59,20 +59,20 @@ test('XvizUIPrimitiveBuilder#treetable', t => {
         }
       }
     },
-    'XvizUIPrimitiveBuilder returns correct data'
+    'XVIZUIPrimitiveBuilder returns correct data'
   );
 
-  builder = new XvizUIPrimitiveBuilder({validator});
+  builder = new XVIZUIPrimitiveBuilder({validator});
   t.throws(
     () => {
       builder.stream('/test').row(0, ['row0']);
       return builder.getData();
     },
     /columns/i,
-    'XvizUIPrimitiveBuilder should throw if columns are not defined'
+    'XVIZUIPrimitiveBuilder should throw if columns are not defined'
   );
 
-  builder = new XvizUIPrimitiveBuilder({validator});
+  builder = new XVIZUIPrimitiveBuilder({validator});
   let row = builder
     .stream('/test')
     .treetable(TEST_COLUMNS)
@@ -96,7 +96,7 @@ test('XvizUIPrimitiveBuilder#treetable', t => {
         }
       }
     },
-    'XvizUIPrimitiveBuilder returns correct data'
+    'XVIZUIPrimitiveBuilder returns correct data'
   );
 
   t.end();
