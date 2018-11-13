@@ -9,7 +9,7 @@ import {LOG_STREAM_MESSAGE} from '../constants';
 import {parseBinaryXVIZ, isBinaryXVIZ} from '../loaders/xviz-loader/xviz-binary-loader';
 import {parseLogMetadata} from './parse-log-metadata';
 import {parseStreamVideoMessage} from './parse-stream-video-message';
-import {TextDecoder} from 'text-encoding'; // Node.js < 9 polyfills
+import TextDecoder from '../utils/text-decoder';
 import parseTimesliceDataV1 from './parse-timeslice-data-v1';
 import parseTimesliceDataV2 from './parse-timeslice-data-v2';
 import {getXVIZSettings} from '../config/xviz-config';

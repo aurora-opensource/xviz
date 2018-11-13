@@ -1,6 +1,6 @@
 /* eslint-disable max-statements */
 import {padTo4Bytes} from '../../utils/array-utils';
-import {TextDecoder} from 'text-encoding';
+import TextDecoder from '../../utils/text-decoder';
 import assert from '../../utils/assert';
 
 // glTF CONSTANTS

@@ -6,7 +6,7 @@
  */
 /* global Blob, URL */
 import {LOG_STREAM_MESSAGE} from '../constants';
-import {TextDecoder} from 'text-encoding'; // Node.js < 9 polyfills
+import TextDecoder from '../utils/text-decoder';
 import {blobToArrayBuffer} from '../utils/binary';
 
 import {parseLogMetadata} from './parse-log-metadata';

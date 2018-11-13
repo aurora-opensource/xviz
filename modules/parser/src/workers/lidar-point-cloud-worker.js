@@ -1,6 +1,6 @@
 import {setXVIZConfig} from '../config/xviz-config';
 import {parseXVIZStream} from '../parsers/parse-xviz-stream';
-import {TextDecoder} from 'text-encoding'; // Node.js < 9 polyfills
+import TextDecoder from '../utils/text-decoder';
 
 export default config => self => {
   setXVIZConfig(config);
