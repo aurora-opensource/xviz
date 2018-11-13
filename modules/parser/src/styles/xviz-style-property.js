@@ -103,7 +103,7 @@ const DEFAULT_STYLES = {
   stroke_width_max_pixels: Number.MAX_SAFE_INTEGER
 };
 
-export default class XvizStyleProperty {
+export default class XVIZStyleProperty {
   static getDefault(key) {
     return DEFAULT_STYLES[key];
   }

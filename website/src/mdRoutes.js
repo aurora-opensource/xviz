@@ -127,27 +127,27 @@ export default [
         name: 'API Reference',
         children: [
           {
-            name: 'Xviz Configuration',
+            name: 'XVIZ Configuration',
             markdown: require('../../docs/api-reference/xviz-configuration.md')
           },
           {
-            name: 'Xviz Parsing',
+            name: 'XVIZ Parsing',
             markdown: require('../../docs/api-reference/parse-xviz.md')
           },
           {
-            name: 'XvizSynchronizer',
+            name: 'XVIZSynchronizer',
             markdown: require('../../docs/api-reference/xviz-synchronizer.md')
           },
           {
-            name: 'XvizLogSlice',
+            name: 'XVIZLogSlice',
             markdown: require('../../docs/api-reference/xviz-log-slice.md')
           },
           {
-            name: 'XvizObject',
+            name: 'XVIZObject',
             markdown: require('../../docs/api-reference/xviz-object.md')
           },
           {
-            name: 'XvizObjectCollection',
+            name: 'XVIZObjectCollection',
             markdown: require('../../docs/api-reference/xviz-object-collection.md')
           },
           {

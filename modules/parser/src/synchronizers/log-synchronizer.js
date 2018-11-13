@@ -35,12 +35,6 @@ export default class LogSynchronizer extends BaseSynchronizer {
     }
   }
 
-  // Used to get the hiResPose if available
-  getHiResDatum(logName) {
-    const hiResTime = this.getHiResTime();
-    return this.logs[logName] ? this._lookupStreamDatum(logName, hiResTime - 1, hiResTime) : null;
-  }
-
   _empty() {
     return !this.logs || Object.keys(this.logs).length === 0;
   }

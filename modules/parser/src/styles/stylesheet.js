@@ -1,5 +1,5 @@
 /* eslint-disable no-console no-undef */
-import XvizStyleProperty from './xviz-style-property';
+import XVIZStyleProperty from './xviz-style-property';
 import {get} from 'dotty';
 
 const SELECTOR_REGEX = /\S+/g;
@@ -54,7 +54,7 @@ export default class Stylesheet {
    * @returns {Number|String|Array} style property default value
    */
   getPropertyDefault(propertyName) {
-    return XvizStyleProperty.getDefault(propertyName);
+    return XVIZStyleProperty.getDefault(propertyName);
   }
 
   /**
@@ -127,7 +127,7 @@ export default class Stylesheet {
     const result = {};
 
     for (const key in properties.style) {
-      result[key] = new XvizStyleProperty(key, properties.style[key]);
+      result[key] = new XVIZStyleProperty(key, properties.style[key]);
     }
     return result;
   }

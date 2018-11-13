@@ -1,4 +1,4 @@
-# XvizTrajectoryHelper 
+# XVIZTrajectoryHelper 
 
 Provide helper functions to generate trajectory for pose and objects.
 

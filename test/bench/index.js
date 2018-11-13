@@ -1,8 +1,8 @@
 import {Bench} from 'probe.gl/bench';
-import {setXvizConfig} from 'xviz';
+import {setXVIZConfig} from 'xviz';
 import xvizBench from './xviz.bench';
 
-setXvizConfig({});
+setXVIZConfig({});
 const suite = new Bench();
 
 xvizBench(suite);

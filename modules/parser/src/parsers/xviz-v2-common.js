@@ -1,4 +1,4 @@
-import {getXvizSettings} from '../config/xviz-config';
+import {getXVIZSettings} from '../config/xviz-config';
 
 const PrimitiveTypes = [
   'circles',
@@ -40,7 +40,7 @@ export function parseVersionString(versionString) {
  *
  */
 export function getPrimitiveData(primitiveObject) {
-  const {currentMajorVersion} = getXvizSettings();
+  const {currentMajorVersion} = getXVIZSettings();
 
   if (currentMajorVersion === 1) {
     if (primitiveObject instanceof Array && primitiveObject.length > 0) {

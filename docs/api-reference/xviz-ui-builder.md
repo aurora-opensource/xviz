@@ -1,8 +1,8 @@
-# XvizUIBuilder
+# XVIZUIBuilder
 
-`XvizUIBuilder` class provides convenient chaining functions to build declarative UI.
+`XVIZUIBuilder` class provides convenient chaining functions to build declarative UI.
 
-## Xviz Declarative UI hierarchy
+## XVIZ Declarative UI hierarchy
 
 ```
 Root
@@ -17,23 +17,23 @@ Root
 ```
 
 * UI root has a list of `panel`s
-* [Panel](#XvizPannelBuilder) has children, which could be either *component* or *container*
-* [Container](#XvizContainerBuilder) children could be either *component* or *container*
+* [Panel](#XVIZPannelBuilder) has children, which could be either *component* or *container*
+* [Container](#XVIZContainerBuilder) children could be either *component* or *container*
 * Component could be one of the following types:
-  - [Metric](#XvizMetricBuilder)
-  - [TreeTable](#XvizTreeTableBuilder)
-  - [Table](#XvizTableBuilder)
-  - [Plot](#XvizPlotBuilder)
-  - [Video](#XvizVideoBuilder)
+  - [Metric](#XVIZMetricBuilder)
+  - [TreeTable](#XVIZTreeTableBuilder)
+  - [Table](#XVIZTableBuilder)
+  - [Plot](#XVIZPlotBuilder)
+  - [Video](#XVIZVideoBuilder)
 
 
 ## Example
 
 ```js
-import { XvizUIBuilder } from '@xviz/builder';
-const builder = new XvizUIBuilder({});
+import { XVIZUIBuilder } from '@xviz/builder';
+const builder = new XVIZUIBuilder({});
 
-const builder = new XvizUIBuilder({});
+const builder = new XVIZUIBuilder({});
 
 const panel = builder
   .panel({name: 'Metrics Panel'});
@@ -85,14 +85,14 @@ builder.getUI();
 */
 ```
 
-## XvizUIBuilder
+## XVIZUIBuilder
 
 The root builder for declarative UI.
 
 ### Constructor
 
 ```js
-new XvizUIBuilder(options);
+new XVIZUIBuilder(options);
 ```
 
 Parameters:
@@ -103,41 +103,41 @@ Parameters:
 ### Methods
 
 ##### child(panel)
-Append a [`XvizPannelBuilder`](#XvizPannelBuilder) instance to the root. Returns the child.
+Append a [`XVIZPannelBuilder`](#XVIZPannelBuilder) instance to the root. Returns the child.
 
 ##### getUI()
 Returns a JSON descriptor of all UI components.
 
 ##### panel(options)
-Returns a new [`XvizPannelBuilder`](#XvizPannelBuilder) instance with the specified options.
+Returns a new [`XVIZPannelBuilder`](#XVIZPannelBuilder) instance with the specified options.
 
 ##### container(options)
-Returns a new [`XvizContainerBuilder`](#XvizContainerBuilder) instance with the specified options.
+Returns a new [`XVIZContainerBuilder`](#XVIZContainerBuilder) instance with the specified options.
 
 ##### metric(options)
-Returns a new [`XvizMetricBuilder`](#XvizMetricBuilder) instance with the specified options.
+Returns a new [`XVIZMetricBuilder`](#XVIZMetricBuilder) instance with the specified options.
 
 ##### table(options)
-Returns a new [`XvizTableBuilder`](#XvizTableBuilder) instance with the specified options.
+Returns a new [`XVIZTableBuilder`](#XVIZTableBuilder) instance with the specified options.
 
 ##### treetable(options)
-Returns a new [`XvizTreeTableBuilder`](#XvizTreeTableBuilder) instance with the specified options.
+Returns a new [`XVIZTreeTableBuilder`](#XVIZTreeTableBuilder) instance with the specified options.
 
 ##### plot(options)
-Returns a new [`XvizPlotBuilder`](#XvizPlotBuilder) instance with the specified options.
+Returns a new [`XVIZPlotBuilder`](#XVIZPlotBuilder) instance with the specified options.
 
 ##### video(options)
-Returns a new [`XvizVideoBuilder`](#XvizVideoBuilder) instance with the specified options.
+Returns a new [`XVIZVideoBuilder`](#XVIZVideoBuilder) instance with the specified options.
 
 
-## XvizPanelBuilder
+## XVIZPanelBuilder
 
 The panel builder for declarative UI.
 
 ### Constructor
 
 ```js
-new XvizPanelBuilder(options);
+new XVIZPanelBuilder(options);
 ```
 
 Parameters:
@@ -153,14 +153,14 @@ Append a container or a component to the panel. Returns the child.
 ##### getUI()
 Returns a JSON descriptor of this panel.
 
-## XvizContainerBuilder
+## XVIZContainerBuilder
 
 The container builder for declarative UI.
 
 ### Constructor
 
 ```js
-new XvizContainerBuilder(options);
+new XVIZContainerBuilder(options);
 ```
 
 Parameters:
@@ -177,14 +177,14 @@ Append a container or a component to the container.
 Returns a JSON descriptor of this container.
 
 
-## XvizMetricBuilder
+## XVIZMetricBuilder
 
 The metric component builder for declarative UI.
 
 ### Constructor
 
 ```js
-new XvizMetricBuilder(options);
+new XVIZMetricBuilder(options);
 ```
 
 Parameters:
@@ -198,14 +198,14 @@ Parameters:
 Returns a JSON descriptor of this component.
 
 
-## XvizPlotBuilder
+## XVIZPlotBuilder
 
 The plot component builder for declarative UI.
 
 ### Constructor
 
 ```js
-new XvizPlotBuilder(options);
+new XVIZPlotBuilder(options);
 ```
 
 Parameters:
@@ -220,14 +220,14 @@ Parameters:
 Returns a JSON descriptor of this component.
 
 
-## XvizTableBuilder
+## XVIZTableBuilder
 
 The table component builder for declarative UI.
 
 ### Constructor
 
 ```js
-new XvizTableBuilder(options);
+new XVIZTableBuilder(options);
 ```
 
 Parameters:
@@ -242,14 +242,14 @@ Parameters:
 Returns a JSON descriptor of this component.
 
 
-## XvizTreeTableBuilder
+## XVIZTreeTableBuilder
 
 The tree table component builder for declarative UI.
 
 ### Constructor
 
 ```js
-new XvizTreeTableBuilder(options);
+new XVIZTreeTableBuilder(options);
 ```
 
 Parameters:
@@ -264,14 +264,14 @@ Parameters:
 Returns a JSON descriptor of this component.
 
 
-## XvizVideoBuilder
+## XVIZVideoBuilder
 
 The video component builder for declarative UI.
 
 ### Constructor
 
 ```js
-new XvizVideoBuilder(options);
+new XVIZVideoBuilder(options);
 ```
 
 Parameters:

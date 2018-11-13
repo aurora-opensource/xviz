@@ -21,7 +21,7 @@
 All methods except `getFrame()` return `this` builder instance
 
 ##### getFrame()
-* Return an object with xviz protocol containing all the streams in current frame built from the XvizBuilder instance.
+* Return an object with xviz protocol containing all the streams in current frame built from the XVIZBuilder instance.
 
 ##### pose(streamId : String) : XVIZPoseBuilder
 `streamId` is default to `/vehicle_pose` if not specified.

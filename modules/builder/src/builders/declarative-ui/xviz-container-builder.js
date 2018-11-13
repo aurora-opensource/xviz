@@ -1,7 +1,7 @@
-import XvizBaseUiBuilder from './xviz-base-ui-builder';
+import XVIZBaseUiBuilder from './xviz-base-ui-builder';
 import {UI_TYPES} from './constants';
 
-export default class XvizContainerBuilder extends XvizBaseUiBuilder {
+export default class XVIZContainerBuilder extends XVIZBaseUiBuilder {
   constructor({name, layout, interactions, validateWarn, validateError}) {
     super({
       type: UI_TYPES.CONTAINER,

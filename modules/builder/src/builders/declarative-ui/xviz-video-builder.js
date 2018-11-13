@@ -1,7 +1,7 @@
-import XvizBaseUiBuilder from './xviz-base-ui-builder';
+import XVIZBaseUiBuilder from './xviz-base-ui-builder';
 import {UI_TYPES} from './constants';
 
-export default class XvizVideoBuilder extends XvizBaseUiBuilder {
+export default class XVIZVideoBuilder extends XVIZBaseUiBuilder {
   constructor({cameras, interactions, validateWarn, validateError}) {
     super({
       type: UI_TYPES.VIDEO,

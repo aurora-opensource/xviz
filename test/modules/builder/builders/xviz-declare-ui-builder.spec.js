@@ -4,7 +4,7 @@ import {XVIZValidator} from '@xviz/schema';
 
 const schemaValidator = new XVIZValidator();
 
-test('XvizBaseUIBuilder', t => {
+test('XVIZBaseUIBuilder', t => {
   const builder = new XVIZUIBuilder({});
 
   const panel = builder.panel({name: 'Metrics Panel'});

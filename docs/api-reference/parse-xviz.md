@@ -1,2 +1,2 @@
-# parseXviz
+# parseXVIZ
 

@@ -1,4 +1,4 @@
-import {parseXvizStream} from './parse-xviz-stream';
+import {parseXVIZStream} from './parse-xviz-stream';
 
 function noop() {}
 
@@ -14,7 +14,7 @@ export function parseEtlStream(data, opts = {}) {
   const {onData = noop, onDone = noop} = opts;
   const context = onData(opts) || opts.context;
 
-  const stream = parseXvizStream(data, opts.convertPrimitive);
+  const stream = parseXVIZStream(data, opts.convertPrimitive);
 
   onDone({...opts, context});
   return stream;

@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import test from 'tape-catch';
-import XvizVariableBuilder from '@xviz/builder/builders/xviz-variable-builder';
+import XVIZVariableBuilder from '@xviz/builder/builders/xviz-variable-builder';
 import {default as XVIZBuilderValidator} from '@xviz/builder/builders/xviz-validator';
 import {XVIZValidator} from '@xviz/schema';
 
@@ -15,23 +15,23 @@ const validator = new XVIZBuilderValidator({
   }
 });
 
-test('XvizVariableBuilder#default-ctor', t => {
+test('XVIZVariableBuilder#default-ctor', t => {
   /* eslint-disable no-unused-vars */
-  const builder = new XvizVariableBuilder({});
+  const builder = new XVIZVariableBuilder({});
   t.end();
   /* eslint-enable no-unused-vars */
 });
 
-test('XvizVariableBuilder#null getData', t => {
-  const builder = new XvizVariableBuilder({validator});
+test('XVIZVariableBuilder#null getData', t => {
+  const builder = new XVIZVariableBuilder({validator});
   const data = builder.stream('/test').getData();
 
-  t.equal(data, null, 'XvizVariableBuilder returns null if no data');
+  t.equal(data, null, 'XVIZVariableBuilder returns null if no data');
   t.end();
 });
 
-test('XvizVariableBuilder#single entry', t => {
-  const builder = new XvizVariableBuilder({validator});
+test('XVIZVariableBuilder#single entry', t => {
+  const builder = new XVIZVariableBuilder({validator});
   builder.stream('/test').values([20]);
 
   const expected = {
@@ -45,13 +45,13 @@ test('XvizVariableBuilder#single entry', t => {
   };
   const data = builder.getData();
 
-  t.deepEqual(data, expected, 'XvizVariableBuilder single entry matches expected output');
+  t.deepEqual(data, expected, 'XVIZVariableBuilder single entry matches expected output');
   schemaValidator.validate('core/variable_state', data['/test']);
   t.end();
 });
 
-test('XvizVariableBuilder#multiple entry', t => {
-  const builder = new XvizVariableBuilder({validator});
+test('XVIZVariableBuilder#multiple entry', t => {
+  const builder = new XVIZVariableBuilder({validator});
   builder.stream('/test').values([100, 200]);
 
   builder.stream('/foo').values([300, 400]);
@@ -74,14 +74,14 @@ test('XvizVariableBuilder#multiple entry', t => {
   };
   const data = builder.getData();
 
-  t.deepEqual(data, expected, 'XvizVariableBuilder multiple entry matches expected output');
+  t.deepEqual(data, expected, 'XVIZVariableBuilder multiple entry matches expected output');
   schemaValidator.validate('core/variable_state', data['/test']);
   schemaValidator.validate('core/variable_state', data['/foo']);
   t.end();
 });
 
-test('XvizVariableBuilder#all types and multiple entry with ids', t => {
-  const builder = new XvizVariableBuilder({validator});
+test('XVIZVariableBuilder#all types and multiple entry with ids', t => {
+  const builder = new XVIZVariableBuilder({validator});
   builder.stream('/test').values([1, 2, 3]);
 
   builder
@@ -126,20 +126,20 @@ test('XvizVariableBuilder#all types and multiple entry with ids', t => {
   t.deepEqual(
     data,
     expected,
-    'XvizVariableBuilder all types and multiple entries with ids matches expected output'
+    'XVIZVariableBuilder all types and multiple entries with ids matches expected output'
   );
   schemaValidator.validate('core/variable_state', data['/test']);
   schemaValidator.validate('core/variable_state', data['/bar']);
   t.end();
 });
 
-test('XvizVariableBuilder#throwing cases', t => {
-  const builder = new XvizVariableBuilder({validator});
+test('XVIZVariableBuilder#throwing cases', t => {
+  const builder = new XVIZVariableBuilder({validator});
 
   t.throws(
     () => builder.values([1]).getData(),
     /is missing/,
-    'XvizVariableBuilder throws when streamId is not provided'
+    'XVIZVariableBuilder throws when streamId is not provided'
   );
   builder._reset();
 
@@ -148,21 +148,21 @@ test('XvizVariableBuilder#throwing cases', t => {
   t.throws(
     () => builder.id('1').id('2'),
     /already set/,
-    'XvizVariableBuilder throw when trying to set id multiple times'
+    'XVIZVariableBuilder throw when trying to set id multiple times'
   );
   builder._reset();
 
   t.throws(
     () => builder.values('1'),
     /must be array/,
-    'XvizVariableBuilder throws when passing a non-array to values()'
+    'XVIZVariableBuilder throws when passing a non-array to values()'
   );
   builder._reset();
 
   t.throws(
     () => builder.id('1').getData(),
     /not provided/,
-    'XvizVariableBuilder throws when value is not provided'
+    'XVIZVariableBuilder throws when value is not provided'
   );
   builder._reset();
 
@@ -176,14 +176,14 @@ test('XvizVariableBuilder#throwing cases', t => {
       builder.getData();
     },
     /already set for id/,
-    'XvizVariableBuilder throws when id is duplicated'
+    'XVIZVariableBuilder throws when id is duplicated'
   );
   builder._reset();
 
   t.throws(
     () => builder.values([1]).values([2]),
     /already set/,
-    'XvizVariableBuilder throw when trying to set value multiple times'
+    'XVIZVariableBuilder throw when trying to set value multiple times'
   );
   builder._reset();
 

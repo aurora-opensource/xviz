@@ -5,7 +5,7 @@ XVIZ allows the producer to declartively connect strams to UI components like co
 The easiest way to add declarative UI components to your XVIZ in JavaScript is to use the `XVizUIBuilder` class.
 
 ```js
-const builder = new XvizDeclarativeUIBuilder({});
+const builder = new XVIZDeclarativeUIBuilder({});
 
 builder
 .panel('Metrics')

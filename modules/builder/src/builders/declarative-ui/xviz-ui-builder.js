@@ -1,14 +1,14 @@
 /* global console */
 /* eslint-disable no-console */
-import XvizPanelBuilder from './xviz-panel-builder';
+import XVIZPanelBuilder from './xviz-panel-builder';
 
-import XvizContainerBuilder from './xviz-container-builder';
+import XVIZContainerBuilder from './xviz-container-builder';
 
-import XvizMetricBuilder from './xviz-metric-builder';
-import XvizPlotBuilder from './xviz-plot-builder';
-import XvizTableBuilder from './xviz-table-builder';
-import XvizTreeTableBuilder from './xviz-tree-table-builder';
-import XvizVideoBuilder from './xviz-video-builder';
+import XVIZMetricBuilder from './xviz-metric-builder';
+import XVIZPlotBuilder from './xviz-plot-builder';
+import XVIZTableBuilder from './xviz-table-builder';
+import XVIZTreeTableBuilder from './xviz-tree-table-builder';
+import XVIZVideoBuilder from './xviz-video-builder';
 
 import {snakeToCamel} from './utils';
 import {UI_TYPES} from './constants';
@@ -17,15 +17,15 @@ const defaultValidateWarn = console.warn;
 const defaultValidateError = console.error;
 
 const UI_BUILDER_MAP = {
-  [UI_TYPES.PANEL]: XvizPanelBuilder,
+  [UI_TYPES.PANEL]: XVIZPanelBuilder,
 
-  [UI_TYPES.CONTAINER]: XvizContainerBuilder,
+  [UI_TYPES.CONTAINER]: XVIZContainerBuilder,
 
-  [UI_TYPES.METRIC]: XvizMetricBuilder,
-  [UI_TYPES.PLOT]: XvizPlotBuilder,
-  [UI_TYPES.TABLE]: XvizTableBuilder,
-  [UI_TYPES.TREETABLE]: XvizTreeTableBuilder,
-  [UI_TYPES.VIDEO]: XvizVideoBuilder
+  [UI_TYPES.METRIC]: XVIZMetricBuilder,
+  [UI_TYPES.PLOT]: XVIZPlotBuilder,
+  [UI_TYPES.TABLE]: XVIZTableBuilder,
+  [UI_TYPES.TREETABLE]: XVIZTreeTableBuilder,
+  [UI_TYPES.VIDEO]: XVIZVideoBuilder
 };
 
 export default class XVIZUIBuilder {
@@ -55,7 +55,7 @@ export default class XVIZUIBuilder {
   }
 
   child(child) {
-    if (!(child instanceof XvizPanelBuilder)) {
+    if (!(child instanceof XVIZPanelBuilder)) {
       this._validateError('Top level UI element should be `Panel`');
     }
     this._children.push(child);

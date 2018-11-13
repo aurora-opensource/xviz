@@ -1,18 +1,18 @@
-import {XvizObject} from '@xviz/parser';
+import {XVIZObject} from '@xviz/parser';
 
 import test from 'tape-catch';
 
-test('XvizObject#static methods', t => {
-  t.ok(typeof XvizObject.get, 'function', 'get is exposed');
-  t.ok(typeof XvizObject.clear, 'function', 'clear is exposed');
-  t.ok(typeof XvizObject.resetAll, 'function', 'resetAll is exposed');
-  t.ok(typeof XvizObject.getAll, 'function', 'getAll is exposed');
-  t.ok(typeof XvizObject.getAllInCurrentFrame, 'function', 'getAllInCurrentFrame is exposed');
+test('XVIZObject#static methods', t => {
+  t.ok(typeof XVIZObject.get, 'function', 'get is exposed');
+  t.ok(typeof XVIZObject.clear, 'function', 'clear is exposed');
+  t.ok(typeof XVIZObject.resetAll, 'function', 'resetAll is exposed');
+  t.ok(typeof XVIZObject.getAll, 'function', 'getAll is exposed');
+  t.ok(typeof XVIZObject.getAllInCurrentFrame, 'function', 'getAllInCurrentFrame is exposed');
   t.end();
 });
 
-test('XvizObject#constructor', t => {
-  const object = new XvizObject({id: 11, index: 0, timestamp: 1000});
+test('XVIZObject#constructor', t => {
+  const object = new XVIZObject({id: 11, index: 0, timestamp: 1000});
   t.ok(object, 'creates OBJECT object successfully');
   t.is(object.id, 11, 'OBJECT object id is correct');
   t.ok(object.state, 'creates state object');
@@ -22,8 +22,8 @@ test('XvizObject#constructor', t => {
   t.end();
 });
 
-test('XvizObject#observe', t => {
-  const object = new XvizObject({id: 11, index: 0, timestamp: 1000});
+test('XVIZObject#observe', t => {
+  const object = new XVIZObject({id: 11, index: 0, timestamp: 1000});
 
   object._observe(1001);
   t.is(object.startTime, 1000, 'has correct startTime');
@@ -36,8 +36,8 @@ test('XvizObject#observe', t => {
   t.end();
 });
 
-test('XvizObject#_reset, _setTrackingPoint, isValid', t => {
-  const object = new XvizObject({id: 11, index: 0, timestamp: 1000});
+test('XVIZObject#_reset, _setTrackingPoint, isValid', t => {
+  const object = new XVIZObject({id: 11, index: 0, timestamp: 1000});
 
   t.not(object.isValid, 'object should be empty');
 
