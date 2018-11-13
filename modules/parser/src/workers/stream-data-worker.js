@@ -1,4 +1,4 @@
-import {setXVIZConfig} from '../config/xviz-config';
+import {setXVIZConfig, setXVIZSettings} from '../config/xviz-config';
 import {parseStreamDataMessage} from '../parsers/parse-stream-data-message';
 import {preSerialize} from '../parsers/serialize';
 
@@ -31,6 +31,10 @@ export default config => self => {
   }
 
   self.onmessage = e => {
-    parseStreamDataMessage(e.data, onResult, onError);
+    if (e.data.xvizSettings) {
+      setXVIZSettings(e.data.xvizSettings);
+    } else {
+      parseStreamDataMessage(e.data, onResult, onError);
+    }
   };
 };
