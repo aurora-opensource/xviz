@@ -1,6 +1,6 @@
 import {setXVIZConfig} from '../config/xviz-config';
 import {parseXVIZStream} from '../parsers/parse-xviz-stream';
-import TextDecoder from '../utils/text-decoder';
+import {TextDecoder} from '../utils/text-encoding';
 
 export default config => self => {
   setXVIZConfig(config);

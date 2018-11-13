@@ -9,7 +9,7 @@ import {LOG_STREAM_MESSAGE} from '../constants';
 import {parseBinaryXVIZ, isBinaryXVIZ} from '../loaders/xviz-loader/xviz-binary-loader';
 import {parseLogMetadata} from './parse-log-metadata';
 import {parseStreamVideoMessage} from './parse-stream-video-message';
-import TextDecoder from '../utils/text-decoder';
+import {TextDecoder} from '../utils/text-encoding';
 import parseTimesliceDataV1 from './parse-timeslice-data-v1';
 import parseTimesliceDataV2 from './parse-timeslice-data-v2';
 import {getXVIZSettings} from '../config/xviz-config';

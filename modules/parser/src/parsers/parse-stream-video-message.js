@@ -6,7 +6,7 @@
  */
 /* global Blob, URL */
 import {LOG_STREAM_MESSAGE} from '../constants';
-import TextDecoder from '../utils/text-decoder';
+import {TextDecoder} from '../utils/text-encoding';
 import {blobToArrayBuffer} from '../utils/binary';
 
 import {parseLogMetadata} from './parse-log-metadata';
