@@ -12,19 +12,34 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/* global Blob, URL */
 import {parseStreamDataMessage} from './parse-stream-data-message';
 import {WorkerFarm} from '../utils/worker-utils';
 import {postDeserialize} from './serialize';
-import {getXVIZSettings} from '../config/xviz-config';
+import {getXVIZConfig, getXVIZSettings} from '../config/xviz-config';
+import streamDataWorker from '../../dist/workers/stream-data.worker.js';
 
 let workerFarm = null;
 
 export function initializeWorkers({worker, maxConcurrency = 4}) {
   if (!workerFarm) {
+    const xvizConfig = {...getXVIZConfig()};
+    delete xvizConfig.preProcessPrimitive;
+    let workerURL;
+
+    if (typeof worker === 'string') {
+      // worker is an URL
+      workerURL = worker;
+    } else {
+      // use default worker
+      const blob = new Blob([streamDataWorker], {type: 'application/javascript'});
+      workerURL = URL.createObjectURL(blob);
+    }
+
     workerFarm = new WorkerFarm({
-      processor: worker,
+      workerURL,
       maxConcurrency,
-      initialMessage: {xvizSettings: getXVIZSettings()}
+      initialMessage: {xvizConfig, xvizSettings: getXVIZSettings()}
     });
   }
 }

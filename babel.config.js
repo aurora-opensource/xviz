@@ -30,7 +30,12 @@ const CONFIG = {
     ],
     "plugins": [
       "version-inline",
-      "@babel/proposal-class-properties"
+      "@babel/proposal-class-properties",
+      ["babel-plugin-inline-import", {
+        "extensions": [
+          ".worker.js"
+        ]
+      }]
     ],
   }
 };
