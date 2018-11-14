@@ -8,14 +8,16 @@ export default config => self => {
   setXVIZConfig(config);
 
   function onResult(message) {
-    const transfers = [];
+    const transfers = new Set();
 
     switch (message.type) {
-      case LOG_STREAM_MESSAGE.TIME_SLICE:
+      case LOG_STREAM_MESSAGE.TIMESLICE:
         for (const streamName in message.streams) {
           const stream = message.streams[streamName];
           getTransferList(stream.pointCloud, true, transfers);
-          getTransferList(stream.imageData, false, transfers);
+          if (stream.images && stream.images.length) {
+            stream.images.forEach(image => getTransferList(image, true, transfers));
+          }
         }
         break;
 
@@ -28,7 +30,14 @@ export default config => self => {
     }
 
     message = preSerialize(message);
-    self.postMessage(message, transfers);
+
+    /* uncomment for debug */
+    // message._size = {
+    //   arraybuffer: transfers.size
+    // };
+    // message._sentAt = Date.now();
+
+    self.postMessage(message, Array.from(transfers));
   }
 
   function onError(error) {
