@@ -11,13 +11,16 @@ export default config => self => {
 
     if (streams) {
       for (const streamName in streams) {
-        const {pointCloud} = streams[streamName];
+        const {pointCloud, imageData} = streams[streamName];
         if (pointCloud) {
           transfers.push(
             pointCloud.ids.buffer,
             pointCloud.colors.buffer,
             pointCloud.positions.buffer
           );
+        }
+        if (imageData) {
+          transfers.push(imageData.buffer);
         }
       }
     }
