@@ -5,8 +5,8 @@ import {CATEGORY, PRIMITIVE_TYPES} from './constant';
 export default class XVIZPrimitiveBuilder extends XVIZBaseBuilder {
   constructor(props) {
     super({
-      ...props,
-      category: CATEGORY.primitive
+      category: CATEGORY.primitive,
+      ...props
     });
 
     this.reset();

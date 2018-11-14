@@ -205,8 +205,8 @@ export function parseStreamFuturesV2(objects, streamName, time, convertPrimitive
     const future = data.primitives
       .map(primitive => {
         const normalizedPrimitive = normalizeXVIZPrimitive(
-          primitive,
           XVIZPrimitiveSettingsV2,
+          primitive,
           futureIndex,
           streamName,
           data.type,
