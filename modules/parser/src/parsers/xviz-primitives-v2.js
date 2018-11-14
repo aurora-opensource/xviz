@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/* global URL, Blob */
 import {filterVertices} from './filter-vertices';
 import {PRIMITIVE_CAT} from './parse-xviz-primitive';
 import base64js from 'base64-js';
@@ -87,8 +86,8 @@ export default {
       }
       // format is not part of v2 spec
       const imgType = primitive.format ? `image/${primitive.format}` : null;
-      const blob = new Blob([imageData], {type: imgType});
-      primitive.imageUrl = URL.createObjectURL(blob);
+      primitive.imageData = imageData;
+      primitive.imageType = imgType;
       if (primitive.position) {
         primitive.vertices = primitive.position;
       }
