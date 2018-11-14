@@ -1,6 +1,6 @@
 /* global Worker */
 
-function getTransferList(object, recursive = true, transfers = []) {
+export function getTransferList(object, recursive = true, transfers = []) {
   if (!object) {
     // ignore
   } else if (object instanceof ArrayBuffer) {

@@ -4,7 +4,7 @@
  * `message` refers to the raw message received via webSocket.onmessage
  * `data` refers to pre-processed data objects (blob, arraybuffer, JSON object)
  */
-/* global Blob, URL */
+/* global Blob */
 import {LOG_STREAM_MESSAGE} from '../constants';
 import {TextDecoder} from '../utils/text-encoding';
 import {blobToArrayBuffer} from '../utils/binary';
@@ -86,9 +86,8 @@ export function parseVideoFrame(arrayBuffer) {
   const imageSize = view.getUint32(offset, littleEndian);
   offset += 4;
 
-  const blob = new Blob([arrayBuffer]);
-  const image = blob.slice(offset, offset + imageSize, 'image/jpeg');
-  result.imageUrl = URL.createObjectURL(image);
+  result.imageData = arrayBuffer.slice(offset, offset + imageSize);
+  result.imageType = 'image/jpeg';
 
   return result;
 }
