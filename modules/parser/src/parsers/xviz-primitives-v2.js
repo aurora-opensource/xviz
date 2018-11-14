@@ -67,7 +67,8 @@ export default {
     validate: (primitive, streamName, time) => primitive.data,
     normalize: primitive => {
       let imageData = primitive.data;
-      if (typeof primitive.data === 'string') {
+      delete primitive.data;
+      if (typeof imageData === 'string') {
         imageData = base64js.toByteArray(imageData);
       }
       // format is not part of v2 spec
