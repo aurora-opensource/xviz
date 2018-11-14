@@ -45,7 +45,7 @@ export default config => self => {
   }
 
   self.onmessage = e => {
-    if (e.data.xvizConfig) {
+    if (e.data.xvizConfig || e.data.xvizSettings) {
       setXVIZConfig(e.data.xvizConfig);
       setXVIZSettings(e.data.xvizSettings);
     } else {
