@@ -15,32 +15,43 @@
 import {setXVIZConfig, setXVIZSettings} from '../config/xviz-config';
 import {parseStreamDataMessage} from '../parsers/parse-stream-data-message';
 import {preSerialize} from '../parsers/serialize';
+import {getTransferList} from '../utils/worker-utils';
+import {LOG_STREAM_MESSAGE} from '../constants';
 
 export default config => self => {
   setXVIZConfig(config);
 
   function onResult(message) {
-    const transfers = [];
-    const {streams} = message;
+    const transfers = new Set();
 
-    if (streams) {
-      for (const streamName in streams) {
-        const {pointCloud, imageData} = streams[streamName];
-        if (pointCloud) {
-          transfers.push(
-            pointCloud.ids.buffer,
-            pointCloud.colors.buffer,
-            pointCloud.positions.buffer
-          );
+    switch (message.type) {
+      case LOG_STREAM_MESSAGE.TIMESLICE:
+        for (const streamName in message.streams) {
+          const stream = message.streams[streamName];
+          getTransferList(stream.pointCloud, true, transfers);
+          if (stream.images && stream.images.length) {
+            stream.images.forEach(image => getTransferList(image, true, transfers));
+          }
         }
-        if (imageData) {
-          transfers.push(imageData.buffer);
-        }
-      }
+        break;
+
+      case LOG_STREAM_MESSAGE.VIDEO_FRAME:
+        // v1 video stream
+        getTransferList(message.imageData, false, transfers);
+        break;
+
+      default:
     }
 
     message = preSerialize(message);
-    self.postMessage(message, transfers);
+
+    /* uncomment for debug */
+    // message._size = {
+    //   arraybuffer: transfers.size
+    // };
+    // message._sentAt = Date.now();
+
+    self.postMessage(message, Array.from(transfers));
   }
 
   function onError(error) {
@@ -48,7 +59,8 @@ export default config => self => {
   }
 
   self.onmessage = e => {
-    if (e.data.xvizSettings) {
+    if (e.data.xvizConfig || e.data.xvizSettings) {
+      setXVIZConfig(e.data.xvizConfig);
       setXVIZSettings(e.data.xvizSettings);
     } else {
       parseStreamDataMessage(e.data, onResult, onError);
