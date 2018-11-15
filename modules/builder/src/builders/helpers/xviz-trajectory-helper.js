@@ -36,6 +36,21 @@ export function getPoseTrajectory({poses, startFrame, endFrame}) {
 }
 
 /**
+ * Return transform matrix that can be used to transform
+ * data in futurePose into the currentPose reference frame
+ *
+ * @param targetPose {Object} {longitude, latitude, roll, yaw, pitch}
+ * @param sourcePose {Object} {longitude, latitude, roll, yaw, pitch}
+ * @returns {Object} tranformationMatrix
+ */
+export function getPoseTransform(targetPose, sourcePose) {
+  const translation = getPoseOffset(targetPose, sourcePose);
+  return new Pose(targetPose)
+    .getTransformationMatrixToPose(new Pose(sourcePose))
+    .translate([translation[0], translation[1], 0, 0]);
+}
+
+/**
  * Get object trajectory in pose relative coordinates
  * @param targetObject {Object} {id, x, y, z, ...}
  * @param objectFrames {Array}, all the frames of objects, (object: {id, x, y, z})
