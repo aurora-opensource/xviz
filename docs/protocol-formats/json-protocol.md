@@ -1,44 +1,79 @@
 # XVIZ JSON Protocol Format
 
 The JSON XVIZ format is a straight forward mapping of the XVIZ protocol schema contained within an
-envelope that denotes what type the object is.
+optional envelope that denotes what type the object is.
 
 ## Data Type Conversion
 
 The table below provides guidelines on how to convert the types specified in this document into
 JSON.
 
-| Type                                           | JSON Representation                |
-| ---------------------------------------------- | ---------------------------------- |
-| All Core Types (primitive, annotation, styles) | Object `{}`                        |
-| `list<>`                                       | Array []                           |
-| `map<>`                                        | Object `{"key": "value"}`          |
-| `optional<T>`                                  | `null` if not present, otherwise T |
+| Type                                           | JSON Representation                          |
+| ---------------------------------------------- | -------------------------------------------- |
+| All Core Types (primitive, annotation, styles) | Object `{}`                                  |
+| `list<>`                                       | Array []                                     |
+| `map<>`                                        | Object `{"key": "value"}`                    |
+| `optional<T>`                                  | `null` or absent if not present, otherwise T |
 
-## Data Envelope
+## WebSocket Data Envelope
 
-All XVIZ messages are enveloped with additional metadata about how to interpret them.
+This bundles the XVIZ messages in additional layer, allowing you to tell what type the message is,
+as well pass application specific messages on the same WebSocket connection as XVIZ data.
 
-The possible message types are captured in the message_types enum. Supported types are:
+The fields of the message
+
+| Name   | Type     | Description                          |
+| ------ | -------- | ------------------------------------ |
+| `type` | `string` | `namespace/type`                     |
+| `data` | `Object` | The actual message XVIZ or otherwise |
+
+Known namespaces:
+
+- `xviz`
+
+The valid XVIZ message types are:
 
 - `session_start` - Sent from the client upon connection
-- `session_reconfigure` - Sent from the client upon reconfiguration
 - `session_metadata` - Sent from the server upon connection or reconfiguration
 - `state_update` - Sent for messages containing primitives and variables
 
-| Name   | Type           | Description                   |
-| ------ | -------------- | ----------------------------- |
-| `type` | `message_type` | Explicit type of this message |
-| `data` | `message`      | The actual message itself     |
+### Examples
 
-A JSON example of this envelope for a state update message is
+The start message sent from the server to the client:
 
 ```
 {
-    "type": "state_update",
+    "type": "xviz/session_start",
+    "data": {
+        "version": "2.0.0",
+        "session_type": "live",
+        "message_format": "json"
+    }
+}
+```
+
+The metadata message, the first message sent from the server to the client:
+
+```
+{
+    "type": "xviz/session_metadata",
+    "data": {
+        "version": "2.0.0",
+        ...
+    }
+}
+```
+
+A state update message sent from the server to the client:
+
+```
+{
+    "type": "xviz/state_update",
     "data": {
         "update_type": "snapshot",
-        "updates": ...
+        "updates": [
+            ...
+        ]
     }
 }
 ```

@@ -29,7 +29,12 @@ export {parseLogMetadata} from './parsers/parse-log-metadata';
 export {parseVehiclePose} from './parsers/parse-vehicle-pose';
 export {parseEtlStream} from './parsers/parse-etl-stream';
 export {parseStreamMessage, initializeWorkers} from './parsers/parse-stream-message';
-export {parseStreamDataMessage, parseStreamLogData} from './parsers/parse-stream-data-message';
+export {
+  parseStreamDataMessage,
+  parseStreamLogData,
+  isEnvelope,
+  unpackEnvelope
+} from './parsers/parse-stream-data-message';
 export {parseStreamVideoMessage} from './parsers/parse-stream-video-message';
 
 export {default as lidarPointCloudWorker} from './workers/lidar-point-cloud-worker';
