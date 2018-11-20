@@ -26,7 +26,7 @@ import {
 
 /* eslint-disable camelcase */
 
-export default function parseTimesliceData(data, convertPrimitive) {
+export default function parseStreamSet(data, convertPrimitive) {
   const {update_type, updates} = data;
 
   if (update_type !== 'snapshot') {
@@ -54,11 +54,11 @@ export default function parseTimesliceData(data, convertPrimitive) {
     );
   }
 
-  const stateUpdates = updates;
+  const streamSets = updates;
 
   let timestamp = null;
-  if (!timestamp && stateUpdates) {
-    timestamp = stateUpdates.reduce((t, stateUpdate) => {
+  if (!timestamp && streamSets) {
+    timestamp = streamSets.reduce((t, stateUpdate) => {
       return Math.max(t, stateUpdate.timestamp);
     }, 0);
   }
@@ -76,8 +76,8 @@ export default function parseTimesliceData(data, convertPrimitive) {
     // TODO/Xintong validate primary vehicle pose in each update?
   };
 
-  if (stateUpdates) {
-    const xvizStreams = parseStateUpdates(stateUpdates, timestamp, convertPrimitive);
+  if (streamSets) {
+    const xvizStreams = parseStreamSets(streamSets, timestamp, convertPrimitive);
     Object.assign(newStreams, xvizStreams);
   }
 
@@ -85,7 +85,7 @@ export default function parseTimesliceData(data, convertPrimitive) {
 }
 
 /* eslint-disable max-statements */
-function parseStateUpdates(stateUpdates, timestamp, convertPrimitive) {
+function parseStreamSets(streamSets, timestamp, convertPrimitive) {
   const {STREAM_BLACKLIST} = getXVIZConfig();
 
   const newStreams = {};
@@ -96,16 +96,16 @@ function parseStateUpdates(stateUpdates, timestamp, convertPrimitive) {
   const futures = {};
   const uiPrimitives = {};
 
-  for (const stateUpdate of stateUpdates) {
-    Object.assign(poses, stateUpdate.poses);
-    Object.assign(primitives, stateUpdate.primitives);
-    Object.assign(variables, stateUpdate.variables);
-    Object.assign(futures, stateUpdate.future_instances);
-    Object.assign(uiPrimitives, stateUpdate.ui_primitives);
+  for (const streamSet of streamSets) {
+    Object.assign(poses, streamSet.poses);
+    Object.assign(primitives, streamSet.primitives);
+    Object.assign(variables, streamSet.variables);
+    Object.assign(futures, streamSet.future_instances);
+    Object.assign(uiPrimitives, streamSet.ui_primitives);
 
-    if (stateUpdate.time_series) {
+    if (streamSet.time_series) {
       if (timeSeries) {
-        timeSeries.push(...stateUpdate.time_series);
+        timeSeries.push(...streamSet.time_series);
       }
     }
   }

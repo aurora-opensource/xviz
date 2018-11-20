@@ -16,6 +16,9 @@ import {
   setXVIZConfig,
   getXVIZSettings,
   setXVIZSettings,
+  parseStreamDataMessage,
+  isEnvelope,
+  unpackEnvelope,
   parseStreamLogData,
   LOG_STREAM_MESSAGE
 } from '@xviz/parser';
@@ -112,6 +115,43 @@ const TestTimesliceMessageV2 = {
     }
   ]
 };
+
+tape('isEnvelope', t => {
+  t.ok(isEnvelope({type: 'foo', data: {a: 42}}), 'Detected XVIZ envelope');
+
+  t.notok(isEnvelope(TestTimesliceMessageV1), 'V1 data not in envelope');
+
+  t.notok(isEnvelope(TestTimesliceMessageV2), 'V2 data not in envelope');
+
+  t.end();
+});
+
+tape('unpackEnvelope name parsing', t => {
+  const notype = unpackEnvelope({type: 'foo', data: {a: 42}});
+  t.equals('foo', notype.namespace);
+  t.equals('', notype.type);
+
+  const empty = unpackEnvelope({type: '', data: {a: 42}});
+  t.equals('', empty.namespace);
+  t.equals('', empty.type);
+
+  t.end();
+});
+
+tape('unpackEnvelope xviz', t => {
+  const enveloped = {
+    type: 'xviz/state_update',
+    data: {a: 42}
+  };
+  const expected = {
+    namespace: 'xviz',
+    type: 'state_update',
+    data: enveloped.data
+  };
+  t.deepEquals(expected, unpackEnvelope(enveloped));
+
+  t.end();
+});
 
 // TODO: blacklisted streams in xviz common
 tape('parseStreamLogData metadata', t => {
@@ -613,6 +653,98 @@ tape('parseStreamLogData futures timeslice v1', t => {
 
   const lookAheads = slice.streams['/test/polygon'].lookAheads;
   t.equals(lookAheads.length, 2, 'Has 2 primitive sets in lookAheads');
+
+  t.end();
+});
+
+tape('parseStreamDataMessage', t => {
+  setXVIZSettings({currentMajorVersion: 2});
+  setXVIZSettings(defaultXVIZSettings);
+
+  let result;
+  let error;
+  const opts = {};
+  parseStreamDataMessage(
+    {...TestTimesliceMessageV2},
+    newResult => {
+      result = newResult;
+    },
+    newError => {
+      error = newError;
+    },
+    opts
+  );
+
+  t.equals(undefined, error, 'No errors received while parsing');
+  t.equals(result.type, LOG_STREAM_MESSAGE.TIMESLICE, 'Message type set for timeslice');
+  t.equals(
+    result.timestamp,
+    TestTimesliceMessageV2.updates[0].poses['/vehicle_pose'].timestamp,
+    'Message timestamp set from vehicle_pose'
+  );
+
+  t.end();
+});
+
+tape('parseStreamDataMessage enveloped', t => {
+  setXVIZSettings({currentMajorVersion: 2});
+  setXVIZSettings(defaultXVIZSettings);
+
+  const enveloped = {
+    type: 'xviz/state_update',
+    data: {...TestTimesliceMessageV2}
+  };
+
+  let result;
+  let error;
+  const opts = {};
+  parseStreamDataMessage(
+    enveloped,
+    newResult => {
+      result = newResult;
+    },
+    newError => {
+      error = newError;
+    },
+    opts
+  );
+
+  t.equals(undefined, error, 'No errors received while parsing');
+  t.equals(result.type, LOG_STREAM_MESSAGE.TIMESLICE, 'Message type set for timeslice');
+  t.equals(
+    result.timestamp,
+    TestTimesliceMessageV2.updates[0].poses['/vehicle_pose'].timestamp,
+    'Message timestamp set from vehicle_pose'
+  );
+
+  t.end();
+});
+
+tape('parseStreamDataMessage enveloped not xviz', t => {
+  setXVIZSettings({currentMajorVersion: 2});
+  setXVIZSettings(defaultXVIZSettings);
+
+  const enveloped = {
+    type: 'bar/foo',
+    data: {a: 42}
+  };
+
+  let result;
+  let error;
+  const opts = {};
+  parseStreamDataMessage(
+    enveloped,
+    newResult => {
+      result = newResult;
+    },
+    newError => {
+      error = newError;
+    },
+    opts
+  );
+
+  t.equals(undefined, error, 'No errors received while parsing');
+  t.equals(undefined, result, 'No data parsed, unknown type');
 
   t.end();
 });

@@ -53,11 +53,27 @@ function decode(data, recursive) {
   return data;
 }
 
+// Parse apart the namespace and type for the enveloped data
+export function unpackEnvelope(data) {
+  const parts = data.type.split('/');
+  return {
+    namespace: parts[0],
+    type: parts.slice(1).join('/'),
+    data: data.data
+  };
+}
+
+// Sniff out whether the JSON data provided is in the XVIZ envelope format
+export function isEnvelope(data) {
+  return data.type && data.data;
+}
+
 // Post processes a stream message to make it easy to use for JavaScript applications
 export function parseStreamDataMessage(message, onResult, onError, opts) {
   // TODO(twojtasz): better message dispatching
   // here, not all arraybuffer may be image (packed point cloud)
-  if (message instanceof Blob) {
+  // TODO(jlisee): Node.js support for blobs for better unit testing
+  if (typeof Blob !== 'undefined' && message instanceof Blob) {
     parseStreamVideoMessage(message, onResult, onError);
     return;
   }
@@ -69,8 +85,21 @@ export function parseStreamDataMessage(message, onResult, onError, opts) {
     } else {
       data = decode(message, true);
     }
-    const result = parseStreamLogData(data, opts);
-    onResult(result);
+
+    let parseData = true;
+    if (isEnvelope(data)) {
+      const unpacked = unpackEnvelope(data);
+      if (unpacked.namespace === 'xviz') {
+        data = unpacked.data;
+      } else {
+        parseData = false;
+      }
+    }
+
+    if (parseData) {
+      const result = parseStreamLogData(data, opts);
+      onResult(result);
+    }
   } catch (error) {
     onError(error);
   }
