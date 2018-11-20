@@ -1,4 +1,4 @@
-*Uber Confidential Information*
+_Uber Confidential Information_
 
 # xviz
 
@@ -10,8 +10,8 @@ XVIZ protocol and utility libraries.
 
 To build this repository you need:
 
- - Node.js, tested with 8.11.3, compatible with 8.x
- - Yarn, tested with 1.7.0, compatible with 1.x
+- Node.js, tested with 8.11.3, compatible with 8.x
+- Yarn, tested with 1.7.0, compatible with 1.x
 
 To install dependencies, run:
 
@@ -37,7 +37,8 @@ $ yarn test-browser
 
 ## Docs
 
-The documentation is built with the Ocular documentation generator. You can easily iterate on the docs by doing, and see changes live in your browser:
+The documentation is built with the Ocular documentation generator. You can easily iterate on the
+docs by doing, and see changes live in your browser:
 
 ```
 $ cd website
@@ -54,7 +55,7 @@ $ yarn build
 
 Then open `dist/index.html` to view.
 
-
 ## Coding Standard
 
-xviz uses a pinned version of the [uber-es2015](https://www.npmjs.com/package/eslint-config-uber-es2015) linter rules.
+xviz uses a pinned version of the
+[uber-es2015](https://www.npmjs.com/package/eslint-config-uber-es2015) linter rules.

@@ -5,32 +5,38 @@
 ## Constructor
 
 ##### metadata (Object)
-* Use `XVIZMetadataBuilder` to construct metadata object.
+
+- Use `XVIZMetadataBuilder` to construct metadata object.
 
 ##### disableStreams (Array)
-* disableStreams are not flushed to frame.
+
+- disableStreams are not flushed to frame.
 
 ##### validateWarn (Function),
-* called when there is a validation warning.
+
+- called when there is a validation warning.
 
 ##### validateError (Function)
-* called when there is a validation error.
 
+- called when there is a validation error.
 
 ## Methods
+
 All methods except `getFrame()` return `this` builder instance
 
 ##### getFrame()
-* Return an object with xviz protocol containing all the streams in current frame built from the XVIZBuilder instance.
+
+- Return an object with xviz protocol containing all the streams in current frame built from the
+  XVIZBuilder instance.
 
 ##### pose(streamId : String) : XVIZPoseBuilder
-`streamId` is default to `/vehicle_pose` if not specified.
-Also for a frame, stream `/vehicle_pose` must be defined.
-Additional poses can be defined but are not required.
 
-* Start building a `pose` stream.
-* Return `XVIZPoseBuilder` instance
-* `Pose` structure
+`streamId` is default to `/vehicle_pose` if not specified. Also for a frame, stream `/vehicle_pose`
+must be defined. Additional poses can be defined but are not required.
+
+- Start building a `pose` stream.
+- Return `XVIZPoseBuilder` instance
+- `Pose` structure
 
 ```js
 {
@@ -39,37 +45,41 @@ Additional poses can be defined but are not required.
   position: [x, y, z],
   orientation: [roll, pitch, yaw]
 }
-
 ```
 
 ##### primitive(streamId : String) : XVIZPrimitiveBuilder
-* Start building a `primitive` or `future` stream.
-* Return `XVIZPrimitiveBuilder` instance
+
+- Start building a `primitive` or `future` stream.
+- Return `XVIZPrimitiveBuilder` instance
 
 ##### variable(streamId : String) : XVIZVariableBuilder
-* Start building a `variables` stream.
-* Return `XVIZVariableBuilder` instance
+
+- Start building a `variables` stream.
+- Return `XVIZVariableBuilder` instance
 
 ##### timeSeries(streamId : String) : XVIZTimeSeriesBuilder
-* Start building a `timeSeries` stream.
-* Return `XVIZTimeSeriesBuilder` instance
+
+- Start building a `timeSeries` stream.
+- Return `XVIZTimeSeriesBuilder` instance
 
 **Naming rules for `streamId`**
-* Start building a stream.
-* `streamId` has to be path-like.
+
+- Start building a stream.
+- `streamId` has to be path-like.
   - always starts with a `/`
   - sections contain only: `[a-zA-Z0-9_-:.]`
   - does not end with a `/`
 
 Examples:
-   - `/vehicle-pose`
-   - `/vehicle/velocity`
-   - `/object/car-1`
+
+- `/vehicle-pose`
+- `/vehicle/velocity`
+- `/object/car-1`
 
 ##### uiPrimitive(streamId : String) : XVIZUIPrimitiveBuilder
-* Start building a `ui_primitive` stream.
-* Return `XVIZUIPrimitiveBuilder` instance
 
+- Start building a `ui_primitive` stream.
+- Return `XVIZUIPrimitiveBuilder` instance
 
 # XVIZPoseBuilder
 
@@ -78,7 +88,6 @@ Examples:
 ##### position(x: Number, y : Number, z : Number)
 
 ##### orientation(roll: Number, pitch : Number, yaw : Number)
-
 
 # XVIZPrimitiveBuilder
 
@@ -89,63 +98,74 @@ Examples:
 ##### points(vertices : TypedArray)
 
 ##### image(data, format)
-* `data` binary image data
-* `format` e.g. 'png', 'jpg', etc
+
+- `data` binary image data
+- `format` e.g. 'png', 'jpg', etc
 
 ##### dimensions(widthPixel : Number, heightPixel : Number, depth : Number)
-* Only used for `image` primitive, providing dimension info about image stream.
+
+- Only used for `image` primitive, providing dimension info about image stream.
 
 ##### circle(position: Array, radius : Number)
-* `position` has to be an array with length 3, [x, y, z].
+
+- `position` has to be an array with length 3, [x, y, z].
 
 ##### stadium(start : Array, end : Array, radius : Number)
-* Both `start` and `end` are array with length3, [x, y, z].
+
+- Both `start` and `end` are array with length3, [x, y, z].
 
 ##### text(message : String)
 
 ##### position(point : Array)
-* Position has to be an array with length 3.
-* Only used for specifying where to place `text` message.
+
+- Position has to be an array with length 3.
+- Only used for specifying where to place `text` message.
 
 ##### style(style : Object)
+
 check `xviz-stylesheet` for supported style properties
 
 ##### id(id : String)
-* Specify `id` for a primitive.
+
+- Specify `id` for a primitive.
 
 ##### classes(classList : Array)
-* `classList` style classes, should match metadata definition
+
+- `classList` style classes, should match metadata definition
 
 ##### timestamp(timestamp : Number)
-* Primitive with timestamp is considered as `future`.
-* check `core-protocol` for definition of future.
 
+- Primitive with timestamp is considered as `future`.
+- check `core-protocol` for definition of future.
 
 # XVIZVariableBuilder
 
 ##### timestamps(timestamps : Array)
-* Set timestamps of a variable.
+
+- Set timestamps of a variable.
 
 ##### values(values : Any)
-* `values` and `timestamps` should be matched pairs.
-* Each element in `values` array should be `Number`, `String`, or `boolean`.
 
+- `values` and `timestamps` should be matched pairs.
+- Each element in `values` array should be `Number`, `String`, or `boolean`.
 
 # XVIZTimeSeriesBuilder
 
 ##### timestamp(timestamp : Number)
-* Set timestamp.
+
+- Set timestamp.
 
 ##### value(value : Any)
-* Value has to be one of `Number`, `String`, or `boolean`.
 
+- Value has to be one of `Number`, `String`, or `boolean`.
 
 # XVIZUIPrimitiveBuilder
 
 ##### treetable(columns : Array)
 
 Initialize a treetable primitive.
-* `columns` should be an array of descriptors of table columns.
+
+- `columns` should be an array of descriptors of table columns.
 
 ##### row(id: String, column_values: Array)
 
@@ -155,8 +175,8 @@ Add a row to the table. Returns a `XVIZTreeTableRowBuilder` instance that repres
 
 ##### child(id: String, column_values: Array)
 
-Append a row as a child of this row. Returns a `XVIZTreeTableRowBuilder` instance that represents the new row.
-
+Append a row as a child of this row. Returns a `XVIZTreeTableRowBuilder` instance that represents
+the new row.
 
 ## Example
 
@@ -289,5 +309,4 @@ const frame = xvizBuider.getFrame();
     }
   ]
 }
-
 ```

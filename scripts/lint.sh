@@ -44,9 +44,17 @@ case $MODE in
     echo "Checking prettier code styles..."
 
     JS_PATTERN="{modules,test,website}/**/*.js"
-    DOCS_PATTERN="docs/{overview,protocol-formats,protocol-schema}/**/*.md"
+    DOCS_PATTERN="docs/**/*.md"
+    README_PATTERN="*.md"
+    SCHEMA_README="./modules/schema/README.md"
 
-    npx prettier-check "$JS_PATTERN" "$DOCS_PATTERN" || echo "Running prettier." && npx prettier --write "$JS_PATTERN" "$DOCS_PATTERN"  --loglevel warn
+    npx prettier-check "$JS_PATTERN" "$DOCS_PATTERN" "$README_PATTERN" "$SCHEMA_README" \
+        || echo "Running prettier." && npx prettier --loglevel warn --write \
+                                           "$JS_PATTERN" \
+                                           "$DOCS_PATTERN" \
+                                           "$README_PATTERN" \
+                                           "$SCHEMA_README"
+
 
     echo "Running eslint..."
     npx eslint modules test

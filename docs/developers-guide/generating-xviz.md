@@ -1,6 +1,5 @@
 # Generating XVIZ
 
-
 ## Generating XVIZ metadata
 
 ```js
@@ -33,7 +32,6 @@ builder
   .polygon(verts2)
   .timestamp(ts2);
 ```
-
 
 ## Generating XVIZ declarative UI
 

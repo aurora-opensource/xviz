@@ -4,7 +4,8 @@ Styling in XVIZ happens at multiple levels.
 
 ## Object inline styles
 
-Object styling is defined during conversion using the XVIZBuilder.style() method. Simply pass an object with the appropriate style properties and values.
+Object styling is defined during conversion using the XVIZBuilder.style() method. Simply pass an
+object with the appropriate style properties and values.
 
 ## Stream style classes
 
@@ -15,7 +16,9 @@ Using classes requires coordination at two places.
 
 ## Stream style defaults
 
-Stream styles definition define the default style property values for all objects within a stream. They provide a single place to define styles for a stream and avoid unnecessary styling of individual element.
+Stream styles definition define the default style property values for all objects within a stream.
+They provide a single place to define styles for a stream and avoid unnecessary styling of
+individual element.
 
 # Style Specification
 

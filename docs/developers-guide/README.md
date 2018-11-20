@@ -5,8 +5,8 @@ XVIZ comes with a number of tools to help you generated, validate, parse and sty
 This guide will show you how to use these tools to convert your data into XVIZ.
 
 This includes:
- - Explaining what data is required
- - How streams, object, and time are managed in XVIZ
- - Explaining *frames* and it they relate to time and streams
- - How UI elements can be created in XVIZ
 
+- Explaining what data is required
+- How streams, object, and time are managed in XVIZ
+- Explaining _frames_ and it they relate to time and streams
+- How UI elements can be created in XVIZ
