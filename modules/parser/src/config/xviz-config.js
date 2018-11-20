@@ -26,14 +26,14 @@ const DEFAULT_XVIZ_SETTINGS = {
   pathDistanceThreshold: 0.1 // Filters out close vertices (work around for PathLayer issue)
 };
 
-let xvizConfig = Object.assign({}, DEFAULT_XVIZ_CONFIG);
+const xvizConfig = Object.assign({}, DEFAULT_XVIZ_CONFIG);
 const xvizSettings = Object.assign({}, DEFAULT_XVIZ_SETTINGS);
 
 XVIZObject.setDefaultCollection(new XVIZObjectCollection());
 
 // CONFIG contains the static configuration of XVIZ (streams, how to postprocess etc)
 export function setXVIZConfig(config) {
-  xvizConfig = Object.assign({}, DEFAULT_XVIZ_CONFIG, config);
+  Object.assign(xvizConfig, config);
 
   if (Array.isArray(xvizConfig.STREAM_BLACKLIST)) {
     xvizConfig.STREAM_BLACKLIST = new Set(xvizConfig.STREAM_BLACKLIST);

@@ -1,32 +1,21 @@
-/* global Worker */
+/* global Worker, Blob, URL */
 import test from 'tape-catch';
-import {processWithWorker, WorkerFarm} from '@xviz/parser/utils/worker-utils';
+import {WorkerFarm} from '@xviz/parser/utils/worker-utils';
 
-const hasWorker = typeof Worker !== 'undefined';
+let testWorker = null;
 
-const testWorker = require.resolve('./test-worker');
-
-test('processWithWorker', t => {
-  if (!hasWorker) {
-    t.comment('Worker test is browser only');
-    t.end();
-    return;
-  }
-  const testBuffer = new Float32Array(100).buffer;
-
-  processWithWorker(testWorker)(testBuffer)
-    .then(result => {
-      t.ok(result instanceof ArrayBuffer, 'worker returns expected result');
-      t.end();
-    })
-    .catch(err => {
-      t.fail(err);
-      t.end();
-    });
-});
+if (typeof Worker !== 'undefined') {
+  const script = `
+    self.onmessage = event => {
+      setTimeout(() => self.postMessage(event.data), 50);
+    };
+  `;
+  const blob = new Blob([script], {type: 'application/javascript'});
+  testWorker = URL.createObjectURL(blob);
+}
 
 test('WorkerFarm', t => {
-  if (!hasWorker) {
+  if (!testWorker) {
     t.comment('Worker test is browser only');
     t.end();
     return;
@@ -49,7 +38,7 @@ test('WorkerFarm', t => {
   };
 
   const workerFarm = new WorkerFarm({
-    processor: testWorker,
+    workerURL: testWorker,
     maxConcurrency: MAX_CONCURRENCY,
     debug: callback
   });

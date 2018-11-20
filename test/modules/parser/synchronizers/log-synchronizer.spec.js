@@ -1,6 +1,8 @@
 import {LogSynchronizer, setXVIZSettings} from '@xviz/parser';
 import tape from 'tape-catch';
 
+import {resetXVIZConfigAndSettings} from '../config/config-utils';
+
 // xviz data uses snake_case
 /* eslint-disable camelcase */
 
@@ -44,6 +46,7 @@ tape('LogSynchronizer#setTime', t => {
 });
 
 tape('LogSynchronizer#getData', t => {
+  resetXVIZConfigAndSettings();
   setXVIZSettings({TIME_WINDOW: 0.4});
   const logSynchronizer = new LogSynchronizer(LOG_START_TIME, LOGS);
 
