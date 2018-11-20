@@ -1,0 +1,12 @@
+{
+  "type": "plot",
+  "title": "Important regions",
+  "description": "See important regions.",
+  "regions": [
+    {
+      "x": "/some/region/x",
+      "yMin": "/some/region/y_min",
+      "yMax": "/some/region/y_max"
+    }
+  ]
+}

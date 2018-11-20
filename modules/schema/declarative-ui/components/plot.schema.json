@@ -18,13 +18,49 @@
       },
       "minItems": 1,
       "additionalItems": false
+    },
+    "regions": {
+      "type": "array",
+      "minItems": 1,
+      "additionalItems": false,
+      "items": {
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "string"
+          },
+          "yMin": {
+            "type": "string"
+          },
+          "yMax": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "x",
+          "yMin",
+          "yMax"
+        ],
+        "additionalProperties": false
+      }
     }
   },
-  "required": [
-    "type",
-    "title",
-    "independentVariable",
-    "dependentVariables"
+  "anyOf": [
+    {
+      "required": [
+        "type",
+        "title",
+        "independentVariable",
+        "dependentVariables"
+      ]
+    },
+    {
+      "required": [
+        "type",
+        "title",
+        "regions"
+      ]
+    }
   ],
   "additionalProperties": false
 }
