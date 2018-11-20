@@ -6,7 +6,6 @@
 
 Automatically loads schema data.
 
-
 ## Methods
 
 All validation methods throw if the object fails to validate.
@@ -27,7 +26,6 @@ Validate `state_update` message.
 
 Validate `stream_set` type.
 
-
 ### Validate base types
 
 #### `validatePose(data : Object)`
@@ -36,9 +34,8 @@ Validate `stream_set` type.
 
 Validate the different primitive types.
 
- - `type` - the type of the variable, like "point" or "circle", see spec
- - `data` - the object to validate
-
+- `type` - the type of the variable, like "point" or "circle", see spec
+- `data` - the object to validate
 
 #### `validateTimeSeries(data : Object)`
 
@@ -50,9 +47,8 @@ Validate the different primitive types.
 
 Validation the different annotation types.
 
- - `type` - the type of the variable, only "visual" is currently valid
- - `data` - the object to validate
-
+- `type` - the type of the variable, only "visual" is currently valid
+- `data` - the object to validate
 
 ### Uility methods
 
@@ -60,8 +56,8 @@ Validation the different annotation types.
 
 Validate any schema
 
- - `schemaName` - the name of the schema, the ".schema.json" trailer is not needed
- - `data` - the object to validate
+- `schemaName` - the name of the schema, the ".schema.json" trailer is not needed
+- `data` - the object to validate
 
 #### `schemaCount() : Number`
 
