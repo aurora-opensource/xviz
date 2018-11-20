@@ -248,7 +248,7 @@ _TODO: screenshot: streetscape.gl demo app showing normal variable plot_
 | **Name**              | **Type**          | **Description**                                                                         |
 | --------------------- | ----------------- | --------------------------------------------------------------------------------------- |
 | `independentVariable` | `stream_id`       | The stream to use as the X axis.                                                        |
-| `dependentVariable`   | `list<stream_id>` | The streams to plot on the Y axis as a function of the stream that makes up the X axis. |
+| `dependentVariables`  | `list<stream_id>` | The streams to plot on the Y axis as a function of the stream that makes up the X axis. |
 | `title`               | `string`          | Shown at the top of the plot                                                            |
 | `description`         | `string`          | Displayed when hovering over the title                                                  |
 
