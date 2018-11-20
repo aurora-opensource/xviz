@@ -31,7 +31,9 @@ import coreVariableSchemaJson from '../core/variable.schema.json';
 import coreVariableStateSchemaJson from '../core/variable_state.schema.json';
 import declarativeUiComponentBaseSchemaJson from '../declarative-ui/component_base.schema.json';
 import declarativeUiComponentsMetricSchemaJson from '../declarative-ui/components/metric.schema.json';
+import declarativeUiComponentsOnchangeSchemaJson from '../declarative-ui/components/_onchange.schema.json';
 import declarativeUiComponentsPlotSchemaJson from '../declarative-ui/components/plot.schema.json';
+import declarativeUiComponentsSelectSchemaJson from '../declarative-ui/components/select.schema.json';
 import declarativeUiComponentsTableSchemaJson from '../declarative-ui/components/table.schema.json';
 import declarativeUiComponentsTabularSchemaJson from '../declarative-ui/components/_tabular.schema.json';
 import declarativeUiComponentsTreetableSchemaJson from '../declarative-ui/components/treetable.schema.json';
@@ -78,7 +80,9 @@ export const SCHEMA_DATA = {
   'core/variable_state.schema.json': coreVariableStateSchemaJson,
   'declarative-ui/component_base.schema.json': declarativeUiComponentBaseSchemaJson,
   'declarative-ui/components/metric.schema.json': declarativeUiComponentsMetricSchemaJson,
+  'declarative-ui/components/_onchange.schema.json': declarativeUiComponentsOnchangeSchemaJson,
   'declarative-ui/components/plot.schema.json': declarativeUiComponentsPlotSchemaJson,
+  'declarative-ui/components/select.schema.json': declarativeUiComponentsSelectSchemaJson,
   'declarative-ui/components/table.schema.json': declarativeUiComponentsTableSchemaJson,
   'declarative-ui/components/_tabular.schema.json': declarativeUiComponentsTabularSchemaJson,
   'declarative-ui/components/treetable.schema.json': declarativeUiComponentsTreetableSchemaJson,
