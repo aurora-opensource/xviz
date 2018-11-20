@@ -20,6 +20,7 @@ import XVIZContainerBuilder from './xviz-container-builder';
 
 import XVIZMetricBuilder from './xviz-metric-builder';
 import XVIZPlotBuilder from './xviz-plot-builder';
+import XVIZSelectBuilder from './xviz-select-builder';
 import XVIZTableBuilder from './xviz-table-builder';
 import XVIZTreeTableBuilder from './xviz-tree-table-builder';
 import XVIZVideoBuilder from './xviz-video-builder';
@@ -37,6 +38,7 @@ const UI_BUILDER_MAP = {
 
   [UI_TYPES.METRIC]: XVIZMetricBuilder,
   [UI_TYPES.PLOT]: XVIZPlotBuilder,
+  [UI_TYPES.SELECT]: XVIZSelectBuilder,
   [UI_TYPES.TABLE]: XVIZTableBuilder,
   [UI_TYPES.TREETABLE]: XVIZTreeTableBuilder,
   [UI_TYPES.VIDEO]: XVIZVideoBuilder

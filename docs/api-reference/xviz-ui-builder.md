@@ -130,6 +130,10 @@ Returns a new [`XVIZTreeTableBuilder`](#XVIZTreeTableBuilder) instance with the 
 
 Returns a new [`XVIZPlotBuilder`](#XVIZPlotBuilder) instance with the specified options.
 
+##### select(options)
+
+Returns a new [`XVIZSelectBuilder`](#XVIZSelectBuilder) instance with the specified options.
+
 ##### video(options)
 
 Returns a new [`XVIZVideoBuilder`](#XVIZVideoBuilder) instance with the specified options.
@@ -224,6 +228,29 @@ Parameters:
 - **options.description** (String) - description of the plot
 - **options.independentVariable** (String) - the independent variable stream
 - **options.dependentVariables** (Array) - a list of dependent variable streams
+
+### Methods
+
+##### getUI()
+
+Returns a JSON descriptor of this component.
+
+## XVIZSelectBuilder (WARNING: Unstable feature)
+
+The select component builder for declarative UI.
+
+### Constructor
+
+```js
+new XVIZSelectBuilder(options);
+```
+
+Parameters:
+
+- **options.title** (String) - title of the select
+- **options.description** (String) - description of the select
+- **options.stream** (String) - the variable stream that provides the options
+- **options.target** (String) - JSON pointer to configuration property to update
 
 ### Methods
 

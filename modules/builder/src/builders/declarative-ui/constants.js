@@ -20,6 +20,7 @@ export const UI_TYPES = {
   // components
   METRIC: 'metric',
   PLOT: 'plot',
+  SELECT: 'select',
   TABLE: 'table',
   TREETABLE: 'treetable',
   VIDEO: 'video'
