@@ -26,6 +26,15 @@
             "/some/other_stream",
             "/some/second_other_stream"
           ]
+        },
+        {
+          "title": "Additional Info Type",
+          "description": "Which type of additional information you want sent",
+          "type": "select",
+          "stream": "/system/additional_info/types",
+          "onchange": {
+            "target": "/system/info/type"
+          }
         }
       ]
     },

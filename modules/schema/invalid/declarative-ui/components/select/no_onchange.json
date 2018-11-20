@@ -1,0 +1,6 @@
+{
+  "title": "Additional Info Type",
+  "description": "Which type of additional information you want sent",
+  "type": "select",
+  "stream": "/system/additional_info/types"
+}

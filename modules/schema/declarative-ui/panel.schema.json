@@ -47,6 +47,7 @@
               {"$ref": "https://xviz.org/schema/declarative-ui/components/table.json"},
               {"$ref": "https://xviz.org/schema/declarative-ui/components/treetable.json"},
               {"$ref": "https://xviz.org/schema/declarative-ui/components/video.json"},
+              {"$ref": "https://xviz.org/schema/declarative-ui/components/select.json"},
               {"$ref": "#/definitions/container"}
             ]
           },

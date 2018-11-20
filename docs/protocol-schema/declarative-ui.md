@@ -85,6 +85,7 @@ types. The currently supported component interactions:
 - Toggle Streams On/Off
 - Select Source
 - Video Settings Adjustment
+- Change element (`onchange`)
 
 The interactions supported by each component as well as how each interaction behaves and looks is
 described below in the details of each individual component.
@@ -135,11 +136,12 @@ Component is the base type for all visual elements.
 
 The valid values of `component_type`:
 
+- `table`
 - `metric`
 - `plot`
-- `table`
 - `treetable`
 - `video`
+- `select` (WARNING: Unstable feature)
 
 ### Table
 
@@ -386,6 +388,67 @@ components:
     stream: /some/stream/of/treetable/primmatives
     title: A TreeTable!
     type: treetable
+```
+
+### Select (WARNING: Unstable feature)
+
+The Select components allows dynamically configuring the XVIZ transformation done on data sent to
+client. The component displays a list of options populated by a XVIZ variable stream, and allows the
+user to select one of them. This also known as a "combobox" or "dropdown".
+
+When a new option is selected the client sends backend a message (TODO specify me) with the updated
+value then:
+
+- The backend responds with an updated view of the world for the current time
+- Any future requests will use the updated configuration
+
+| **Name**      | **Type**    | **Description**                                              |
+| ------------- | ----------- | ------------------------------------------------------------ |
+| `title`       | `string`    | Displayed on screen besides the selection box                |
+| `description` | `string`    | Displayed when hovering over the title                       |
+| `stream`      | `stream_id` | A XVIZ variable stream containing the options to select      |
+| `onchange`    | `onchange`  | Describes what to happen when a new select option is chosen. |
+
+**onchange** fields
+
+| **Name** | **Type** | **Description**                                            |
+| -------- | -------- | ---------------------------------------------------------- |
+| `target` | `string` | A JSON pointer (RFC 6901) that describes the key to update |
+
+#### Supported Interactions
+
+| **Interaction** | **Description**                                 |
+| --------------- | ----------------------------------------------- |
+| `onchange`      | Reconfigure the backend when the select changes |
+
+#### JSON Example
+
+```
+{
+  "components": [
+    {
+      "title": "Additional Info Type",
+      "description": "Which type of additional information you want sent",
+      "type": "select",
+      "stream": "/system/additional_info/types",
+      "onchange": {
+        "target": "/system/info/type"
+      }
+    }
+  ]
+}
+```
+
+#### YAML Example
+
+```
+components:
+  - type: select
+    title: Additional Info Type
+    description: Which type of additional information you want sent
+    streams: /system/additional_info/types
+    onchange:
+      target: /system/info/type
 ```
 
 ## Complete Example

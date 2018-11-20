@@ -1,0 +1,14 @@
+{
+  "id": "https://xviz.org/schema/declarative-ui/components/_onchange.json",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "target": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "target"
+  ],
+  "additionalProperties": false
+}
