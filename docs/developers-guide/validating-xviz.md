@@ -1,6 +1,5 @@
 # Validating XVIZ
 
-
 ## Validating XVIZ metadata
 
 ```js
@@ -10,7 +9,7 @@ const validator = new XVIZValidator();
 
 // Throws on error
 metadata = {
-  version: "2.0.0"
+  version: '2.0.0'
 };
 
 validator.validatorMetadata(metadata);
@@ -27,7 +26,7 @@ const builder = new XVIZBuilder();
 builder
   .pose()
   .timestamp(ts1);
-builder  
+builder
   .primitive('/test/polygon')
   .timestamp(ts1)
   .polygon([[0, 0, 0], [4, 0, 0], [4, 3, 0]]);
