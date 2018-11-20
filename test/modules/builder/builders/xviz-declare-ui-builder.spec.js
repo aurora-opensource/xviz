@@ -96,3 +96,45 @@ test('XVIZUIBuilder#plot basic', t => {
 
   t.end();
 });
+
+test('XVIZUIBuilder#select', t => {
+  const builder = new XVIZUIBuilder({});
+
+  const panel = builder.panel({name: 'Controls'});
+  const select1 = builder.select({
+    title: 'Choose options value',
+    stream: '/options/value',
+    target: '/import/setting'
+  });
+
+  builder.child(panel).child(select1);
+
+  const expected = {
+    Controls: {
+      name: 'Controls',
+      type: 'panel',
+      children: [
+        {
+          type: 'select',
+          title: 'Choose options value',
+          stream: '/options/value',
+          onchange: {
+            target: '/import/setting'
+          }
+        }
+      ]
+    }
+  };
+
+  const actual = builder.getUI();
+
+  t.deepEqual(actual, expected, 'XVIZUIBuilder should match expectation');
+
+  for (const name in actual) {
+    if (actual.hasOwnProperty(name)) {
+      schemaValidator.validate('declarative-ui/panel', actual[name]);
+    }
+  }
+
+  t.end();
+});
