@@ -11,7 +11,7 @@
     "independentVariable": {
       "type": "string"
     },
-    "dependentVariable": {
+    "dependentVariables": {
       "type": "array",
       "items": {
         "type": "string"
@@ -24,7 +24,7 @@
     "type",
     "title",
     "independentVariable",
-    "dependentVariable"
+    "dependentVariables"
   ],
   "additionalProperties": false
 }

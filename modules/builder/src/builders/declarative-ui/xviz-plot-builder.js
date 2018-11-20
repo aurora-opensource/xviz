@@ -18,7 +18,7 @@ import {UI_TYPES} from './constants';
 export default class XVIZPlotBuilder extends XVIZBaseUiBuilder {
   constructor({
     independentVariable,
-    dependentVariable,
+    dependentVariables,
     description,
     title,
     validateWarn,
@@ -30,7 +30,7 @@ export default class XVIZPlotBuilder extends XVIZBaseUiBuilder {
       validateError
     });
     this._independentVariable = independentVariable;
-    this._dependentVariable = dependentVariable;
+    this._dependentVariables = dependentVariables;
     this._description = description;
     this._title = title;
 
@@ -38,15 +38,19 @@ export default class XVIZPlotBuilder extends XVIZBaseUiBuilder {
   }
 
   _validate() {
-    if (!this._name) {
-      this._validateError('Panel should have `name`.');
+    if (this._independentVariable) {
+      if (!this._dependentVariables) {
+        this._validateError('Plot should have `dependentVariables`.');
+      }
+    } else {
+      this._validateError('Plot should have `independentVariable`.');
     }
   }
 
   getUI() {
     const obj = super.getUI();
     obj.independentVariable = this._independentVariable;
-    obj.dependentVariable = this._dependentVariable;
+    obj.dependentVariables = this._dependentVariables;
 
     if (this._title) {
       obj.title = this._title;

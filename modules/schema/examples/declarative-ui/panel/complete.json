@@ -4,6 +4,7 @@
   "name": "Example Panel",
   "interactions": ["reorderable"],
   "children": [
+
     {
       "type": "container",
       "layout": "horizontal",
@@ -22,7 +23,7 @@
           "title": "A nested plot!",
           "description": "The change in some streams as a function of the other one",
           "independentVariable": "/some/stream",
-          "dependentVariable": [
+          "dependentVariables": [
             "/some/other_stream",
             "/some/second_other_stream"
           ]
@@ -38,6 +39,7 @@
         }
       ]
     },
+
     {
       "type": "table",
       "title": "A table showing something",
@@ -45,6 +47,7 @@
       "displayObjectId": true,
       "stream": "/prediction/some_table"
     },
+
     {
       "type": "metric",
       "title": "Some metric",
@@ -54,16 +57,18 @@
         "/some_value/commanded"
       ]
     },
+
     {
       "type": "plot",
       "title": "Some Other Streams vs Some Stream",
       "description": "The change in some streams as a function of the other one",
       "independentVariable": "/some/stream",
-      "dependentVariable": [
+      "dependentVariables": [
         "/some/other_stream",
         "/some/second_other_stream"
       ]
     },
+
     {
       "type": "video",
       "cameras": [
@@ -72,6 +77,7 @@
         "rear-port-roof-camera"
       ]
     },
+
     {
       "type": "treetable",
       "title": "A TreeTable!",
@@ -79,5 +85,6 @@
       "displayObjectId": false,
       "stream": "/some/stream/of/treetable/primmatives"
     }
+
   ]
 }

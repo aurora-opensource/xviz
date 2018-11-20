@@ -18,6 +18,14 @@ import {XVIZValidator} from '@xviz/schema';
 
 const schemaValidator = new XVIZValidator();
 
+function validateUIBuilderOutput(results) {
+  for (const name in results) {
+    if (results.hasOwnProperty(name)) {
+      schemaValidator.validate('declarative-ui/panel', results[name]);
+    }
+  }
+}
+
 test('XVIZBaseUIBuilder', t => {
   const builder = new XVIZUIBuilder({});
 
@@ -65,11 +73,40 @@ test('XVIZBaseUIBuilder', t => {
 
   t.deepEqual(actual, expected, 'XVIZUIBuilder should match expectation');
 
-  for (const name in actual) {
-    if (actual.hasOwnProperty(name)) {
-      schemaValidator.validate('declarative-ui/panel', actual[name]);
+  validateUIBuilderOutput(actual);
+
+  t.end();
+});
+
+test('XVIZUIBuilder#plot basic', t => {
+  const builder = new XVIZUIBuilder({});
+  const panel = builder.panel({name: 'Plots'});
+  const select1 = builder.plot({
+    title: 'Basic Plot',
+    independentVariable: '/plan/distance',
+    dependentVariables: ['/plan/cost']
+  });
+  builder.child(panel).child(select1);
+
+  const expected = {
+    Plots: {
+      name: 'Plots',
+      type: 'panel',
+      children: [
+        {
+          type: 'plot',
+          title: 'Basic Plot',
+          independentVariable: '/plan/distance',
+          dependentVariables: ['/plan/cost']
+        }
+      ]
     }
-  }
+  };
+
+  const actual = builder.getUI();
+  t.deepEqual(actual, expected, 'XVIZUIBuilder should match expectation');
+
+  validateUIBuilderOutput(actual);
 
   t.end();
 });
