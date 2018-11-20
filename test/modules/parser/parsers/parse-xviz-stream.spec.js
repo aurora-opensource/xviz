@@ -23,9 +23,12 @@ import {XVIZValidator} from '@xviz/schema';
 
 import tape from 'tape-catch';
 
+import {resetXVIZConfigAndSettings} from '../config/config-utils';
+
 const schemaValidator = new XVIZValidator();
 
 tape('parseStreamTimeSeries#simple', t => {
+  resetXVIZConfigAndSettings();
   setXVIZSettings({currentMajorVersion: 2});
 
   const testData = [
@@ -93,6 +96,7 @@ tape('parseStreamTimeSeries#simple', t => {
 });
 
 tape('parseStreamVariable#simple v2', t => {
+  resetXVIZConfigAndSettings();
   setXVIZSettings({currentMajorVersion: 2});
 
   const time = 1001;
@@ -152,6 +156,7 @@ tape('parseStreamVariable#simple v2', t => {
 });
 
 tape('parseStreamUIPrimitives#simple v2', t => {
+  resetXVIZConfigAndSettings();
   setXVIZSettings({currentMajorVersion: 2});
 
   const time = 1001;
@@ -179,6 +184,7 @@ tape('parseStreamUIPrimitives#simple v2', t => {
 });
 
 tape('parseStreamVariable#simple v1', t => {
+  resetXVIZConfigAndSettings();
   setXVIZSettings({currentMajorVersion: 1});
 
   const time = 1001;

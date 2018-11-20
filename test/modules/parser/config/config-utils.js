@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/* global setTimeout */
-export default self => {
-  self.onmessage = event => {
-    setTimeout(() => self.postMessage(event.data), 50);
-  };
-};
+import {setXVIZConfig, getXVIZConfig, getXVIZSettings, setXVIZSettings} from '@xviz/parser';
+
+const defaultXVIZConfig = Object.assign({}, getXVIZConfig());
+const defaultXVIZSettings = Object.assign({}, getXVIZSettings());
+
+export function resetXVIZConfigAndSettings() {
+  setXVIZConfig(defaultXVIZConfig);
+  setXVIZSettings(defaultXVIZSettings);
+}

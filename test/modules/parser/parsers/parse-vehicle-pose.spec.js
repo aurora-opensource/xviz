@@ -12,15 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {setXVIZConfig, parseVehiclePose} from '@xviz/parser';
+import {parseVehiclePose} from '@xviz/parser';
 import {getTransformsFromPose} from '@xviz/parser/parsers/parse-vehicle-pose';
 
 import tape from 'tape-catch';
 import vehiclePose from 'test-data/sample-vehicle-pose';
 
 tape('parseVehiclePose#import', t => {
-  setXVIZConfig({});
-
   t.ok(parseVehiclePose, 'parseVehiclePose imported ok');
 
   const result = parseVehiclePose([vehiclePose]);

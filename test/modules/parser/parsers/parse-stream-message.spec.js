@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {setXVIZConfig, parseStreamMessage} from '@xviz/parser';
+import {parseStreamMessage} from '@xviz/parser';
 
 import tape from 'tape-catch';
 
@@ -25,8 +25,6 @@ import tape from 'tape-catch';
 // TOOD: blacklisted streams in xviz common
 //
 tape('parseStreamMessage#import', t => {
-  setXVIZConfig({});
-
   // TODO - issues under Node.js
   // const metaMessage = parseStreamMessage(TestMetadataMessage);
 
