@@ -223,7 +223,7 @@ Parameters:
 - **options.title** (String) - title of the plot
 - **options.description** (String) - description of the plot
 - **options.independentVariable** (String) - the independent variable stream
-- **options.dependentVariable** (Array) - a list of dependent variable streams
+- **options.dependentVariables** (Array) - a list of dependent variable streams
 
 ### Methods
 
