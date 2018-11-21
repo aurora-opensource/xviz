@@ -1,6 +1,7 @@
 # XVIZ Primitive Specification
 
-The geometry primitives currently supported in XVIZ are:
+Primitives are the most basic units of rendering data. The geometry primitives currently supported
+in XVIZ are:
 
 - `point`
 - `polygon`
@@ -10,14 +11,49 @@ The geometry primitives currently supported in XVIZ are:
 - `text`
 - `image`
 
-## Flat Arrays
+## Base Field
 
-For faster loading directly in memory buffers where you see `list<Point3d>` a flat list of numbers
-can be supplied. In those cases that list must be a multiple of 3, where each 3 elements is the
-`(x,y,z)` tuple that makes up a 3D point.
+Every primitive in XVIZ has an optional base object which contains fields that are common to all
+objects. These fields let you associated data with an object or applying styling to the object.
 
-The same is true of `list<color>`, instead the list must be a multiple of 4, where each element is
-the `(r, g, b, a)` color tuple.
+Fields of the base object:
+
+| Name            | Type                  | Description                                    |
+| --------------- | --------------------- | ---------------------------------------------- |
+| `object_id`     | `optional<object_id>` | Which object is this primitive associated with |
+| `inline_style`  | `optional<style>`     | Optional inline style                          |
+| `style_classes` | `list<class_id>`      | Semantic/visualize classes.                    |
+
+## Styling
+
+A major use of the base object is to style a primitive. As an example in JSON of a `point` primitive
+using style classes:
+
+```js
+{
+    "base": {
+      "object_id": "178beda89169420cbb876c14acdba7f8",
+      "classes": ["car", "important"]
+    },
+    "vertices": [[9, 15, 3], [20, 13, 3], [20, 5, 3]]
+}
+```
+
+You can do the same with inline styles but it is much less efficient to send the same styling
+information for each object over and over. Here is what it looks like to use an inline style form:
+
+```js
+{
+    "base": {
+      "object_id": "178beda89169420cbb876c14acdba7f8",
+      "style": {
+          "fill_color": "#FF0000",
+          "stroke_color": "#000080"
+      }
+    },
+    "vertices": [[9, 15, 3], [20, 13, 3], [20, 5, 3]]
+}
+```
 
 ## Point Primitive
 
@@ -31,7 +67,7 @@ point cloud. If there is more than one vertex in the vertices field then it is a
 
 Example:
 
-```
+```js
 {
     "points": [[9, 15, 3], [20, 13, 3], [20, 5, 3]]
 }
@@ -47,7 +83,7 @@ The polygon primitive is used to draw any closed shape.
 
 JSON example using style class for styling:
 
-```
+```js
 {
     "vertices": [[9, 15, 3], [20, 13, 3], [20, 5, 3]]
 }
@@ -63,7 +99,7 @@ The polyline primitive is used to draw any polygonal chain.
 
 JSON example using style class for styling:
 
-```
+```js
 {
     "vertices": [[9, 15, 3], [20, 13, 3], [20, 5, 3]]
 }
@@ -80,7 +116,7 @@ The circle primitive is used to draw circles and rings, it’s center lines up w
 
 Example:
 
-```
+```js
 {
     "center": [9, 15, 3],
     "radius_m": 2.5
@@ -100,7 +136,7 @@ closest that XVIZ has to support for 3D capsule shapes.
 
 Example:
 
-```
+```js
 {
     "start": [9, 15, 3],
     "end": [20, 13, 3],
@@ -120,7 +156,7 @@ the top left corner of the text.
 
 Example:
 
-```
+```js
 {
     "position": [9, 15, 3],
     "text": "Location of interest"
@@ -141,7 +177,7 @@ The image primitive is used to render existing graphics.
 This is a pure JSON example, for efficiency reasons you would normally use the binary protocol which
 stores the raw image directly instead of needing to base64 encode it.
 
-```
+```js
 {
     "position": [9, 15, 3],
     "data": "/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=",
