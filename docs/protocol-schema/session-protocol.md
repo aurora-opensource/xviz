@@ -97,6 +97,23 @@ has just the single `/object/polygon` containing a
 }
 ```
 
+## Request Messages
+
+### Reconfigure (WARNING: unstable feature)
+
+Reconfigure messages allow for a client to change the configuration of a XVIZ server, affecting all
+future requests for data from the server. This in turn enables a client to enable or disable
+expensive to compute or transmit features.
+
+A typical source for reconfigure messages would be a user selecting a new value in a
+[declarative ui select component](/docs/protocol-schema/declarative-ui.md#select-warning-unstable-feature-).
+Which would send a `delta` reconfigure message to the server.
+
+| Name            | Type                   | Description                                       |
+| --------------- | ---------------------- | ------------------------------------------------- |
+| `update_type`   | `enum { full, delta }` | Whether we have a complete or incremental update. |
+| `config_update` | `object`               | A JSON patch or full configuration update.        |
+
 ## Core Types
 
 ### Stream Metadata

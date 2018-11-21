@@ -8,6 +8,8 @@ import "core.proto";
 import "style.proto";
 import "options.proto";
 
+import "google/protobuf/struct.proto";
+
 package xviz.v2.session;
 
 message Start
@@ -52,6 +54,24 @@ message StateUpdate
 
     repeated core.StreamSet updates = 2;
 }
+
+
+message Reconfigure
+{
+    option (xviz_json_schema) = "session/reconfigure";
+
+    enum UpdateType
+    {
+        not_set = 0;
+        delta = 1;
+        full = 2;
+    }
+
+    UpdateType update_type = 1;
+
+    google.protobuf.Struct config_update = 2;
+}
+
 
 message Metadata
 {
