@@ -1,6 +1,5 @@
 /* eslint-disable no-console no-undef */
 import XVIZStyleProperty from './xviz-style-property';
-import {get} from 'dotty';
 
 const SELECTOR_REGEX = /\S+/g;
 const OPERATOR_REGEX = /([=:~\*\^]+)/;
@@ -96,7 +95,7 @@ export default class Stylesheet {
         return object => object && object[name] === value;
       default: {
         return object => {
-          const classes = get(object, 'base.classes');
+          const classes = object && object.base && object.base.classes;
           return object && ((classes && classes.includes(name)) || object[name]);
         };
       }
