@@ -3,8 +3,15 @@
   "streams": {
     "/velocity": {
       "units": "m",
+      "category": "time_series",
+      "scalar_type": "float"
+    },
+    "/data": {
+      "units": "m",
       "coordinate": "DYNAMIC",
-      "transform_callback": "map_base"
+      "transform_callback": "map_base",
+      "category": "primitive",
+      "primitive_type": "point"
     }
   },
   "cameras": {

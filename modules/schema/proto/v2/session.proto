@@ -15,7 +15,7 @@ package xviz.v2.session;
 message Start
 {
     option (xviz_json_schema) = "session/start";
-    
+
     string version = 1;
 
     string profile = 2;
@@ -34,14 +34,14 @@ message Start
         json = 1;
         binary = 2;
     }
-    
+
     MessageFormat message_format = 4;
 }
 
 
 message StateUpdate
 {
-    option (xviz_json_schema) = "session/state_update";    
+    option (xviz_json_schema) = "session/state_update";
 
     enum UpdateType
     {
@@ -75,7 +75,7 @@ message Reconfigure
 
 message Metadata
 {
-    option (xviz_json_schema) = "session/metadata";    
+    option (xviz_json_schema) = "session/metadata";
 
     string version = 1;
 
@@ -91,24 +91,38 @@ message Metadata
 
 message StreamMetadata
 {
-    option (xviz_json_schema) = "session/stream_metadata";    
+    option (xviz_json_schema) = "session/stream_metadata";
 
     string source = 1;
 
     string units = 2;
-    
+
+    // Type information
+
     enum Category
     {
         category_not_set = 0;
-        annotation = 1;
-        future_instance = 2;
-        pose = 3;
-        primitive = 4;
-        time_series = 5;
-        variable = 6;
+        primitive = 1;
+        time_series = 2;
+        variable = 3;
+        annotation = 4;
+        future_instance = 5;
+        pose = 6;
+        ui_primitive = 7;
     }
 
     Category category = 3;
+
+    enum ScalarType
+    {
+        scalar_type_not_set = 0;
+        float = 1;
+        in32 = 2;
+        string = 3;
+        bool = 4;
+    }
+
+    ScalarType scalar_type = 4;
 
     enum PrimitiveType
     {
@@ -121,13 +135,35 @@ message StreamMetadata
         stadium = 6;
         text = 7;
     }
-    
-    PrimitiveType type = 4;
 
-    style.StreamValue stream_style = 5;
+    PrimitiveType primitive_type = 5;
 
-    repeated style.Class style_classes = 6;
-    
+    enum UIPrimitiveType
+    {
+        ui_primitive_type_not_set = 0;
+        treetable = 1;
+    }
+
+    UIPrimitiveType ui_primitive_type = 6;
+
+    enum AnnotationType
+    {
+        annotation_type_not_set = 0;
+        visual = 1;
+    }
+
+    AnnotationType annotation_type = 7;
+
+
+    // Style information
+
+    style.StreamValue stream_style = 8;
+
+    repeated style.Class style_classes = 9;
+
+
+    // Coordinate information
+
     enum CoordinateType
     {
         NOT_SET = 0;
@@ -137,18 +173,18 @@ message StreamMetadata
         VEHICLE_RELATIVE = 4;
     }
 
-    CoordinateType coordinate = 7;
+    CoordinateType coordinate = 10;
 
     /// 4x4 matrix flattened into 16 elements
-    repeated double transform = 8;
+    repeated double transform = 11;
 
-    string transform_callback = 9;
+    string transform_callback = 12;
 }
 
 
 message CameraInfo
 {
-    option (xviz_json_schema) = "session/camera_info";    
+    option (xviz_json_schema) = "session/camera_info";
 
     string human_name = 1;
 

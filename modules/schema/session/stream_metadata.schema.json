@@ -23,11 +23,20 @@
         "future_instance",
         "pose",
         "primitive",
+        "ui_primitive",
         "time_series",
         "variable"
       ]
     },
-    "type": {
+    "scalar_type": {
+      "enum": [
+        "float",
+        "int32",
+        "bool",
+        "string"
+      ]
+    },
+    "primitive_type": {
       "enum": [
         "circle",
         "image",
@@ -36,6 +45,16 @@
         "polyline",
         "stadium",
         "text"
+      ]
+    },
+    "ui_primitive_type": {
+      "enum": [
+        "treetable"
+      ]
+    },
+    "annotation_type": {
+      "enum": [
+        "visual"
       ]
     },
     "stream_style": {
@@ -81,21 +100,49 @@
           "properties": {
             "category": {
               "enum": [
-                "future_instance",
-                "primitive"
+                "time_series",
+                "variable"
               ]
             }
           },
-          "required": ["type"]
+          "required": ["scalar_type"]
         },
         {
           "properties": {
             "category": {
               "enum": [
-                "annotation",
-                "pose",
-                "time_series",
-                "variable"
+                "future_instance",
+                "primitive"
+              ]
+            }
+          },
+          "required": ["primitive_type"]
+        },
+        {
+          "properties": {
+            "category": {
+              "enum": [
+                "ui_primitive"
+              ]
+            }
+          },
+          "required": ["ui_primitive_type"]
+        },
+        {
+          "properties": {
+            "category": {
+              "enum": [
+                "annotation"
+              ]
+            }
+          },
+          "required": ["annotation_type"]
+        },
+        {
+          "properties": {
+            "category": {
+              "enum": [
+                "pose"
               ]
             }
           }
