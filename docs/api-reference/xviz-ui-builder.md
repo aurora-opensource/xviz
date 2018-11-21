@@ -1,6 +1,6 @@
 # XVIZUIBuilder
 
-`XVIZUIBuilder` class provides convenient chaining functions to build declarative UI.
+The `XVIZUIBuilder` class provides convenient chaining functions to build declarative UI.
 
 ## XVIZ Declarative UI hierarchy
 
@@ -38,46 +38,18 @@ const panel = builder.panel({name: 'Metrics Panel'});
 
 const container = builder.container({name: 'Metrics Container 1'});
 
-const metrics1 = builder.metric({streams: ['/vehicle/velocity']}).title('Velocity');
+const metrics1 = builder.metric({streams: ['/vehicle/velocity'], title: 'Velocity'});
 
-const metrics2 = builder.metric({streams: ['/vehicle/acceleration']}).title('Acceleration');
+const metrics2 = builder.metric({streams: ['/vehicle/acceleration'], title: 'Acceleration'});
 
 container.child(metrics1);
 container.child(metrics2);
 builder.child(panel).child(container);
+
+const ui = builder.getUI();
+console.log(ui);
 ```
 
-Output:
-
-```js
-builder.getUI();
-/* returns:
-   [
-    {
-      type: 'panel',
-      name: 'Metrics Panel',
-      children: [
-        {
-          type: 'container',
-          name: 'Metrics Container',
-          children: [
-            {
-              type: 'metric',
-              title: 'Velocity',
-              streams: ['/vehicle/velocity']
-            },
-            {
-              type: 'metric',
-              title: 'Acceleration',
-              streams: ['/vehicle/acceleration']
-            }
-          ]
-        }
-      ]
-    }
-  ]
-*/
-```
 
 ## XVIZUIBuilder
 
@@ -86,7 +58,8 @@ The root builder for declarative UI.
 ### Constructor
 
 ```js
-new XVIZUIBuilder(options);
+import {XVIZUIBuilder} from '@xviz/builder';
+const xvizUIBuilder = new XVIZUIBuilder(options);
 ```
 
 Parameters:
@@ -110,42 +83,8 @@ Returns a JSON descriptor of all UI components.
 
 Returns a new [`XVIZPannelBuilder`](#XVIZPannelBuilder) instance with the specified options.
 
-##### container(options)
-
-Returns a new [`XVIZContainerBuilder`](#XVIZContainerBuilder) instance with the specified options.
-
-##### metric(options)
-
-Returns a new [`XVIZMetricBuilder`](#XVIZMetricBuilder) instance with the specified options.
-
-##### table(options)
-
-Returns a new [`XVIZTableBuilder`](#XVIZTableBuilder) instance with the specified options.
-
-##### treetable(options)
-
-Returns a new [`XVIZTreeTableBuilder`](#XVIZTreeTableBuilder) instance with the specified options.
-
-##### plot(options)
-
-Returns a new [`XVIZPlotBuilder`](#XVIZPlotBuilder) instance with the specified options.
-
-##### select(options)
-
-Returns a new [`XVIZSelectBuilder`](#XVIZSelectBuilder) instance with the specified options.
-
-##### video(options)
-
-Returns a new [`XVIZVideoBuilder`](#XVIZVideoBuilder) instance with the specified options.
-
-## XVIZPanelBuilder
-
-The panel builder for declarative UI.
-
-### Constructor
-
 ```js
-new XVIZPanelBuilder(options);
+const panelBuilder = xvizUIBuilder.panel(options);
 ```
 
 Parameters:
@@ -153,6 +92,111 @@ Parameters:
 - **options.name** (String)
 - **options.layout** (String) - `vertical` or `horizontal`.
 - **options.interactions** (String) - `reorderable` or `drag_out`
+
+##### container(options)
+
+Returns a new [`XVIZContainerBuilder`](#XVIZContainerBuilder) instance with the specified options.
+
+```js
+const containerBuilder = xvizUIBuilder.container(options);
+```
+
+Parameters:
+
+- **options.name** (String)
+- **options.layout** (String) - `vertical` or `horizontal`.
+- **options.interactions** (String) - `reorderable` or `drag_out`
+
+##### metric(options)
+
+Returns a new [`XVIZMetricBuilder`](#XVIZMetricBuilder) instance with the specified options.
+
+```js
+const metricBuilder = xvizUIBuilder.metric(options);
+```
+
+Parameters:
+
+- **options.title** (String) - title of the metrics card
+- **options.description** (String) - description of the metrics card
+- **options.streams** (Array) - a list of variable streams to visualize
+
+##### plot(options)
+
+Returns a new [`XVIZPlotBuilder`](#XVIZPlotBuilder) instance with the specified options.
+
+```js
+const plotBuilder = xvizUIBuilder.plot(options);
+```
+
+Parameters:
+
+- **options.title** (String) - title of the plot
+- **options.description** (String) - description of the plot
+- **options.independentVariable** (String) - the independent variable stream
+- **options.dependentVariables** (Array) - a list of dependent variable streams
+
+##### select(options) (WARNING: Unstable feature)
+
+Returns a new [`XVIZSelectBuilder`](#XVIZSelectBuilder) instance with the specified options.
+
+```js
+const selectBuilder = xvizUIBuilder.select(options);
+```
+
+Parameters:
+
+- **options.title** (String) - title of the select
+- **options.description** (String) - description of the select
+- **options.stream** (String) - the variable stream that provides the options
+- **options.target** (String) - JSON pointer to configuration property to update
+
+##### table(options)
+
+Returns a new [`XVIZTableBuilder`](#XVIZTableBuilder) instance with the specified options.
+
+```js
+const tableBuilder = xvizUIBuilder.table(options);
+```
+
+Parameters:
+
+- **options.title** (String) - title of the plot
+- **options.description** (String) - description of the plot
+- **options.stream** (String) - the stream that contains the table data
+- **options.displayObjectId** (Boolean) - whether to display the object ID column
+
+##### treetable(options)
+
+Returns a new [`XVIZTreeTableBuilder`](#XVIZTreeTableBuilder) instance with the specified options.
+
+```js
+const treetableBuilder = xvizUIBuilder.treetable(options);
+```
+
+Parameters:
+
+- **options.title** (String) - title of the plot
+- **options.description** (String) - description of the plot
+- **options.stream** (String) - the stream that contains the table data
+- **options.displayObjectId** (Boolean) - whether to display the object ID column
+
+##### video(options)
+
+Returns a new [`XVIZVideoBuilder`](#XVIZVideoBuilder) instance with the specified options.
+
+```js
+const videoBuilder = xvizUIBuilder.video(options);
+```
+
+Parameters:
+
+- **options.cameras** (Array) - a list of streams to render as video
+
+
+## XVIZPanelBuilder
+
+The panel builder for declarative UI.
 
 ### Methods
 
@@ -168,23 +212,11 @@ Returns a JSON descriptor of this panel.
 
 The container builder for declarative UI.
 
-### Constructor
-
-```js
-new XVIZContainerBuilder(options);
-```
-
-Parameters:
-
-- **options.name** (String)
-- **options.layout** (String) - `vertical` or `horizontal`.
-- **options.interactions** (String) - `reorderable` or `drag_out`
-
 ### Methods
 
-##### child(panel)
+##### child(component)
 
-Append a container or a component to the container.
+Append a container or a component to the container. Returns the child.
 
 ##### getUI()
 
@@ -193,18 +225,6 @@ Returns a JSON descriptor of this container.
 ## XVIZMetricBuilder
 
 The metric component builder for declarative UI.
-
-### Constructor
-
-```js
-new XVIZMetricBuilder(options);
-```
-
-Parameters:
-
-- **options.title** (String) - title of the metrics card
-- **options.description** (String) - description of the metrics card
-- **options.streams** (Array) - a list of variable streams to visualize
 
 ### Methods
 
@@ -216,41 +236,15 @@ Returns a JSON descriptor of this component.
 
 The plot component builder for declarative UI.
 
-### Constructor
-
-```js
-new XVIZPlotBuilder(options);
-```
-
-Parameters:
-
-- **options.title** (String) - title of the plot
-- **options.description** (String) - description of the plot
-- **options.independentVariable** (String) - the independent variable stream
-- **options.dependentVariables** (Array) - a list of dependent variable streams
-
 ### Methods
 
 ##### getUI()
 
 Returns a JSON descriptor of this component.
 
-## XVIZSelectBuilder (WARNING: Unstable feature)
+## XVIZSelectBuilder
 
 The select component builder for declarative UI.
-
-### Constructor
-
-```js
-new XVIZSelectBuilder(options);
-```
-
-Parameters:
-
-- **options.title** (String) - title of the select
-- **options.description** (String) - description of the select
-- **options.stream** (String) - the variable stream that provides the options
-- **options.target** (String) - JSON pointer to configuration property to update
 
 ### Methods
 
@@ -262,19 +256,6 @@ Returns a JSON descriptor of this component.
 
 The table component builder for declarative UI.
 
-### Constructor
-
-```js
-new XVIZTableBuilder(options);
-```
-
-Parameters:
-
-- **options.title** (String) - title of the plot
-- **options.description** (String) - description of the plot
-- **options.stream** (String) - the stream that contains the table data
-- **options.displayObjectId** (boolean) - whether to display the object ID column
-
 ### Methods
 
 ##### getUI()
@@ -285,19 +266,6 @@ Returns a JSON descriptor of this component.
 
 The tree table component builder for declarative UI.
 
-### Constructor
-
-```js
-new XVIZTreeTableBuilder(options);
-```
-
-Parameters:
-
-- **options.title** (String) - title of the plot
-- **options.description** (String) - description of the plot
-- **options.stream** (String) - the stream that contains the table data
-- **options.displayObjectId** (boolean) - whether to display the object ID column
-
 ### Methods
 
 ##### getUI()
@@ -307,16 +275,6 @@ Returns a JSON descriptor of this component.
 ## XVIZVideoBuilder
 
 The video component builder for declarative UI.
-
-### Constructor
-
-```js
-new XVIZVideoBuilder(options);
-```
-
-Parameters:
-
-- **options.cameras** (Array) - a list of streams to render as video
 
 ### Methods
 
