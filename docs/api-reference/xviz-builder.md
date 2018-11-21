@@ -5,10 +5,10 @@ The `XVIZBuilder` class provides convenient chaining functions to format data fo
 ## Example
 
 ```js
-import {XVIZBuilder} from '@xviz/builder'
+import {XVIZBuilder} from '@xviz/builder';
 
 const xvizBuilder = new XVIZBuilder({
-  metadata: {}  // See XVIZMetadataBuilder for generating metadata object
+  metadata: {} // See XVIZMetadataBuilder for generating metadata object
 });
 
 xvizBuilder
@@ -30,22 +30,16 @@ xvizBuilder
   .points(new Float32Array([1.23, 0.45, 0.06]))
   .timestamp(123)
   .style({
-     fill_color: [0, 0, 0, 255]
+    fill_color: [0, 0, 0, 255]
   })
 
   .primitive('/pedestrian-1-trajectory')
-  .polygon([
-    [1.23, 0.45, 0.06],
-    [2.45, 0.67, 0.08],
-    [1.67, 0.53, 0.07],
-    [1.23, 0.45, 0.06],
-  ])
+  .polygon([[1.23, 0.45, 0.06], [2.45, 0.67, 0.08], [1.67, 0.53, 0.07], [1.23, 0.45, 0.06]])
   .timestamp(123);
 
 const frame = xvizBuider.getFrame();
 console.log(frame);
 ```
-
 
 ## XVIZBuilder
 
@@ -58,32 +52,39 @@ const xvizBuilder = new XVIZBuilder(options);
 
 Parameters:
 
-- **options.metadata** (Object) - a JSON object that is the metadata of the session. See [XVIZMetadataBuilder](/docs/api-reference/xviz-metadata-builder.md) for generating metadata objects.
-- **options.disableStreams** (Array) - a list of stream names to disable. Disabled streams are not flushed to frame.
+- **options.metadata** (Object) - a JSON object that is the metadata of the session. See
+  [XVIZMetadataBuilder](/docs/api-reference/xviz-metadata-builder.md) for generating metadata
+  objects.
+- **options.disableStreams** (Array) - a list of stream names to disable. Disabled streams are not
+  flushed to frame.
 - **options.validateWarn** (Function) - called when there is a validation warning. Default is
   `console.warn`.
 - **options.validateError** (Function) - called when there is a validation error. Default is
   `console.error`.
 
-
 ### Methods
 
 ##### getFrame()
 
-Return a JSON object with xviz protocol containing all the streams in current frame built from the XVIZBuilder instance.
+Return a JSON object with xviz protocol containing all the streams in current frame built from the
+XVIZBuilder instance.
 
 ##### pose(streamId)
 
-Start building a [pose](/docs/protocol-schema/core-protocol.md#Poses) stream. Returns a [XVIZPoseBuilder](#XVIZPoseBuilder) instance.
+Start building a [pose](/docs/protocol-schema/core-protocol.md#Poses) stream. Returns a
+[XVIZPoseBuilder](#XVIZPoseBuilder) instance.
 
 Parameters:
 
-- **streamId** (String) - the name of the pose stream. Default to `/vehicle_pose` if not specified. Note that for a valid frame, stream `/vehicle_pose`
-must be defined. Additional poses can be defined but are not required.
+- **streamId** (String) - the name of the pose stream. Default to `/vehicle_pose` if not specified.
+  Note that for a valid frame, stream `/vehicle_pose` must be defined. Additional poses can be
+  defined but are not required.
 
 ##### primitive(streamId)
 
-Start building a [primitive](/docs/protocol-schema/core-protocol.md#Primitive-State) or [future](/docs/protocol-schema/core-protocol.md#Future-Instances) stream. Returns a [XVIZPrimitiveBuilder](#XVIZPrimitiveBuilder) instance.
+Start building a [primitive](/docs/protocol-schema/core-protocol.md#Primitive-State) or
+[future](/docs/protocol-schema/core-protocol.md#Future-Instances) stream. Returns a
+[XVIZPrimitiveBuilder](#XVIZPrimitiveBuilder) instance.
 
 Parameters:
 
@@ -91,7 +92,8 @@ Parameters:
 
 ##### variable(streamId)
 
-Start building a [variable](/docs/protocol-schema/core-protocol.md#Variable-State) stream. Returns a [XVIZVariableBuilder](#XVIZVariableBuilder) instance.
+Start building a [variable](/docs/protocol-schema/core-protocol.md#Variable-State) stream. Returns a
+[XVIZVariableBuilder](#XVIZVariableBuilder) instance.
 
 Parameters:
 
@@ -99,7 +101,8 @@ Parameters:
 
 ##### timeSeries(streamId)
 
-Start building a [time series](/docs/protocol-schema/core-protocol.md#Time-Series-State) stream. Returns a [XVIZTimeSeriesBuilder](#XVIZTimeSeriesBuilder) instance.
+Start building a [time series](/docs/protocol-schema/core-protocol.md#Time-Series-State) stream.
+Returns a [XVIZTimeSeriesBuilder](#XVIZTimeSeriesBuilder) instance.
 
 Parameters:
 
@@ -107,7 +110,8 @@ Parameters:
 
 ##### uiPrimitive(streamId)
 
-Start building a [UI primitive](/docs/protocol-schema/core-protocol.md#UI-Primitive-State) stream. Returns a [XVIZUIPrimitiveBuilder](#XVIZUIPrimitiveBuilder) instance.
+Start building a [UI primitive](/docs/protocol-schema/core-protocol.md#UI-Primitive-State) stream.
+Returns a [XVIZUIPrimitiveBuilder](#XVIZUIPrimitiveBuilder) instance.
 
 Parameters:
 
@@ -128,7 +132,6 @@ Examples:
 - `/vehicle-pose`
 - `/vehicle/velocity`
 - `/object/car-1/pose`
-
 
 ## XVIZPoseBuilder
 
@@ -206,7 +209,9 @@ Returns: `this`
 
 ##### timestamp(timestamp)
 
-Set the timestamp of the primitive. Primitive with timestamp is considered as `future`. Check [XVIZ Core Protocol](/docs/protocol-schema/core-protocol.md) for the definition of primitives and futures.
+Set the timestamp of the primitive. Primitive with timestamp is considered as `future`. Check
+[XVIZ Core Protocol](/docs/protocol-schema/core-protocol.md) for the definition of primitives and
+futures.
 
 Parameters:
 
@@ -220,7 +225,8 @@ Set the primitive-specific style. This will override the style defined in the st
 
 Parameters:
 
-- **style** (Object) - Check [XVIZ Stylesheet Spec](/docs/protocol-schema/style-specification.md) for supported style properties.
+- **style** (Object) - Check [XVIZ Stylesheet Spec](/docs/protocol-schema/style-specification.md)
+  for supported style properties.
 
 Returns: `this`
 
@@ -319,7 +325,6 @@ Parameters:
 
 Returns: `this`
 
-
 ## XVIZVariableBuilder
 
 ### Methods
@@ -405,4 +410,3 @@ Parameters:
 - **column_values** (Array:String|Number|Boolean) - a list of values for each column.
 
 Returns: a `XVIZTreeTableRowBuilder` instance that represents the new row.
-

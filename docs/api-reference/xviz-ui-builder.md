@@ -50,7 +50,6 @@ const ui = builder.getUI();
 console.log(ui);
 ```
 
-
 ## XVIZUIBuilder
 
 The root builder for declarative UI.
@@ -192,7 +191,6 @@ const videoBuilder = xvizUIBuilder.video(options);
 Parameters:
 
 - **options.cameras** (Array) - a list of streams to render as video
-
 
 ## XVIZPanelBuilder
 

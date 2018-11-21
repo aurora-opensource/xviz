@@ -1,11 +1,12 @@
 # XVIZMetadataBuilder
 
-The `XVIZMetadataBuilder` class provides convenient chaining functions to format metadata for the xviz protocol.
+The `XVIZMetadataBuilder` class provides convenient chaining functions to format metadata for the
+xviz protocol.
 
 ## Example
 
 ```js
-import {XVIZMetadataBuilder, XVIZBuilder} from '@xviz/builder'
+import {XVIZMetadataBuilder, XVIZBuilder} from '@xviz/builder';
 
 // xviz metadata provides log metadata, i.e. startTime, endTime, streams, styles,
 const xvizMetaBuider = new XVIZMetadataBuilder();
@@ -48,7 +49,6 @@ Parameters:
   `console.warn`.
 - **options.validateError** (Function) - called when there is a validation error. Default is
   `console.error`.
-
 
 ## Methods
 
@@ -102,7 +102,8 @@ Set `category` of the stream.
 
 Parameters:
 
-- **category** (String) - `primitive`, `time_series`, `variable`, etc. See [XVIZ Core Protocol](/docs/protocol-schema/core-protocol.md) for details.
+- **category** (String) - `primitive`, `time_series`, `variable`, etc. See
+  [XVIZ Core Protocol](/docs/protocol-schema/core-protocol.md) for details.
 
 Returns: `this`
 
@@ -113,8 +114,11 @@ Set `type` of the stream.
 Parameters:
 
 - **type** (String)
-  + For category `variable` and `time_series`, options are `float`,  `integer`, `string` and `boolean`. See [XVIZ Core Protocol](/docs/protocol-schema/core-protocol.md) for details.
-  + For category `primitive`, options are `point`,  `polygon`,  `polyline`, `circle`, `stadium`, `text` and `image`. See [Geometry Primitives](/docs/protocol-schema/geometry-primitives.md) for details.
+  - For category `variable` and `time_series`, options are `float`, `integer`, `string` and
+    `boolean`. See [XVIZ Core Protocol](/docs/protocol-schema/core-protocol.md) for details.
+  - For category `primitive`, options are `point`, `polygon`, `polyline`, `circle`, `stadium`,
+    `text` and `image`. See [Geometry Primitives](/docs/protocol-schema/geometry-primitives.md) for
+    details.
 
 Returns: `this`
 
@@ -140,11 +144,14 @@ Returns: `this`
 
 ###### transformMatrix(matrix)
 
-Add a custom transform matrix in order to make a relative adjustment from the core pose of the stream.
+Add a custom transform matrix in order to make a relative adjustment from the core pose of the
+stream.
 
 Parameters:
 
-- **matrix** (Array) - an [Matrix4](https://github.com/uber-web/math.gl/blob/master/docs/api-reference/matrix4.md) instance or an array of 16 numbers.
+- **matrix** (Array) - an
+  [Matrix4](https://github.com/uber-web/math.gl/blob/master/docs/api-reference/matrix4.md) instance
+  or an array of 16 numbers.
 
 Returns: `this`
 
@@ -158,13 +165,13 @@ function we have to construct a transform matrix from a pose definition.
 Parameters:
 
 - **position** (Object) - the translation of the stream.
-  + **position.x** (Number) - in meters.
-  + **position.y** (Number) - in meters.
-  + **position.z** (Number) - in meters.
+  - **position.x** (Number) - in meters.
+  - **position.y** (Number) - in meters.
+  - **position.z** (Number) - in meters.
 - **orientation** (Object) - the rotation of the stream.
-  + **orientation.roll** (Number) - in radians.
-  + **orientation.pitch** (Number) - in radians.
-  + **orientation.yaw** (Number) - in radians.
+  - **orientation.roll** (Number) - in radians.
+  - **orientation.pitch** (Number) - in radians.
+  - **orientation.yaw** (Number) - in radians.
 
 Returns: `this`
 
@@ -180,7 +187,8 @@ Define the default style with style object.
 
 Parameters:
 
-- **style** (Object) - Check [XVIZ Stylesheet Spec](/docs/protocol-schema/style-specification.md) for supported style properties.
+- **style** (Object) - Check [XVIZ Stylesheet Spec](/docs/protocol-schema/style-specification.md)
+  for supported style properties.
 
 Returns: `this`
 
@@ -191,6 +199,7 @@ Define a style class with its corresponding styles.
 Parameters:
 
 - **className** (String) - The class name that the style object should apply to.
-- **style** (Object) - Check [XVIZ Stylesheet Spec](/docs/protocol-schema/style-specification.md) for supported style properties.
+- **style** (Object) - Check [XVIZ Stylesheet Spec](/docs/protocol-schema/style-specification.md)
+  for supported style properties.
 
 Returns: `this`
