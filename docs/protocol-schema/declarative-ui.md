@@ -240,17 +240,39 @@ components:
 
 ### Plot
 
-The Plot component is used for showing one or more variables as a function of other another
-variable. It is useful for viewing data side-by-side.
+The Plot component is used for showing one or more variables at once on screen. It has a standard
+mode where it shows a set of dependent variables as a function of an independent variable. In region
+mode 2D regions defined by an x variable and min and max y variables.
 
 _TODO: screenshot: streetscape.gl demo app showing normal variable plot_
+
+| **Name**      | **Type** | **Description**                        |
+| ------------- | -------- | -------------------------------------- |
+| `title`       | `string` | Shown at the top of the plot           |
+| `description` | `string` | Displayed when hovering over the title |
+
+#### Standard Mode Fields
 
 | **Name**              | **Type**          | **Description**                                                                         |
 | --------------------- | ----------------- | --------------------------------------------------------------------------------------- |
 | `independentVariable` | `stream_id`       | The stream to use as the X axis.                                                        |
 | `dependentVariables`  | `list<stream_id>` | The streams to plot on the Y axis as a function of the stream that makes up the X axis. |
-| `title`               | `string`          | Shown at the top of the plot                                                            |
-| `description`         | `string`          | Displayed when hovering over the title                                                  |
+
+#### Region Mode Fields (WARNING: Unstable feature)
+
+Theses define areas between an upper and lower bound along a set of x coordinates. These streams can
+contain multiple objects so you can plot a full set of regions with a single entry region entry. To
+style these regions apply style information to the `x` stream.
+
+| **Name**  | **Type**       | **Description**    |
+| --------- | -------------- | ------------------ |
+| `regions` | `list<region>` | The set of regions |
+
+| **Name** | **Type**    | **Description**                                                                                                                 |
+| -------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `x`      | `stream_id` | The X axis values of the regions, , expected a floating point variable stream. Style's on this stream apply to the full region. |
+| `yMin`   | `stream_id` | The visible lower bound of the region on the Y axis, expected a floating point variable stream.                                 |
+| `yMax`   | `stream_id` | The visible upper bound of the region on the Y axis, , expected a floating point variable stream.                               |
 
 #### Supported Interactions
 

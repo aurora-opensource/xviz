@@ -60,12 +60,14 @@
 
     {
       "type": "plot",
-      "title": "Some Other Streams vs Some Stream",
-      "description": "The change in some streams as a function of the other one",
-      "independentVariable": "/some/stream",
-      "dependentVariables": [
-        "/some/other_stream",
-        "/some/second_other_stream"
+      "title": "Important regions",
+      "description": "See important regions.",
+      "regions": [
+        {
+          "x": "/some/region/x",
+          "yMin": "/some/region/y_min",
+          "yMax": "/some/region/y_max"
+        }
       ]
     },
 
