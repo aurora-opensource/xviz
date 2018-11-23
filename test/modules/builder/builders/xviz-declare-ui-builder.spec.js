@@ -78,11 +78,11 @@ test('XVIZBaseUIBuilder', t => {
   t.end();
 });
 
-test('XVIZUIBuilder#plot basic', t => {
+test('XVIZUIBuilder#plot standard', t => {
   const builder = new XVIZUIBuilder({});
   const panel = builder.panel({name: 'Plots'});
   const select1 = builder.plot({
-    title: 'Basic Plot',
+    title: 'Standard Plot',
     independentVariable: '/plan/distance',
     dependentVariables: ['/plan/cost']
   });
@@ -95,9 +95,52 @@ test('XVIZUIBuilder#plot basic', t => {
       children: [
         {
           type: 'plot',
-          title: 'Basic Plot',
+          title: 'Standard Plot',
           independentVariable: '/plan/distance',
           dependentVariables: ['/plan/cost']
+        }
+      ]
+    }
+  };
+
+  const actual = builder.getUI();
+  t.deepEqual(actual, expected, 'XVIZUIBuilder should match expectation');
+
+  validateUIBuilderOutput(actual);
+
+  t.end();
+});
+
+test('XVIZUIBuilder#plot region', t => {
+  const builder = new XVIZUIBuilder({});
+  const panel = builder.panel({name: 'Plots'});
+  const select1 = builder.plot({
+    title: 'Region Plot',
+    regions: [
+      {
+        x: '/plan/obs/x',
+        yMin: '/plan/obs/y_min',
+        yMax: '/plan/obs/y_max'
+      }
+    ]
+  });
+  builder.child(panel).child(select1);
+
+  const expected = {
+    Plots: {
+      name: 'Plots',
+      type: 'panel',
+      children: [
+        {
+          type: 'plot',
+          title: 'Region Plot',
+          regions: [
+            {
+              x: '/plan/obs/x',
+              yMin: '/plan/obs/y_min',
+              yMax: '/plan/obs/y_max'
+            }
+          ]
         }
       ]
     }

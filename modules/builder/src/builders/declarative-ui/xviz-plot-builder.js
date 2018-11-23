@@ -19,6 +19,7 @@ export default class XVIZPlotBuilder extends XVIZBaseUiBuilder {
   constructor({
     independentVariable,
     dependentVariables,
+    regions,
     description,
     title,
     validateWarn,
@@ -31,6 +32,7 @@ export default class XVIZPlotBuilder extends XVIZBaseUiBuilder {
     });
     this._independentVariable = independentVariable;
     this._dependentVariables = dependentVariables;
+    this._regions = regions;
     this._description = description;
     this._title = title;
 
@@ -42,15 +44,21 @@ export default class XVIZPlotBuilder extends XVIZBaseUiBuilder {
       if (!this._dependentVariables) {
         this._validateError('Plot should have `dependentVariables`.');
       }
-    } else {
-      this._validateError('Plot should have `independentVariable`.');
+    } else if (!this._regions) {
+      this._validateError('Plot should have either `independentVariable` or `regions`.');
     }
   }
 
   getUI() {
     const obj = super.getUI();
-    obj.independentVariable = this._independentVariable;
-    obj.dependentVariables = this._dependentVariables;
+    if (this._independentVariable) {
+      obj.independentVariable = this._independentVariable;
+      obj.dependentVariables = this._dependentVariables;
+    }
+
+    if (this._regions) {
+      obj.regions = this._regions;
+    }
 
     if (this._title) {
       obj.title = this._title;
