@@ -52,6 +52,7 @@ import primitivesStadiumSchemaJson from '../primitives/stadium.schema.json';
 import primitivesTextSchemaJson from '../primitives/text.schema.json';
 import sessionCameraInfoSchemaJson from '../session/camera_info.schema.json';
 import sessionMetadataSchemaJson from '../session/metadata.schema.json';
+import sessionReconfigureSchemaJson from '../session/reconfigure.schema.json';
 import sessionStartSchemaJson from '../session/start.schema.json';
 import sessionStateUpdateSchemaJson from '../session/state_update.schema.json';
 import sessionStreamMetadataSchemaJson from '../session/stream_metadata.schema.json';
@@ -101,6 +102,7 @@ export const SCHEMA_DATA = {
   'primitives/text.schema.json': primitivesTextSchemaJson,
   'session/camera_info.schema.json': sessionCameraInfoSchemaJson,
   'session/metadata.schema.json': sessionMetadataSchemaJson,
+  'session/reconfigure.schema.json': sessionReconfigureSchemaJson,
   'session/start.schema.json': sessionStartSchemaJson,
   'session/state_update.schema.json': sessionStateUpdateSchemaJson,
   'session/stream_metadata.schema.json': sessionStreamMetadataSchemaJson,

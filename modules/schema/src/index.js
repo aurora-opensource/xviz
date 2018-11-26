@@ -26,3 +26,5 @@ export {default as XVIZValidator} from './validator';
 export {loadProtos, getXVIZProtoTypes, EXTENSION_PROPERTY} from './proto-validation';
 
 export {protoEnumsToInts, enumToIntField} from './proto-utils';
+
+export {StructEncode} from './proto-struct-wrapper';

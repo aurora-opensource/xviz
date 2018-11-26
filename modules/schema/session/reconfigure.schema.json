@@ -1,0 +1,22 @@
+{
+  "id": "https://xviz.org/schema/session/reconfigure.json",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "XVIZ Reconfigure message",
+  "type": "object",
+  "properties": {
+    "update_type": {
+      "enum": [
+        "delta",
+        "full"
+      ]
+    },
+    "config_update": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "update_type",
+    "config_update"
+  ],
+  "additionalProperties": false
+}

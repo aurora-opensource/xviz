@@ -117,8 +117,10 @@ function validateAgainstExample(t, validator, protoType, examplePath) {
     t.fail(`JSON failed proto verify, err: ${err} for: ${examplePath}, content: ${content}`);
   }
 
-  // Populate proto object with content
-  const serializedProtoData = protoType.encode(jsonExample).finish();
+  // Populate proto object with content, we do "fromObject" first
+  // so that the well known types will be handled
+  const protoObject = protoType.fromObject(jsonExample);
+  const serializedProtoData = protoType.encode(protoObject).finish();
   const protoData = protoType.decode(serializedProtoData);
 
   // Dump to Object
