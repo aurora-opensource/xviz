@@ -131,6 +131,11 @@ reconfiguration happens.
 | `units`              | `string`                          | For variable and time series data this lets the user know what kind of data they are looking at.                                                           |
 | `value_map`          | `optional<enum{ stream values }>` | A list of all of the values that will be sent on the stream. The indexes of the values are used to translate them into numeric values for plotting.        |
 | `style_info`         | `map<class_id, style>`            | Describes how the data should be rendered.                                                                                                                 |
+| `category`           | `enum{ category }`                | What kind of data is on this stream, see the matching type field for details.                                                                              |
+| `scalar_type`        | `enum{ scalar-types }`            | The kind of value for `time_series` or `variable`                                                                                                          |
+| `primitive_type`     | `enum{ primitive_types }`         | What is the exact primitive                                                                                                                                |
+| `ui_primitive_type`  | `enum{ ui_primitive_types }`      | The only valid type is "treetable" right now.                                                                                                              |
+| `annotation_type`    | `enum{ annotation_types }`        | The only valid type is "visual" right now.                                                                                                                 |
 
 Frames:
 
@@ -138,7 +143,34 @@ Frames:
 - `GEOGRAPHIC` - data in lat/lon/altitude
 - `VEHICLE_RELATIVE` - the data is relative to primary vehicle, with an optional additional
   transform
-- `DYNAMIC` -
+- `DYNAMIC` - name of a function which returns the needed transform at runtime
+
+Category:
+
+- `primitive`
+- `time_series`
+- `variable`
+- `annotation`
+- `future_instance`
+- `pose`
+- `ui_primitive`
+
+Scalar types:
+
+- `float`
+- `in32`
+- `string`
+- `bool`
+
+Primitive types:
+
+- `circle`
+- `image`
+- `point`
+- `polygon`
+- `polyline`
+- `stadium`
+- `text`
 
 ### Camera Info
 

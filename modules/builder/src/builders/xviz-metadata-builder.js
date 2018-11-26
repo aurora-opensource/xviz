@@ -37,6 +37,7 @@ export default class XVIZMetadataBuilder {
     this.tmp_matrix_transform = null;
     this.tmp_pose_transform = null;
     this.tmp_log_info = {};
+    this.tmp_type = null;
     // TODO:
     // cameras
     // stream_aliases
@@ -95,7 +96,7 @@ export default class XVIZMetadataBuilder {
 
   // Used for validation in XVIZBuilder
   type(t) {
-    this.tmp_stream.type = t;
+    this.tmp_type = t;
     return this;
   }
 
@@ -170,6 +171,12 @@ export default class XVIZMetadataBuilder {
         streamData.transform = transform;
       }
 
+      if (streamData.category === 'primitive') {
+        streamData.primitive_type = this.tmp_type;
+      } else if (streamData.category === 'variable' || streamData.category === 'time_series') {
+        streamData.scalar_type = this.tmp_type;
+      }
+
       this.data.streams[this.streamId] = streamData;
     }
 
@@ -181,5 +188,6 @@ export default class XVIZMetadataBuilder {
     this.tmp_stream = {};
     this.tmp_matrix_transform = null;
     this.tmp_pose_transform = null;
+    this.tmp_type = null;
   }
 }

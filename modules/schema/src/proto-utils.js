@@ -68,8 +68,8 @@ export function enumToIntField(values, fieldName, jsonObject) {
     const newValue = values[originalValue];
 
     if (newValue === undefined) {
-      const msg = `Error: ${fieldName} not present on object`;
-      throw msg;
+      const msg = `Error: field "${fieldName}" has unknown enum value "${originalValue}"`;
+      throw new Error(msg);
     }
 
     jsonObject[fieldName] = newValue;
