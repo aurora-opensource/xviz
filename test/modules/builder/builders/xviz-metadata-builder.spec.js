@@ -33,7 +33,7 @@ test.skip('XVIZMetadataBuilder#build-with-transformMatrix-array', t => {
     streams: {
       '/test/stream': {
         category: 'primitive',
-        type: 'circle',
+        primitive_type: 'circle',
         coordinate: 'VEHICLE_RELATIVE',
         transform: new Matrix4([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]]),
         stream_style: {
@@ -84,7 +84,7 @@ test.skip('XVIZMetadataBuilder#build-with-transformMatrix-matrix4', t => {
     streams: {
       '/test/stream': {
         category: 'primitive',
-        type: 'circle',
+        primitive_type: 'circle',
         coordinate: 'VEHICLE_RELATIVE',
         transform: new Matrix4([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [1, 2, 3, 1]])
       }
@@ -122,7 +122,7 @@ test('XVIZMetadataBuilder#build-with-pose', t => {
     streams: {
       '/test/stream': {
         category: 'primitive',
-        type: 'polygon',
+        primitive_type: 'polygon',
         transform: new Matrix4([1, 0, -0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 2, 3, 1])
       }
     },
@@ -145,7 +145,8 @@ test('XVIZMetadataBuilder#multiple-streams', t => {
     .category('primitive')
     .type('polygon')
     .stream('/test-stream/2')
-    .category('variable');
+    .category('variable')
+    .type('float');
 
   const metadata = xb.getMetadata();
 
@@ -156,10 +157,11 @@ test('XVIZMetadataBuilder#multiple-streams', t => {
     streams: {
       '/test-stream/1': {
         category: 'primitive',
-        type: 'polygon'
+        primitive_type: 'polygon'
       },
       '/test-stream/2': {
-        category: 'variable'
+        category: 'variable',
+        scalar_type: 'float'
       }
     },
     log_info: {
