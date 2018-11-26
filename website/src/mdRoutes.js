@@ -50,6 +50,7 @@ export default [
           }
         ]
       },
+
       {
         name: "Developer's Guide",
         children: [
@@ -95,12 +96,43 @@ export default [
           }
         ]
       },
+
+      {
+        name: 'Declarative UI',
+        children: [
+          {
+            name: 'Overview',
+            markdown: require('../../docs/declarative-ui/overview.md')
+          },
+          {
+            name: 'Layout Types',
+            markdown: require('../../docs/declarative-ui/layout-types.md')
+          },
+          {
+            name: 'Interactions',
+            markdown: require('../../docs/declarative-ui/interactions.md')
+          },
+          {
+            name: 'Layout Elements',
+            markdown: require('../../docs/declarative-ui/layout-elements.md')
+          },
+          {
+            name: 'Components',
+            markdown: require('../../docs/declarative-ui/components.md')
+          }
+        ]
+      },
+
       {
         name: 'Protocol Schema',
         children: [
           {
-            name: 'Core Protocol',
-            markdown: require('../../docs/protocol-schema/core-protocol.md')
+            name: 'Introduction',
+            markdown: require('../../docs/protocol-schema/introduction.md')
+          },
+          {
+            name: 'Core Types',
+            markdown: require('../../docs/protocol-schema/core-types.md')
           },
           {
             name: 'Session Protocol',
@@ -115,15 +147,12 @@ export default [
             markdown: require('../../docs/protocol-schema/style-specification.md')
           },
           {
-            name: 'Declarative UI',
-            markdown: require('../../docs/protocol-schema/declarative-ui.md')
-          },
-          {
             name: 'UI Primitives',
             markdown: require('../../docs/protocol-schema/ui-primitives.md')
           }
         ]
       },
+
       {
         name: 'Protocol Implementations',
         children: [
@@ -137,6 +166,7 @@ export default [
           }
         ]
       },
+
       {
         name: 'API Reference',
         children: [

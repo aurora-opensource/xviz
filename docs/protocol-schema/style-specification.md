@@ -71,7 +71,7 @@ Here is an example of metadata with style classes defined for a stream '/object/
 
 ## Stream Styling
 
-Stream styling allows you to define all the properties that an Object my use, but also includes
+Stream styling allows you to define all the properties that an Object may use, but also includes
 additional properties that effectively act as toggles for rendering. These properties allow for some
 performance advantage in the rendering pipeline when set to 'false'.
 
