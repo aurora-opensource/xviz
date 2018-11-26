@@ -37,23 +37,13 @@ $ yarn test-browser
 
 ## Docs
 
-The documentation is built with the Ocular documentation generator. You can easily iterate on the
-docs by doing, and see changes live in your browser:
+The website version of the documentation can be viewed via the streetscape.gl project:
 
 ```
-$ cd website
+$ cd ../streetscape.gl/website # the streetscape.gl repo must be cloned into the same parent directory as xviz
 $ yarn  # install dependencies
-$ yarn start
+$ yarn start-local
 ```
-
-If you wish to just do a static build, run:
-
-```
-$ cd website
-$ yarn build
-```
-
-Then open `dist/index.html` to view.
 
 ## Coding Standard
 
