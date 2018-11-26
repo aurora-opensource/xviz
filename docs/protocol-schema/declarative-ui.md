@@ -418,7 +418,7 @@ The Select components allows dynamically configuring the XVIZ transformation don
 client. The component displays a list of options populated by a XVIZ variable stream, and allows the
 user to select one of them. This also known as a "combobox" or "dropdown".
 
-When a new option is selected the client sends backend a message (TODO specify me) with the updated
+When a new option is selected the client sends backend a message reconfiguration with the updated
 value then:
 
 - The backend responds with an updated view of the world for the current time
@@ -442,6 +442,26 @@ value then:
 | **Interaction** | **Description**                                 |
 | --------------- | ----------------------------------------------- |
 | `onchange`      | Reconfigure the backend when the select changes |
+
+#### Resulting messages
+
+The reconfiguration message sent preforms an update to the configuration of the backend. Allow to
+for example to toggle on and off an expensive to compute and transmit feature.
+
+So for the examples below we would get a `reconfigure` message of the form:
+
+```
+{
+    "update_type": "delta",
+    "config_update": {
+        "system": {
+            "info": {
+                "type": "newvalue"
+            }
+        }
+    }
+}
+```
 
 #### JSON Example
 
