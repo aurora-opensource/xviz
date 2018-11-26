@@ -552,7 +552,7 @@ test('XVIZBuilder#futures-single-primitive', t => {
   const verts = [[0, 0, 0], [4, 0, 0], [4, 3, 0]];
   const ts = 1.0;
 
-  builder.future_instance(streamId, ts).polygon(verts);
+  builder.futureInstance(streamId, ts).polygon(verts);
 
   const expected = {
     update_type: 'snapshot',
@@ -599,13 +599,13 @@ test('XVIZBuilder#futures-multiple-primitive reverse timestamp insert', t => {
   const ts2 = 1.0;
 
   builder
-    .future_instance(streamId, ts1)
+    .futureInstance(streamId, ts1)
     .polygon(verts1)
     .style({
       fill_color: [255, 0, 0]
     });
 
-  builder.future_instance(streamId, ts2).polygon(verts2);
+  builder.futureInstance(streamId, ts2).polygon(verts2);
 
   const expected = {
     update_type: 'snapshot',
@@ -662,13 +662,13 @@ test('XVIZBuilder#futures-multiple-primitive-per-ts', t => {
   const ts2 = 2.0;
 
   builder
-    .future_instance(streamId, ts1)
+    .futureInstance(streamId, ts1)
     .polygon(verts1)
     .id('1')
     .polygon(verts2);
 
   builder
-    .future_instance(streamId, ts2)
+    .futureInstance(streamId, ts2)
     .polygon(verts1)
     .id('1')
     .polygon(verts2);

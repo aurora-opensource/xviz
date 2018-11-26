@@ -76,7 +76,7 @@ export default class XVIZBuilder {
     return this._streamBuilder;
   }
 
-  future_instance(streamId, timestamp) {
+  futureInstance(streamId, timestamp) {
     this._streamBuilder = this._futureInstanceBuilder.stream(streamId);
     this._streamBuilder._timestamp(timestamp);
     return this._streamBuilder;

@@ -153,7 +153,8 @@ test('insertTimestamps#append existing entry', t => {
     points: [10, 11, 12]
   };
 
-  const expectedValues = [...values];
+  // Deep copy input
+  const expectedValues = JSON.parse(JSON.stringify(values));
   expectedValues[1].points.push(value);
 
   insertTimestamp(timestamps, values, ts, 'points', value);

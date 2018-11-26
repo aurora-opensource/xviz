@@ -32,22 +32,41 @@ export function getPoseTrajectory({poses, startFrame, endFrame}) {
     vertices.push(poses[i].pose);
   }
 
-  return vertices.map((m, i) => getPoseOffset(vertices[0], m));
+  return vertices.map((m, i) => getGeospatialVector(vertices[0], m, vertices[0].yaw));
 }
 
 /**
  * Return transform matrix that can be used to transform
  * data in futurePose into the currentPose reference frame
  *
- * @param targetPose {Object} {longitude, latitude, roll, yaw, pitch}
- * @param sourcePose {Object} {longitude, latitude, roll, yaw, pitch}
- * @returns {Object} tranformationMatrix
+ * @param from {Object} {longitude, latitude, pitch, roll, yaw}
+ * @param to {Object} {longitude, latitude, pitch, roll, yaw}
+ * @returns {Object} tranformation matrix that converts 'from' relative coordinates into 'to' relative coordinates
  */
-export function getPoseTransform(targetPose, sourcePose) {
-  const translation = getPoseOffset(targetPose, sourcePose);
-  return new Pose(targetPose)
-    .getTransformationMatrixToPose(new Pose(sourcePose))
-    .translate([translation[0], translation[1], 0, 0]);
+export function getGeospatialToPoseTransform(from, to) {
+  const toPose = new Pose({
+    x: 0,
+    y: 0,
+    z: 0,
+    pitch: to.pitch,
+    roll: to.roll,
+    yaw: to.yaw
+  });
+
+  // Since 'to' is the target, get the vector from 'to -> from'
+  // and use that to set the position of 'from Pose'
+  const v = getGeospatialVector(to, from, to.yaw);
+
+  const fromPose = new Pose({
+    x: v[0],
+    y: v[1],
+    z: 0,
+    pitch: from.pitch,
+    roll: from.roll,
+    yaw: from.yaw
+  });
+
+  return toPose.getTransformationMatrixToPose(fromPose);
 }
 
 /**
@@ -75,7 +94,7 @@ export function getObjectTrajectory({
     const step = motions[i];
     const currVehiclePose = poseFrames[startFrame + i].pose;
 
-    const [x, y] = getPoseOffset(startVehiclePose, currVehiclePose);
+    const [x, y] = getGeospatialVector(startVehiclePose, currVehiclePose, startVehiclePose.yaw);
 
     const transformMatrix = new Pose(currVehiclePose).getTransformationMatrixFromPose(
       new Pose(startVehiclePose)
@@ -90,12 +109,26 @@ export function getObjectTrajectory({
   return vertices;
 }
 
-function getPoseOffset(p1, p2) {
-  const point1 = turf.point([p1.longitude, p1.latitude]);
-  const point2 = turf.point([p2.longitude, p2.latitude]);
-  const distInMeters = turf.distance(point1, point2, {units: 'meters'});
-  const bearing = turf.bearing(point1, point2);
-  const radianDiff = ((90 - bearing) * Math.PI) / 180.0 - p1.yaw;
+/**
+ * Get the meter vector from geospatial coordinates relative to the given heading
+ *
+ * @param from {Object} {longitude, latitude}
+ * @param to {Object} {longitude, latitude}
+ * @param heading {Number} Radian measurement, 0 = east, positive is counter clockwise
+ * @returns {Array} Vector [x, y] in meters
+ */
+export function getGeospatialVector(from, to, heading = 0) {
+  const fromCoord = turf.point([from.longitude, from.latitude]);
+  const toCoord = turf.point([to.longitude, to.latitude]);
+  const distInMeters = turf.distance(fromCoord, toCoord, {units: 'meters'});
+
+  // Bearing is degrees from north, positive is clockwise
+  const bearing = turf.bearing(fromCoord, toCoord);
+
+  // Get the bearing relative to heading
+  const relativeBearing = turf.degreesToRadians(90 - bearing);
+  const radianDiff = relativeBearing - heading;
+
   return [distInMeters * Math.cos(radianDiff), distInMeters * Math.sin(radianDiff)];
 }
 
