@@ -1,0 +1,189 @@
+[
+  {
+    "name": "Overview",
+    "children": [
+      {
+        "name": "Introduction",
+        "markdown": "README.md"
+      },
+      {
+        "name": "What's New",
+        "markdown": "CHANGELOG.md"
+      },
+      {
+        "name": "Versioning",
+        "markdown": "overview/versioning.md"
+      },
+      {
+        "name": "Concepts",
+        "markdown": "overview/concepts.md"
+      },
+      {
+        "name": "Conventions",
+        "markdown": "overview/conventions.md"
+      },
+      {
+        "name": "Roadmap",
+        "markdown": "overview/roadmap.md"
+      },
+      {
+        "name": "Related Projects",
+        "markdown": "overview/related.md"
+      }
+    ]
+  },
+
+  {
+    "name": "Developer's Guide",
+    "children": [
+      {
+        "name": "Overview",
+        "markdown": "developers-guide/README.md"
+      },
+      {
+        "name": "Installing",
+        "markdown": "developers-guide/installing-xviz.md"
+      },
+      {
+        "name": "Structure of XVIZ Data",
+        "markdown": "developers-guide/structure-of-xviz.md"
+      },
+      {
+        "name": "Generating XVIZ",
+        "markdown": "developers-guide/generating-xviz.md"
+      },
+      {
+        "name": "Validating XVIZ",
+        "markdown": "developers-guide/validating-xviz.md"
+      },
+      {
+        "name": "Serving XVIZ",
+        "markdown": "developers-guide/serving-xviz.md"
+      },
+      {
+        "name": "Parsing XVIZ",
+        "markdown": "developers-guide/parsing-xviz.md"
+      },
+      {
+        "name": "Styling XVIZ",
+        "markdown": "developers-guide/styling-xviz.md"
+      },
+      {
+        "name": "Using the Declarative UI",
+        "markdown": "developers-guide/using-declarative-ui.md"
+      },
+      {
+        "name": "Using XVIZ without JavaScript",
+        "markdown": "developers-guide/using-xviz-in-other-languages.md"
+      }
+    ]
+  },
+
+  {
+    "name": "Declarative UI",
+    "children": [
+      {
+        "name": "Overview",
+        "markdown": "declarative-ui/overview.md"
+      },
+      {
+        "name": "Layout Types",
+        "markdown": "declarative-ui/layout-types.md"
+      },
+      {
+        "name": "Interactions",
+        "markdown": "declarative-ui/interactions.md"
+      },
+      {
+        "name": "Layout Elements",
+        "markdown": "declarative-ui/layout-elements.md"
+      },
+      {
+        "name": "Components",
+        "markdown": "declarative-ui/components.md"
+      }
+    ]
+  },
+
+  {
+    "name": "Protocol Schema",
+    "children": [
+      {
+        "name": "Introduction",
+        "markdown": "protocol-schema/introduction.md"
+      },
+      {
+        "name": "Core Types",
+        "markdown": "protocol-schema/core-types.md"
+      },
+      {
+        "name": "Session Protocol",
+        "markdown": "protocol-schema/session-protocol.md"
+      },
+      {
+        "name": "Geometry Primitives",
+        "markdown": "protocol-schema/geometry-primitives.md"
+      },
+      {
+        "name": "Styling Specification",
+        "markdown": "protocol-schema/style-specification.md"
+      },
+      {
+        "name": "UI Primitives",
+        "markdown": "protocol-schema/ui-primitives.md"
+      }
+    ]
+  },
+
+  {
+    "name": "Protocol Implementations",
+    "children": [
+      {
+        "name": "JSON Protocol",
+        "markdown": "protocol-formats/json-protocol.md"
+      },
+      {
+        "name": "Binary Protocol",
+        "markdown": "protocol-formats/binary-protocol.md"
+      }
+    ]
+  },
+
+  {
+    "name": "API Reference",
+    "children": [
+      {
+        "name": "XVIZ Configuration",
+        "markdown": "api-reference/xviz-configuration.md"
+      },
+      {
+        "name": "XVIZ Parsing",
+        "markdown": "api-reference/parse-xviz.md"
+      },
+      {
+        "name": "XVIZSynchronizer",
+        "markdown": "api-reference/xviz-synchronizer.md"
+      },
+      {
+        "name": "XVIZLogSlice",
+        "markdown": "api-reference/xviz-log-slice.md"
+      },
+      {
+        "name": "XVIZObject",
+        "markdown": "api-reference/xviz-object.md"
+      },
+      {
+        "name": "XVIZObjectCollection",
+        "markdown": "api-reference/xviz-object-collection.md"
+      },
+      {
+        "name": "XVIZ Loader",
+        "markdown": "api-reference/xviz-loader.md"
+      },
+      {
+        "name": "XVIZValidator",
+        "markdown": "api-reference/xviz-validator.md"
+      }
+    ]
+  }
+]
