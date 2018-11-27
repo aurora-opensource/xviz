@@ -1,233 +1,26 @@
 # XVIZBuilder
 
-`XVIZBuilder` class provides convenient chaining functions to format data for the xviz protocol.
-
-## Constructor
-
-##### metadata (Object)
-
-- Use `XVIZMetadataBuilder` to construct metadata object.
-
-##### disableStreams (Array)
-
-- disableStreams are not flushed to frame.
-
-##### validateWarn (Function),
-
-- called when there is a validation warning.
-
-##### validateError (Function)
-
-- called when there is a validation error.
-
-## Methods
-
-All methods except `getFrame()` return `this` builder instance
-
-##### getFrame()
-
-- Return an object with xviz protocol containing all the streams in current frame built from the
-  XVIZBuilder instance.
-
-##### pose(streamId : String) : XVIZPoseBuilder
-
-`streamId` is default to `/vehicle_pose` if not specified. Also for a frame, stream `/vehicle_pose`
-must be defined. Additional poses can be defined but are not required.
-
-- Start building a `pose` stream.
-- Return `XVIZPoseBuilder` instance
-- `Pose` structure
-
-```js
-{
-  timestamp: timestamp,
-  mapOrigin: {longitude, latitude, altitude},
-  position: [x, y, z],
-  orientation: [roll, pitch, yaw]
-}
-```
-
-##### primitive(streamId : String) : XVIZPrimitiveBuilder
-
-- Start building a `primitive` or `future` stream.
-- Return `XVIZPrimitiveBuilder` instance
-
-##### variable(streamId : String) : XVIZVariableBuilder
-
-- Start building a `variables` stream.
-- Return `XVIZVariableBuilder` instance
-
-##### timeSeries(streamId : String) : XVIZTimeSeriesBuilder
-
-- Start building a `timeSeries` stream.
-- Return `XVIZTimeSeriesBuilder` instance
-
-**Naming rules for `streamId`**
-
-- Start building a stream.
-- `streamId` has to be path-like.
-  - always starts with a `/`
-  - sections contain only: `[a-zA-Z0-9_-:.]`
-  - does not end with a `/`
-
-Examples:
-
-- `/vehicle-pose`
-- `/vehicle/velocity`
-- `/object/car-1`
-
-##### uiPrimitive(streamId : String) : XVIZUIPrimitiveBuilder
-
-- Start building a `ui_primitive` stream.
-- Return `XVIZUIPrimitiveBuilder` instance
-
-# XVIZPoseBuilder
-
-##### mapOrigin(longitude : Number, latitude : Number, altitude : Number)
-
-##### position(x: Number, y : Number, z : Number)
-
-##### orientation(roll: Number, pitch : Number, yaw : Number)
-
-# XVIZPrimitiveBuilder
-
-##### polygon(vertices : TypedArray)
-
-##### polyline(vertices : TypedArray)
-
-##### points(vertices : TypedArray)
-
-##### image(data, format)
-
-- `data` binary image data
-- `format` e.g. 'png', 'jpg', etc
-
-##### dimensions(widthPixel : Number, heightPixel : Number, depth : Number)
-
-- Only used for `image` primitive, providing dimension info about image stream.
-
-##### circle(position: Array, radius : Number)
-
-- `position` has to be an array with length 3, [x, y, z].
-
-##### stadium(start : Array, end : Array, radius : Number)
-
-- Both `start` and `end` are array with length3, [x, y, z].
-
-##### text(message : String)
-
-##### position(point : Array)
-
-- Position has to be an array with length 3.
-- Only used for specifying where to place `text` message.
-
-##### style(style : Object)
-
-check `xviz-stylesheet` for supported style properties
-
-##### id(id : String)
-
-- Specify `id` for a primitive.
-
-##### classes(classList : Array)
-
-- `classList` style classes, should match metadata definition
-
-##### timestamp(timestamp : Number)
-
-- Primitive with timestamp is considered as `future`.
-- check `core-protocol` for definition of future.
-
-# XVIZVariableBuilder
-
-##### timestamps(timestamps : Array)
-
-- Set timestamps of a variable.
-
-##### values(values : Any)
-
-- `values` and `timestamps` should be matched pairs.
-- Each element in `values` array should be `Number`, `String`, or `boolean`.
-
-# XVIZTimeSeriesBuilder
-
-##### timestamp(timestamp : Number)
-
-- Set timestamp.
-
-##### value(value : Any)
-
-- Value has to be one of `Number`, `String`, or `boolean`.
-
-# XVIZUIPrimitiveBuilder
-
-##### treetable(columns : Array)
-
-Initialize a treetable primitive.
-
-- `columns` should be an array of descriptors of table columns.
-
-##### row(id: String, column_values: Array)
-
-Add a row to the table. Returns a `XVIZTreeTableRowBuilder` instance that represents the new row.
-
-## XVIZTreeTableRowBuilder
-
-##### child(id: String, column_values: Array)
-
-Append a row as a child of this row. Returns a `XVIZTreeTableRowBuilder` instance that represents
-the new row.
+The `XVIZBuilder` class provides convenient chaining functions to format data for the xviz protocol.
 
 ## Example
 
 ```js
-import {XVIZMetadataBuilder, XVIZBuilder} from '@xviz/builder'
-
-// xviz metadata provides log metadata, i.e. startTime, endTime, streams, styles,
-const xvizMetaBuider = new XVIZMetadataBuilder();
-xvizMetaBuider
-  .stream('/vehicle-pose')
-  .stream('/velocity')
-  .category('variable')
-  .type('float')
-  .unit('m/s^2')
-
-  .stream('/point-cloud')
-  .category('primitive')
-  .type('point')
-  .streamStyle({
-    fill_color: '#00a',
-    radius_pixels: 2
-  })
-
-  .stream('/pedestrian-1-trajectory')
-  .category('primitive')
-  .type('polygon');
-
-const pose = {
-  time: 123,
-  latitude: 12.345,
-  longitude: 12.345,
-  altitude: 12.345,
-  roll: 0.123,
-  pitch: 0.123,
-  yaw: 0.123
-};
+import {XVIZBuilder} from '@xviz/builder';
 
 const xvizBuilder = new XVIZBuilder({
-  metadata,
-  disableStreams
+  metadata: {} // See XVIZMetadataBuilder for generating metadata object
 });
 
-const polygon = new Float32Array([
-  [1.23, 0.45, 0.06],
-  [2.45, 0.67, 0.08],
-  [1.67, 0.53, 0.07],
-  [1.23, 0.45, 0.06],
-]);
-
 xvizBuilder
-  .pose(pose)
+  .pose({
+    time: 123,
+    latitude: 12.345,
+    longitude: 12.345,
+    altitude: 12.345,
+    roll: 0.123,
+    pitch: 0.123,
+    yaw: 0.123
+  })
 
   .variable('/velocity')
   .timestamp(123)
@@ -235,78 +28,385 @@ xvizBuilder
 
   .primitive('/point-cloud')
   .points(new Float32Array([1.23, 0.45, 0.06]))
-  .timestamp()
+  .timestamp(123)
   .style({
-     fill_color: [0, 0, 0, 255]
+    fill_color: [0, 0, 0, 255]
   })
 
   .primitive('/pedestrian-1-trajectory')
-  .polygon(polygon)
+  .polygon([[1.23, 0.45, 0.06], [2.45, 0.67, 0.08], [1.67, 0.53, 0.07], [1.23, 0.45, 0.06]])
   .timestamp(123);
 
-
 const frame = xvizBuider.getFrame();
-
-// frame data format
-{
-  update_type: 'snapshot',
-  updates: [
-    {
-      poses: {
-        '/vehicle_pose': {
-          timestamp: 123,
-          mapOrigin: {
-            latitude: 12.345,
-            longitude: 12.345,
-            altitude: 12.345
-          }
-          orientation: [
-            0.123,
-            0.123,
-            0.123
-          ]
-        }
-      }
-      primitives: {
-        '/point-cloud': {
-          points: [
-            {
-              base: {
-                style: {
-                  fill_color: [255,0,0]
-                }
-              },
-              vertices: [1.23, 0.45, 0.06]
-            }
-          ]
-        }
-      },
-      variables: {
-        '/velocity': {
-          variables: [
-            {
-              values: [1.23]
-            }
-          ]
-        }
-      },
-      future_instances: {
-        '/pedestrian-1-trajectory': {
-          timestamps: [123],
-          type: 'polygon',
-          primitives: [
-            [
-              {
-                [1.23, 0.45, 0.06],
-                [2.45, 0.67, 0.08],
-                [1.67, 0.53, 0.07],
-                [1.23, 0.45, 0.06]
-              }
-            ]
-          ]
-        }
-      }
-    }
-  ]
-}
+console.log(frame);
 ```
+
+## XVIZBuilder
+
+### Constructor
+
+```js
+import {XVIZBuilder} from '@xviz/builder';
+const xvizBuilder = new XVIZBuilder(options);
+```
+
+Parameters:
+
+- **options.metadata** (Object) - a JSON object that is the metadata of the session. See
+  [XVIZMetadataBuilder](/docs/api-reference/xviz-metadata-builder.md) for generating metadata
+  objects.
+- **options.disableStreams** (Array) - a list of stream names to disable. Disabled streams are not
+  flushed to frame.
+- **options.validateWarn** (Function) - called when there is a validation warning. Default is
+  `console.warn`.
+- **options.validateError** (Function) - called when there is a validation error. Default is
+  `console.error`.
+
+### Methods
+
+##### getFrame()
+
+Return a JSON object with xviz protocol containing all the streams in current frame built from the
+XVIZBuilder instance.
+
+##### pose(streamId)
+
+Start building a [pose](/docs/protocol-schema/core-protocol.md#Poses) stream. Returns a
+[XVIZPoseBuilder](#XVIZPoseBuilder) instance.
+
+Parameters:
+
+- **streamId** (String) - the name of the pose stream. Default to `/vehicle_pose` if not specified.
+  Note that for a valid frame, stream `/vehicle_pose` must be defined. Additional poses can be
+  defined but are not required.
+
+##### primitive(streamId)
+
+Start building a [primitive](/docs/protocol-schema/core-protocol.md#Primitive-State) or
+[future](/docs/protocol-schema/core-protocol.md#Future-Instances) stream. Returns a
+[XVIZPrimitiveBuilder](#XVIZPrimitiveBuilder) instance.
+
+Parameters:
+
+- **streamId** (String) - the name of the primitive or future stream.
+
+##### variable(streamId)
+
+Start building a [variable](/docs/protocol-schema/core-protocol.md#Variable-State) stream. Returns a
+[XVIZVariableBuilder](#XVIZVariableBuilder) instance.
+
+Parameters:
+
+- **streamId** (String) - the name of the variable stream.
+
+##### timeSeries(streamId)
+
+Start building a [time series](/docs/protocol-schema/core-protocol.md#Time-Series-State) stream.
+Returns a [XVIZTimeSeriesBuilder](#XVIZTimeSeriesBuilder) instance.
+
+Parameters:
+
+- **streamId** (String) - the name of the time series stream.
+
+##### uiPrimitive(streamId)
+
+Start building a [UI primitive](/docs/protocol-schema/core-protocol.md#UI-Primitive-State) stream.
+Returns a [XVIZUIPrimitiveBuilder](#XVIZUIPrimitiveBuilder) instance.
+
+Parameters:
+
+- **streamId** (String) - the name of the UI primitive stream.
+
+### Remarks
+
+#### Naming rules for streams
+
+`streamId` has to be path-like.
+
+- always starts with a `/`
+- sections contain only: `[a-zA-Z0-9_-:.]`
+- does not end with a `/`
+
+Examples:
+
+- `/vehicle-pose`
+- `/vehicle/velocity`
+- `/object/car-1/pose`
+
+## XVIZPoseBuilder
+
+### Methods
+
+##### timestamp(timestamp)
+
+Set the timestamp of the pose.
+
+Parameters:
+
+- **timestamp** (Number)
+
+Returns: `this`
+
+##### mapOrigin(longitude, latitude, altitude)
+
+Set the reference point of the pose.
+
+Parameters:
+
+- **longitude** (Number) - in degrees.
+- **latitude** (Number) - in degrees.
+- **altitude** (Number) - in meters.
+
+Returns: `this`
+
+##### position(x, y, z)
+
+Set the translation of the pose from the reference point.
+
+Parameters:
+
+- **x** (Number) - easting in meters.
+- **y** (Number) - northing in meters.
+- **z** (Number) - vertical offset in meters.
+
+Returns: `this`
+
+##### orientation(roll, pitch, yaw)
+
+Set the rotation of the pose.
+
+Parameters:
+
+- **roll** (Number) - in radians.
+- **pitch** (Number) - in radians.
+- **yaw** (Number) - in radians.
+
+Returns: `this`
+
+# XVIZPrimitiveBuilder
+
+### Methods
+
+##### id(id)
+
+Specify the object id for a primitive.
+
+Parameters:
+
+- **id** (String)
+
+Returns: `this`
+
+##### classes(classList)
+
+Classes for styling, should match the style definition in the stream metadata.
+
+Parameters:
+
+- **classList** (Array:String)
+
+Returns: `this`
+
+##### timestamp(timestamp)
+
+Set the timestamp of the primitive. Primitive with timestamp is considered as `future`. Check
+[XVIZ Core Protocol](/docs/protocol-schema/core-protocol.md) for the definition of primitives and
+futures.
+
+Parameters:
+
+- **timestamp** (Number)
+
+Returns: `this`
+
+##### style(style)
+
+Set the primitive-specific style. This will override the style defined in the stream metadata.
+
+Parameters:
+
+- **style** (Object) - Check [XVIZ Stylesheet Spec](/docs/protocol-schema/style-specification.md)
+  for supported style properties.
+
+Returns: `this`
+
+##### polygon(vertices)
+
+Add a [polygon](/docs/protocol-schema/geometry-primitives#Polygon-Primitive) primitive.
+
+Parameters:
+
+- **vertices** (Array:Point3D)
+
+Returns: `this`
+
+##### polyline(vertices)
+
+Add a [polyline](/docs/protocol-schema/geometry-primitives#Polyline-Primitive) primitive.
+
+Parameters:
+
+- **vertices** (Array:Point3D)
+
+Returns: `this`
+
+##### points(vertices)
+
+Add a [point](/docs/protocol-schema/geometry-primitives#Point-Primitive) primitive.
+
+Parameters:
+
+- **vertices** (Array:Point3D)
+
+Returns: `this`
+
+##### image(data, format)
+
+Add a [image](/docs/protocol-schema/geometry-primitives#Image-Primitive) primitive.
+
+Parameters:
+
+- **data** (Uint8Array) - binary image data
+- **format** (String) - `png`, `jpg`, etc.
+
+Returns: `this`
+
+##### dimensions(widthPixel, heightPixel)
+
+Only used for `image` primitive, providing dimension info about image stream.
+
+Parameters:
+
+- **widthPixel** (Number)
+- **heightPixel** (Number)
+
+Returns: `this`
+
+##### circle(position: Array, radius : Number)
+
+Add a [circle](/docs/protocol-schema/geometry-primitives#Circle-Primitive) primitive.
+
+Parameters:
+
+- **position** (Point3D) - center of the circle
+- **radius** (Number)
+
+Returns: `this`
+
+##### stadium(start, end, radius)
+
+Add a [stadium](/docs/protocol-schema/geometry-primitives#Stadium-Primitive) primitive.
+
+Parameters:
+
+- **start** (Point3D)
+- **end** (Point3D)
+- **radius** (Number)
+
+Returns: `this`
+
+##### text(message)
+
+Add a [text](/docs/protocol-schema/geometry-primitives#Text-Primitive) primitive.
+
+Parameters:
+
+- **message** (String)
+
+Returns: `this`
+
+##### position(point)
+
+Only used for specifying where to place `text` message.
+
+Parameters:
+
+- **point** (Point3D)
+
+Returns: `this`
+
+## XVIZVariableBuilder
+
+### Methods
+
+##### timestamps(timestamps)
+
+Set the timestamps of a variable.
+
+Parameters:
+
+- **timestamps** (Array:Number)
+
+Returns: `this`
+
+##### values(values : Any)
+
+Set the values of a variable, as matched pairs with `timestamps`.
+
+Parameters:
+
+- **values** (Array:Number|String|Boolean)
+
+Returns: `this`
+
+## XVIZTimeSeriesBuilder
+
+### Methods
+
+##### timestamp(timestamp)
+
+Set the timestamp of an entry.
+
+Parameters:
+
+- **timestamp** (Number)
+
+Returns: `this`
+
+##### value(value)
+
+Set the value of an entry.
+
+Parameters:
+
+- **value** (Number|String|Boolean)
+
+Returns: `this`
+
+## XVIZUIPrimitiveBuilder
+
+### Methods
+
+##### treetable(columns)
+
+Initialize a treetable primitive.
+
+Parameters:
+
+- **columns** (Array:Object) - an array of descriptors of table columns.
+
+Returns: `this`
+
+##### row(id, column_values)
+
+Add a row to the table.
+
+Parameters:
+
+- **id** (String) - id of the new row.
+- **column_values** (Array:String|Number|Boolean) - a list of values for each column.
+
+Returns: a `XVIZTreeTableRowBuilder` instance that represents the new row.
+
+## XVIZTreeTableRowBuilder
+
+##### child(id, column_values)
+
+Append a row as a child of this row.
+
+Parameters:
+
+- **id** (String) - id of the new row.
+- **column_values** (Array:String|Number|Boolean) - a list of values for each column.
+
+Returns: a `XVIZTreeTableRowBuilder` instance that represents the new row.

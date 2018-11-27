@@ -1,83 +1,179 @@
 # XVIZMetadataBuilder
 
-`XVIZMetadataBuilder` class helps generate metadata object
+The `XVIZMetadataBuilder` class provides convenient chaining functions to format metadata for the
+xviz protocol.
+
+## Example
+
+```js
+import {XVIZMetadataBuilder, XVIZBuilder} from '@xviz/builder';
+
+// xviz metadata provides log metadata, i.e. startTime, endTime, streams, styles,
+const xvizMetaBuider = new XVIZMetadataBuilder();
+xvizMetaBuider
+  .startTime(1542768000)
+  .endTime(1542768060)
+
+  .stream('/vehicle-pose')
+  .stream('/velocity')
+  .category('variable')
+  .type('float')
+  .unit('m/s^2')
+
+  .stream('/point-cloud')
+  .category('primitive')
+  .type('point')
+  .streamStyle({
+    fill_color: '#00a',
+    radius_pixels: 2
+  })
+
+  .stream('/pedestrian-1-trajectory')
+  .category('primitive')
+  .type('polygon');
+
+const metadata = xvizMetaBuider.getMetadata();
+console.log(metadata);
+```
+
+## Constructor
+
+```js
+import {XVIZMetadataBuilder} from '@xviz/builder';
+const xvizMetadataBuilder = new XVIZMetadataBuilder(options);
+```
+
+Parameters:
+
+- **options.validateWarn** (Function) - called when there is a validation warning. Default is
+  `console.warn`.
+- **options.validateError** (Function) - called when there is a validation error. Default is
+  `console.error`.
 
 ## Methods
 
-###### getMetadata() : Object
+###### getMetadata()
 
-Return `metadata` object.
+Returns a JSON object with xviz protocol that is the metadata of the session.
 
-###### startTime(time : Number)
+###### startTime(time)
 
 Set log start time.
 
-###### endTime(time : Number)
+Parameters:
+
+- **time** (Number)
+
+Returns: `this`
+
+###### endTime(time)
 
 Set log end time.
 
-###### ui(uiBuilder : XVIZUIBuilder)
+Parameters:
+
+- **time** (Number)
+
+Returns: `this`
+
+###### ui(uiBuilder)
 
 Set the configuration of declarative UI.
 
-###### stream(streamId : String)
+Parameters:
+
+- **uiBuilder** ([XVIZUIBuilder](/docs/api-reference/xivz-ui-builder.md))
+
+Returns: `this`
+
+###### stream(streamId)
 
 Add a stream.
 
-###### category(category : String)
+Parameters:
 
-Set `category` of the stream. Options are
+- **streamId** (String)
 
-- `primitive`
-- `time_series`
-- `variable`
+Returns: `this`
 
-See `core-protocol` for details.
+###### category(category)
 
-###### type(type : String)
+Set `category` of the stream.
 
-Set type of the stream.
+Parameters:
 
-For category `variable` and `time_series`, options are
+- **category** (String) - `primitive`, `time_series`, `variable`, etc. See
+  [XVIZ Core Protocol](/docs/protocol-schema/core-protocol.md) for details.
 
-- `float`
-- `integer`
-- `string`
-- `boolean` check `core-protocol` for details.
+Returns: `this`
 
-For `primitive`, options are
+###### type(type)
 
-- `point`
-- `polygon`
-- `polyline`
-- `circle`
-- `stadium`
-- `text`
-- `image` check `geometry-primitives` for details.
+Set `type` of the stream.
 
-###### unit(unit : String)
+Parameters:
 
-Set unit for `variable` or `time_series`. e.g. `m/s`, `m/s^2`
+- **type** (String)
+  - For category `variable` and `time_series`, options are `float`, `integer`, `string` and
+    `boolean`. See [XVIZ Core Protocol](/docs/protocol-schema/core-protocol.md) for details.
+  - For category `primitive`, options are `point`, `polygon`, `polyline`, `circle`, `stadium`,
+    `text` and `image`. See [Geometry Primitives](/docs/protocol-schema/geometry-primitives.md) for
+    details.
 
-###### coordinate(coordinate : String)
+Returns: `this`
+
+###### unit(unit)
+
+Set unit for `variable` or `time_series`.
+
+Parameters:
+
+- **unit** (String) - `m/s`, `m/s^2`, etc.
+
+Returns: `this`
+
+###### coordinate(coordinate)
 
 Set the coordinate for a stream.
 
-`vehicle_relative`, `map_relative` or any customized name.
+Parameters:
 
-###### transformMatrix(matrix: Matrix4 | Array)
+- **coordinate** (String) - `GEOGRAPHIC`, `VEHICLE_RELATIVE`, `IDENTITY` or `DYNAMIC`.
 
-Add a custom transform matrix. In order to make a relative adjustment from the core pose of the
-stream. `matrix` could be an Matrix4
-([math.gl](https://github.com/uber-web/math.gl/blob/master/docs/api-reference/matrix4.md)) instance
-or an array of 16 numbers.
+Returns: `this`
 
-###### pose(position: Object, orientation: Object)
+###### transformMatrix(matrix)
+
+Add a custom transform matrix in order to make a relative adjustment from the core pose of the
+stream.
+
+Parameters:
+
+- **matrix** (Array) - an
+  [Matrix4](https://github.com/uber-web/math.gl/blob/master/docs/api-reference/matrix4.md) instance
+  or an array of 16 numbers.
+
+Returns: `this`
+
+###### pose(position, orientation)
 
 `position`: `{x, y, z}` `orientation`: `{roll, pitch, yaw}`
 
 Stream data from sensors can have a pose offset relative to the vehicle pose. `pose` is a convenient
-function we have to day to construct a transform matrix from a pose definition.
+function we have to construct a transform matrix from a pose definition.
+
+Parameters:
+
+- **position** (Object) - the translation of the stream.
+  - **position.x** (Number) - in meters.
+  - **position.y** (Number) - in meters.
+  - **position.z** (Number) - in meters.
+- **orientation** (Object) - the rotation of the stream.
+  - **orientation.roll** (Number) - in radians.
+  - **orientation.pitch** (Number) - in radians.
+  - **orientation.yaw** (Number) - in radians.
+
+Returns: `this`
 
 `position` and `orientation` will be used to construct a
 [Pose](https://github.com/uber-web/math.gl/blob/master/src/pose.js) instance and applied to a
@@ -85,14 +181,25 @@ identity matrix.
 
 **Note:** Both `pose` and `transformMatrix` can not be applied at the same time.
 
-###### streamStyle(style : Object)
+###### streamStyle(style)
 
-Define default style with style object.
+Define the default style with style object.
 
-###### styleClass(className : String, style : Object)
+Parameters:
 
-Define a style class with style object.
+- **style** (Object) - Check [XVIZ Stylesheet Spec](/docs/protocol-schema/style-specification.md)
+  for supported style properties.
 
-Refer `style-specification` for supported style properties.
+Returns: `this`
 
-Refer the example in `XVIZBuilder`
+###### styleClass(className, style)
+
+Define a style class with its corresponding styles.
+
+Parameters:
+
+- **className** (String) - The class name that the style object should apply to.
+- **style** (Object) - Check [XVIZ Stylesheet Spec](/docs/protocol-schema/style-specification.md)
+  for supported style properties.
+
+Returns: `this`
