@@ -39,6 +39,7 @@ import declarativeUiComponentsTabularSchemaJson from '../declarative-ui/componen
 import declarativeUiComponentsTreetableSchemaJson from '../declarative-ui/components/treetable.schema.json';
 import declarativeUiComponentsVideoSchemaJson from '../declarative-ui/components/video.schema.json';
 import declarativeUiPanelSchemaJson from '../declarative-ui/panel.schema.json';
+import envelopeSchemaJson from '../envelope.schema.json';
 import mathMatrix3x3SchemaJson from '../math/matrix3x3.schema.json';
 import mathMatrix4x4SchemaJson from '../math/matrix4x4.schema.json';
 import mathPoint3dListSchemaJson from '../math/point3d_list.schema.json';
@@ -89,6 +90,7 @@ export const SCHEMA_DATA = {
   'declarative-ui/components/treetable.schema.json': declarativeUiComponentsTreetableSchemaJson,
   'declarative-ui/components/video.schema.json': declarativeUiComponentsVideoSchemaJson,
   'declarative-ui/panel.schema.json': declarativeUiPanelSchemaJson,
+  'envelope.schema.json': envelopeSchemaJson,
   'math/matrix3x3.schema.json': mathMatrix3x3SchemaJson,
   'math/matrix4x4.schema.json': mathMatrix4x4SchemaJson,
   'math/point3d_list.schema.json': mathPoint3dListSchemaJson,

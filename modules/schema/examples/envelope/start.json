@@ -1,0 +1,7 @@
+{
+  "type": "xviz/start",
+  "data": {
+    "version": "2.0.0",
+    "profile": "fast"
+  }
+}

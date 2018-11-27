@@ -1,0 +1,64 @@
+{
+  "id": "https://xviz.org/schema/envelope.json",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "XVIZ data envelope",
+  "type": "object",
+  "properties":  {
+    "type": {},
+    "data": {}
+  },
+  "anyOf": [
+    {
+      "properties":  {
+        "type": {
+          "type": "string",
+          "pattern": "^((?!xviz\/).)*$"
+        },
+        "data": {
+          "type": "object"
+        }
+      }
+    },
+    {
+      "properties":  {
+        "type": {
+          "enum": [
+            "xviz/start"
+          ]
+        },
+        "data": {
+          "$ref": "https://xviz.org/schema/session/start.json"
+        }
+      }
+    },
+    {
+      "properties":  {
+        "type": {
+          "enum": [
+            "xviz/metadata"
+          ]
+        },
+        "data": {
+          "$ref": "https://xviz.org/schema/session/metadata.json"
+        }
+      }
+    },
+    {
+      "properties":  {
+        "type": {
+          "enum": [
+            "xviz/state_update"
+          ]
+        },
+        "data": {
+          "$ref": "https://xviz.org/schema/session/state_update.json"
+        }
+      }
+    }
+  ],
+  "required": [
+    "type",
+    "data"
+  ],
+  "additionalProperties": false
+}
