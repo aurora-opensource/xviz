@@ -27,11 +27,9 @@ export function encodeBinaryXVIZ(inputJson, options) {
   return encodeGLB(json, newOptions);
 }
 
-export function writeBinaryXVIZtoFile(filePath, json, options) {
+export function writeBinaryXVIZtoFile(sink, directory, name, json, options) {
   const glbFileBuffer = encodeBinaryXVIZ(json, options);
-  const fs = module.require('fs');
-  fs.writeFileSync(`${filePath}.glb`, toBuffer(glbFileBuffer), {flag: 'w'});
-  // console.log(`Wrote ${filePath}.glb`);
+  sink.writeSync(directory, `${name}.glb`, toBuffer(glbFileBuffer), {flag: 'w'});
   return glbFileBuffer;
 }
 

@@ -15,32 +15,51 @@
 import {writeBinaryXVIZtoFile} from './xviz-binary-writer';
 import {xvizConvertJson} from './xviz-json-encoder.js';
 
+// 0-frame is an index file for timestamp metadata
+// 1-frame is the metadata file for the log
+// 2-frame is where the actual XVIZ updates begin
 const frameName = index => `${index + 2}-frame`;
 
-export default class XVIZWriter {
+/**
+ * Class to abstract away file IO
+ */
+class FileSink {
   constructor() {
+    this.fs = module.require('fs');
+    this.path = module.require('path');
+  }
+
+  writeSync(scope, name, data) {
+    const xvizMetadataFilename = this.path.join(scope, name);
+    const options = {
+      flag: 'w'
+    };
+    this.fs.writeFileSync(xvizMetadataFilename, data, options);
+  }
+}
+
+export default class XVIZWriter {
+  constructor(dataSink) {
+    this.sink = dataSink || new FileSink();
     this.frameTimings = {
       frames: new Map()
     };
+    this.wroteFrameIndex = null;
   }
 
   // xvizMetadata is the object returned
   // from a Builder.
   writeMetadata(xvizDirectory, xvizMetadata, options = {writeBinary: true, writeJson: false}) {
-    const fs = module.require('fs');
-    const path = module.require('path');
-    const xvizMetadataFilename = path.join(xvizDirectory, '1-frame');
-
     this._saveTimestamp(xvizMetadata);
 
     if (options.writeBinary) {
-      writeBinaryXVIZtoFile(xvizMetadataFilename, xvizMetadata, {flattenArrays: false});
+      writeBinaryXVIZtoFile(this.sink, xvizDirectory, '1-frame', xvizMetadata, {
+        flattenArrays: false
+      });
     }
 
     if (options.writeJson) {
-      fs.writeFileSync(`${xvizMetadataFilename}.json`, JSON.stringify(xvizMetadata, null, 2), {
-        flag: 'w'
-      });
+      this.sink.writeSync(xvizDirectory, '1-frame.json', JSON.stringify(xvizMetadata));
     }
   }
 
@@ -50,14 +69,20 @@ export default class XVIZWriter {
     xvizFrame,
     options = {writeBinary: true, writeJson: false}
   ) {
+    if (this.wroteFrameIndex !== null) {
+      throw new Error(
+        `writeFrame() was called after writeFrameIndex().  The index was written with last frame of ${frameName(
+          this.wroteFrameIndex - 1
+        )}`
+      );
+    }
+
     this._saveTimestamp(xvizFrame, frameNumber);
 
-    const fs = module.require('fs');
-    const path = module.require('path');
-    // +2 is because 1 is metadata, so we start with 2
-    const frameFilePath = path.join(xvizDirectory, frameName(frameNumber));
     if (options.writeBinary) {
-      writeBinaryXVIZtoFile(frameFilePath, xvizFrame, {flattenArrays: false});
+      writeBinaryXVIZtoFile(this.sink, xvizDirectory, frameName(frameNumber), xvizFrame, {
+        flattenArrays: false
+      });
     }
 
     if (options.writeJson) {
@@ -71,19 +96,25 @@ export default class XVIZWriter {
       };
 
       const jsonXVIZFrame = xvizConvertJson(xvizFrame);
-      fs.writeFileSync(`${frameFilePath}.json`, JSON.stringify(jsonXVIZFrame, numberRounder), {
-        flag: 'w'
-      });
+      this.sink.writeSync(
+        xvizDirectory,
+        `${frameName(frameNumber)}.json`,
+        JSON.stringify(jsonXVIZFrame, numberRounder)
+      );
     }
   }
 
   writeFrameIndex(xvizDirectory) {
-    const fs = module.require('fs');
-    const path = module.require('path');
-    const frameFilePath = path.join(xvizDirectory, '0-frame');
-
     const {startTime, endTime, frames} = this.frameTimings;
-    const frameTimings = {startTime, endTime};
+    const frameTimings = {};
+
+    if (startTime) {
+      frameTimings.startTime = startTime;
+    }
+
+    if (endTime) {
+      frameTimings.endTime = endTime;
+    }
 
     // Sort frames by index before writing out as an array
     const frameTimes = Array.from(frames.keys()).sort((a, b) => a - b);
@@ -103,23 +134,37 @@ export default class XVIZWriter {
     });
     frameTimings.timing = timing;
 
-    fs.writeFileSync(`${frameFilePath}.json`, JSON.stringify(frameTimings, {flag: 'w'}));
+    this.sink.writeSync(xvizDirectory, '0-frame.json', JSON.stringify(frameTimings));
+    this.wroteFrameIndex = timing.length;
   }
 
   /* eslint-disable camelcase */
   _saveTimestamp(xviz_data, index) {
     const {log_info, updates} = xviz_data;
 
-    if (log_info) {
-      const {start_time, end_time} = log_info || {};
-      this.frameTimings.startTime = start_time;
-      this.frameTimings.endTime = end_time;
-    } else if (updates && index !== undefined) {
+    if (index === undefined) {
+      // Metadata case
+      if (log_info) {
+        const {start_time, end_time} = log_info || {};
+        if (start_time) {
+          this.frameTimings.startTime = start_time;
+        }
+
+        if (end_time) {
+          this.frameTimings.endTime = end_time;
+        }
+      }
+    } else if (updates) {
+      if (updates.length === 0 || !updates.every(update => typeof update.timestamp === 'number')) {
+        throw new Error('XVIZ updates did not contain a valid timestamp');
+      }
+
       const min = Math.min(updates.map(update => update.timestamp));
-      const max = Math.min(updates.map(update => update.timestamp));
+      const max = Math.max(updates.map(update => update.timestamp));
 
       this.frameTimings.frames.set(index, [min, max, index, frameName(index)]);
     } else {
+      // Missing updates & index is invalid call
       throw new Error('Cannot find timestamp');
     }
   }
