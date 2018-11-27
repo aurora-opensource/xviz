@@ -240,7 +240,7 @@ The plot component builder for declarative UI.
 
 Returns a JSON descriptor of this component.
 
-## XVIZSelectBuilder
+## XVIZSelectBuilder (WARNING: Unstable feature)
 
 The select component builder for declarative UI.
 
