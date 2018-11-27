@@ -3,7 +3,8 @@ export const PRIMITIVE_CAT = {
   FEATURE: 'features',
   LABEL: 'labels',
   POINTCLOUD: 'pointCloud',
-  IMAGE: 'images'
+  IMAGE: 'images',
+  COMPONENT: 'components' // TODO(twojtasz): remove when v1 support is removed
 };
 
 // eslint-disable-next-line max-params
