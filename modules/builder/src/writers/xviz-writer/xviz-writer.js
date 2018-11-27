@@ -1,6 +1,9 @@
 import {writeBinaryXVIZtoFile} from './xviz-binary-writer';
 import {xvizConvertJson} from './xviz-json-encoder.js';
 
+// 0-frame is an index file for timestamp metadata
+// 1-frame is the metadata file for the log
+// 2-frame is where the actual XVIZ updates begin
 const frameName = index => `${index + 2}-frame`;
 
 /**
