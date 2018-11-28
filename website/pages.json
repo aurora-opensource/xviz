@@ -157,6 +157,10 @@
         "markdown": "api-reference/xviz-configuration.md"
       },
       {
+        "name": "XVIZBuilder",
+        "markdown": "api-reference/xviz-builder.md"
+      },
+      {
         "name": "XVIZ Parsing",
         "markdown": "api-reference/parse-xviz.md"
       },
