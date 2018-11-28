@@ -64,16 +64,6 @@
   "anyOf": [
     {
       "required": [
-        "annotations"
-      ]
-    },
-    {
-      "required": [
-        "future_instances"
-      ]
-    },
-    {
-      "required": [
         "poses"
       ]
     },
@@ -84,12 +74,27 @@
     },
     {
       "required": [
+        "ui_primitives"
+      ]
+    },
+    {
+      "required": [
         "time_series"
       ]
     },
     {
       "required": [
+        "future_instances"
+      ]
+    },
+    {
+      "required": [
         "variables"
+      ]
+    },
+    {
+      "required": [
+        "annotations"
       ]
     }
   ],

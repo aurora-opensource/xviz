@@ -1,0 +1,21 @@
+{
+  "timestamp": 1001.3,
+  "ui_primitives": {
+    "/ui/mytable": {
+      "treetable": {
+        "columns": [
+          {
+            "display_text": "Name",
+            "type": "string"
+          }
+        ],
+        "nodes": [
+          {
+            "id": 0,
+            "column_values": ["Jim"]
+          }
+        ]
+      }
+    }
+  }
+}
