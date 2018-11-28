@@ -566,10 +566,7 @@ test('XVIZBuilder#futures-single-primitive', t => {
   const verts = [[0, 0, 0], [4, 0, 0], [4, 3, 0]];
   const ts = 1.0;
 
-  builder
-    .primitive(streamId)
-    .polygon(verts)
-    .timestamp(ts);
+  builder.futureInstance(streamId, ts).polygon(verts);
 
   const expected = {
     update_type: 'snapshot',
@@ -603,25 +600,26 @@ test('XVIZBuilder#futures-single-primitive', t => {
   t.end();
 });
 
-test('XVIZBuilder#futures-multiple-primitive', t => {
+test('XVIZBuilder#futures-multiple-primitive reverse timestamp insert', t => {
   const builder = new XVIZBuilder();
   setupPose(builder);
   const streamId = '/test/polygon';
 
   const verts1 = [[1, 2, 3], [0, 0, 0], [2, 3, 4]];
   const verts2 = [[0, 0, 0], [4, 0, 0], [4, 3, 0]];
+
+  // NOTE: inserted in reverse timestamp order
   const ts1 = 2.0;
   const ts2 = 1.0;
 
   builder
-    .primitive(streamId)
-    .timestamp(ts1)
+    .futureInstance(streamId, ts1)
     .polygon(verts1)
     .style({
       fill_color: [255, 0, 0]
-    })
-    .polygon(verts2)
-    .timestamp(ts2);
+    });
+
+  builder.futureInstance(streamId, ts2).polygon(verts2);
 
   const expected = {
     update_type: 'snapshot',
@@ -651,6 +649,79 @@ test('XVIZBuilder#futures-multiple-primitive', t => {
                       }
                     },
                     vertices: verts1
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+    ]
+  };
+
+  const frame = builder.getFrame();
+  t.deepEqual(frame, expected, 'XVIZBuilder multiple primitives futures matches expected output');
+  schemaValidator.validate('session/state_update', frame);
+  t.end();
+});
+
+test('XVIZBuilder#futures-multiple-primitive-per-ts', t => {
+  const builder = new XVIZBuilder();
+  setupPose(builder);
+  const streamId = '/test/polygon';
+
+  const verts1 = [[1, 2, 3], [0, 0, 0], [2, 3, 4]];
+  const verts2 = [[0, 0, 0], [4, 0, 0], [4, 3, 0]];
+  const ts1 = 1.0;
+  const ts2 = 2.0;
+
+  builder
+    .futureInstance(streamId, ts1)
+    .polygon(verts1)
+    .id('1')
+    .polygon(verts2);
+
+  builder
+    .futureInstance(streamId, ts2)
+    .polygon(verts1)
+    .id('1')
+    .polygon(verts2);
+
+  const expected = {
+    update_type: 'snapshot',
+    updates: [
+      {
+        timestamp: 1.0,
+        poses: {
+          [PRIMARY_POSE_STREAM]: DEFAULT_POSE
+        },
+        future_instances: {
+          [streamId]: {
+            timestamps: [ts1, ts2],
+            primitives: [
+              {
+                polygons: [
+                  {
+                    base: {
+                      object_id: '1'
+                    },
+                    vertices: verts1
+                  },
+                  {
+                    vertices: verts2
+                  }
+                ]
+              },
+              {
+                polygons: [
+                  {
+                    base: {
+                      object_id: '1'
+                    },
+                    vertices: verts1
+                  },
+                  {
+                    vertices: verts2
                   }
                 ]
               }

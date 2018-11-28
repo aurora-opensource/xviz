@@ -82,13 +82,24 @@ Parameters:
 
 ##### primitive(streamId)
 
-Start building a [primitive](/docs/protocol-schema/core-protocol.md#Primitive-State) or
-[future](/docs/protocol-schema/core-protocol.md#Future-Instances) stream. Returns a
+Start building a [primitive](/docs/protocol-schema/core-protocol.md#Primitive-State). Returns a
 [XVIZPrimitiveBuilder](#XVIZPrimitiveBuilder) instance.
 
 Parameters:
 
-- **streamId** (String) - the name of the primitive or future stream.
+- **streamId** (String) - the name of the primitive stream.
+
+##### futureInstance(streamId, timestamp)
+
+Start building a [futureInstance](/docs/protocol-schema/core-types.md?section=future-instances)
+stream. Returns a
+[XVIZFutureInstanceBuilder](/docs/api-reference/xviz-builder.md?section=XVIZFutureInstanceBuilder)
+instance.
+
+Parameters:
+
+- **streamId** (String) - the name of the futureInstance stream.
+- **timestamp** (Number) - the future timestamp the primitive data represents
 
 ##### variable(streamId)
 
@@ -183,7 +194,7 @@ Parameters:
 
 Returns: `this`
 
-# XVIZPrimitiveBuilder
+## XVIZPrimitiveBuilder
 
 ### Methods
 
@@ -204,18 +215,6 @@ Classes for styling, should match the style definition in the stream metadata.
 Parameters:
 
 - **classList** (Array:String)
-
-Returns: `this`
-
-##### timestamp(timestamp)
-
-Set the timestamp of the primitive. Primitive with timestamp is considered as `future`. Check
-[XVIZ Core Protocol](/docs/protocol-schema/core-protocol.md) for the definition of primitives and
-futures.
-
-Parameters:
-
-- **timestamp** (Number)
 
 Returns: `this`
 
@@ -324,6 +323,13 @@ Parameters:
 - **point** (Point3D)
 
 Returns: `this`
+
+## XVIZFutureInstanceBuilder
+
+### Methods
+
+Refer to [XVIZPrimitiveBuilder](/docs/api-reference/xviz-builder.md#XVIZPrimitiveBuilder) as
+XVIZFutureInstanceBuilder is a specialization of that class and supports all of the methods defined.
 
 ## XVIZVariableBuilder
 
