@@ -13,6 +13,7 @@ export {default as XVIZMetadataBuilder} from './builders/xviz-metadata-builder';
 export {default as XVIZUIBuilder} from './builders/declarative-ui/xviz-ui-builder';
 
 export {
+  getGeospatialToPoseTransform as _getGeospatialToPoseTransform,
   getPoseTrajectory as _getPoseTrajectory,
   getObjectTrajectory as _getObjectTrajectory,
   getRelativeCoordinates as _getRelativeCoordinates

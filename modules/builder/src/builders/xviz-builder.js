@@ -2,6 +2,7 @@
 /* eslint-disable camelcase */
 import XVIZPoseBuilder from './xviz-pose-builder';
 import XVIZPrimitiveBuilder from './xviz-primitive-builder';
+import XVIZFutureInstanceBuilder from './xviz-future-instance-builder';
 import XVIZUIPrimitiveBuilder from './xviz-ui-primitive-builder';
 import XVIZTimeSeriesBuilder from './xviz-time-series-builder';
 import XVIZValidator from './xviz-validator';
@@ -46,6 +47,10 @@ export default class XVIZBuilder {
       metadata: this.metadata,
       validator: this._validator
     });
+    this._futureInstanceBuilder = new XVIZFutureInstanceBuilder({
+      metadata: this.metadata,
+      validator: this._validator
+    });
     this._uiPrimitivesBuilder = new XVIZUIPrimitiveBuilder({
       metadata: this.metadata,
       validator: this._validator
@@ -68,6 +73,12 @@ export default class XVIZBuilder {
 
   primitive(streamId) {
     this._streamBuilder = this._primitivesBuilder.stream(streamId);
+    return this._streamBuilder;
+  }
+
+  futureInstance(streamId, timestamp) {
+    this._streamBuilder = this._futureInstanceBuilder.stream(streamId);
+    this._streamBuilder._timestamp(timestamp);
     return this._streamBuilder;
   }
 
@@ -101,7 +112,8 @@ export default class XVIZBuilder {
       this._validator.error(`Every frame requires a ${PRIMARY_POSE_STREAM} stream`);
     }
 
-    const {primitives, futures} = this._primitivesBuilder.getData();
+    const primitives = this._primitivesBuilder.getData();
+    const futures = this._futureInstanceBuilder.getData();
     const variables = this._variablesBuilder.getData();
     const timeSeries = this._timeSeriesBuilder.getData();
     const uiPrimitives = this._uiPrimitivesBuilder.getData();
