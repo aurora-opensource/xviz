@@ -7,7 +7,7 @@ import {getTransformsFromPose} from '../parsers/parse-vehicle-pose';
 
 // One time slice, one datum from each stream.
 export default class LogSlice {
-  constructor(streamFilter, lookAheadIndex, streamsByReverseTime) {
+  constructor(streamFilter, lookAheadMs, streamsByReverseTime) {
     this.features = {};
     this.variables = {};
     this.pointCloud = null;
@@ -15,7 +15,7 @@ export default class LogSlice {
     this.components = {};
     this.streams = {};
 
-    this.initialize(streamFilter, lookAheadIndex, streamsByReverseTime);
+    this.initialize(streamFilter, lookAheadMs, streamsByReverseTime);
   }
 
   // Extract car data from vehicle_pose and get geoJson for related frames
@@ -72,14 +72,14 @@ export default class LogSlice {
    * Among other things parses XVIZ Object-related info from misc streams and merge into XVIZ
    * feature properties.
    */
-  initialize(streamFilter, lookAheadIndex, streamsByReverseTime) {
+  initialize(streamFilter, lookAheadMs, streamsByReverseTime) {
     // get data if we don't already have that stream && it is not filtered.
     // TODO: make streamFilter a list of filtered streams
     // so it can default to [], and then only exclude if filter.includes(x)
     streamsByReverseTime.forEach(streams => {
       for (const streamName in streams) {
         if (!this.streams[streamName] && this._includeStream(streamFilter, streamName)) {
-          this.addStreamDatum(streams[streamName], streamName, lookAheadIndex, this);
+          this.addStreamDatum(streams[streamName], streamName, lookAheadMs, this);
         }
       }
     });
@@ -88,7 +88,7 @@ export default class LogSlice {
   /**
    * Process a stream and put the appropriate data into
    */
-  addStreamDatum(datum, streamName, lookAheadIndex) {
+  addStreamDatum(datum, streamName, lookAheadMs) {
     this.streams[streamName] = datum;
 
     this.setLabelsOnXVIZObjects(datum.labels);
@@ -97,7 +97,15 @@ export default class LogSlice {
 
     // Future data is separate from features so we can control independently
     if (lookAheads.length) {
-      this.lookAheads[streamName] = lookAheads[lookAheadIndex] || [];
+      const lookAheadTime = datum.time + lookAheadMs;
+      const lookAheadIndexPlusOne = lookAheads.findIndex(lookAhead => {
+        return lookAhead.length && lookAhead[0].timestamp > lookAheadTime;
+      });
+
+      // If there is no entry range this will be undefined or 0
+      if (lookAheadIndexPlusOne) {
+        this.lookAheads[streamName] = lookAheads[lookAheadIndexPlusOne - 1];
+      }
     }
 
     // Combine data from current datums
