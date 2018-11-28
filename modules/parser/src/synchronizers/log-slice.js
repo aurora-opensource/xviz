@@ -1,5 +1,6 @@
 import {getXVIZConfig} from '../config/xviz-config';
 import XVIZObject from '../objects/xviz-object';
+import {findInsertPos, INSERT_POSITION} from '../utils/search';
 
 import {getTransformsFromPose} from '../parsers/parse-vehicle-pose';
 
@@ -96,15 +97,12 @@ export default class LogSlice {
     const {features = [], lookAheads = [], variable, pointCloud = null} = datum;
 
     // Future data is separate from features so we can control independently
-    if (lookAheads.length) {
+    if (lookAheads.length && lookAheadMs > 0) {
       const lookAheadTime = datum.time + lookAheadMs;
-      const lookAheadIndexPlusOne = lookAheads.findIndex(lookAhead => {
-        return lookAhead.length && lookAhead[0].timestamp > lookAheadTime;
-      });
+      const lookAheadIndex = findInsertPos(lookAheads, lookAheadTime, INSERT_POSITION.LEFT);
 
-      // If there is no entry range this will be undefined or 0
-      if (lookAheadIndexPlusOne) {
-        this.lookAheads[streamName] = lookAheads[lookAheadIndexPlusOne - 1];
+      if (lookAheadIndex) {
+        this.lookAheads[streamName] = lookAheads[lookAheadIndex];
       }
     }
 
