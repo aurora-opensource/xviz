@@ -53,7 +53,7 @@ test('findInsertPos#position past end of array', t => {
   let pos = findInsertPos(testTimeslices, 600, IP.LEFT);
   t.equal(pos, 5, 'Left insert position is 5');
 
-  pos = findInsertPos(testTimeslices, 500, IP.RIGHT);
+  pos = findInsertPos(testTimeslices, 600, IP.RIGHT);
   t.equal(pos, 5, 'Right insert position is 5');
 
   t.end();

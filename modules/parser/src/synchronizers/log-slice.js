@@ -4,6 +4,16 @@ import {findInsertPos, INSERT_POSITION} from '../utils/search';
 
 import {getTransformsFromPose} from '../parsers/parse-vehicle-pose';
 
+// lookAheads is an array of arrays, so we need to fetch out the first
+// timestamp of the inner array.
+function lookAheadTimesliceAccessor(timeslices, index) {
+  if (timeslices[index] && timeslices[index].length) {
+    return timeslices[index][0].timestamp;
+  }
+
+  throw new Error('Missing entry or timestamp in lookAhead array');
+}
+
 // LOGSLICE CLASS
 
 // One time slice, one datum from each stream.
@@ -99,10 +109,10 @@ export default class LogSlice {
     // Future data is separate from features so we can control independently
     if (lookAheads.length && lookAheadMs > 0) {
       const lookAheadTime = datum.time + lookAheadMs;
-      const lookAheadIndex = findInsertPos(lookAheads, lookAheadTime, INSERT_POSITION.LEFT);
+      const lookAheadIndex = findInsertPos(lookAheads, lookAheadTime, INSERT_POSITION.RIGHT, lookAheadTimesliceAccessor);
 
       if (lookAheadIndex) {
-        this.lookAheads[streamName] = lookAheads[lookAheadIndex];
+        this.lookAheads[streamName] = lookAheads[lookAheadIndex - 1];
       }
     }
 

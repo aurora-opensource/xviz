@@ -10,9 +10,10 @@ export const INSERT_POSITION = {
  * @params {Array} timeslices which elements contain a 'timestamp' property
  * @params {number} timestamp
  * @params {number} insertPosition - insert to the left or right of the equal element.
+ * @params {number} timestampAccessor - access the timestamp of the timeslice elements
  * @returns {number} index of insert position
  */
-export function findInsertPos(timeslices, timestamp, insertPosition = INSERT_POSITION.LEFT) {
+export function findInsertPos(timeslices, timestamp, insertPosition = INSERT_POSITION.LEFT, timestampAccessor = (timeslice, index) => timeslice[index].timestamp) {
   assert(Number.isFinite(timestamp), 'valid timeslice search timestamp');
 
   let lowerBound = 0;
@@ -22,7 +23,7 @@ export function findInsertPos(timeslices, timestamp, insertPosition = INSERT_POS
 
   while (lowerBound <= upperBound) {
     currentIndex = ((lowerBound + upperBound) / 2) | 0;
-    currentTimestamp = timeslices[currentIndex].timestamp;
+    currentTimestamp = timestampAccessor(timeslices, currentIndex);
 
     if (currentTimestamp < timestamp) {
       lowerBound = currentIndex + 1;
