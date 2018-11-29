@@ -5,7 +5,7 @@ export const INSERT_POSITION = {
   RIGHT: 1
 };
 
-const defaultTimestampAccessor = (timeslice, index) => timeslice[index].timestamp;
+const defaultTimestampAccessor = timeslice => timeslice.timestamp;
 
 /**
  * Binary search on sorted timeslices
@@ -30,7 +30,7 @@ export function findInsertPos(
 
   while (lowerBound <= upperBound) {
     currentIndex = ((lowerBound + upperBound) / 2) | 0;
-    currentTimestamp = timestampAccessor(timeslices, currentIndex);
+    currentTimestamp = timestampAccessor(timeslices[currentIndex]);
 
     if (currentTimestamp < timestamp) {
       lowerBound = currentIndex + 1;

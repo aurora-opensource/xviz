@@ -6,9 +6,9 @@ import {getTransformsFromPose} from '../parsers/parse-vehicle-pose';
 
 // lookAheads is an array of arrays, so we need to fetch out the first
 // timestamp of the inner array.
-function lookAheadTimesliceAccessor(timeslices, index) {
-  if (timeslices[index] && timeslices[index].length) {
-    return timeslices[index][0].timestamp;
+function lookAheadTimesliceAccessor(timeslice) {
+  if (timeslice && timeslice.length) {
+    return timeslice[0].timestamp;
   }
 
   throw new Error('Missing entry or timestamp in lookAhead array');
