@@ -109,7 +109,12 @@ export default class LogSlice {
     // Future data is separate from features so we can control independently
     if (lookAheads.length && lookAheadMs > 0) {
       const lookAheadTime = datum.time + lookAheadMs;
-      const lookAheadIndex = findInsertPos(lookAheads, lookAheadTime, INSERT_POSITION.RIGHT, lookAheadTimesliceAccessor);
+      const lookAheadIndex = findInsertPos(
+        lookAheads,
+        lookAheadTime,
+        INSERT_POSITION.RIGHT,
+        lookAheadTimesliceAccessor
+      );
 
       if (lookAheadIndex) {
         this.lookAheads[streamName] = lookAheads[lookAheadIndex - 1];

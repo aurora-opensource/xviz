@@ -5,6 +5,8 @@ export const INSERT_POSITION = {
   RIGHT: 1
 };
 
+const defaultTimestampAccessor = (timeslice, index) => timeslice[index].timestamp;
+
 /**
  * Binary search on sorted timeslices
  * @params {Array} timeslices which elements contain a 'timestamp' property
@@ -13,7 +15,12 @@ export const INSERT_POSITION = {
  * @params {number} timestampAccessor - access the timestamp of the timeslice elements
  * @returns {number} index of insert position
  */
-export function findInsertPos(timeslices, timestamp, insertPosition = INSERT_POSITION.LEFT, timestampAccessor = (timeslice, index) => timeslice[index].timestamp) {
+export function findInsertPos(
+  timeslices,
+  timestamp,
+  insertPosition = INSERT_POSITION.LEFT,
+  timestampAccessor = defaultTimestampAccessor
+) {
   assert(Number.isFinite(timestamp), 'valid timeslice search timestamp');
 
   let lowerBound = 0;
