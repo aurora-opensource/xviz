@@ -36,3 +36,4 @@ import './objects/xviz-object.spec';
 import './objects/xviz-object-collection.spec';
 
 import './utils/worker-utils.spec';
+import './utils/search.spec';

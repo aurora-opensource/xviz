@@ -20,12 +20,10 @@ import memoize from '../utils/memoize';
 import assert from '../utils/assert';
 
 // MEMOIZATION OF LOGSLICE CONSTRUCTOR AND GET METHOD
-const getCurrentLogSliceMemoized = memoize(
-  (streamFilter, lookAheadIndex, ...streamsByReverseTime) => {
-    xvizStats.bump('getCurrentLogSliceMemoized');
-    return new LogSlice(streamFilter, lookAheadIndex, streamsByReverseTime);
-  }
-);
+const getCurrentLogSliceMemoized = memoize((streamFilter, lookAheadMs, ...streamsByReverseTime) => {
+  xvizStats.bump('getCurrentLogSliceMemoized');
+  return new LogSlice(streamFilter, lookAheadMs, streamsByReverseTime);
+});
 
 const getCurrentFrameMemoized = memoize(
   (logSlice, vehiclePose, trackedObjectId, postProcessFrame) => {
@@ -56,7 +54,7 @@ export default class BaseSynchronizer {
 
     this.time = 0;
     this.loResTime = 0;
-    this.lookAheadIndex = 0;
+    this.lookAheadMs = 0;
 
     this.setTime(startTime);
   }
@@ -115,12 +113,12 @@ export default class BaseSynchronizer {
   /**
    * Set the lookAhead time offset.
    *
-   * @param {Number} offset - Seconds into the future
+   * @param {Number} offset - milliseconds into the future
    * @return {LogSynchronizer} - returns itself for chaining
    */
   setLookAheadTimeOffset(offset) {
     // Change the offset time into an index.
-    this.lookAheadIndex = Math.floor(offset * 10);
+    this.lookAheadMs = offset;
     return this;
   }
 
@@ -145,7 +143,7 @@ export default class BaseSynchronizer {
 
     return getCurrentLogSliceMemoized(
       streamFilter,
-      this.lookAheadIndex,
+      this.lookAheadMs,
       ...this._streamsByReverseTime
     );
   }

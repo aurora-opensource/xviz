@@ -14,10 +14,11 @@
 
 import XVIZObject from '../objects/xviz-object';
 import assert from '../utils/assert';
+import {findInsertPos, INSERT_POSITION} from '../utils/search';
 
 // Insert positions
-const LEFT = 0;
-const RIGHT = 1;
+const LEFT = INSERT_POSITION.LEFT;
+const RIGHT = INSERT_POSITION.RIGHT;
 
 // Buffer types
 const UNLIMITED = 0;
@@ -307,34 +308,13 @@ export default class XVIZStreamBuffer {
   }
 
   /**
-   * Binary search on sorted timeslices
+   * Return insert position for timeslice data given a timestamp
    * @params {number} timestamp
    * @params {number} insertPosition - insert to the left or right of the equal element.
    * @returns {number} index of insert position
    */
   _indexOf(timestamp, insertPosition = LEFT) {
-    assert(Number.isFinite(timestamp), 'streambuffer timestamp');
-
     const {timeslices} = this;
-
-    let lowerBound = 0;
-    let upperBound = timeslices.length - 1;
-    let currentIndex;
-    let currentTimestamp;
-
-    while (lowerBound <= upperBound) {
-      currentIndex = ((lowerBound + upperBound) / 2) | 0;
-      currentTimestamp = timeslices[currentIndex].timestamp;
-
-      if (currentTimestamp < timestamp) {
-        lowerBound = currentIndex + 1;
-      } else if (currentTimestamp > timestamp) {
-        upperBound = currentIndex - 1;
-      } else {
-        return insertPosition === LEFT ? currentIndex : currentIndex + 1;
-      }
-    }
-
-    return lowerBound;
+    return findInsertPos(timeslices, timestamp, insertPosition);
   }
 }
