@@ -1,13 +1,24 @@
 import {getXVIZConfig} from '../config/xviz-config';
 import XVIZObject from '../objects/xviz-object';
+import {findInsertPos, INSERT_POSITION} from '../utils/search';
 
 import {getTransformsFromPose} from '../parsers/parse-vehicle-pose';
+
+// lookAheads is an array of arrays, so we need to fetch out the first
+// timestamp of the inner array.
+function lookAheadTimesliceAccessor(timeslice) {
+  if (timeslice && timeslice.length) {
+    return timeslice[0].timestamp;
+  }
+
+  throw new Error('Missing entry or timestamp in lookAhead array');
+}
 
 // LOGSLICE CLASS
 
 // One time slice, one datum from each stream.
 export default class LogSlice {
-  constructor(streamFilter, lookAheadIndex, streamsByReverseTime) {
+  constructor(streamFilter, lookAheadMs, streamsByReverseTime) {
     this.features = {};
     this.variables = {};
     this.pointCloud = null;
@@ -15,7 +26,7 @@ export default class LogSlice {
     this.components = {};
     this.streams = {};
 
-    this.initialize(streamFilter, lookAheadIndex, streamsByReverseTime);
+    this.initialize(streamFilter, lookAheadMs, streamsByReverseTime);
   }
 
   // Extract car data from vehicle_pose and get geoJson for related frames
@@ -72,14 +83,14 @@ export default class LogSlice {
    * Among other things parses XVIZ Object-related info from misc streams and merge into XVIZ
    * feature properties.
    */
-  initialize(streamFilter, lookAheadIndex, streamsByReverseTime) {
+  initialize(streamFilter, lookAheadMs, streamsByReverseTime) {
     // get data if we don't already have that stream && it is not filtered.
     // TODO: make streamFilter a list of filtered streams
     // so it can default to [], and then only exclude if filter.includes(x)
     streamsByReverseTime.forEach(streams => {
       for (const streamName in streams) {
         if (!this.streams[streamName] && this._includeStream(streamFilter, streamName)) {
-          this.addStreamDatum(streams[streamName], streamName, lookAheadIndex, this);
+          this.addStreamDatum(streams[streamName], streamName, lookAheadMs, this);
         }
       }
     });
@@ -88,7 +99,7 @@ export default class LogSlice {
   /**
    * Process a stream and put the appropriate data into
    */
-  addStreamDatum(datum, streamName, lookAheadIndex) {
+  addStreamDatum(datum, streamName, lookAheadMs) {
     this.streams[streamName] = datum;
 
     this.setLabelsOnXVIZObjects(datum.labels);
@@ -96,8 +107,18 @@ export default class LogSlice {
     const {features = [], lookAheads = [], variable, pointCloud = null} = datum;
 
     // Future data is separate from features so we can control independently
-    if (lookAheads.length) {
-      this.lookAheads[streamName] = lookAheads[lookAheadIndex] || [];
+    if (lookAheads.length && lookAheadMs > 0) {
+      const lookAheadTime = datum.time + lookAheadMs;
+      const lookAheadIndex = findInsertPos(
+        lookAheads,
+        lookAheadTime,
+        INSERT_POSITION.RIGHT,
+        lookAheadTimesliceAccessor
+      );
+
+      if (lookAheadIndex) {
+        this.lookAheads[streamName] = lookAheads[lookAheadIndex - 1];
+      }
     }
 
     // Combine data from current datums
