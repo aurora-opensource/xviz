@@ -56,6 +56,12 @@ to the server to change way data is transformed for future requests.
 
 _UML Sequence diagram of viewing a live session with XVIZ_
 
+### Data Transfer - Point In Time
+
+To get a single picture of the world at a specific time the client sends a
+[`transform_point_in_time`](#transform_point_in_time-warning-unstable-feature-) message, and the
+server responds with a single [`state_update`](#state_update) containing a full world snapshot.
+
 ### Reconfiguration
 
 Optionally the unstable [`reconfigure`](#reconfigure-warning-unstable-feature-) message can be sent
@@ -173,12 +179,12 @@ Sent from the client to the server to request part of the given log. The time bo
 and if not present entire log is sent. Using `desired_streams` you can have the server only send
 streams you need, limiting data usage and potentially speeding up backend processing.
 
-| Name                | Type                  | Description                                                               |
-| ------------------- | --------------------- | ------------------------------------------------------------------------- |
-| `id`                | `string`              | identifier used to track request, echo'd back upon completion.            |
-| `start_timestamp`   | `optional<timestamp>` | Where to start transformation, inclusive, if not present use start of log |
-| `end_timestamp`     | `optional<timestamp>` | Where to end transformation, inclusive, if not present use end of log.    |
-| `requested_streams` | `list<string>`        | If non-empty, only send these streams.                                    |
+| Name              | Type                  | Description                                                               |
+| ----------------- | --------------------- | ------------------------------------------------------------------------- |
+| `id`              | `string`              | identifier used to track request, echo'd back upon completion.            |
+| `start_timestamp` | `optional<timestamp>` | Where to start transformation, inclusive, if not present use start of log |
+| `end_timestamp`   | `optional<timestamp>` | Where to end transformation, inclusive, if not present use end of log.    |
+| `desired_streams` | `list<string>`        | If non-empty, only send these streams.                                    |
 
 ### transform_log_done
 
@@ -188,6 +194,19 @@ Sent from the server to the client to indicate the completion of the
 | Name | Type     | Description                                                 |
 | ---- | -------- | ----------------------------------------------------------- |
 | `id` | `string` | identifier passed with the original `transform_log` request |
+
+### transform_point_in_time (WARNING: unstable feature)
+
+Sent from the client to the server to request a snapshot of a single point in time from a log. This
+will contain the latest version of all streams, or the requested subset up to the `query_timestamp`,
+inclusive. Using the `desired_streams` you can have the server only send streams you need, limiting
+data usage and potentially speeding up backend processing.
+
+| Name              | Type           | Description                                                      |
+| ----------------- | -------------- | ---------------------------------------------------------------- |
+| `id`              | `string`       | identifier used to track request, echo'd back upon completion.   |
+| `query_timestamp` | `timestamp`    | The point at time which to get the state of the desired streams. |
+| `desired_streams` | `list<string>` | If non-empty, only send these streams.                           |
 
 ### reconfigure (WARNING: unstable feature)
 

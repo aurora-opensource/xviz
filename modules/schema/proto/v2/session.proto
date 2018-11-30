@@ -78,6 +78,18 @@ message TransformLogDone
 }
 
 
+message TransformPointInTime
+{
+    option (xviz_json_schema) = "session/transform_point_in_time";
+
+    string id = 1;
+
+    double query_timestamp = 2;
+
+    repeated string desired_streams = 3;
+}
+
+
 message Reconfigure
 {
     option (xviz_json_schema) = "session/reconfigure";

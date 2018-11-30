@@ -1,0 +1,11 @@
+{
+  "type": "xviz/transform_point_in_time",
+  "data": {
+    "id": "9a71050b-4143-479e-8700-36ec2ed8670a",
+    "query_timestamp": 1.234,
+    "desired_streams": [
+      "/a",
+      "/b"
+    ]
+  }
+}
