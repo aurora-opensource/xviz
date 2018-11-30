@@ -11,24 +11,52 @@
     "profile": {
       "type": "string"
     },
-    "session_type": {
-      "type": "string",
-      "enum": [
-        "live",
-        "log",
-        "unbuffered_log"
-      ]
-    },
+    "session_type": {},
     "message_format": {
       "type": "string",
       "enum": [
         "json",
         "binary"
       ]
+    },
+    "log": {
     }
   },
   "required": [
     "version"
+  ],
+  "oneOf": [
+    {
+      "properties":  {
+        "session_type": {
+          "type": "string",
+          "enum": [
+            "log"
+          ]
+        },
+        "log": {
+          "pattern": ".*"
+        }
+      },
+      "required": [
+        "version",
+        "log"
+      ]
+    },
+    {
+      "properties":  {
+        "session_type": {
+          "type": "string",
+          "enum": [
+            "live"
+          ]
+        }
+      },
+      "required": [
+        "version"
+      ],
+      "not": { "required": [ "log" ] }
+    }
   ],
   "additionalProperties": false
 }

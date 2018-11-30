@@ -1,0 +1,15 @@
+{
+  "id": "https://xviz.org/schema/session/transform_log_done.json",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "XVIZ Session Transform Log Done",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "id"
+  ],
+  "additionalProperties": false
+}
