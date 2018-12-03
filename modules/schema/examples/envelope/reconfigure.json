@@ -1,0 +1,13 @@
+{
+  "type": "xviz/reconfigure",
+  "data": {
+    "update_type": "full",
+    "config_update": {
+      "base": {
+        "subprop": "value",
+        "otherprop": 5,
+        "array": [1, 2, 3]
+      }
+    }
+  }
+}

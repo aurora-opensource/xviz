@@ -35,7 +35,10 @@ The valid XVIZ message types are:
 
 - `session_start` - Sent from the client upon connection
 - `session_metadata` - Sent from the server upon connection or reconfiguration
-- `state_update` - Sent for messages containing primitives and variables
+- `transform_log` - Sent from client to the server to request data
+- `state_update` - Sent from the server to the client, contains XVIZ the data
+- `transform_log_done` - Sent from server to the client to indicate completion
+- `error` - Sent from server to client indicate a failure of some kind
 
 ### Examples
 

@@ -47,11 +47,59 @@
       "properties":  {
         "type": {
           "enum": [
+            "xviz/transform_log"
+          ]
+        },
+        "data": {
+          "$ref": "https://xviz.org/schema/session/transform_log.json"
+        }
+      }
+    },
+    {
+      "properties":  {
+        "type": {
+          "enum": [
             "xviz/state_update"
           ]
         },
         "data": {
           "$ref": "https://xviz.org/schema/session/state_update.json"
+        }
+      }
+    },
+    {
+      "properties":  {
+        "type": {
+          "enum": [
+            "xviz/transform_log_done"
+          ]
+        },
+        "data": {
+          "$ref": "https://xviz.org/schema/session/transform_log_done.json"
+        }
+      }
+    },
+    {
+      "properties":  {
+        "type": {
+          "enum": [
+            "xviz/reconfigure"
+          ]
+        },
+        "data": {
+          "$ref": "https://xviz.org/schema/session/reconfigure.json"
+        }
+      }
+    },
+    {
+      "properties":  {
+        "type": {
+          "enum": [
+            "xviz/error"
+          ]
+        },
+        "data": {
+          "$ref": "https://xviz.org/schema/session/error.json"
         }
       }
     }
