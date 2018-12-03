@@ -36,6 +36,22 @@ message Start
     }
 
     MessageFormat message_format = 4;
+
+    string log = 5;
+}
+
+
+message TransformLog
+{
+    option (xviz_json_schema) = "session/transform_log";
+
+    string id = 1;
+
+    double start_timestamp = 2;
+
+    double end_timestamp = 3;
+
+    repeated string desired_streams = 4;
 }
 
 

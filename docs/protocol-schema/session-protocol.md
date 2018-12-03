@@ -4,6 +4,18 @@ XVIZ can be used to visualize data from a running system or logged data. In this
 connects to a server and establishes a session. At the start of the session the available streams
 and parameters are setup.
 
+## Server Types
+
+XVIZ servers can exist in a variety of types that effect what transforms they can do on data, and
+whether than be reconfigured. Typical types are:
+
+- **dynamic-log** - these transform raw underlying data into XVIZ on demand, these can respond to
+  all command types.
+- **static-log** - serving static XVIZ data from a storage location, these cannot respond to any
+  reconfigure commands
+- **live** - embedded in a running system, these typically cannot respond to any transform commands,
+  but can be reconfigured.
+
 ## Session Message Flow
 
 An XVIZ client and server establish a session that is focused on data from a single log or live
@@ -79,19 +91,28 @@ will start streaming data to the client as soon as it can.
 
 Common Parameters:
 
-| Name             | Type               | Description                                                                    |
-| ---------------- | ------------------ | ------------------------------------------------------------------------------ |
-| `version`        | `string`           | Protocol version, for example `2.0.0`                                          |
-| `profile`        | `string`           | The backend configuration, defines what streams you will get.                  |
-| `session_type`   | `string`           | Type of session being opened up.                                               |
-| `message_format` | `string`           | Format the data will be represented in.                                        |
-| `log`            | `optional<string>` | When the `session_type` = `log`, this parameters identifies which log to open. |
+| Name             | Type               | Description                                                                                   |
+| ---------------- | ------------------ | --------------------------------------------------------------------------------------------- |
+| `version`        | `string`           | Protocol version, for example `2.0.0`                                                         |
+| `profile`        | `optional<string>` | The backend configuration, defines the content, type, and selections of streams you will get. |
+| `session_type`   | `optional<string>` | Type of session being opened up, default is `log`                                             |
+| `message_format` | `optional<string>` | Format the data will be represented in, default value is `json`.                              |
+| `log`            | `optional<string>` | When the `session_type` = `log`, this parameters identifies which log to open.                |
+
+**errors** The follow fields do not accept all parameters,
+
+- `profile` - if the value is not supported an [`error`](#error) message will be sent. If the server
+  is a [static-log](#server-types) type it will continue to send data, otherwise the connection
+  closed.
+- `session_type` - if the type is not supported an [`error`](#error) message will be sent and the
+  connection closed.
+- `message_format` - if the type is not supported an [`error`](#error) message will be sent and the
+  connection closed.
 
 **session_type** - valid values:
 
 - `live` - send data in real time
 - `log` - show data from a log
-- `unbuffered_log` - data is sent back in at the same rate it was logged
 
 **message_format** - valid values:
 
@@ -106,6 +127,7 @@ in messages, the cameras, and the Declarative UI panels.
 | Name             | Type                              | Description                                                                                                                                                                                                                                        |
 | ---------------- | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `version`        | `string`                          | Protocol version, for example `2.0.0`                                                                                                                                                                                                              |
+| `profile`        | `string`                          | The configuration, used to generate the data                                                                                                                                                                                                       |
 | `streams`        | `map<stream_id, stream_metadata>` | Stream information                                                                                                                                                                                                                                 |
 | `cameras`        | `map<string, camera_info>`        | Camera information indexed by camera name.                                                                                                                                                                                                         |
 | `stream_aliases` | `map<stream_id, stream_id>`       | Map from an old to new stream names so the "schema" of streams can evolve without the client code being changed. Even though this will be used infrequently having it in place allows seamless backend change without having to update the client. |
@@ -176,15 +198,15 @@ has just the single `/object/polygon` containing a
 ### transform_log
 
 Sent from the client to the server to request part of the given log. The time bounds are optional,
-and if not present entire log is sent. Using `desired_streams` you can have the server only send
+and if not present entire log is sent. Using `requested_streams` you can have the server only send
 streams you need, limiting data usage and potentially speeding up backend processing.
 
-| Name              | Type                  | Description                                                               |
-| ----------------- | --------------------- | ------------------------------------------------------------------------- |
-| `id`              | `string`              | identifier used to track request, echo'd back upon completion.            |
-| `start_timestamp` | `optional<timestamp>` | Where to start transformation, inclusive, if not present use start of log |
-| `end_timestamp`   | `optional<timestamp>` | Where to end transformation, inclusive, if not present use end of log.    |
-| `desired_streams` | `list<string>`        | If non-empty, only send these streams.                                    |
+| Name                | Type                  | Description                                                               |
+| ------------------- | --------------------- | ------------------------------------------------------------------------- |
+| `id`                | `string`              | identifier used to track request, echo'd back upon completion.            |
+| `start_timestamp`   | `optional<timestamp>` | Where to start transformation, inclusive, if not present use start of log |
+| `end_timestamp`     | `optional<timestamp>` | Where to end transformation, inclusive, if not present use end of log.    |
+| `requested_streams` | `list<string>`        | If non-empty, only send these streams.                                    |
 
 ### transform_log_done
 
@@ -199,14 +221,14 @@ Sent from the server to the client to indicate the completion of the
 
 Sent from the client to the server to request a snapshot of a single point in time from a log. This
 will contain the latest version of all streams, or the requested subset up to the `query_timestamp`,
-inclusive. Using the `desired_streams` you can have the server only send streams you need, limiting
+inclusive. Using the `requested_streams` you can have the server only send streams you need, limiting
 data usage and potentially speeding up backend processing.
 
-| Name              | Type           | Description                                                      |
-| ----------------- | -------------- | ---------------------------------------------------------------- |
-| `id`              | `string`       | identifier used to track request, echo'd back upon completion.   |
-| `query_timestamp` | `timestamp`    | The point at time which to get the state of the desired streams. |
-| `desired_streams` | `list<string>` | If non-empty, only send these streams.                           |
+| Name                | Type           | Description                                                      |
+| ------------------- | -------------- | ---------------------------------------------------------------- |
+| `id`                | `string`       | identifier used to track request, echo'd back upon completion.   |
+| `query_timestamp`   | `timestamp`    | The point at time which to get the state of the desired streams. |
+| `requested_streams` | `list<string>` | If non-empty, only send these streams.                           |
 
 ### reconfigure (WARNING: unstable feature)
 
