@@ -55,6 +55,20 @@ message TransformLog
 }
 
 
+message TransformLog
+{
+    option (xviz_json_schema) = "session/transform_log";
+
+    string id = 1;
+
+    double start_timestamp = 2;
+
+    double end_timestamp = 3;
+
+    repeated string desired_streams = 4;
+}
+
+
 message StateUpdate
 {
     option (xviz_json_schema) = "session/state_update";
@@ -77,6 +91,18 @@ message TransformLogDone
     option (xviz_json_schema) = "session/transform_log_done";
 
     string id = 1;
+}
+
+
+message TransformPointInTime
+{
+    option (xviz_json_schema) = "session/transform_point_in_time";
+
+    string id = 1;
+
+    double query_timestamp = 2;
+
+    repeated string desired_streams = 3;
 }
 
 
