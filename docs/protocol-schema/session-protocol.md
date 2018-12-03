@@ -221,8 +221,8 @@ Sent from the server to the client to indicate the completion of the
 
 Sent from the client to the server to request a snapshot of a single point in time from a log. This
 will contain the latest version of all streams, or the requested subset up to the `query_timestamp`,
-inclusive. Using the `requested_streams` you can have the server only send streams you need, limiting
-data usage and potentially speeding up backend processing.
+inclusively. Using the `requested_streams` you can have the server only send streams you need,
+limiting data usage and potentially speeding up backend processing.
 
 | Name                | Type           | Description                                                      |
 | ------------------- | -------------- | ---------------------------------------------------------------- |
