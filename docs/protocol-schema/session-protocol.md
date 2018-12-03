@@ -1,45 +1,127 @@
 # Session Protocol Specification
 
-XVIZ can be used to visualize data from a running system. In this contexts a client connects to a
-server and establishes a session. At the start of the session the available streams and parameters
-are setup.
+XVIZ can be used to visualize data from a running system or logged data. In this contexts a client
+connects to a server and establishes a session. At the start of the session the available streams
+and parameters are setup.
+
+## Server Types
+
+XVIZ servers can exist in a variety of types that effect what transforms they can do on data, and
+whether than be reconfigured. Typical types are:
+
+- **dynamic-log** - these transform raw underlying data into XVIZ on demand, these can respond to
+  all command types.
+- **static-log** - serving static XVIZ data from a storage location, these cannot respond to any
+  reconfigure commands
+- **live** - embedded in a running system, these typically cannot respond to any transform commands,
+  but can be reconfigured.
+
+## Session Message Flow
+
+An XVIZ client and server establish a session that is focused on data from a single log or live
+scene. A session is first initiated by a client with some parameters, to which the server responds
+with metadata. Then either streaming or on demand data transfer beings. Optionally clients can use
+the unstable reconfiguration feature to change how the server is transforming data for the client.
+
+The session protocol is currently defined, and designed, to operator over a WebSocket, or similar
+reliable, in order, datagram based communications channel.
+
+### Initialization
+
+Each session is started by a client connecting to the server, in the WebSocket case this involves an
+HTTP GET request that is upgraded by the server to a persistent WebSocket connection. Termination of
+the connection terminates the session.
+
+After connection is established client starts by sending the [`start`](#start) message, which sets
+the type of session and various other parameters. In the WebSocket case you can send the
+[`start`](#start) properties as URL parameters eliminating the need to send the message. The server
+responds with a [`metadata`](#metadata) message that contains various information about the XVIZ
+data the server can provide.
+
+![Session Initialization Sequence](./images/session-init-sequence.png)
+
+_UML Sequence diagram of an XVIZ session initialization_
+
+### Data Transfer - Live
+
+Upon start of a live session the server will immediately, and continuously send the client
+[`state_update`](#state_update) messages at an undefined rate.
+
+Optionally the unstable [`reconfigure`](#reconfigure-warning-unstable-feature-) message can be sent
+to the server to change future data send to the server.
+
+![Session Log Sequence](./images/session-log-sequence.png)
+
+_UML Sequence diagram of transforming a log with XVIZ_
+
+### Data Transfer - Logs
+
+To request log data the client starts with a [`transform_log`](#transform_log) request that
+specifies the time range of the log to send back along with a request id. The server then responds
+with an indeterminate number of [`state_update`](#state_update) messages. When complete it sends the
+`done` message tagged with given request id.
+
+Optionally the unstable [`reconfigure`](#reconfigure-warning-unstable-feature-) message can be sent
+to the server to change way data is transformed for future requests.
+
+![Session Live Sequence](./images/session-live-sequence.png)
+
+_UML Sequence diagram of viewing a live session with XVIZ_
+
+### Reconfiguration
+
+Optionally the unstable [`reconfigure`](#reconfigure-warning-unstable-feature-) message can be sent
+to the server to change way data is transformed for future requests. This can happen any time after
+the connection has been initialized.
 
 ## Session Message Types
 
 These describe client server communication to start and manage sessions.
 
-### Session Start (from Client)
+### start
 
 Sent by the client to the service or encoded as URL parameters. When the server gets this message it
 will start streaming data to the client as soon as it can.
 
 Common Parameters:
 
-| Name             | Type     | Description                                                   |
-| ---------------- | -------- | ------------------------------------------------------------- |
-| `version`        | `string` | Protocol version, for example `2.0.0`                         |
-| `profile`        | `string` | The backend configuration, defines what streams you will get. |
-| `session_type`   | `string` | Type of session being opened up.                              |
-| `message_format` | `string` | Format the data will be represented in.                       |
+| Name             | Type               | Description                                                                                   |
+| ---------------- | ------------------ | --------------------------------------------------------------------------------------------- |
+| `version`        | `string`           | Protocol version, for example `2.0.0`                                                         |
+| `profile`        | `optional<string>` | The backend configuration, defines the content, type, and selections of streams you will get. |
+| `session_type`   | `optional<string>` | Type of session being opened up, default is `log`                                             |
+| `message_format` | `optional<string>` | Format the data will be represented in, default value is `json`.                              |
+| `log`            | `optional<string>` | When the `session_type` = `log`, this parameters identifies which log to open.                |
+
+**errors** The follow fields do not accept all parameters,
+
+- `profile` - if the value is not supported an [`error`](#error) message will be sent. If the server
+  is a [static-log](#server-types) type it will continue to send data, otherwise the connection
+  closed.
+- `session_type` - if the type is not supported an [`error`](#error) message will be sent and the
+  connection closed.
+- `message_format` - if the type is not supported an [`error`](#error) message will be sent and the
+  connection closed.
 
 **session_type** - valid values:
 
 - `live` - send data in real time
 - `log` - show data from a log
-- `unbuffered_log` - data is sent back in at the same rate it was logged
 
 **message_format** - valid values:
 
 - `json` - JSON types encoded as UT8 strings.
 - `binary` - Our GLB based binary container format.
 
-### Session Metadata (to Client)
+### metadata
 
-Sent to client upon connection
+Sent by server to the client upon connection. Contains information about the XVIZ streams to expect
+in messages, the cameras, and the Declarative UI panels.
 
 | Name             | Type                              | Description                                                                                                                                                                                                                                        |
 | ---------------- | --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `version`        | `string`                          | Protocol version, for example `2.0.0`                                                                                                                                                                                                              |
+| `profile`        | `string`                          | The configuration, used to generate the data                                                                                                                                                                                                       |
 | `streams`        | `map<stream_id, stream_metadata>` | Stream information                                                                                                                                                                                                                                 |
 | `cameras`        | `map<string, camera_info>`        | Camera information indexed by camera name.                                                                                                                                                                                                         |
 | `stream_aliases` | `map<stream_id, stream_id>`       | Map from an old to new stream names so the "schema" of streams can evolve without the client code being changed. Even though this will be used infrequently having it in place allows seamless backend change without having to update the client. |
@@ -62,9 +144,17 @@ created.
 
 **vehicle_info** - currently unspecified
 
+### error
+
+Sent to clients if there is any issue with the server system.
+
+| Name      | Type     | Description               |
+| --------- | -------- | ------------------------- |
+| `message` | `string` | Text describing the error |
+
 ## Data Messages
 
-### State Update
+### state_update
 
 This is a collection of stream sets for all extractor output.
 
@@ -99,14 +189,36 @@ has just the single `/object/polygon` containing a
 
 ## Request Messages
 
-### Reconfigure (WARNING: unstable feature)
+### transform_log
+
+Sent from the client to the server to request part of the given log. The time bounds are optional,
+and if not present entire log is sent. Using `desired_streams` you can have the server only send
+streams you need, limiting data usage and potentially speeding up backend processing.
+
+| Name                | Type                  | Description                                                               |
+| ------------------- | --------------------- | ------------------------------------------------------------------------- |
+| `id`                | `string`              | identifier used to track request, echo'd back upon completion.            |
+| `start_timestamp`   | `optional<timestamp>` | Where to start transformation, inclusive, if not present use start of log |
+| `end_timestamp`     | `optional<timestamp>` | Where to end transformation, inclusive, if not present use end of log.    |
+| `requested_streams` | `list<string>`        | If non-empty, only send these streams.                                    |
+
+### transform_log_done
+
+Sent from the server to the client to indicate the completion of the
+[`transform_log`](#transform_log) request. This is the only indicate that the request has completed.
+
+| Name | Type     | Description                                                 |
+| ---- | -------- | ----------------------------------------------------------- |
+| `id` | `string` | identifier passed with the original `transform_log` request |
+
+### reconfigure (WARNING: unstable feature)
 
 Reconfigure messages allow for a client to change the configuration of a XVIZ server, affecting all
 future requests for data from the server. This in turn enables a client to enable or disable
 expensive to compute or transmit features.
 
 A typical source for reconfigure messages would be a user selecting a new value in a
-[declarative ui select component](/docs/protocol-schema/declarative-ui.md#select-warning-unstable-feature-).
+[declarative ui select component](/docs/declarative-ui/components.md#select-warning-unstable-feature-).
 Which would send a `delta` reconfigure message to the server.
 
 | Name            | Type                   | Description                                       |
@@ -116,7 +228,7 @@ Which would send a `delta` reconfigure message to the server.
 
 ## Core Types
 
-### Stream Metadata
+### stream_metadata
 
 Metadata provides information about the structure of a stream. Ideally redundant information is
 removed from streams and put into metadata packets that are sent at the start of streaming or when a
@@ -172,7 +284,7 @@ Primitive types:
 - `stadium`
 - `text`
 
-### Camera Info
+### camera_info
 
 Everything you need to display and deeply integrate video into a 3D application.
 
@@ -187,7 +299,7 @@ Everything you need to display and deeply integrate video into a 3D application.
 | `rectification_projection` | `3x3 float matrix` | Transform raw pixel coordinates to rectified coordinates (use in a shader, reference). Also called a "homography".  |
 | `gl_projection`            | `4x4 float matrix` | Goes from 3D world coordinates to rectified image coordinates. Use with OpenGL to draw 3D data on top of the image. |
 
-### UI Panel Info
+### ui_panel_info
 
 UI configuration that comes with the data explaining how best to display it.
 
@@ -197,4 +309,4 @@ UI configuration that comes with the data explaining how best to display it.
 | `needed_streams` | `list<stream_id>`        | What streams are needed to populate this panel. |
 | `config`         | `string, declarative ui` | Declarative UI panel configuration              |
 
-See [declarative ui specification](/docs/protocol-schema/declarative-ui.md) to learn more.
+See [declarative ui specification](/docs/declarative-ui/overview.md) to learn more.

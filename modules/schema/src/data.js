@@ -52,11 +52,14 @@ import primitivesPolylineSchemaJson from '../primitives/polyline.schema.json';
 import primitivesStadiumSchemaJson from '../primitives/stadium.schema.json';
 import primitivesTextSchemaJson from '../primitives/text.schema.json';
 import sessionCameraInfoSchemaJson from '../session/camera_info.schema.json';
+import sessionErrorSchemaJson from '../session/error.schema.json';
 import sessionMetadataSchemaJson from '../session/metadata.schema.json';
 import sessionReconfigureSchemaJson from '../session/reconfigure.schema.json';
 import sessionStartSchemaJson from '../session/start.schema.json';
 import sessionStateUpdateSchemaJson from '../session/state_update.schema.json';
 import sessionStreamMetadataSchemaJson from '../session/stream_metadata.schema.json';
+import sessionTransformLogDoneSchemaJson from '../session/transform_log_done.schema.json';
+import sessionTransformLogSchemaJson from '../session/transform_log.schema.json';
 import sessionUiPanelInfoSchemaJson from '../session/ui_panel_info.schema.json';
 import styleClassSchemaJson from '../style/class.schema.json';
 import styleColorSchemaJson from '../style/_color.schema.json';
@@ -103,11 +106,14 @@ export const SCHEMA_DATA = {
   'primitives/stadium.schema.json': primitivesStadiumSchemaJson,
   'primitives/text.schema.json': primitivesTextSchemaJson,
   'session/camera_info.schema.json': sessionCameraInfoSchemaJson,
+  'session/error.schema.json': sessionErrorSchemaJson,
   'session/metadata.schema.json': sessionMetadataSchemaJson,
   'session/reconfigure.schema.json': sessionReconfigureSchemaJson,
   'session/start.schema.json': sessionStartSchemaJson,
   'session/state_update.schema.json': sessionStateUpdateSchemaJson,
   'session/stream_metadata.schema.json': sessionStreamMetadataSchemaJson,
+  'session/transform_log_done.schema.json': sessionTransformLogDoneSchemaJson,
+  'session/transform_log.schema.json': sessionTransformLogSchemaJson,
   'session/ui_panel_info.schema.json': sessionUiPanelInfoSchemaJson,
   'style/class.schema.json': styleClassSchemaJson,
   'style/_color.schema.json': styleColorSchemaJson,

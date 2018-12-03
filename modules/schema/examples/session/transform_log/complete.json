@@ -1,0 +1,9 @@
+{
+  "id": "9a71050b-4143-479e-8700-36ec2ed8670a",
+  "end_timestamp": 1.234,
+  "start_timestamp": 5.314,
+  "desired_streams": [
+    "/a",
+    "/b"
+  ]
+}

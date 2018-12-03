@@ -36,6 +36,22 @@ message Start
     }
 
     MessageFormat message_format = 4;
+
+    string log = 5;
+}
+
+
+message TransformLog
+{
+    option (xviz_json_schema) = "session/transform_log";
+
+    string id = 1;
+
+    double start_timestamp = 2;
+
+    double end_timestamp = 3;
+
+    repeated string desired_streams = 4;
 }
 
 
@@ -53,6 +69,14 @@ message StateUpdate
     UpdateType update_type = 1;
 
     repeated core.StreamSet updates = 2;
+}
+
+
+message TransformLogDone
+{
+    option (xviz_json_schema) = "session/transform_log_done";
+
+    string id = 1;
 }
 
 
@@ -86,6 +110,14 @@ message Metadata
     map<string, string> stream_aliases = 4;
 
     map<string, UIPanelInfo> ui_config = 5;
+}
+
+
+message Error
+{
+    option (xviz_json_schema) = "session/error";
+
+    string message = 1;
 }
 
 

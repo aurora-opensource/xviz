@@ -1,0 +1,28 @@
+{
+  "id": "https://xviz.org/schema/session/transform_log.json",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "XVIZ Session Transform Log",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "start_timestamp": {
+      "type": "number"
+    },
+    "end_timestamp": {
+      "type": "number"
+    },
+    "desired_streams": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "additionalItems": false
+    }
+  },
+  "required": [
+    "id"
+  ],
+  "additionalProperties": false
+}
