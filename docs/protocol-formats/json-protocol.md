@@ -33,8 +33,8 @@ Known namespaces:
 
 The valid XVIZ message types are:
 
-- `session_start` - Sent from the client upon connection
-- `session_metadata` - Sent from the server upon connection or reconfiguration
+- `start` - Sent from the client upon connection
+- `metadata` - Sent from the server upon connection or reconfiguration
 - `transform_log` - Sent from client to the server to request data
 - `state_update` - Sent from the server to the client, contains XVIZ the data
 - `transform_log_done` - Sent from server to the client to indicate completion
@@ -46,7 +46,7 @@ The start message sent from the server to the client:
 
 ```
 {
-    "type": "xviz/session_start",
+    "type": "xviz/start",
     "data": {
         "version": "2.0.0",
         "session_type": "live",
@@ -59,7 +59,7 @@ The metadata message, the first message sent from the server to the client:
 
 ```
 {
-    "type": "xviz/session_metadata",
+    "type": "xviz/metadata",
     "data": {
         "version": "2.0.0",
         ...
