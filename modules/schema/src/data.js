@@ -60,6 +60,7 @@ import sessionStateUpdateSchemaJson from '../session/state_update.schema.json';
 import sessionStreamMetadataSchemaJson from '../session/stream_metadata.schema.json';
 import sessionTransformLogDoneSchemaJson from '../session/transform_log_done.schema.json';
 import sessionTransformLogSchemaJson from '../session/transform_log.schema.json';
+import sessionTransformPointInTimeSchemaJson from '../session/transform_point_in_time.schema.json';
 import sessionUiPanelInfoSchemaJson from '../session/ui_panel_info.schema.json';
 import styleClassSchemaJson from '../style/class.schema.json';
 import styleColorSchemaJson from '../style/_color.schema.json';
@@ -114,6 +115,7 @@ export const SCHEMA_DATA = {
   'session/stream_metadata.schema.json': sessionStreamMetadataSchemaJson,
   'session/transform_log_done.schema.json': sessionTransformLogDoneSchemaJson,
   'session/transform_log.schema.json': sessionTransformLogSchemaJson,
+  'session/transform_point_in_time.schema.json': sessionTransformPointInTimeSchemaJson,
   'session/ui_panel_info.schema.json': sessionUiPanelInfoSchemaJson,
   'style/class.schema.json': styleClassSchemaJson,
   'style/_color.schema.json': styleColorSchemaJson,

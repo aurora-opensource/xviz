@@ -102,6 +102,18 @@
           "$ref": "https://xviz.org/schema/session/error.json"
         }
       }
+    },
+    {
+      "properties":  {
+        "type": {
+          "enum": [
+            "xviz/transform_point_in_time"
+          ]
+        },
+        "data": {
+          "$ref": "https://xviz.org/schema/session/transform_point_in_time.json"
+        }
+      }
     }
   ],
   "required": [

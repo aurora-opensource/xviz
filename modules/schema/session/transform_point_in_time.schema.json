@@ -1,0 +1,26 @@
+{
+  "id": "https://xviz.org/schema/session/transform_point_in_time.json",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "XVIZ Session Transform Point In Time",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "query_timestamp": {
+      "type": "number"
+    },
+    "desired_streams": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "additionalItems": false
+    }
+  },
+  "required": [
+    "id",
+    "query_timestamp"
+  ],
+  "additionalProperties": false
+}
