@@ -3,14 +3,14 @@ const Ajv = require('ajv');
 
 import {SCHEMA_DATA} from './data';
 
-class ValidationError extends Error {
+export class ValidationError extends Error {
   constructor(...args) {
     super(...args);
     Error.captureStackTrace(this, ValidationError);
   }
 }
 
-export default class XVIZValidator {
+export class XVIZValidator {
   constructor() {
     this.ajv = newAjv();
 
