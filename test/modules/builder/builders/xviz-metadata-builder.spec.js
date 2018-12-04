@@ -111,7 +111,10 @@ test('XVIZMetadataBuilder#build-with-pose', t => {
     .stream('/test/stream')
     .category('primitive')
     .type('polygon')
-    .pose({x: 1, y: 2, z: 3});
+    .pose({x: 1, y: 2, z: 3})
+    .stream('/test/stream/future')
+    .category('future_instance')
+    .type('polygon');
 
   const metadata = xb.getMetadata();
 
@@ -124,6 +127,10 @@ test('XVIZMetadataBuilder#build-with-pose', t => {
         category: 'primitive',
         primitive_type: 'polygon',
         transform: new Matrix4([1, 0, -0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 2, 3, 1])
+      },
+      '/test/stream/future': {
+        category: 'future_instance',
+        primitive_type: 'polygon'
       }
     },
     log_info: {
