@@ -15,6 +15,7 @@
 // Note: XVIZ data structures use snake_case
 /* eslint-disable camelcase*/
 import {_Pose as Pose, Matrix4} from 'math.gl';
+import {CATEGORY} from './constant';
 
 /* global console */
 /* eslint-disable no-console */
@@ -171,9 +172,15 @@ export default class XVIZMetadataBuilder {
         streamData.transform = transform;
       }
 
-      if (streamData.category === 'primitive') {
+      if (
+        streamData.category === CATEGORY.primitive ||
+        streamData.category === CATEGORY.future_instance
+      ) {
         streamData.primitive_type = this.tmp_type;
-      } else if (streamData.category === 'variable' || streamData.category === 'time_series') {
+      } else if (
+        streamData.category === CATEGORY.variable ||
+        streamData.category === CATEGORY.time_series
+      ) {
         streamData.scalar_type = this.tmp_type;
       }
 
