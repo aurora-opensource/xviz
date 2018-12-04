@@ -11,7 +11,7 @@ XVIZ protocol and utility libraries.
 To build this repository you need:
 
 - Node.js, tested with 8.11.3, compatible with 8.x
-- Yarn, tested with 1.7.0, compatible with 1.x
+- Yarn, tested with 1.10.0, compatible with 1.x
 
 To install dependencies, run:
 
