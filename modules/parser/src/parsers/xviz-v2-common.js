@@ -43,8 +43,15 @@ export function getPrimitiveData(primitiveObject) {
   const {currentMajorVersion} = getXVIZSettings();
 
   if (currentMajorVersion === 1) {
-    if (primitiveObject instanceof Array && primitiveObject.length > 0) {
-      return {type: primitiveObject[0].type, primitives: primitiveObject};
+    if (primitiveObject instanceof Array) {
+      if (primitiveObject.length === 0) {
+        // The empty array implies 'no data' for this object, which is distinct
+        // from 'absence of data' which would happen if there was not primitive entry at all
+        return {type: null, primitives: primitiveObject};
+      } else if (primitiveObject.length > 0) {
+        // This is populated primitive data
+        return {type: primitiveObject[0].type, primitives: primitiveObject};
+      }
     }
   }
 
