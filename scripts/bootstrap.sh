@@ -5,6 +5,8 @@ echo 'Bootstrapping xviz, installing in all directories'
 
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
 # install dependencies
 yarn
 
