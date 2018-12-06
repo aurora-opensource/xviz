@@ -52,8 +52,10 @@ const TransitionTable = Object.freeze({
 
   CONNECTED: {
     START: msg => {
-      if (msg.session_type === 'live') {
-        return SessionState.LIVE_SESSION_INITIALIZING;
+      if (msg) {
+        if (msg.session_type === 'live') {
+          return SessionState.LIVE_SESSION_INITIALIZING;
+        }
       }
       return SessionState.LOG_SESSION_INITIALIZING;
     }
@@ -90,15 +92,16 @@ const TransitionTable = Object.freeze({
 // server is sending the right messages, in the right order, and that are
 // contain valid data.
 export class XVIZSessionValidator {
-  constructor() {
+  constructor(options = {verbose: false}) {
+    this.options = options;
     this.msgValidator = new XVIZValidator();
+    this.state = SessionState.DISCONNECTED;
+    this.resetState();
+  }
+
+  onConnect() {
     this.state = SessionState.CONNECTED;
-    this.stats = {
-      messages: {},
-      validationErrors: {},
-      stateErrors: {}
-    };
-    this.lastMessage = null;
+    this.resetState();
   }
 
   onStart(msg) {
@@ -126,7 +129,7 @@ export class XVIZSessionValidator {
   }
 
   // Denote the connection has been closed
-  close() {
+  onClose() {
     this.state = SessionState.DISCONNECTED;
 
     if (this.lastMessage !== MessageTypes.ERROR) {
@@ -156,7 +159,24 @@ export class XVIZSessionValidator {
       this.msgValidator.validate(schemaName, msg);
     } catch (e) {
       if (e instanceof ValidationError) {
-        this.stats.validationErrors[msgType] = this.stats.validationErrors[msgType] || 1;
+        // Gather unique errors per item
+        const errMsg = e.toString();
+        let uniqueErrors = this.stats.uniqueErrors[msgType];
+        const newError = uniqueErrors === undefined;
+
+        if (newError) {
+          uniqueErrors = {};
+          uniqueErrors[errMsg] = 1;
+          this.stats.uniqueErrors[msgType] = uniqueErrors;
+        } else {
+          uniqueErrors[errMsg] = uniqueErrors[errMsg] + 1 || 1;
+        }
+
+        this.stats.validationErrors[msgType] = this.stats.validationErrors[msgType] + 1 || 1;
+
+        if (newError && this.options.invalidCallback) {
+          this.options.invalidCallback(msgType, e, msg);
+        }
       } else {
         throw e;
       }
@@ -183,5 +203,15 @@ export class XVIZSessionValidator {
     } else {
       this.state = nextState;
     }
+  }
+
+  resetState() {
+    this.stats = {
+      messages: {},
+      validationErrors: {},
+      uniqueErrors: {},
+      stateErrors: {}
+    };
+    this.lastMessage = null;
   }
 }

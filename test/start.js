@@ -40,7 +40,11 @@ moduleAlias.addAliases({
   '@xviz/schema':
     mode === 'dist'
       ? resolve(__dirname, '../modules/schema/dist/es5')
-      : resolve(__dirname, '../modules/schema/src')
+      : resolve(__dirname, '../modules/schema/src'),
+  '@xviz/tool':
+    mode === 'dist'
+      ? resolve(__dirname, '../modules/tool/dist/es5')
+      : resolve(__dirname, '../modules/tool/src')
 });
 
 switch (mode) {
