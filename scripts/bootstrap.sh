@@ -5,6 +5,8 @@ echo 'Bootstrapping xviz, installing in all directories'
 
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
 # install dependencies
 yarn
 
@@ -26,3 +28,9 @@ for D in *; do (
 
 # build the submodules
 npm run build
+
+# Setup KITTI converter JS dependencies
+(cd "${SCRIPT_DIR}/../examples/converters/kitti" && yarn --check-files)
+
+# Setup XVIZ server JS dependencies
+(cd "${SCRIPT_DIR}/../examples/server" && yarn --check-files)
