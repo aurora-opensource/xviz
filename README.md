@@ -31,7 +31,6 @@ $ ./scripts/download-kitti-data.sh
 $ ./scripts/run-kitti-example.sh
 ```
 
-
 ### Test
 
 Run tests under Node.js:
