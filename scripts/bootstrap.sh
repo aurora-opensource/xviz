@@ -26,3 +26,9 @@ for D in *; do (
 
 # build the submodules
 npm run build
+
+# Setup KITTI converter JS dependencies
+(cd "${SCRIPT_DIR}/../examples/converters/kitti" && yarn --check-files)
+
+# Setup XVIZ server JS dependencies
+(cd "${SCRIPT_DIR}/../examples/server" && yarn --check-files)

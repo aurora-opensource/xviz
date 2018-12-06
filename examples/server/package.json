@@ -1,0 +1,12 @@
+{
+  "name": "xviz-demo-server",
+  "version": "0.1.0",
+  "scripts": {
+    "start": "node ./index.js"
+  },
+  "dependencies": {
+    "@xviz/parser": "../../../xviz/modules/parser",
+    "argparse": "^1.0.10",
+    "ws": "^5.2.1"
+  }
+}

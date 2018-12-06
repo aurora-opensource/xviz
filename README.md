@@ -1,6 +1,6 @@
 _Uber Confidential Information_
 
-# xviz
+# XVIZ
 
 XVIZ protocol and utility libraries.
 
@@ -11,7 +11,7 @@ XVIZ protocol and utility libraries.
 To build this repository you need:
 
 - Node.js, tested with 8.11.3, compatible with 8.x
-- Yarn, tested with 1.7.0, compatible with 1.x
+- Yarn, tested with 1.10.0, compatible with 1.x
 
 To install dependencies, run:
 
@@ -20,6 +20,17 @@ $ git clone https://github.com/uber/xviz.git
 $ cd xviz
 $ yarn bootstrap
 ```
+
+### Run KITTI example
+
+```bash
+# Download KITTI data
+$ ./scripts/download-kitti-data.sh
+
+# Convert KITTI data if necessary and run the XVIZ Server and Client
+$ ./scripts/run-kitti-example.sh
+```
+
 
 ### Test
 
