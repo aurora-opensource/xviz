@@ -18,7 +18,11 @@ Parser plugins:
 
 ### getXVIZConfig(config)
 
-Returns the current XVIZ config.
+Parameters:
+
+- `config` (Object)
+
+Returns: current XVIZ config (Object).
 
 ### setXVIZSettings(config)
 
@@ -31,4 +35,8 @@ Sets the XVIZ settings. The default settings are:
 
 ### getXVIZSettings(config)
 
-Returns the current xviz settings.
+Parameters:
+
+- `config` (Object)
+
+Returns: current xviz settings (Object).

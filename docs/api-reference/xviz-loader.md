@@ -2,15 +2,23 @@
 
 ## Functions
 
-### parseBinaryXVIZ(arrayBuffer : ArrayBuffer) : Object
+### parseBinaryXVIZ(arrayBuffer) 
 
 Parses an in-memory, GLB formatted `ArrayBuffer` into XVIZ.
 
-### encodeBinaryXVIZ(json : Object, options : Object) : ArrayBuffer
+Parameters:
 
-- `options=` (Object)
+- `arrayBuffer` (ArrayBuffer) - json object to encode
+
+Returns: decoded data (Object).
+
+### encodeBinaryXVIZ(json, options)
+- `json` (Object) - Data to encode
+- `options` (Object)
   - `options.flattenArrays`=`true` - Whether to flatten arrays
   - `options.magic`=`MAGIC_XVIZ` - Magic number (first four bytes in file)
+
+Returns: encoded data (ArrayBuffer).
 
 Encodes an XVIZ data structure into an arrayBuffer that can be written atomically to file.
 

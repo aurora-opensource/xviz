@@ -45,9 +45,9 @@ const xvizMetadataBuilder = new XVIZMetadataBuilder(options);
 
 Parameters:
 
-- **options.validateWarn** (Function) - called when there is a validation warning. Default is
+- `options.validateWarn` (Function) - called when there is a validation warning. Default is
   `console.warn`.
-- **options.validateError** (Function) - called when there is a validation error. Default is
+- `options.validateError` (Function) - called when there is a validation error. Default is
   `console.error`.
 
 ## Methods
@@ -62,7 +62,7 @@ Set log start time.
 
 Parameters:
 
-- **time** (Number)
+- `time` (Number)
 
 Returns: `this`
 
@@ -72,7 +72,7 @@ Set log end time.
 
 Parameters:
 
-- **time** (Number)
+- `time` (Number)
 
 Returns: `this`
 
@@ -82,7 +82,7 @@ Set the configuration of declarative UI.
 
 Parameters:
 
-- **uiBuilder** ([XVIZUIBuilder](/docs/api-reference/xivz-ui-builder.md))
+- `uiBuilder` ([XVIZUIBuilder](/docs/api-reference/xivz-ui-builder.md))
 
 Returns: `this`
 
@@ -92,7 +92,7 @@ Add a stream.
 
 Parameters:
 
-- **streamId** (String)
+- `streamId` (String)
 
 Returns: `this`
 
@@ -102,7 +102,7 @@ Set `category` of the stream.
 
 Parameters:
 
-- **category** (String) - `primitive`, `time_series`, `variable`, etc. See
+- `category` (String) - `primitive`, `time_series`, `variable`, etc. See
   [XVIZ Core Protocol](/docs/protocol-schema/core-protocol.md) for details.
 
 Returns: `this`
@@ -113,7 +113,7 @@ Set `type` of the stream.
 
 Parameters:
 
-- **type** (String)
+- `type` (String)
   - For category `variable` and `time_series`, options are `float`, `integer`, `string` and
     `boolean`. See [XVIZ Core Protocol](/docs/protocol-schema/core-protocol.md) for details.
   - For category `primitive`, options are `point`, `polygon`, `polyline`, `circle`, `stadium`,
@@ -128,7 +128,7 @@ Set unit for `variable` or `time_series`.
 
 Parameters:
 
-- **unit** (String) - `m/s`, `m/s^2`, etc.
+- `unit` (String) - `m/s`, `m/s^2`, etc.
 
 Returns: `this`
 
@@ -138,7 +138,7 @@ Set the coordinate for a stream.
 
 Parameters:
 
-- **coordinate** (String) - `GEOGRAPHIC`, `VEHICLE_RELATIVE`, `IDENTITY` or `DYNAMIC`.
+- `coordinate` (String) - `GEOGRAPHIC`, `VEHICLE_RELATIVE`, `IDENTITY` or `DYNAMIC`.
 
 Returns: `this`
 
@@ -149,7 +149,7 @@ stream.
 
 Parameters:
 
-- **matrix** (Array) - an
+- `matrix` (Array) - an
   [Matrix4](https://github.com/uber-web/math.gl/blob/master/docs/api-reference/matrix4.md) instance
   or an array of 16 numbers.
 
@@ -164,14 +164,14 @@ function we have to construct a transform matrix from a pose definition.
 
 Parameters:
 
-- **position** (Object) - the translation of the stream.
-  - **position.x** (Number) - in meters.
-  - **position.y** (Number) - in meters.
-  - **position.z** (Number) - in meters.
-- **orientation** (Object) - the rotation of the stream.
-  - **orientation.roll** (Number) - in radians.
-  - **orientation.pitch** (Number) - in radians.
-  - **orientation.yaw** (Number) - in radians.
+- `position` (Object) - the translation of the stream.
+  - `position.x` (Number) - in meters.
+  - `position.y` (Number) - in meters.
+  - `position.z` (Number) - in meters.
+- `orientation` (Object) - the rotation of the stream.
+  - `orientation.roll` (Number) - in radians.
+  - `orientation.pitch` (Number) - in radians.
+  - `orientation.yaw` (Number) - in radians.
 
 Returns: `this`
 
@@ -187,7 +187,7 @@ Define the default style with style object.
 
 Parameters:
 
-- **style** (Object) - Check [XVIZ Stylesheet Spec](/docs/protocol-schema/style-specification.md)
+- `style` (Object) - Check [XVIZ Stylesheet Spec](/docs/protocol-schema/style-specification.md)
   for supported style properties.
 
 Returns: `this`
@@ -198,8 +198,8 @@ Define a style class with its corresponding styles.
 
 Parameters:
 
-- **className** (String) - The class name that the style object should apply to.
-- **style** (Object) - Check [XVIZ Stylesheet Spec](/docs/protocol-schema/style-specification.md)
+- `className` (String) - The class name that the style object should apply to.
+- `style` (Object) - Check [XVIZ Stylesheet Spec](/docs/protocol-schema/style-specification.md)
   for supported style properties.
 
 Returns: `this`
