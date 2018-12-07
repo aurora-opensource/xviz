@@ -3,7 +3,7 @@
 
 FROM node:8.11.4
 
-RUN yarn global add yarn@1.7.0
+RUN yarn global add yarn@1.10.0
 
 WORKDIR /xviz
 ENV PATH /xviz/node_modules/.bin:$PATH
