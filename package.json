@@ -59,7 +59,7 @@
   "engines": {
     "node": ">= 8",
     "npm": ">= 5",
-    "yarn": ">= 1.7.0"
+    "yarn": ">= 1.10.0"
   },
   "pre-commit": [
     "test"
