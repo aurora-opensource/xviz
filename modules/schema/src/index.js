@@ -7,7 +7,9 @@ export {
   parseJSONFile
 } from './file-validation';
 
-export {default as XVIZValidator} from './validator';
+export {XVIZValidator} from './validator';
+
+export {XVIZSessionValidator, MessageTypes} from './session-validator';
 
 export {loadProtos, getXVIZProtoTypes, EXTENSION_PROPERTY} from './proto-validation';
 
