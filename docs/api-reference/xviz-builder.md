@@ -76,7 +76,7 @@ Start building a [pose](/docs/protocol-schema/core-protocol.md#Poses) stream. Re
 
 Parameters:
 
-- **streamId** (String) - the name of the pose stream. Default to `/vehicle_pose` if not specified.
+- `streamId` (String) - the name of the pose stream. Default to `/vehicle_pose` if not specified.
   Note that for a valid frame, stream `/vehicle_pose` must be defined. Additional poses can be
   defined but are not required.
 
@@ -87,7 +87,7 @@ Start building a [primitive](/docs/protocol-schema/core-protocol.md#Primitive-St
 
 Parameters:
 
-- **streamId** (String) - the name of the primitive stream.
+- `streamId` (String) - the name of the primitive stream.
 
 ##### futureInstance(streamId, timestamp)
 
@@ -98,8 +98,8 @@ instance.
 
 Parameters:
 
-- **streamId** (String) - the name of the futureInstance stream.
-- **timestamp** (Number) - the future timestamp the primitive data represents
+- `streamId` (String) - the name of the futureInstance stream.
+- `timestamp` (Number) - the future timestamp the primitive data represents
 
 ##### variable(streamId)
 
@@ -108,7 +108,7 @@ Start building a [variable](/docs/protocol-schema/core-protocol.md#Variable-Stat
 
 Parameters:
 
-- **streamId** (String) - the name of the variable stream.
+- `streamId` (String) - the name of the variable stream.
 
 ##### timeSeries(streamId)
 
@@ -117,7 +117,7 @@ Returns a [XVIZTimeSeriesBuilder](#XVIZTimeSeriesBuilder) instance.
 
 Parameters:
 
-- **streamId** (String) - the name of the time series stream.
+- `streamId` (String) - the name of the time series stream.
 
 ##### uiPrimitive(streamId)
 
@@ -126,7 +126,7 @@ Returns a [XVIZUIPrimitiveBuilder](#XVIZUIPrimitiveBuilder) instance.
 
 Parameters:
 
-- **streamId** (String) - the name of the UI primitive stream.
+- `streamId` (String) - the name of the UI primitive stream.
 
 ### Remarks
 
@@ -154,7 +154,7 @@ Set the timestamp of the pose.
 
 Parameters:
 
-- **timestamp** (Number)
+- `timestamp` (Number)
 
 Returns: `this`
 
@@ -164,9 +164,9 @@ Set the reference point of the pose.
 
 Parameters:
 
-- **longitude** (Number) - in degrees.
-- **latitude** (Number) - in degrees.
-- **altitude** (Number) - in meters.
+- `longitude` (Number) - in degrees.
+- `latitude` (Number) - in degrees.
+- `altitude` (Number) - in meters.
 
 Returns: `this`
 
@@ -176,9 +176,9 @@ Set the translation of the pose from the reference point.
 
 Parameters:
 
-- **x** (Number) - easting in meters.
-- **y** (Number) - northing in meters.
-- **z** (Number) - vertical offset in meters.
+- `x` (Number) - easting in meters.
+- `y` (Number) - northing in meters.
+- `z` (Number) - vertical offset in meters.
 
 Returns: `this`
 
@@ -188,9 +188,9 @@ Set the rotation of the pose.
 
 Parameters:
 
-- **roll** (Number) - in radians.
-- **pitch** (Number) - in radians.
-- **yaw** (Number) - in radians.
+- `roll` (Number) - in radians.
+- `pitch` (Number) - in radians.
+- `yaw` (Number) - in radians.
 
 Returns: `this`
 
@@ -204,7 +204,7 @@ Specify the object id for a primitive.
 
 Parameters:
 
-- **id** (String)
+- `id` (String)
 
 Returns: `this`
 
@@ -214,7 +214,7 @@ Classes for styling, should match the style definition in the stream metadata.
 
 Parameters:
 
-- **classList** (Array:String)
+- `classList` (Array:String)
 
 Returns: `this`
 
@@ -224,7 +224,7 @@ Set the primitive-specific style. This will override the style defined in the st
 
 Parameters:
 
-- **style** (Object) - Check [XVIZ Stylesheet Spec](/docs/protocol-schema/style-specification.md)
+- `style` (Object) - Check [XVIZ Stylesheet Spec](/docs/protocol-schema/style-specification.md)
   for supported style properties.
 
 Returns: `this`
@@ -235,7 +235,7 @@ Add a [polygon](/docs/protocol-schema/geometry-primitives#Polygon-Primitive) pri
 
 Parameters:
 
-- **vertices** (Array:Point3D)
+- `vertices` (Array:Point3D)
 
 Returns: `this`
 
@@ -245,7 +245,7 @@ Add a [polyline](/docs/protocol-schema/geometry-primitives#Polyline-Primitive) p
 
 Parameters:
 
-- **vertices** (Array:Point3D)
+- `vertices` (Array:Point3D)
 
 Returns: `this`
 
@@ -255,7 +255,7 @@ Add a [point](/docs/protocol-schema/geometry-primitives#Point-Primitive) primiti
 
 Parameters:
 
-- **vertices** (Array:Point3D)
+- `vertices` (Array:Point3D)
 
 Returns: `this`
 
@@ -265,8 +265,8 @@ Add a [image](/docs/protocol-schema/geometry-primitives#Image-Primitive) primiti
 
 Parameters:
 
-- **data** (Uint8Array) - binary image data
-- **format** (String) - `png`, `jpg`, etc.
+- `data` (Uint8Array) - binary image data
+- `format` (String) - `png`, `jpg`, etc.
 
 Returns: `this`
 
@@ -276,8 +276,8 @@ Only used for `image` primitive, providing dimension info about image stream.
 
 Parameters:
 
-- **widthPixel** (Number)
-- **heightPixel** (Number)
+- `widthPixel` (Number)
+- `heightPixel` (Number)
 
 Returns: `this`
 
@@ -287,8 +287,8 @@ Add a [circle](/docs/protocol-schema/geometry-primitives#Circle-Primitive) primi
 
 Parameters:
 
-- **position** (Point3D) - center of the circle
-- **radius** (Number)
+- `position` (Point3D) - center of the circle
+- `radius` (Number)
 
 Returns: `this`
 
@@ -298,9 +298,9 @@ Add a [stadium](/docs/protocol-schema/geometry-primitives#Stadium-Primitive) pri
 
 Parameters:
 
-- **start** (Point3D)
-- **end** (Point3D)
-- **radius** (Number)
+- `start` (Point3D)
+- `end` (Point3D)
+- `radius` (Number)
 
 Returns: `this`
 
@@ -310,7 +310,7 @@ Add a [text](/docs/protocol-schema/geometry-primitives#Text-Primitive) primitive
 
 Parameters:
 
-- **message** (String)
+- `message` (String)
 
 Returns: `this`
 
@@ -320,7 +320,7 @@ Only used for specifying where to place `text` message.
 
 Parameters:
 
-- **point** (Point3D)
+- `point` (Point3D)
 
 Returns: `this`
 
@@ -341,17 +341,17 @@ Set the timestamps of a variable.
 
 Parameters:
 
-- **timestamps** (Array:Number)
+- `timestamps` (Array:Number)
 
 Returns: `this`
 
-##### values(values : Any)
+##### values(values: Any)
 
 Set the values of a variable, as matched pairs with `timestamps`.
 
 Parameters:
 
-- **values** (Array:Number|String|Boolean)
+- `values` (Array:Number|String|Boolean)
 
 Returns: `this`
 
@@ -365,7 +365,7 @@ Set the timestamp of an entry.
 
 Parameters:
 
-- **timestamp** (Number)
+- `timestamp` (Number)
 
 Returns: `this`
 
@@ -375,7 +375,7 @@ Set the value of an entry.
 
 Parameters:
 
-- **value** (Number|String|Boolean)
+- `value` (Number|String|Boolean)
 
 Returns: `this`
 
@@ -389,7 +389,7 @@ Initialize a treetable primitive.
 
 Parameters:
 
-- **columns** (Array:Object) - an array of descriptors of table columns.
+- `columns` (Array:Object) - an array of descriptors of table columns.
 
 Returns: `this`
 
@@ -399,11 +399,10 @@ Add a row to the table.
 
 Parameters:
 
-- **id** (String) - id of the new row.
-- **column_values** (Array:String|Number|Boolean) - a list of values for each column.
+- `id` (String) - id of the new row.
+- `column_values` (Array:String|Number|Boolean) - a list of values for each column.
 
 Returns: a `XVIZTreeTableRowBuilder` instance that represents the new row.
-
 ## XVIZTreeTableRowBuilder
 
 ##### child(id, column_values)
@@ -412,7 +411,7 @@ Append a row as a child of this row.
 
 Parameters:
 
-- **id** (String) - id of the new row.
-- **column_values** (Array:String|Number|Boolean) - a list of values for each column.
+- `id` (String) - id of the new row.
+- `column_values` (Array: String|Number|Boolean) - a list of values for each column.
 
 Returns: a `XVIZTreeTableRowBuilder` instance that represents the new row.

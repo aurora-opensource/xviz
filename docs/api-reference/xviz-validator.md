@@ -12,53 +12,90 @@ All validation methods throw if the object fails to validate.
 
 ### Validate high level objects
 
-#### `validateMetadata(data : Object)`
+##### validateMetadata(data)
 
 Validate `metadata` information.
 
-#### `validateStateUpdate(data : Object)`
+Parameters: 
+
+- `data` (Object)
+
+
+##### validateStateUpdate(data)
 
 Validate `state_update` message.
 
+Parameters: 
+
+- `data` (Object)
+
 ### Validate core object
 
-#### `validateStreamSet(data : Object)`
+##### validateStreamSet(data : Object)
 
 Validate `stream_set` type.
 
 ### Validate base types
 
-#### `validatePose(data : Object)`
+##### validatePose(data)
 
-#### `validatePrimitive(type : String, data : Object)`
+Validate `pose` object.
+
+Parameters: 
+
+- `data` (Object)
+
+
+##### validatePrimitive(type, data)
 
 Validate the different primitive types.
 
-- `type` - the type of the variable, like "point" or "circle", see spec
-- `data` - the object to validate
+Parameters: 
 
-#### `validateTimeSeries(data : Object)`
+- `type` (String) - the type of the variable, like "point" or "circle", see spec
+- `data` (Object) - the object to validate
 
-#### `validateFutureInstances(data : Object)`
+##### validateTimeSeries(data : Object)
 
-#### `validateVariable(data : Object)`
+Parameters: 
 
-#### `validateAnnotation(type : String, data : Object)`
+- `data` (Object)
+
+##### validateFutureInstances(data : Object)
+
+Parameters: 
+
+- `data` (Object)
+
+##### validateVariable(data : Object)
+
+Parameters: 
+
+- `data` (Object)
+
+##### validateAnnotation(type, data)
 
 Validation the different annotation types.
 
-- `type` - the type of the variable, only "visual" is currently valid
-- `data` - the object to validate
+Parameters: 
 
-### Uility methods
+- `type` (String) - the type of the variable, only "visual" is currently valid
+- `data` (Object) - the object to validate
 
-#### `validate(schemaName, data)`
+### Utility methods
+
+##### validate(schemaName, data)
 
 Validate any schema
 
-- `schemaName` - the name of the schema, the ".schema.json" trailer is not needed
-- `data` - the object to validate
+Parameters: 
 
-#### `schemaCount() : Number`
+- `schemaName` (String) - the name of the schema, the ".schema.json" trailer is not needed
+- `data` (Object) - the object to validate
+
+##### schemaCount() 
 
 Useful for checking the validator initialized properly.
+
+Returns: schema count (Number)
+
