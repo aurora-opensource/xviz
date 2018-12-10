@@ -8,39 +8,42 @@ import {XVIZObject} from 'viz';
 
 ## Static Methods
 
-##### `get(id)`
+##### get(id)
 
-Returns an `XVIZObject` instance for the given `id`.
+Parameters:
+- id (Number): XVIZ object id
 
-##### `getAll()`
+Returns: an `XVIZObject` instance for the given `id`.
 
-Returns all XVIZ objects in the current log. Keys are ids and values are `XVIZObject` instances.
+##### getAll()
 
-##### `getAllInCurrentFrame()`
+Returns: all XVIZ objects in the current log. Keys are ids and values are `XVIZObject` instances.
 
-Returns all XVIZ objects in the current frame. Keys are ids and values are `XVIZObject` instances.
+##### getAllInCurrentFrame()
+
+Returns: all XVIZ objects in the current frame. Keys are ids and values are `XVIZObject` instances.
 
 ## Properties
 
-##### `id` (string)
+##### id (string)
 
 The XVIZ object id.
 
-##### `state` (object)
+##### state (object)
 
 The app state of the object, such as `tracked` and `selected`.
 
-##### `props` (Map)
+##### props (Map)
 
 The properties of the object from the XVIZ log, such as `label` and `soc`. `props` is empty if the
 object does not exist in the current frame.
 
-##### `position` (array)
+##### position (array)
 
 The coordinates of the tracking point of the object. `undefined` if the object does not exist in the
 current frame.
 
-##### `isValid` (bool)
+##### isValid (bool)
 
 `true` if the object is in the current frame.
 

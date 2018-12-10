@@ -63,9 +63,9 @@ const xvizUIBuilder = new XVIZUIBuilder(options);
 
 Parameters:
 
-- **options.validateWarn** (Function) - called when there is a validation warning. Default is
+- `options.validateWarn` (Function) - called when there is a validation warning. Default is
   `console.warn`.
-- **options.validateError** (Function) - called when there is a validation error. Default is
+- `options.validateError` (Function) - called when there is a validation error. Default is
   `console.error`.
 
 ### Methods
@@ -88,9 +88,9 @@ const panelBuilder = xvizUIBuilder.panel(options);
 
 Parameters:
 
-- **options.name** (String)
-- **options.layout** (String) - `vertical` or `horizontal`.
-- **options.interactions** (String) - `reorderable` or `drag_out`
+- `options.name` (String)
+- `options.layout` (String) - `vertical` or `horizontal`.
+- `options.interactions` (String) - `reorderable` or `drag_out`
 
 ##### container(options)
 
@@ -102,9 +102,9 @@ const containerBuilder = xvizUIBuilder.container(options);
 
 Parameters:
 
-- **options.name** (String)
-- **options.layout** (String) - `vertical` or `horizontal`.
-- **options.interactions** (String) - `reorderable` or `drag_out`
+- `options.name` (String)
+- `options.layout` (String) - `vertical` or `horizontal`.
+- `options.interactions` (String) - `reorderable` or `drag_out`
 
 ##### metric(options)
 
@@ -116,9 +116,9 @@ const metricBuilder = xvizUIBuilder.metric(options);
 
 Parameters:
 
-- **options.title** (String) - title of the metrics card
-- **options.description** (String) - description of the metrics card
-- **options.streams** (Array) - a list of variable streams to visualize
+- `options.title` (String) - title of the metrics card
+- `options.description` (String) - description of the metrics card
+- `options.streams` (Array) - a list of variable streams to visualize
 
 ##### plot(options)
 
@@ -130,10 +130,10 @@ const plotBuilder = xvizUIBuilder.plot(options);
 
 Parameters:
 
-- **options.title** (String) - title of the plot
-- **options.description** (String) - description of the plot
-- **options.independentVariable** (String) - the independent variable stream
-- **options.dependentVariables** (Array) - a list of dependent variable streams
+- `options.title` (String) - title of the plot
+- `options.description` (String) - description of the plot
+- `options.independentVariable` (String) - the independent variable stream
+- `options.dependentVariables` (Array) - a list of dependent variable streams
 
 ##### select(options) (WARNING: Unstable feature)
 
@@ -145,10 +145,10 @@ const selectBuilder = xvizUIBuilder.select(options);
 
 Parameters:
 
-- **options.title** (String) - title of the select
-- **options.description** (String) - description of the select
-- **options.stream** (String) - the variable stream that provides the options
-- **options.target** (String) - JSON pointer to configuration property to update
+- `options.title` (String) - title of the select
+- `options.description` (String) - description of the select
+- `options.stream` (String) - the variable stream that provides the options
+- `options.target` (String) - JSON pointer to configuration property to update
 
 ##### table(options)
 
@@ -160,10 +160,10 @@ const tableBuilder = xvizUIBuilder.table(options);
 
 Parameters:
 
-- **options.title** (String) - title of the plot
-- **options.description** (String) - description of the plot
-- **options.stream** (String) - the stream that contains the table data
-- **options.displayObjectId** (Boolean) - whether to display the object ID column
+- `options.title` (String) - title of the plot
+- `options.description` (String) - description of the plot
+- `options.stream` (String) - the stream that contains the table data
+- `options.displayObjectId` (Boolean) - whether to display the object ID column
 
 ##### treetable(options)
 
@@ -175,10 +175,10 @@ const treetableBuilder = xvizUIBuilder.treetable(options);
 
 Parameters:
 
-- **options.title** (String) - title of the plot
-- **options.description** (String) - description of the plot
-- **options.stream** (String) - the stream that contains the table data
-- **options.displayObjectId** (Boolean) - whether to display the object ID column
+- `options.title` (String) - title of the plot
+- `options.description` (String) - description of the plot
+- `options.stream` (String) - the stream that contains the table data
+- `options.displayObjectId` (Boolean) - whether to display the object ID column
 
 ##### video(options)
 
@@ -190,7 +190,7 @@ const videoBuilder = xvizUIBuilder.video(options);
 
 Parameters:
 
-- **options.cameras** (Array) - a list of streams to render as video
+- `options.cameras` (Array) - a list of streams to render as video
 
 ## XVIZPanelBuilder
 
