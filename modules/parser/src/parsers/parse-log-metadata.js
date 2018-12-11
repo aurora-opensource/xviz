@@ -84,11 +84,13 @@ export function parseLogMetadataV2(data) {
   // Use XVIZ configuration to filter out unwanted / blacklisted streams
   const {STREAM_BLACKLIST} = getXVIZConfig();
   const streams = {};
-  Object.keys(originalStreams).forEach(streamName => {
-    if (!STREAM_BLACKLIST.has(streamName)) {
-      streams[streamName] = originalStreams[streamName];
-    }
-  });
+  if (originalStreams) {
+    Object.keys(originalStreams).forEach(streamName => {
+      if (!STREAM_BLACKLIST.has(streamName)) {
+        streams[streamName] = originalStreams[streamName];
+      }
+    });
+  }
 
   const logInfo = data.log_info || {};
   const logStartTime = logInfo.log_start_time;

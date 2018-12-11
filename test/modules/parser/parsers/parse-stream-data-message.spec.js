@@ -25,7 +25,7 @@ import {
 import {XVIZValidator} from '@xviz/schema';
 
 import tape from 'tape-catch';
-import TestMetadataMessage from 'test-data/sample-metadata-message';
+import TestMetadataMessageV2 from 'test-data/sample-metadata-message';
 import TestMetadataMessageV1 from 'test-data/sample-metadata-message-v1';
 import TestFuturesMessageV1 from 'test-data/sample-frame-futures-v1';
 
@@ -156,7 +156,7 @@ tape('unpackEnvelope xviz', t => {
 tape('parseStreamLogData metadata', t => {
   resetXVIZConfigAndSettings();
 
-  const metaMessage = parseStreamLogData(TestMetadataMessage);
+  const metaMessage = parseStreamLogData(TestMetadataMessageV2, {v2Type: 'metadata'});
 
   t.equals(metaMessage.type, LOG_STREAM_MESSAGE.METADATA, 'Metadata type set');
   t.equals(
@@ -167,12 +167,12 @@ tape('parseStreamLogData metadata', t => {
 
   t.equals(
     metaMessage.eventStartTime,
-    TestMetadataMessage.log_info.start_time,
+    TestMetadataMessageV2.log_info.start_time,
     'Metadata eventStartTime set'
   );
   t.equals(
     metaMessage.eventEndTime,
-    TestMetadataMessage.log_info.end_time,
+    TestMetadataMessageV2.log_info.end_time,
     'Metadata eventEndTime set'
   );
 
@@ -194,12 +194,12 @@ tape('parseStreamLogData metadata v1', t => {
 
   t.equals(
     metaMessage.eventStartTime,
-    TestMetadataMessage.log_info.start_time,
+    TestMetadataMessageV2.log_info.start_time,
     'Metadata eventStartTime set'
   );
   t.equals(
     metaMessage.eventEndTime,
-    TestMetadataMessage.log_info.end_time,
+    TestMetadataMessageV2.log_info.end_time,
     'Metadata eventEndTime set'
   );
 
@@ -223,7 +223,7 @@ tape('parseStreamLogData unsupported version v2', t => {
   setXVIZConfig({supportedVersions: [1]});
 
   t.throws(
-    () => parseStreamLogData(TestMetadataMessage),
+    () => parseStreamLogData(TestMetadataMessageV2, {v2Type: 'metadata'}),
     /XVIZ version 2 is not supported/,
     'Throws if supportedVersions does not match currentMajorVersion'
   );
@@ -235,7 +235,7 @@ tape('parseStreamLogData undetectable version', t => {
   setXVIZConfig({supportedVersions: [2]});
 
   t.throws(
-    () => parseStreamLogData({...TestMetadataMessage, version: 'abc'}),
+    () => parseStreamLogData({...TestMetadataMessageV2, version: 'abc'}, {v2Type: 'metadata'}),
     /Unable to detect the XVIZ version/,
     'Throws if version exists but cannot parse major version'
   );
@@ -245,7 +245,7 @@ tape('parseStreamLogData undetectable version', t => {
 tape('parseStreamLogData metadata with full log time only', t => {
   resetXVIZConfigAndSettings();
 
-  const metaMessage = parseStreamLogData(metadataWithLogStartEnd);
+  const metaMessage = parseStreamLogData(metadataWithLogStartEnd, {v2Type: 'metadata'});
 
   t.equals(metaMessage.type, LOG_STREAM_MESSAGE.METADATA, 'Metadata type set');
   t.equals(
@@ -277,9 +277,12 @@ tape('parseStreamLogData validate result when missing updates', t => {
   resetXVIZConfigAndSettings();
   setXVIZSettings({currentMajorVersion: 2});
 
-  const metaMessage = parseStreamLogData({
-    update_type: 'snapshot'
-  });
+  const metaMessage = parseStreamLogData(
+    {
+      update_type: 'snapshot'
+    },
+    {v2Type: 'state_update'}
+  );
 
   t.equals(metaMessage.type, LOG_STREAM_MESSAGE.INCOMPLETE, 'Type after parse set to error');
   t.ok(/Missing required/.test(metaMessage.message), 'Message details on what is missing');
@@ -291,10 +294,13 @@ tape('parseStreamLogData validate result when updates is empty', t => {
   resetXVIZConfigAndSettings();
   setXVIZSettings({currentMajorVersion: 2});
 
-  const metaMessage = parseStreamLogData({
-    update_type: 'snapshot',
-    updates: []
-  });
+  const metaMessage = parseStreamLogData(
+    {
+      update_type: 'snapshot',
+      updates: []
+    },
+    {v2Type: 'state_update'}
+  );
 
   t.equals(metaMessage.type, LOG_STREAM_MESSAGE.INCOMPLETE, 'Type after parse set to error');
   t.ok(/"updates" has length of 0/.test(metaMessage.message), 'Message details length is 0');
@@ -306,10 +312,13 @@ tape('parseStreamLogData validate result when missing timestamp in updates', t =
   resetXVIZConfigAndSettings();
   setXVIZSettings({currentMajorVersion: 2});
 
-  const metaMessage = parseStreamLogData({
-    update_type: 'snapshot',
-    updates: [{}]
-  });
+  const metaMessage = parseStreamLogData(
+    {
+      update_type: 'snapshot',
+      updates: [{}]
+    },
+    {v2Type: 'state_update'}
+  );
 
   t.equals(metaMessage.type, LOG_STREAM_MESSAGE.INCOMPLETE, 'Type after parse set to error');
   t.ok(
@@ -324,10 +333,7 @@ tape('parseStreamLogData error', t => {
   resetXVIZConfigAndSettings();
   setXVIZSettings({currentMajorVersion: 2});
 
-  const metaMessage = parseStreamLogData({
-    ...TestTimesliceMessageV2,
-    type: 'error'
-  });
+  const metaMessage = parseStreamLogData({message: 'my message'}, {v2Type: 'error'});
   t.equals(metaMessage.type, LOG_STREAM_MESSAGE.ERROR, 'Metadata type set to error');
 
   t.end();
@@ -338,40 +344,52 @@ tape('parseStreamLogData timeslice INCOMPLETE', t => {
   setXVIZSettings({currentMajorVersion: 2});
 
   // NOTE: no explicit type for this message yet.
-  let metaMessage = parseStreamLogData({
-    ...TestTimesliceMessageV2,
-    timestamp: null
-  });
+  let metaMessage = parseStreamLogData(
+    {
+      ...TestTimesliceMessageV2,
+      timestamp: null
+    },
+    {v2Type: 'state_update'}
+  );
   t.equals(metaMessage.type, LOG_STREAM_MESSAGE.TIMESLICE, 'Missing timestamp is ok');
 
-  metaMessage = parseStreamLogData({
-    ...TestTimesliceMessageV2,
-    updates: [{updates: null}]
-  });
+  metaMessage = parseStreamLogData(
+    {
+      ...TestTimesliceMessageV2,
+      updates: [{updates: null}]
+    },
+    {v2Type: 'state_update'}
+  );
   t.equals(metaMessage.type, LOG_STREAM_MESSAGE.INCOMPLETE, 'Missing updates incomplete');
 
-  metaMessage = parseStreamLogData({
-    ...TestTimesliceMessageV2,
-    updates: [
-      {
-        poses: {
-          '/vehicle_pose': {
-            mapOrigin: {longitude: 11.2, latitude: 33.4, altitude: 55.6}
+  metaMessage = parseStreamLogData(
+    {
+      ...TestTimesliceMessageV2,
+      updates: [
+        {
+          poses: {
+            '/vehicle_pose': {
+              mapOrigin: {longitude: 11.2, latitude: 33.4, altitude: 55.6}
+            }
           }
         }
-      }
-    ]
-  });
+      ]
+    },
+    {v2Type: 'state_update'}
+  );
   t.equals(metaMessage.type, LOG_STREAM_MESSAGE.INCOMPLETE, 'Missing updates is incomplete');
 
-  metaMessage = parseStreamLogData({
-    ...TestTimesliceMessageV2,
-    updates: [
-      {
-        timestamp: null
-      }
-    ]
-  });
+  metaMessage = parseStreamLogData(
+    {
+      ...TestTimesliceMessageV2,
+      updates: [
+        {
+          timestamp: null
+        }
+      ]
+    },
+    {v2Type: 'state_update'}
+  );
   t.equals(metaMessage.type, LOG_STREAM_MESSAGE.INCOMPLETE, 'Missing timestamp is incomplete');
 
   t.end();
@@ -382,7 +400,7 @@ tape('parseStreamLogData timeslice', t => {
   setXVIZSettings({currentMajorVersion: 2});
 
   // NOTE: no explicit type for this message yet.
-  const metaMessage = parseStreamLogData({...TestTimesliceMessageV2});
+  const metaMessage = parseStreamLogData({...TestTimesliceMessageV2}, {v2Type: 'state_update'});
   t.equals(metaMessage.type, LOG_STREAM_MESSAGE.TIMESLICE, 'Message type set for timeslice');
   t.equals(
     metaMessage.timestamp,
@@ -717,6 +735,68 @@ tape('parseStreamDataMessage enveloped', t => {
     TestTimesliceMessageV2.updates[0].poses['/vehicle_pose'].timestamp,
     'Message timestamp set from vehicle_pose'
   );
+
+  t.end();
+});
+
+tape('parseStreamDataMessage#enveloped#metadata', t => {
+  resetXVIZConfigAndSettings();
+  setXVIZSettings({currentMajorVersion: 2});
+
+  const enveloped = {
+    type: 'xviz/metadata',
+    data: {version: '2.0.0'}
+  };
+
+  let result;
+  let error;
+  const opts = {};
+  parseStreamDataMessage(
+    enveloped,
+    newResult => {
+      result = newResult;
+    },
+    newError => {
+      error = newError;
+    },
+    opts
+  );
+
+  t.equals(undefined, error, 'No errors received while parsing');
+  t.notEquals(undefined, result, 'Update units');
+  t.equals(result.type, LOG_STREAM_MESSAGE.METADATA, 'Message type set for metadata');
+  t.equals(result.version, enveloped.data.version);
+
+  t.end();
+});
+
+tape('parseStreamDataMessage#enveloped#transform_log_done', t => {
+  resetXVIZConfigAndSettings();
+  setXVIZSettings({currentMajorVersion: 2});
+
+  const enveloped = {
+    type: 'xviz/transform_log_done',
+    data: {id: 'foo'}
+  };
+
+  let result;
+  let error;
+  const opts = {};
+  parseStreamDataMessage(
+    enveloped,
+    newResult => {
+      result = newResult;
+    },
+    newError => {
+      error = newError;
+    },
+    opts
+  );
+
+  t.equals(undefined, error, 'No errors received while parsing');
+  t.notEquals(undefined, result, 'Update units');
+  t.equals(result.type, LOG_STREAM_MESSAGE.DONE, 'Message type set to done');
+  t.equals(result.id, enveloped.data.id);
 
   t.end();
 });

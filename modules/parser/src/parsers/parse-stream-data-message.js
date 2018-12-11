@@ -86,10 +86,12 @@ export function parseStreamDataMessage(message, onResult, onError, opts) {
       data = decode(message, true);
     }
 
+    let v2Type;
     let parseData = true;
     if (isEnvelope(data)) {
       const unpacked = unpackEnvelope(data);
       if (unpacked.namespace === 'xviz') {
+        v2Type = unpacked.type;
         data = unpacked.data;
       } else {
         parseData = false;
@@ -97,7 +99,7 @@ export function parseStreamDataMessage(message, onResult, onError, opts) {
     }
 
     if (parseData) {
-      const result = parseStreamLogData(data, opts);
+      const result = parseStreamLogData(data, {...opts, v2Type});
       onResult(result);
     }
   } catch (error) {
@@ -105,37 +107,28 @@ export function parseStreamDataMessage(message, onResult, onError, opts) {
   }
 }
 
-function checkV2MetadataFields(data) {
-  // Check for version 2.0.0
-  // TODO(twojtasz): proper semver parsing
-  if (data.streams && data.version && data.version === '2.0.0') {
-    data.type = 'metadata';
-  }
-}
-
 export function parseStreamLogData(data, opts = {}) {
-  // Handle v2 metadata that lacks a 'type'
-  // Plan is an envelope will wrap and replace this field check
-  checkV2MetadataFields(data);
-
   // TODO(twojtasz): this data.message is due an
   // uncoordinated change on the XVIZ server, temporary.
-  switch (data.type || data.message || data.update_type) {
+  const typeKey = opts.v2Type || data.type || data.message || data.update_type;
+
+  switch (typeKey) {
+    case 'state_update':
+      return parseTimesliceData(data, opts.convertPrimitive);
     case 'metadata':
       return {
         ...parseLogMetadata(data),
         // ensure application sees the metadata type set to the uppercase version
         type: LOG_STREAM_MESSAGE.METADATA
       };
+    case 'transform_log_done':
+      return {...data, type: LOG_STREAM_MESSAGE.DONE};
     case 'error':
       return {...data, message: 'Stream server error', type: LOG_STREAM_MESSAGE.ERROR};
+
+    // v1 types
     case 'done':
       return {...data, type: LOG_STREAM_MESSAGE.DONE};
-    case 'ack':
-      return null;
-    // v2 update types
-    case 'snapshot':
-    case 'incremental':
     default:
       //  TODO(twojtasz): XVIZ should be tagging this with a type
       return parseTimesliceData(data, opts.convertPrimitive);
