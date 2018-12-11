@@ -1,6 +1,7 @@
 # XVIZBuilder
 
-The `XVIZBuilder` class provides convenient chaining functions to format data for the xviz protocol.
+The `XVIZBuilder` class is a ["fluent" API](https://en.wikipedia.org/wiki/Fluent_interface) which
+provides convenient chaining methods to build up XVIZ data in an easy-to-read way.
 
 ## Example
 
