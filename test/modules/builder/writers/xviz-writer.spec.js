@@ -2,6 +2,21 @@
 import test from 'tape-catch';
 import {XVIZWriter} from '@xviz/builder';
 
+const SAMPLE_METADATA = {
+  log_info: {
+    start_time: 1,
+    end_time: 2
+  }
+};
+
+const SAMPLE_STATE_UPDATE = {
+  updates: [
+    {
+      timestamp: 100
+    }
+  ]
+};
+
 class MemorySink {
   constructor() {
     this.data = new Map();
@@ -42,7 +57,7 @@ test('XVIZWriter#default-ctor sink', t => {
 
 test('XVIZWriter#writeMetadata empty', t => {
   const sink = new MemorySink();
-  const builder = new XVIZWriter(sink);
+  const builder = new XVIZWriter(sink, {envelope: false});
 
   const data = {};
   builder.writeMetadata('test', data, {writeBinary: true, writeJson: true});
@@ -55,7 +70,7 @@ test('XVIZWriter#writeMetadata empty', t => {
 
 test('XVIZWriter#writeMetadata empty, write options off', t => {
   const sink = new MemorySink();
-  const builder = new XVIZWriter(sink);
+  const builder = new XVIZWriter(sink, {envelope: false});
 
   const data = {};
   builder.writeMetadata('test', data, {writeBinary: false, writeJson: false});
@@ -67,14 +82,9 @@ test('XVIZWriter#writeMetadata empty, write options off', t => {
 
 test('XVIZWriter#writeMetadata', t => {
   const sink = new MemorySink();
-  const builder = new XVIZWriter(sink);
+  const builder = new XVIZWriter(sink, {envelope: false});
 
-  const data = {
-    log_info: {
-      start_time: 1,
-      end_time: 2
-    }
-  };
+  const data = SAMPLE_METADATA;
 
   builder.writeMetadata('test', data, {writeBinary: true, writeJson: true});
 
@@ -84,9 +94,31 @@ test('XVIZWriter#writeMetadata', t => {
   t.end();
 });
 
+test('XVIZWriter#writeMetadataEnvelope', t => {
+  const sink = new MemorySink();
+  const builder = new XVIZWriter(sink, {envelope: true});
+
+  const data = SAMPLE_METADATA;
+
+  const expected = {
+    type: 'xviz/metadata',
+    data
+  };
+
+  builder.writeMetadata('test', data, {writeJson: true});
+
+  t.ok(sink.has('test', '1-frame.json'), 'wrote json metadata frame');
+  t.deepEquals(
+    JSON.parse(sink.get('test', '1-frame.json')),
+    expected,
+    'json metadata fetched matches'
+  );
+  t.end();
+});
+
 test('XVIZWriter#writeFrame missing updates', t => {
   const sink = new MemorySink();
-  const builder = new XVIZWriter(sink);
+  const builder = new XVIZWriter(sink, {envelope: false});
 
   const data = {};
 
@@ -100,7 +132,7 @@ test('XVIZWriter#writeFrame missing updates', t => {
 
 test('XVIZWriter#writeFrame updates missing timestamp', t => {
   const sink = new MemorySink();
-  const builder = new XVIZWriter(sink);
+  const builder = new XVIZWriter(sink, {envelope: false});
 
   const data = {
     updates: []
@@ -116,15 +148,9 @@ test('XVIZWriter#writeFrame updates missing timestamp', t => {
 
 test('XVIZWriter#writeFrame', t => {
   const sink = new MemorySink();
-  const builder = new XVIZWriter(sink);
+  const builder = new XVIZWriter(sink, {envelope: false});
 
-  const data = {
-    updates: [
-      {
-        timestamp: 100
-      }
-    ]
-  };
+  const data = SAMPLE_STATE_UPDATE;
 
   builder.writeFrame('test', 0, data, {writeJson: true});
 
@@ -133,17 +159,32 @@ test('XVIZWriter#writeFrame', t => {
   t.end();
 });
 
+test('XVIZWriter#writeFrameEnveloped', t => {
+  const sink = new MemorySink();
+  const builder = new XVIZWriter(sink, {envelope: true});
+
+  const data = SAMPLE_STATE_UPDATE;
+  const expected = {
+    type: 'xviz/state_update',
+    data
+  };
+
+  builder.writeFrame('test', 0, data, {writeJson: true});
+
+  t.ok(sink.has('test', '2-frame.json'), 'wrote json frame');
+  t.deepEquals(
+    JSON.parse(sink.get('test', '2-frame.json')),
+    expected,
+    'json frame fetched matches'
+  );
+  t.end();
+});
+
 test('XVIZWriter#default-ctor frames writeFrameIndex', t => {
   const sink = new MemorySink();
-  const builder = new XVIZWriter(sink);
+  const builder = new XVIZWriter(sink, {envelope: false});
 
-  const data = {
-    updates: [
-      {
-        timestamp: 100
-      }
-    ]
-  };
+  const data = SAMPLE_STATE_UPDATE;
 
   builder.writeFrame('test', 0, data);
   builder.writeFrameIndex('test');
@@ -164,15 +205,9 @@ test('XVIZWriter#default-ctor frames writeFrameIndex', t => {
 
 test('XVIZWriter#default-ctor frames writeFrame after writeFrameIndex', t => {
   const sink = new MemorySink();
-  const builder = new XVIZWriter(sink);
+  const builder = new XVIZWriter(sink, {envelope: false});
 
-  const data = {
-    updates: [
-      {
-        timestamp: 100
-      }
-    ]
-  };
+  const data = SAMPLE_STATE_UPDATE;
 
   builder.writeFrame('test', 0, data);
   builder.writeFrameIndex('test');

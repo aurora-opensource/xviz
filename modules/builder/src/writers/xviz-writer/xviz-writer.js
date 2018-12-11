@@ -25,18 +25,23 @@ class FileSink {
 }
 
 export default class XVIZWriter {
-  constructor(dataSink) {
+  constructor(dataSink, options = {envelope: true}) {
     this.sink = dataSink || new FileSink();
     this.frameTimings = {
       frames: new Map()
     };
     this.wroteFrameIndex = null;
+    this.options = options;
   }
 
   // xvizMetadata is the object returned
   // from a Builder.
   writeMetadata(xvizDirectory, xvizMetadata, options = {writeBinary: true, writeJson: false}) {
     this._saveTimestamp(xvizMetadata);
+
+    if (this.options.envelope) {
+      xvizMetadata = {type: 'xviz/metadata', data: xvizMetadata};
+    }
 
     if (options.writeBinary) {
       writeBinaryXVIZtoFile(this.sink, xvizDirectory, '1-frame', xvizMetadata, {
@@ -64,6 +69,10 @@ export default class XVIZWriter {
     }
 
     this._saveTimestamp(xvizFrame, frameNumber);
+
+    if (this.options.envelope) {
+      xvizFrame = {type: 'xviz/state_update', data: xvizFrame};
+    }
 
     if (options.writeBinary) {
       writeBinaryXVIZtoFile(this.sink, xvizDirectory, frameName(frameNumber), xvizFrame, {

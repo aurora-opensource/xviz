@@ -281,6 +281,9 @@ class ConnectionContext {
 
     // Respond to control messages from the browser
     ws.on('message', msg => this.onMessage(msg));
+
+    // On connection send metadata
+    this.sendMetadataResp();
   }
 
   onClose(event) {
@@ -293,17 +296,11 @@ class ConnectionContext {
     this.log(`> Message ${msg.type} from Client`);
 
     switch (msg.type) {
-      case 'open':
+      case 'xviz/start':
+        // TODO: support choosing log here
         break;
-      case 'play':
-        this.sendPlayResp(msg);
-        break;
-      case 'metadata':
-        this.sendMetadata();
-        break;
-      case 'open_log': {
+      case 'xviz/transform_log': {
         this.log(`| ts: ${msg.timestamp} duration: ${msg.duration}`);
-        this.sendMetadataResp();
         this.sendPlayResp(msg);
         break;
       }
@@ -316,27 +313,27 @@ class ConnectionContext {
    *
    * @returns frameRequest object or null
    */
-  setupFrameRequest({timestamp, duration}) {
+  setupFrameRequest({start_timestamp, end_timestamp}) {
     const {frames, frames_timing} = this;
-    const {frame_limit, duration: default_duration} = this.settings;
+    const {frame_limit, duration} = this.settings;
 
     //  log time bounds
     const log_time_start = frames_timing[0];
     const log_time_end = frames_timing[frames_timing.length - 1];
 
     // default values
-    if (!timestamp) {
-      timestamp = frames_timing[0];
+    let timestampStart = start_timestamp;
+
+    if (!timestampStart) {
+      timestampStart = frames_timing[0];
     }
 
-    if (!duration) {
-      duration = default_duration;
+    let timestampEnd = end_timestamp;
+    if (!timestampEnd) {
+      timestampEnd = timestampStart + duration;
     }
 
     // bounds checking
-    const timestampStart = timestamp;
-    const timestampEnd = timestamp + duration;
-
     if (timestampStart > log_time_end || timestampEnd < log_time_start) {
       return null;
     }
@@ -360,11 +357,6 @@ class ConnectionContext {
       end,
       index: start
     };
-  }
-
-  // Open establishes the resource to load
-  sendOpenResp(clientMessage) {
-    this.ws.send(JSON.stringify({type: 'ack'}));
   }
 
   sendMetadataResp(clientMessage) {
@@ -407,7 +399,9 @@ class ConnectionContext {
     if (this.replaceFrameRequest) {
       frameRequest = this.replaceFrameRequest;
       this.log(`| Replacing inflight request.`);
-      this.ws.send(JSON.stringify({type: 'cancelled'}));
+      // TODO(jlsee): this should be a real message type, that
+      // contains the request which as canceled
+      this.sendEnveloped('cancelled', {});
       this.replaceFrameRequest = null;
     }
 
@@ -438,8 +432,8 @@ class ConnectionContext {
 
     // End case
     if (ii >= last_index) {
-      // When last_index reached send 'done' message
-      this.ws.send(JSON.stringify({type: 'done'}), {}, () => {
+      // When last_index reached send 'transform_log_done' message
+      this.sendEnveloped('transform_log_done', {}, {}, () => {
         this.logMsgSent(frame_send_time, -1, frame_index, 'json');
       });
 
@@ -473,6 +467,15 @@ class ConnectionContext {
         });
       }
     }
+  }
+
+  sendEnveloped(type, msg, options, callback) {
+    const envelope = {
+      type: `xviz/${type}`,
+      data: msg
+    };
+    const data = JSON.stringify(envelope);
+    this.ws.send(data, options, callback);
   }
 
   log(msg) {
