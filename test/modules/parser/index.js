@@ -9,6 +9,7 @@ import './parsers/filter-vertices.spec';
 import './parsers/parse-stream-data-message.spec';
 import './parsers/parse-stream-message.spec';
 import './parsers/parse-vehicle-pose.spec';
+import './parsers/parse-xviz-pose.spec';
 import './parsers/parse-xviz-stream.spec';
 import './parsers/serialize.spec';
 import './parsers/xviz-v2-common.spec';
