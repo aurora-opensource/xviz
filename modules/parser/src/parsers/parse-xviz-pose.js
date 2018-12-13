@@ -32,5 +32,5 @@ export function parseXVIZPose(pose) {
     });
   }
 
-  return result;
+  return {...pose, ...result};
 }
