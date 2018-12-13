@@ -1,4 +1,5 @@
 import {filterVertices} from './filter-vertices';
+import {ensureUnFlattenedVertices} from './xviz-v2-common';
 import {PRIMITIVE_CAT} from './parse-xviz-primitive';
 import base64js from 'base64-js';
 
@@ -28,6 +29,8 @@ export default {
     category: PRIMITIVE_CAT.FEATURE,
     validate: (primitive, streamName, time) => primitive.vertices && primitive.vertices.length >= 2,
     normalize: primitive => {
+      primitive.vertices = ensureUnFlattenedVertices(primitive.vertices);
+
       // z is required by filterVertices
       primitive.vertices.forEach(v => {
         v[2] = v[2] || 0;
@@ -43,6 +46,8 @@ export default {
     category: PRIMITIVE_CAT.FEATURE,
     validate: (primitive, streamName, time) => primitive.vertices && primitive.vertices.length >= 3,
     normalize: primitive => {
+      primitive.vertices = ensureUnFlattenedVertices(primitive.vertices);
+
       // This is a polygon primitive which per XVIZ protocol implicitly says
       // that the provided path is closed. Push a copy of first vert to end of array.
       // Array comparison turns out to be expensive. Looks like the polygon returned
@@ -56,6 +61,8 @@ export default {
     category: PRIMITIVE_CAT.POINTCLOUD,
     validate: (primitive, streamName, time) => primitive.points && primitive.points.length > 0,
     normalize: primitive => {
+      primitive.points = ensureUnFlattenedVertices(primitive.points);
+
       // Alias XVIZ 2.0 to normalized vertices field.
       primitive.vertices = primitive.points;
       aliasId(primitive);

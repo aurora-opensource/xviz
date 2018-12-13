@@ -1,4 +1,8 @@
-import {parseVersionString} from '@xviz/parser/parsers/xviz-v2-common';
+import {
+  parseVersionString,
+  unFlattenVertices,
+  ensureUnFlattenedVertices
+} from '@xviz/parser/parsers/xviz-v2-common';
 
 import tape from 'tape-catch';
 
@@ -56,5 +60,22 @@ tape('XVIZ V2 Common#parseVersionString invalid strings', t => {
   result = parseVersionString('1-2-3');
   validateVersion(t, result, 1, null, null);
 
+  t.end();
+});
+
+tape('XVIZ V2 Common#unFlattenVertices', t => {
+  const input = [1, 2, 3, 4, 5, 6];
+  const expected = [[1, 2, 3], [4, 5, 6]];
+
+  t.deepEqual(unFlattenVertices(input), expected, 'vertices inflated');
+  t.end();
+});
+
+tape('XVIZ V2 Common#ensureUnFlattenedVertices', t => {
+  const input = [1, 2, 3, 4, 5, 6];
+  const expected = [[1, 2, 3], [4, 5, 6]];
+
+  t.deepEqual(ensureUnFlattenedVertices(input), expected, 'vertices inflated');
+  t.deepEqual(ensureUnFlattenedVertices(expected), expected, 'vertices unchanged');
   t.end();
 });
