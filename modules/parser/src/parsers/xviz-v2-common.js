@@ -72,3 +72,28 @@ export function getPrimitiveData(primitiveObject) {
   // TODO(twojtasz): Cleanup data flow as downstream expects an object rather than an error.
   return {};
 }
+
+/**
+ *  Turns arrays from [1, 2, 3, 4, 5, 6] to [[1, 2, 3], [4, 5, 6]]. The array
+ *  must have a length a multiple of 3.
+ */
+export function unFlattenVertices(vertices) {
+  const result = [];
+  for (let i = 0; i < vertices.length; i = i + 3) {
+    result.push([vertices[i], vertices[i + 1], vertices[i + 2]]);
+  }
+
+  return result;
+}
+
+/**
+ *  Unflattens an array only if it's already flat. Only works on arrays with a
+ *  length that is a multiple of 3.
+ */
+export function ensureUnFlattenedVertices(vertices) {
+  if (vertices.length > 0 && !Array.isArray(vertices[0])) {
+    return unFlattenVertices(vertices);
+  }
+
+  return vertices;
+}
