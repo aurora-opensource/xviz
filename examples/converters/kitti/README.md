@@ -32,10 +32,10 @@ Follow the comments to get an understanding of the how's and why's of converting
 
 E.g date=2011_09_26 drive=0005
 
-Unzip these archives and put them in `../../../data/kitti` directory
+Unzip these archives and put them in one directory. 
 
 ```
-yarn start -d 2011_09_26/2011_09_26_drive_0005_sync
+yarn start -d <path-to-data-source>/2011_09_26/2011_09_26_drive_0005_sync -o <path-to-output>
 ```
 
 
@@ -67,10 +67,9 @@ yarn start -d 2011_09_26/2011_09_26_drive_0005_sync
             |             |         |    |--0000000000.bin
             |             |         |    |--...
             |             |         |--timestamps.txt
-            |             |--tracklet_labels.xml  
-            |--generated                                    // generated data dir
-                   |--0                                     // per frame per folder
-                      |--0-frame.json                       // per frame per json file
-                   |--1
-                      |--1-frame.json
+            |             |--tracklet_labels.xml
+
+|--output                                                   // generated data dir
+      |--0-frame.glb                                        // per frame per .glb file
+      |--1-frame.glb
 ```
