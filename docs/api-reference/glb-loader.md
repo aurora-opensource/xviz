@@ -15,11 +15,11 @@ inlined binary data fields.
 
 Parameters:
 
-- `arrayBuffer` (ArrayBuffer) - an ArrayBuffer to decode 
+- `arrayBuffer` (ArrayBuffer) - an ArrayBuffer to decode
 
 Returns: `Object`
 
-### encodeGLB(json) 
+### encodeGLB(json)
 
 Writes JavaScript JSON data structure into an arrayBuffer that can be written atomically to file,
 extracting binary fields from the data and placing these in a compact binary chunk following the

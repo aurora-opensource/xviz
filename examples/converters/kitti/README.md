@@ -70,6 +70,7 @@ yarn start -d <path-to-data-source>/2011_09_26/2011_09_26_drive_0005_sync -o <pa
             |             |--tracklet_labels.xml
 
 |--output                                                   // generated data dir
-      |--0-frame.glb                                        // per frame per .glb file
-      |--1-frame.glb
+      |--0-frame.json                                       // timimg index file 
+      |--1-frame.glb                                        // per frame per .glb file
+      |--2-frame.glb                            
 ```
