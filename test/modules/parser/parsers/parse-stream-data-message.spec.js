@@ -25,6 +25,8 @@ import {
 import {XVIZValidator} from '@xviz/schema';
 
 import tape from 'tape-catch';
+import clone from 'clone';
+
 import TestMetadataMessageV2 from 'test-data/sample-metadata-message';
 import TestMetadataMessageV1 from 'test-data/sample-metadata-message-v1';
 import TestFuturesMessageV1 from 'test-data/sample-frame-futures-v1';
@@ -462,37 +464,7 @@ tape('parseStreamLogData preProcessPrimitive type change', t => {
 tape('parseStreamLogData pointCloud timeslice', t => {
   resetXVIZConfigAndSettings();
   setXVIZSettings({currentMajorVersion: 2});
-  const PointCloudTestTimesliceMessage = {
-    update_type: 'snapshot',
-    updates: [
-      {
-        timestamp: 1001.0,
-        poses: {
-          '/vehicle_pose': {
-            timestamp: 1001.0,
-            mapOrigin: {longitude: 11.2, latitude: 33.4, altitude: 55.6},
-            position: [1.1, 2.2, 3.3],
-            orientation: [0.1, 0.2, 0.3]
-          }
-        },
-        primitives: {
-          '/test/stream': {
-            points: [
-              {
-                base: {
-                  object_id: 1234,
-                  style: {
-                    fill_color: [255, 255, 255]
-                  }
-                },
-                points: [[1000, 1000, 200]]
-              }
-            ]
-          }
-        }
-      }
-    ]
-  };
+  const PointCloudTestTimesliceMessage = TestTimesliceMessageV2;
 
   // NOTE: no explicit type for this message yet.
   const slice = parseStreamLogData({...PointCloudTestTimesliceMessage});
@@ -507,41 +479,102 @@ tape('parseStreamLogData pointCloud timeslice', t => {
   t.end();
 });
 
+tape('parseStreamLogData polyline flat', t => {
+  resetXVIZConfigAndSettings();
+  setXVIZSettings({currentMajorVersion: 2});
+  const TestTimeslice = clone(TestTimesliceMessageV2);
+  TestTimeslice.updates[0].primitives['/test/stream'] = {
+    polylines: [
+      {
+        base: {
+          object_id: '1234',
+          style: {
+            fill_color: [255, 255, 255]
+          }
+        },
+        vertices: [1000, 1000, 200, 1000, 1000, 250]
+      }
+    ]
+  };
+
+  // NOTE: no explicit type for this message yet.
+  const slice = parseStreamLogData({...TestTimeslice});
+  t.equals(slice.type, LOG_STREAM_MESSAGE.TIMESLICE, 'Message type set for timeslice');
+
+  const features = slice.streams['/test/stream'].features;
+  t.equals(features.length, 1, 'has has object');
+  t.equals(features[0].type, 'polyline', 'type is polyline');
+  t.deepEquals(features[0].vertices, [[1000, 1000, 200], [1000, 1000, 250]], 'array is nested');
+
+  t.end();
+});
+
+tape('parseStreamLogData polygon flat', t => {
+  resetXVIZConfigAndSettings();
+  setXVIZSettings({currentMajorVersion: 2});
+  const TestTimeslice = clone(TestTimesliceMessageV2);
+  TestTimeslice.updates[0].primitives['/test/stream'] = {
+    polygons: [
+      {
+        base: {
+          object_id: '1234',
+          style: {
+            fill_color: [255, 255, 255]
+          }
+        },
+        vertices: [1000, 1000, 200, 1000, 1000, 250, 1000, 1000, 300]
+      }
+    ]
+  };
+
+  // NOTE: no explicit type for this message yet.
+  const slice = parseStreamLogData({...TestTimeslice});
+  t.equals(slice.type, LOG_STREAM_MESSAGE.TIMESLICE, 'Message type set for timeslice');
+
+  const features = slice.streams['/test/stream'].features;
+  t.equals(features.length, 1, 'has has object');
+  t.equals(features[0].type, 'polygon', 'type is polygon');
+  t.deepEquals(
+    features[0].vertices,
+    // We automatically close loops...
+    [[1000, 1000, 200], [1000, 1000, 250], [1000, 1000, 300], [1000, 1000, 200]],
+    'array is nested and looped back'
+  );
+
+  t.end();
+});
+
+tape('parseStreamLogData flat JSON pointCloud', t => {
+  resetXVIZConfigAndSettings();
+  setXVIZSettings({currentMajorVersion: 2});
+  const PointCloudTestTimesliceMessage = clone(TestTimesliceMessageV2);
+  PointCloudTestTimesliceMessage.updates[0].primitives['/test/stream'].points.points = [
+    1000,
+    1000,
+    200
+  ];
+
+  // NOTE: no explicit type for this message yet.
+  const slice = parseStreamLogData({...PointCloudTestTimesliceMessage});
+  t.equals(slice.type, LOG_STREAM_MESSAGE.TIMESLICE, 'Message type set for timeslice');
+  t.ok(slice.streams['/test/stream'].pointCloud, 'has a point cloud');
+
+  const pointCloud = slice.streams['/test/stream'].pointCloud;
+  t.equals(pointCloud.numInstances, 1, 'Has 1 instance');
+  t.deepEquals(pointCloud.positions, [1000, 1000, 200], 'Has 3 values in positions');
+  t.equals(pointCloud.colors.length, 4, 'Has 4 values in colors');
+
+  t.end();
+});
+
 tape('parseStreamLogData pointCloud timeslice TypedArray', t => {
   resetXVIZConfigAndSettings();
   setXVIZSettings({currentMajorVersion: 2});
 
-  const PointCloudTestTimesliceMessage = {
-    update_type: 'snapshot',
-    updates: [
-      {
-        timestamp: 1001.0,
-        poses: {
-          '/vehicle_pose': {
-            timestamp: 1001.0,
-            mapOrigin: {longitude: 11.2, latitude: 33.4, altitude: 55.6},
-            position: [1.1, 2.2, 3.3],
-            orientation: [0.1, 0.2, 0.3]
-          }
-        },
-        primitives: {
-          '/test/stream': {
-            points: [
-              {
-                base: {
-                  object_id: '1234',
-                  style: {
-                    fill_color: [255, 255, 255]
-                  }
-                },
-                points: new Float32Array([1000, 1000, 200])
-              }
-            ]
-          }
-        }
-      }
-    ]
-  };
+  const PointCloudTestTimesliceMessage = clone(TestTimesliceMessageV2);
+  PointCloudTestTimesliceMessage.updates[0].primitives[
+    '/test/stream'
+  ].points.points = new Float32Array([1000, 1000, 200]);
 
   // NOTE: no explicit type for this message yet.
   const slice = parseStreamLogData({...PointCloudTestTimesliceMessage});
@@ -560,46 +593,16 @@ tape('parseStreamLogData pointCloud timeslice', t => {
   resetXVIZConfigAndSettings();
   setXVIZSettings({currentMajorVersion: 2});
 
-  const PointCloudTestTimesliceMessage = {
-    update_type: 'snapshot',
-    updates: [
-      {
-        timestamp: 1001.0,
-        poses: {
-          '/vehicle_pose': {
-            timestamp: 1001.0,
-            mapOrigin: {longitude: 11.2, latitude: 33.4, altitude: 55.6},
-            position: [1.1, 2.2, 3.3],
-            orientation: [0.1, 0.2, 0.3]
-          }
-        },
-        primitives: {
-          '/test/stream': {
-            points: [
-              {
-                object_id: '1234',
-                base: {
-                  style: {
-                    fill_color: [255, 255, 255]
-                  }
-                },
-                points: [[1000, 1000, 200]]
-              },
-              {
-                object_id: '1235',
-                base: {
-                  style: {
-                    fill_color: [255, 255, 255]
-                  }
-                },
-                points: new Float32Array([1000, 1000, 200])
-              }
-            ]
-          }
-        }
+  const PointCloudTestTimesliceMessage = clone(TestTimesliceMessageV2);
+  PointCloudTestTimesliceMessage.updates[0].primitives['/test/stream'].points.push({
+    object_id: '1235',
+    base: {
+      style: {
+        fill_color: [255, 255, 255]
       }
-    ]
-  };
+    },
+    points: new Float32Array([1000, 1000, 200])
+  });
 
   // NOTE: no explicit type for this message yet.
   const slice = parseStreamLogData({...PointCloudTestTimesliceMessage});
