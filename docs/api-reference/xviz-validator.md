@@ -16,16 +16,15 @@ All validation methods throw if the object fails to validate.
 
 Validate `metadata` information.
 
-Parameters: 
+Parameters:
 
 - `data` (Object)
-
 
 ##### validateStateUpdate(data)
 
 Validate `state_update` message.
 
-Parameters: 
+Parameters:
 
 - `data` (Object)
 
@@ -41,35 +40,34 @@ Validate `stream_set` type.
 
 Validate `pose` object.
 
-Parameters: 
+Parameters:
 
 - `data` (Object)
-
 
 ##### validatePrimitive(type, data)
 
 Validate the different primitive types.
 
-Parameters: 
+Parameters:
 
 - `type` (String) - the type of the variable, like "point" or "circle", see spec
 - `data` (Object) - the object to validate
 
 ##### validateTimeSeries(data : Object)
 
-Parameters: 
+Parameters:
 
 - `data` (Object)
 
 ##### validateFutureInstances(data : Object)
 
-Parameters: 
+Parameters:
 
 - `data` (Object)
 
 ##### validateVariable(data : Object)
 
-Parameters: 
+Parameters:
 
 - `data` (Object)
 
@@ -77,7 +75,7 @@ Parameters:
 
 Validation the different annotation types.
 
-Parameters: 
+Parameters:
 
 - `type` (String) - the type of the variable, only "visual" is currently valid
 - `data` (Object) - the object to validate
@@ -88,14 +86,13 @@ Parameters:
 
 Validate any schema
 
-Parameters: 
+Parameters:
 
 - `schemaName` (String) - the name of the schema, the ".schema.json" trailer is not needed
 - `data` (Object) - the object to validate
 
-##### schemaCount() 
+##### schemaCount()
 
 Useful for checking the validator initialized properly.
 
 Returns: schema count (Number)
-

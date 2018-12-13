@@ -224,8 +224,8 @@ Set the primitive-specific style. This will override the style defined in the st
 
 Parameters:
 
-- `style` (Object) - Check [XVIZ Stylesheet Spec](/docs/protocol-schema/style-specification.md)
-  for supported style properties.
+- `style` (Object) - Check [XVIZ Stylesheet Spec](/docs/protocol-schema/style-specification.md) for
+  supported style properties.
 
 Returns: `this`
 
@@ -403,6 +403,7 @@ Parameters:
 - `column_values` (Array:String|Number|Boolean) - a list of values for each column.
 
 Returns: a `XVIZTreeTableRowBuilder` instance that represents the new row.
+
 ## XVIZTreeTableRowBuilder
 
 ##### child(id, column_values)

@@ -11,6 +11,7 @@ import {XVIZObject} from 'viz';
 ##### get(id)
 
 Parameters:
+
 - id (Number): XVIZ object id
 
 Returns: an `XVIZObject` instance for the given `id`.
