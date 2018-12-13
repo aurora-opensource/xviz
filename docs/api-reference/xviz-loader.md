@@ -2,7 +2,7 @@
 
 ## Functions
 
-### parseBinaryXVIZ(arrayBuffer) 
+### parseBinaryXVIZ(arrayBuffer)
 
 Parses an in-memory, GLB formatted `ArrayBuffer` into XVIZ.
 
@@ -13,6 +13,7 @@ Parameters:
 Returns: decoded data (Object).
 
 ### encodeBinaryXVIZ(json, options)
+
 - `json` (Object) - Data to encode
 - `options` (Object)
   - `options.flattenArrays`=`true` - Whether to flatten arrays

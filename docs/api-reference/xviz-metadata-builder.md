@@ -187,8 +187,8 @@ Define the default style with style object.
 
 Parameters:
 
-- `style` (Object) - Check [XVIZ Stylesheet Spec](/docs/protocol-schema/style-specification.md)
-  for supported style properties.
+- `style` (Object) - Check [XVIZ Stylesheet Spec](/docs/protocol-schema/style-specification.md) for
+  supported style properties.
 
 Returns: `this`
 
@@ -199,7 +199,7 @@ Define a style class with its corresponding styles.
 Parameters:
 
 - `className` (String) - The class name that the style object should apply to.
-- `style` (Object) - Check [XVIZ Stylesheet Spec](/docs/protocol-schema/style-specification.md)
-  for supported style properties.
+- `style` (Object) - Check [XVIZ Stylesheet Spec](/docs/protocol-schema/style-specification.md) for
+  supported style properties.
 
 Returns: `this`

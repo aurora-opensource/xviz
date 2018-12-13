@@ -26,6 +26,7 @@ parser.addArgument(['-d', '--data-directory'], {
 });
 
 parser.addArgument(['-o', '--output'], {
+  required: true,
   help: 'Path to generated data. Relative path will be resolved relative to /data/generated/kitti/'
 });
 
@@ -55,19 +56,16 @@ parser.addArgument(['--image-max-height'], {
 });
 
 parser.addArgument('--fake-streams', {
-  defaultValue: '',
+  defaultValue: true,
   help: 'Generate fake streams with random data for testing'
 });
 
 // extract args from user input
 module.exports = function getArgs() {
   const args = parser.parseArgs();
-  const inputDir = path.resolve(__dirname, '../../../../data/kitti', args.data_directory);
-  const outputDir = path.resolve(
-    __dirname,
-    '../../../../data/generated/kitti',
-    args.out || args.data_directory
-  );
+  const inputDir = args.data_directory;
+  const outputDir = args.output;
+
   console.log(inputDir, outputDir); // eslint-disable-line
   const disabledStreams = args.disable_streams.split(',').filter(Boolean);
   return {
