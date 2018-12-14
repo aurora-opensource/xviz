@@ -46,7 +46,7 @@ parser.addArgument(['--image-max-height'], {
 });
 
 parser.addArgument('--fake-streams', {
-  defaultValue: true,
+  defaultValue: '',
   help: 'Generate fake streams with random data for testing'
 });
 

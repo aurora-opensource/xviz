@@ -7,7 +7,6 @@ import StaticData from './converters/static-data';
 
 module.exports = async function main(args) {
   const {inputDir, samplesDir, disabledStreams, fakeStreams, frameLimit, scenes, imageMaxWidth, imageMaxHeight} = args;
-  console.log({ imageMaxWidth, imageMaxHeight})
 
   const staticData = new StaticData(inputDir);
   for (const scene of scenes) {
