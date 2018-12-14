@@ -32,8 +32,8 @@ xb.stream(this.LIDAR_POINTS)
   });
 ```
 
-We can we are setting standard attributes and taking into account the `pose()` offset required for
-the lidar sensor.
+You can see we are setting standard attributes and taking into account the `pose()` offset required
+for the lidar sensor.
 
 To convert the data to XVIZ it is worth show how this data is parsed first.
 
@@ -43,7 +43,6 @@ export function loadLidarData(data) {
   const float = new Float32Array(binary);
   const size = Math.round(binary.length / 4);
 
-  // We could return interleaved buffers, no conversion!
   const positions = new Float32Array(3 * size);
   const colors = new Uint8Array(4 * size).fill(255);
 

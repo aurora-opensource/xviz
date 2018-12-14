@@ -44,6 +44,6 @@ The data provides the following that we will take advantage of in this conversio
 
 # Data synchronization
 
-XVIZ does not handle synchronizing data across the multiple data sources that come from a system. We
-rely on data synchronization to be handled during the conversion step if necessary. For this reason
-we are using the **sync+rectified** data from KITTI which aligns all the data by timestamp.
+XVIZ will accurately synchronize multiple timestamped XVIZ streams, but your system must be able to
+syncrhonize and timestamp the data itself. For this reason we are using the **sync+rectified** data
+from KITTI which aligns all the data by timestamp.

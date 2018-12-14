@@ -1,8 +1,8 @@
 # Example Guide
 
-This example guide describes converting the KITTI dataset into XVIZ. It provides a starting point
-for understanding how data is converted to XVIZ and accessed in the browser to quickly visualize and
-explore your data.
+This example guide describes converting the [KITTI](http://www.cvlibs.net/datasets/kitti) dataset
+into XVIZ. It provides a starting point for understanding how data is converted to XVIZ and accessed
+in the browser to quickly visualize and explore your data.
 
 ## What XVIZ enables
 

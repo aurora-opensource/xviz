@@ -45,7 +45,9 @@ With our classes defined, the main convertion code flow will be as follows
 
 1. Process args and options
 2. Construct the KITTI Converter
-3. Construct an [XVIZWriter]
-4. Collect and write out [XVIZ Metadata]
-5. Process frames
-6. Write out an [XVIZWriter.writeFrameIndex] to support fast loading and random seek
+3. Construct an [XVIZWriter](/docs/api-reference/xviz-writer.md)
+4. Collect and write out [XVIZ Metadata](/docs/protocol-schema/session-protocol.md#metadata)
+5. Process frames and write out with
+   [XVIZWriter.writeFrame](/docs/api-reference/xviz-writer.md#writeframe)
+6. Write out an [XVIZWriter.writeFrameIndex](/docs/api-reference/xviz-writer.md#writeframeindex) to
+   support fast loading and random seek in the XVIZ Server

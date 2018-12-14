@@ -33,8 +33,8 @@ const xb = xvizMetaBuilder;
 xb.stream('/vehicle_pose').category('pose');
 ```
 
-We are simply defining the 'stream name' and the 'category'. However because pose is so important
-there is a required name `/vehicle_pose`. The list of
+We are simply defining the **stream name** and the **category**. However because pose is so
+important there is a required name `/vehicle_pose`. The list of
 [category values](/docs/protocol-schema/session-protocol.md#stream_metadata) can be seen in the
 specification.
 
@@ -80,12 +80,12 @@ const xb = xvizMetaBuilder;
   .unit('m/s')
 ```
 
-The constants used here represent the strings '/vehicle/acceleration' and '/vehicle/velocity'
-respectively. The 'type()' defines the value types of the stream and the lists of
+The constants used here represent the strings `/vehicle/acceleration` and `/vehicle/velocity`
+respectively. The `type()` defines the value types of the stream and the lists of
 [type values](/docs/protocol-schema/session-protocol.md#stream_metadata) can be in the
 specification.
 
-The 'unit()' is a free form string to define the units that will be displayed in the UI.
+The `unit()` is a free form string to define the units that will be displayed in the UI.
 
 The data for each frame is converted as follows.
 
