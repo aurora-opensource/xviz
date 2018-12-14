@@ -28,7 +28,7 @@ case $MODE in
   *)
     echo "Checking prettier code styles..."
 
-    JS_PATTERN="{modules,test,website}/**/*.js"
+    JS_PATTERN="{modules,test,website,examples}/**/*.js"
     DOCS_PATTERN="docs/**/*.md"
     README_PATTERN="*.md"
     SCHEMA_README="./modules/schema/README.md"

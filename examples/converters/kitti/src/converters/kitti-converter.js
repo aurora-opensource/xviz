@@ -46,14 +46,12 @@ export class KittiConverter {
       new CameraConverter(this.inputDir, {
         disabledStreams: this.disabledStreams,
         options: this.imageOptions
-      })
+      }),
+      new FutureTrackletsConverter(this.inputDir, () => gpsConverter.getPoses(), this.timestamps)
     ];
 
     if (this.fakeStreams) {
       this.converters.push(new RandomDataGenerator());
-      this.converters.push(
-        new FutureTrackletsConverter(this.inputDir, () => gpsConverter.getPoses(), this.timestamps)
-      );
     }
 
     this.converters.forEach(converter => converter.load());
