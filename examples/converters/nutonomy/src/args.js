@@ -2,12 +2,12 @@ const {ArgumentParser} = require('argparse');
 
 const parser = new ArgumentParser({
   addHelp: true,
-  description: 'KITTI to XVIZ converter'
+  description: 'NuTonomy to XVIZ converter'
 });
 
 parser.addArgument(['-d', '--data-directory'], {
   required: true,
-  help: 'Path to raw KITTI data.'
+  help: 'Path to raw nutonomy data (metadata and annotations).'
 });
 
 parser.addArgument(['-o', '--output'], {
@@ -15,9 +15,14 @@ parser.addArgument(['-o', '--output'], {
   help: 'Path to generated data.'
 });
 
-parser.addArgument('--json', {
-  action: 'storeTrue',
-  help: 'Generate JSON XVIZ output instead of the binary file format'
+parser.addArgument(['--samples-directory'], {
+  required: true,
+  help: 'Path to nutonomy samples data (Lidar, Radar).'
+});
+
+parser.addArgument(['--scenes'], {
+  required: true,
+  help: 'List of scene number'
 });
 
 parser.addArgument(['--disable-streams'], {
@@ -36,7 +41,7 @@ parser.addArgument(['--image-max-width'], {
 });
 
 parser.addArgument(['--image-max-height'], {
-  defaultValue: 300,
+  defaultValue: 250,
   help: 'Image max height'
 });
 
@@ -45,22 +50,34 @@ parser.addArgument('--fake-streams', {
   help: 'Generate fake streams with random data for testing'
 });
 
+parser.addArgument('--list-scenes', {
+  defaultValue: false,
+  help: 'List available scenes (use with -d or --data-directory).'
+});
+
 // extract args from user input
 module.exports = function getArgs() {
   const args = parser.parseArgs();
   const inputDir = args.data_directory;
-  const outputDir = args.output;
-
+  const samplesDir = args.samples_directory;
+  const outputDir = args.output || args.data_directory;
+  const scenes = args.scenes
+    .split(',')
+    .filter(Boolean)
+    .map(n => Number(n));
   console.log(inputDir, outputDir); // eslint-disable-line
   const disabledStreams = args.disable_streams.split(',').filter(Boolean);
+
   return {
     inputDir,
     outputDir,
+    samplesDir,
     disabledStreams,
     fakeStreams: Boolean(args.fake_streams),
     imageMaxWidth: Number(args.image_max_width),
     imageMaxHeight: Number(args.image_max_height),
     frameLimit: Number(args.frame_limit),
-    writeJson: Number(args.json)
+    listScenes: args.list_scenes,
+    scenes
   };
 };
