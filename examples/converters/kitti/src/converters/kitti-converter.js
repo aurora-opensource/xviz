@@ -1,17 +1,17 @@
 import path from 'path';
-import { XVIZBuilder, XVIZMetadataBuilder } from '@xviz/builder';
+import {XVIZBuilder, XVIZMetadataBuilder} from '@xviz/builder';
 
-import { getTimestamps, createDir } from '../parsers/common';
+import {getTimestamps, createDir} from '../parsers/common';
 import GPSConverter from './gps-converter';
 import LidarConverter from './lidar-converter';
 import TrackletsConverter from './tracklets-converter';
 import FutureTrackletsConverter from './future-tracklets-converter';
 import CameraConverter from './camera-converter';
 import RandomDataGenerator from './random-data-generator';
-import { getDeclarativeUI } from './declarative-ui';
+import {getDeclarativeUI} from './declarative-ui';
 
 export class KittiConverter {
-  constructor(inputDir, outputDir, { disabledStreams, fakeStreams, imageMaxWidth, imageMaxHeight }) {
+  constructor(inputDir, outputDir, {disabledStreams, fakeStreams, imageMaxWidth, imageMaxHeight}) {
     this.inputDir = inputDir;
     this.outputDir = outputDir;
     this.disabledStreams = disabledStreams;
@@ -42,7 +42,7 @@ export class KittiConverter {
     this.converters = [
       gpsConverter,
       new TrackletsConverter(this.inputDir, () => gpsConverter.getPoses()),
-      new LidarConverter(this.inputDir, 'velodyne_points', { disabledStreams: this.disabledStreams }),
+      new LidarConverter(this.inputDir, 'velodyne_points', {disabledStreams: this.disabledStreams}),
       new CameraConverter(this.inputDir, {
         disabledStreams: this.disabledStreams,
         options: this.imageOptions
