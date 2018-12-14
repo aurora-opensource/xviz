@@ -34,7 +34,6 @@ export default class CameraConverter {
       maxWidth: imageMaxWidth,
       maxHeight: imageMaxHeight
     };
-    console.log({ imageMaxWidth, imageMaxHeight})
     this.cameraSources = disabledStreams
       ? CAMERA_SOURCES.filter(source => disabledStreams.indexOf(source) === -1)
       : CAMERA_SOURCES;

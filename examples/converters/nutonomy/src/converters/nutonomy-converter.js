@@ -70,13 +70,22 @@ export default class NuTonomyConverter {
       imageMaxWidth: this.imageMaxWidth,
       imageMaxHeight: this.imageMaxHeight
     });
+    const futureObjectsConverter = new FutureObjectsConverter(
+      this.inputDir,
+      'sample_annotation.json'
+    );
 
     // Note: order is important due to data deps on the pose
-    this.converters = [gpsConverter, objectConverter, lidarConverter, cameraConverter];
+    this.converters = [
+      gpsConverter,
+      objectConverter,
+      lidarConverter,
+      cameraConverter,
+      futureObjectsConverter
+    ];
 
     if (this.fakeStreams) {
       this.converters.push(new RandomDataGenerator());
-      this.converters.push(new FutureObjectsConverter(this.inputDir, 'sample_annotation.json'));
     }
 
     gpsConverter.load({

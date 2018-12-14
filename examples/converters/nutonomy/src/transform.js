@@ -20,8 +20,16 @@ import NuTonomyConverter from './converters/nutonomy-converter';
 import StaticData from './converters/static-data';
 
 module.exports = async function main(args) {
-  const {inputDir, samplesDir, disabledStreams, fakeStreams, frameLimit, scenes, imageMaxWidth, imageMaxHeight} = args;
-  console.log({ imageMaxWidth, imageMaxHeight})
+  const {
+    inputDir,
+    samplesDir,
+    disabledStreams,
+    fakeStreams,
+    frameLimit,
+    scenes,
+    imageMaxWidth,
+    imageMaxHeight
+  } = args;
 
   const staticData = new StaticData(inputDir);
   for (const scene of scenes) {
