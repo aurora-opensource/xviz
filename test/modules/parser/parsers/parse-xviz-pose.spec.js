@@ -33,7 +33,7 @@ tape('parseXVIZPose#simple', t => {
   t.end();
 });
 
-tape.only('parseXVIZPose#additionalProperties preserved', t => {
+tape('parseXVIZPose#additionalProperties preserved', t => {
   const additionalPropPose = {
     ...testXVIZPose,
     extraProp: true
