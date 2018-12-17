@@ -8,6 +8,8 @@ import {
 
 import {loadTracklets} from '../parsers/parse-tracklets';
 
+const FUTURE_STEPS = 100; // 10 seconds
+
 /**
  * FutureTrackletsConverter uses known data about tracklets to generate
  * "future" data (ie predictions) to demonstrate how they can be generated
@@ -58,8 +60,7 @@ export default class FutureTrackletsConverter {
       return;
     }
 
-    // Generate predictions for 10 frames
-    const futureFrameLimit = Math.min(frameNumber + 10, this.frameLimit);
+    const futureFrameLimit = Math.min(frameNumber + FUTURE_STEPS, this.frameLimit);
 
     for (let i = frameNumber; i < futureFrameLimit; i++) {
       const tracklets = this._convertTrackletsFutureFrame(frameNumber, i);
