@@ -18,6 +18,8 @@ import {parseJsonFile} from '../common';
 import {OBJECT_PALATTE} from './objects-converter';
 import {loadObjects} from '../parsers/parse-objects';
 
+const FUTURE_STEPS = 25; // 10 seconds
+
 export default class FutureObjectsConverter {
   constructor(rootDir, streamFile) {
     this.rootDir = rootDir;
@@ -40,8 +42,7 @@ export default class FutureObjectsConverter {
   }
 
   convertFrame(frameIndex, xvizBuilder) {
-    // Generate predictions for 10 frames
-    const futureFrameLimit = Math.min(frameIndex + 10, this.frames.length);
+    const futureFrameLimit = Math.min(frameIndex + FUTURE_STEPS, this.frames.length);
 
     for (let i = frameIndex; i < futureFrameLimit; i++) {
       const objects = this._convertObjectsFutureFrame(frameIndex, i);
