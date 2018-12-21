@@ -66,7 +66,7 @@ function loadTimingIndex(data_directory) {
     console.log('Timing index file is missing the "timing" entry');
   }
 
-  return null;
+  return [];
 }
 
 // Check for data files or tar.gz and extract as necessary
