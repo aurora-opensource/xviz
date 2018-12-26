@@ -6,7 +6,6 @@ import {resetXVIZConfigAndSettings} from '../config/config-utils';
 // xviz data uses snake_case
 /* eslint-disable camelcase */
 
-const LOG_START_TIME = 0;
 const LOGS = {
   log1: [
     {attributes: {transmission_time: 100}, value: 1},
@@ -36,13 +35,13 @@ const TEST_CASES = [
 ];
 
 tape('LogSynchronizer#constructor', t => {
-  const logSynchronizer = new LogSynchronizer(LOG_START_TIME, LOGS);
+  const logSynchronizer = new LogSynchronizer(LOGS);
   t.ok(logSynchronizer instanceof LogSynchronizer, 'Constructed');
   t.end();
 });
 
 tape('LogSynchronizer#setTime', t => {
-  const logSynchronizer = new LogSynchronizer(LOG_START_TIME, LOGS);
+  const logSynchronizer = new LogSynchronizer(LOGS);
   logSynchronizer.setTime(10);
   t.equals(logSynchronizer.getTime(), 10, 'Set and retrieved time');
   t.end();
@@ -51,7 +50,7 @@ tape('LogSynchronizer#setTime', t => {
 tape('LogSynchronizer#getData', t => {
   resetXVIZConfigAndSettings();
   setXVIZSettings({TIME_WINDOW: 3});
-  const logSynchronizer = new LogSynchronizer(LOG_START_TIME, LOGS);
+  const logSynchronizer = new LogSynchronizer(LOGS);
 
   for (const tc of TEST_CASES) {
     const {time, log1, log2} = tc;
