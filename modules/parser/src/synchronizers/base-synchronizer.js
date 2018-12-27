@@ -48,15 +48,12 @@ const getCurrentFrameMemoized = memoize(
  * - Each timeslice object must contain a GPS timestamp
  */
 export default class BaseSynchronizer {
-  constructor(startTime, opts = {}) {
-    this.startTime = startTime;
+  constructor(opts = {}) {
     this.opts = opts;
 
     this.time = 0;
     this.loResTime = 0;
     this.lookAheadMs = 0;
-
-    this.setTime(startTime);
   }
 
   // The "frame" contains the processed and combined data from the current log slice
@@ -104,10 +101,6 @@ export default class BaseSynchronizer {
     this.loResTime = Math.round(time * PLAYBACK_FRAME_RATE) / PLAYBACK_FRAME_RATE;
     assert(Number.isFinite(this.time), 'Invalid time');
     return this;
-  }
-
-  setDeltaTime(time) {
-    return this.setTime(this.startTime + time);
   }
 
   /**

@@ -20,7 +20,6 @@ import {resetXVIZConfigAndSettings} from '../config/config-utils';
 // xviz data uses snake_case
 /* eslint-disable camelcase */
 
-const LOG_START_TIME = 0;
 const TEST_BUFFER = new XVIZStreamBuffer();
 TEST_BUFFER.timeslices = [
   {
@@ -83,13 +82,13 @@ const TEST_CASES = [
 ];
 
 tape('StreamSynchronizer#constructor', t => {
-  const logSynchronizer = new StreamSynchronizer(LOG_START_TIME, TEST_BUFFER);
+  const logSynchronizer = new StreamSynchronizer(TEST_BUFFER);
   t.ok(logSynchronizer instanceof StreamSynchronizer, 'Constructed');
   t.end();
 });
 
 tape('StreamSynchronizer#setTime', t => {
-  const logSynchronizer = new StreamSynchronizer(LOG_START_TIME, TEST_BUFFER);
+  const logSynchronizer = new StreamSynchronizer(TEST_BUFFER);
   logSynchronizer.setTime(10);
   t.equals(logSynchronizer.getTime(), 10, 'Set and retrieved time');
   t.end();
@@ -98,7 +97,7 @@ tape('StreamSynchronizer#setTime', t => {
 tape('StreamSynchronizer#getData', t => {
   resetXVIZConfigAndSettings();
   setXVIZSettings({TIME_WINDOW: 3});
-  const logSynchronizer = new StreamSynchronizer(LOG_START_TIME, TEST_BUFFER);
+  const logSynchronizer = new StreamSynchronizer(TEST_BUFFER);
 
   for (const tc of TEST_CASES) {
     const {time, log1, log2} = tc;

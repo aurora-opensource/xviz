@@ -31,8 +31,8 @@ export default class LogSynchronizer extends BaseSynchronizer {
    * - Each log object must contain a GPS timestamp
    *   either in the `attributes.transmission_time` or the `time` fields
    */
-  constructor(startTime, logs = {}, opts) {
-    super(startTime, opts);
+  constructor(logs = {}, opts) {
+    super(opts);
 
     // Set up log state for all logs, so that we can move forward and back
     this.logs = {};
