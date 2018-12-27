@@ -42,8 +42,8 @@ export function parseLogMetadataV1(data) {
     }
   });
 
-  const logStartTime = data.log_start_time;
-  const logEndTime = data.log_end_time;
+  const logStartTime = data.log_start_time || null;
+  const logEndTime = data.log_end_time || null;
   // Fallback to complete log time if we don't have a specific playback time range
   const eventStartTime = data.start_time || logStartTime;
   const eventEndTime = data.end_time || logEndTime;
@@ -79,8 +79,8 @@ export function parseLogMetadataV2(data) {
   }
 
   const logInfo = data.log_info || {};
-  const logStartTime = logInfo.log_start_time;
-  const logEndTime = logInfo.log_end_time;
+  const logStartTime = logInfo.log_start_time || null;
+  const logEndTime = logInfo.log_end_time || null;
   // Fallback to complete log time if we don't have a specific playback time range
   const eventStartTime = logInfo.start_time || logStartTime;
   const eventEndTime = logInfo.end_time || logEndTime;
