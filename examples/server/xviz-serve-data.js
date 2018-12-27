@@ -203,23 +203,37 @@ function getTimestampV1(xviz_data) {
 }
 
 function getTimestampV2(xviz_data) {
-  const {log_info, updates} = xviz_data;
-  const {start_time} = log_info || {};
-  let vehicle_pose = null;
-
-  if (updates && updates[0] && updates[0].poses) {
-    vehicle_pose = updates[0].poses['/vehicle_pose'];
-  }
-
   let timestamp;
-  if (start_time) {
-    timestamp = start_time;
-  } else if (vehicle_pose) {
-    timestamp = vehicle_pose.timestamp;
-  } else if (updates) {
-    timestamp = updates.reduce((t, stateUpdate) => {
-      return Math.max(t, stateUpdate.timestamp);
-    }, 0);
+
+  // Handled timestamp from metadata
+  const {log_info} = xviz_data;
+  if (log_info) {
+    if (log_info.start_time) {
+      timestamp = log_info.start_time;
+    }
+  } else {
+    // Handled timestamp from XVIZ update message
+    let {updates} = xviz_data;
+
+    // If not a direct XVIZ message, check for the envelope
+    if (!updates && xviz_data.data && xviz_data.data.updates) {
+      updates = xviz_data.data.updates;
+    } else {
+      throw new Error('Unable to find "updates" field to extract timestamp from XVIZ data.');
+    }
+
+    let vehicle_pose = null;
+    if (updates && updates[0] && updates[0].poses) {
+      vehicle_pose = updates[0].poses['/vehicle_pose'];
+    }
+
+    if (vehicle_pose) {
+      timestamp = vehicle_pose.timestamp;
+    } else if (updates) {
+      timestamp = updates.reduce((t, stateUpdate) => {
+        return Math.max(t, stateUpdate.timestamp);
+      }, 0);
+    }
   }
 
   return timestamp;
