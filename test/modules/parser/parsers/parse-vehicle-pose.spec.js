@@ -29,7 +29,8 @@ tape('parseVehiclePose#import', t => {
 
 tape('parseVehiclePose#getTransformsFromPose', t => {
   const result = getTransformsFromPose(vehiclePose);
-  t.equal(result, null);
+  t.equals(result.origin, null, 'no mapOrigin present');
+  t.deepEquals(result.trackPosition, [0, 0, 0], 'trackPosition');
 
   t.end();
 });
