@@ -104,7 +104,7 @@ export function parseLogMetadataV2(data) {
   const metadata = {
     ...data,
 
-    streams,
+    streams, // Overrides entry from 'data'
 
     logStartTime,
     logEndTime,
