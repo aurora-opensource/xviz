@@ -84,12 +84,12 @@ export default class LogSlice {
    * feature properties.
    */
   initialize(streamFilter, lookAheadMs, streamsByReverseTime) {
+    const filter = streamFilter && Object.keys(streamFilter).length > 0 ? streamFilter : null;
+
     // get data if we don't already have that stream && it is not filtered.
-    // TODO: make streamFilter a list of filtered streams
-    // so it can default to [], and then only exclude if filter.includes(x)
     streamsByReverseTime.forEach(streams => {
       for (const streamName in streams) {
-        if (!this.streams[streamName] && this._includeStream(streamFilter, streamName)) {
+        if (!this.streams[streamName] && this._includeStream(filter, streamName)) {
           this.addStreamDatum(streams[streamName], streamName, lookAheadMs, this);
         }
       }
