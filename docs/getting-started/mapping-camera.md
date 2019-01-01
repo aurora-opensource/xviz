@@ -1,12 +1,6 @@
 # Mapping Camera Images
 
 KITTI has 4 camera image sources. The conversion code converts each image into a separate stream.
-Separating the data by stream is useful because eventually, see [roadmap](TODO), our XVIZ server
-will provide the ability to select streams before sending the XVIZ data which can result in
-significant size reduction of data when it is not necessary.
-
-It also means the streams could be accessed if necessary by enabling them and requesting the data
-again.
 
 > Due to transmission size considerations, it is typically important to down scale images as much as
 > possible. Many cameras today capture at HD resolutions and downsizing to e.g. 720x480 leads to a

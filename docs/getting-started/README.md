@@ -6,8 +6,6 @@ in the browser to quickly visualize and explore your data.
 
 ## What XVIZ enables
 
-![streetscape.gl](streetscape-mini.gif)
-
 Describing your data in XVIZ allows you to tap into an ecosystem that is decoupled from any specific
 platform and allowed to optimize for the target use-cases powered by web applications.
 

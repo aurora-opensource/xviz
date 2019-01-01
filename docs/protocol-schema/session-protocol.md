@@ -268,7 +268,7 @@ reconfiguration happens.
 | `ui_primitive_type`  | `enum{ ui_primitive_types }`      | The only valid type is "treetable" right now.                                                                                                              |
 | `annotation_type`    | `enum{ annotation_types }`        | The only valid type is "visual" right now.                                                                                                                 |
 
-Frames:
+#### Frames:
 
 - `IDENTITY` - data in meters, apply no transform to the data before display
 - `GEOGRAPHIC` - data in lat/lon/altitude
@@ -276,7 +276,7 @@ Frames:
   transform
 - `DYNAMIC` - name of a function which returns the needed transform at runtime
 
-Category:
+#### Category:
 
 - `primitive`
 - `time_series`
@@ -286,14 +286,14 @@ Category:
 - `pose`
 - `ui_primitive`
 
-Scalar types:
+#### Scalar types:
 
 - `float`
 - `in32`
 - `string`
 - `bool`
 
-Primitive types:
+#### Primitive types:
 
 - `circle`
 - `image`

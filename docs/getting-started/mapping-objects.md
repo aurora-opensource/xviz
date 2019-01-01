@@ -47,12 +47,10 @@ from the vehicle position origin.
   .pose(this.FIXTURE_TRANSFORM_POSE)
 ```
 
-This pose transform is simple, but depending on the data there are other options available. See the
-[metadata pose transform](TODO) for additional information.
-
 In this stream metadata definition also see the first use of `streamStyle()` method. This method
-defines a default style definition for all stream data. Refer to the full [Style reference](TODO)
-for the complete list of attributes that can be set.
+defines a default style definition for all stream data. Refer to the full
+[Style reference](/docs/protocol-schema/style-specification.md) for the complete list of attributes
+that can be set.
 
 It is worth mentioning that styles can be defined in 3 ways. Here they are listed in order of
 precedence
@@ -73,14 +71,15 @@ xvizBuilder
   .id(tracklet.id);
 ```
 
-This is a simple conversion using the [circle()](TODO) method.
+This is a simple conversion using the [circle()](/docs/api-reference/xviz-builder.md) method.
 
-This is the the first use of the [id()](TODO) method. For the complete description read the
-[XVIZ Object Identity](TODO) documentation. Briefly xviz does not model objects directly, in part
-due to the fact that various systems may emit data related to an object but in a separate domain.
-Forcing the full definition of an object would make this a more difficult for coordinating data
-about an object across all sources. XVIZ allows elements to be marked with an **id** which can be
-used in an XVIZ client to construct the unified view of information attached to that id.
+This is the the first use of the [id()](/docs/api-reference/xviz-builder.md) method. For the
+complete description read the [XVIZ Object Identity](/docs/protocol-schema/core-types.md)
+documentation. Briefly xviz does not model objects directly, in part due to the fact that various
+systems may emit data related to an object but in a separate domain. Forcing the full definition of
+an object would make this a more difficult for coordinating data about an object across all sources.
+XVIZ allows elements to be marked with an **id** which can be used in an XVIZ client to construct
+the unified view of information attached to that id.
 
 ### Object bounds
 
@@ -122,9 +121,10 @@ xb.stream(this.TRACKLETS)
   .pose(this.FIXTURE_TRANSFORM_POSE);
 ```
 
-The new element here is the use of the [styleClass()](TODO) method. This enables a list of style
-attributes to be reference by the class name, avoiding repeating this inline at the actual polygon
-creation. We can also see that the 'pose()' offset is also applied to this stream.
+The new element here is the use of the [styleClass()](/docs/api-reference/xviz-builder.md) method.
+This enables a list of style attributes to be reference by the class name, avoiding repeating this
+inline at the actual polygon creation. We can also see that the 'pose()' offset is also applied to
+this stream.
 
 Here is how the individual polygon and labels are converted to XVIZ.
 
@@ -139,17 +139,17 @@ xvizBuilder
   .id(tracklet.id);
 ```
 
-The [polygon()](TODO) is just a list of vertices.
+The [polygon()](/docs/api-reference/xviz-builder.md) is just a list of vertices.
 
-We can see the method [classes()](TODO) is called, and because the class names where aligned with
-the strings used in the KITTI data we simply are setting the class to the string. Notice that the
-parameter to the `classes()` method is an array as it supports multiple classes for each object. It
-is important to note that the class resolution order is taken from the stream metadata, where the
-latter definition has highest priority.
+We can see the method [classes()](/docs/api-reference/xviz-builder.md) is called, and because the
+class names where aligned with the strings used in the KITTI data we simply are setting the class to
+the string. Notice that the parameter to the `classes()` method is an array as it supports multiple
+classes for each object. It is important to note that the class resolution order is taken from the
+stream metadata, where the latter definition has highest priority.
 
-We also see the method [style()](TODO) being used along with classes. This inline styling take
-precendence over the others. In this case, the `height` attribute is provided per object by KITTI
-which is taken advantage of here to provide a visual treatment that matches the label height of each
-object in the scene.
+We also see the method [style()](/docs/api-reference/xviz-builder.md) being used along with classes.
+This inline styling take precendence over the others. In this case, the `height` attribute is
+provided per object by KITTI which is taken advantage of here to provide a visual treatment that
+matches the label height of each object in the scene.
 
-See the [style guide](TODO) for the full details on styling.
+See the [style guide](/docs/protocol-schema/style-specification.md) for the full details on styling.

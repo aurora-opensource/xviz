@@ -18,13 +18,14 @@ XVIZ allows you to describe:
 
 ## XVIZ Protocol Specification
 
-The [XVIZ User Guide](TODO) covers topics in greater detail.
+The [XVIZ Protocol](/docs/protocol-schema/introduction.md) covers important concepts and the data
+types .
 
 ## XVIZ Javascript Libraries
 
-The [XVIZ Javascript](TODO) libraries are a set of modules to validate, build, and parse XVIZ
-formatted data. These libraries make working with XVIZ easier and provide support for validation of
-any other language implementations.
+The [XVIZ Javascript](/docs/api-reference/xviz-builder.md) libraries are a set of modules to
+validate, build, and parse XVIZ data. These libraries make working with XVIZ easier and provide
+support for validation of any other language implementations.
 
 ## XVIZ Server
 
@@ -32,5 +33,5 @@ XVIZ was designed with a focus on distributed systems and teams. This means taki
 size and processing and well as optimizing for data transmission over network infrastructures.
 
 The XVIZ Server is a simple demonstration of how XVIZ data can be delivered to your application.
-Follow the [Quick Start Guide](TODO) to see how simple it is to start sending XVIZ data to your
+Follow the [Quick Start](/docs/getting-started/xviz-server.md) to start sending XVIZ data to your
 application.

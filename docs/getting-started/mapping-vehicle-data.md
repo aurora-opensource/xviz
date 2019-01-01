@@ -56,8 +56,8 @@ KITTI provides all the information necessary and you can see the details of the 
 data every Pose is determined by the mapOrigin.
 
 If the mapOrigin was fixed, we could use the `position()` as meter offsets from that known location.
-However that is not the case here. Please see the topic on [XVIZ Reference Frames](TODO) for more
-details.
+However that is not the case here. Please see the topic on
+[XVIZ Reference Frames](/docs/protocol-schema/session-protocol.md) for more details.
 
 ### Acceleration and Velocity
 
