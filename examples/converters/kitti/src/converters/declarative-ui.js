@@ -33,8 +33,15 @@ function getMetricsPanel(builder) {
     description: 'The velocity of the vehicle'
   });
 
+  const metricWheel = builder.metric({
+    title: 'Wheel',
+    streams: ['/vehicle/wheel'],
+    description: 'The angular rate of the vehicle'
+  });
+
   container.child(metricAcceleration);
   container.child(metricVelocity);
+  container.child(metricWheel);
   panel.child(container);
 
   return panel;
