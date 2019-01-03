@@ -10,12 +10,12 @@ Component is the base type for all visual elements.
 
 The valid values of `component_type`:
 
-- `table`
-- `metric`
-- `plot`
-- `treetable`
-- `video`
-- `select` (WARNING: Unstable feature)
+- [`table`](#Table)
+- [`metric`](#Metric)
+- [`plot`](#Plot)
+- [`treetable`](#treetable)
+- [`video`](#video)
+- [`select`](#select-warning-unstable-feature-) (WARNING: Unstable feature)
 
 ## Table
 
@@ -23,12 +23,12 @@ The Table element renders data similar to how data is presented in a traditional
 
 _TODO: screentshot: panel with table from streetscape.gl demo app_
 
-| **Name**          | **Type**    | **Description**                                                                                          |
-| ----------------- | ----------- | -------------------------------------------------------------------------------------------------------- |
-| `stream`          | `stream_id` | The stream name to populate the table data from. Must be a stream of [[LINK EM TO TreeTable] primitives. |
-| `title`           | `string`    | A title to display above the component.                                                                  |
-| `description`     | `string`    | A description of this element, displayed when hovering over the title.                                   |
-| `displayObjectId` | `boolean`   | Controls whether or not the object ID column, which is automatically added to TreeTables, is displayed.  |
+| **Name**          | **Type**    | **Description**                                                                                                                                       |
+| ----------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `stream`          | `stream_id` | The stream name to populate the table data from. Must be a stream of [`treetable`](/docs/protocol-schema/ui-primitives.md#treetable-type) primitives. |
+| `title`           | `string`    | A title to display above the component.                                                                                                               |
+| `description`     | `string`    | A description of this element, displayed when hovering over the title.                                                                                |
+| `displayObjectId` | `boolean`   | Controls whether or not the object ID column, which is automatically added to TreeTables, is displayed.                                               |
 
 ### Supported Interactions
 
@@ -73,11 +73,11 @@ time series data on the same chart so that data can be easily compared.
 
 _TODO: screenshot: streetscape.gl demo app showing drag-able sub-panels_
 
-| **Name**      | **Type**                 | **Description**                                                                                         |
-| ------------- | ------------------------ | ------------------------------------------------------------------------------------------------------- |
-| `streams`     | `map<string, stream_id>` | The streams to display in the chart.. Must be a stream of [time series states TODO LINK TO TIME SERIES] |
-| `title`       | `string`                 |                                                                                                         |
-| `description` | `string`                 | Displayed when hovering over the title                                                                  |
+| **Name**      | **Type**                 | **Description**                                                                                                              |
+| ------------- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
+| `streams`     | `map<string, stream_id>` | The streams to display in the chart, expects a [`time_series`](/docs/protocol-schema/core-types.md#time-series-state) stream |
+| `title`       | `string`                 |                                                                                                                              |
+| `description` | `string`                 | Displayed when hovering over the title                                                                                       |
 
 ### Supported Interactions
 
@@ -114,9 +114,10 @@ components:
 
 ## Plot
 
-The Plot component is used for showing one or more variables at once on screen. It has a standard
-mode where it shows a set of dependent variables as a function of an independent variable. In region
-mode 2D regions defined by an x variable and min and max y variables.
+The Plot component is used for showing one or more
+[`variables` streams](/docs/protocol-schema/core-types.md#variables) at once on screen. It has a
+standard mode where it shows a set of dependent variables as a function of an independent variable.
+In region mode 2D regions defined by an x variable and min and max y variables.
 
 _TODO: screenshot: streetscape.gl demo app showing normal variable plot_
 
@@ -127,10 +128,10 @@ _TODO: screenshot: streetscape.gl demo app showing normal variable plot_
 
 #### Standard Mode Fields
 
-| **Name**              | **Type**          | **Description**                                                                         |
-| --------------------- | ----------------- | --------------------------------------------------------------------------------------- |
-| `independentVariable` | `stream_id`       | The stream to use as the X axis.                                                        |
-| `dependentVariables`  | `list<stream_id>` | The streams to plot on the Y axis as a function of the stream that makes up the X axis. |
+| **Name**              | **Type**          | **Description**                                                                                                                                     |
+| --------------------- | ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `independentVariable` | `stream_id`       | The [`variable`](/docs/protocol-schema/core-types.md#variables) stream to use as the X axis.                                                        |
+| `dependentVariables`  | `list<stream_id>` | The [`variable`](/docs/protocol-schema/core-types.md#variables) streams to plot on the Y axis as a function of the stream that makes up the X axis. |
 
 #### Region Mode Fields (WARNING: Unstable feature)
 
@@ -142,11 +143,11 @@ style these regions apply style information to the `x` stream.
 | --------- | -------------- | ------------------ |
 | `regions` | `list<region>` | The set of regions |
 
-| **Name** | **Type**    | **Description**                                                                                                                 |
-| -------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `x`      | `stream_id` | The X axis values of the regions, expects a floating point variable stream. Style's on this stream apply to the full region. |
-| `yMin`   | `stream_id` | The visible lower bound of the region on the Y axis, expects a floating point variable stream.                                 |
-| `yMax`   | `stream_id` | The visible upper bound of the region on the Y axis, expects a floating point variable stream.                               |
+| **Name** | **Type**    | **Description**                                                                                                                                                                 |
+| -------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `x`      | `stream_id` | The X axis values of the regions, expects a floating point [`variable`](/docs/protocol-schema/core-types.md#variables) stream. Style's on this stream apply to the full region. |
+| `yMin`   | `stream_id` | The visible lower bound of the region on the Y axis, expects a floating point [`variable`](/docs/protocol-schema/core-types.md#variables) stream.                               |
+| `yMax`   | `stream_id` | The visible upper bound of the region on the Y axis, expects a floating point [`variable`](/docs/protocol-schema/core-types.md#variables) stream.                               |
 
 ### Supported Interactions
 
@@ -192,9 +193,9 @@ streams concurrently, multiple video elements need to be created.
 
 _TODO: screenshot: streetscape.gl demo app showing the video element_
 
-| **Name**  | **Type**       | **Description**                                                                                                            |
-| --------- | -------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `cameras` | `list<string>` | A list of the streams of video that can be rendered by this element. Only [[cameras listed - TODO link to camera metadata] |
+| **Name**  | **Type**       | **Description**                                                                                                                                                                 |
+| --------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `cameras` | `list<string>` | A list of the streams of video that can be rendered by this element. The available streams are in the [`metadata`](/docs/protocol-schema/session-protocol.md#metadata) message. |
 
 ### Supported Interactions
 
@@ -236,19 +237,19 @@ components:
 The TreeTable represents data in a way similar to that of a file system explorer window. The data is
 hierarchical with common fields at each node, some fields being empty depending on where the node
 sits in the tree. Each node is typically rendered as one row in TreeTable with higher level nodes
-being collapsible.
-
-[LINK ME TO tree-table.md]
-([similar in concept to this](http://doc.qt.io/qt-5/qtwidgets-itemviews-simpletreemodel-example.html#design-and-concepts))
+being collapsible. . It's similar in concept to Qt's
+([tree model concept](http://doc.qt.io/qt-5/qtwidgets-itemviews-simpletreemodel-example.html#design-and-concepts)).
+See the docs on the [`treetable`](/docs/protocol-schema/ui-primitives.md#treetable-type) UI
+primitive to learn more about the XVIZ version.
 
 _TODO: screenshot: streetscape.gl demo app showing treetable data_
 
-| **Name**            | **Type**    | **Description**                                                                      |
-| ------------------- | ----------- | ------------------------------------------------------------------------------------ |
-| `stream`            | `stream_id` | The stream of TreeTable primitives to populate with which to populate this component |
-| `title`             | `string`    | A title to display at the top of the TreeTable                                       |
-| `description`       | `string`    | A description of this component, displayed when hovering over the title.             |
-| `display_object_id` | `boolean`   | Whether or not to display the object ID column                                       |
+| **Name**            | **Type**    | **Description**                                                                                                                                    |
+| ------------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `stream`            | `stream_id` | The stream of of [`treetable`](/docs/protocol-schema/ui-primitives.md#treetable-type) primitives to populate with which to populate this component |
+| `title`             | `string`    | A title to display at the top of the TreeTable                                                                                                     |
+| `description`       | `string`    | A description of this component, displayed when hovering over the title.                                                                           |
+| `display_object_id` | `boolean`   | Whether or not to display the object ID column                                                                                                     |
 
 ### Supported Interactions
 
@@ -298,12 +299,12 @@ value then:
 - The backend responds with an updated view of the world for the current time
 - Any future requests will use the updated configuration
 
-| **Name**      | **Type**    | **Description**                                              |
-| ------------- | ----------- | ------------------------------------------------------------ |
-| `title`       | `string`    | Displayed on screen besides the selection box                |
-| `description` | `string`    | Displayed when hovering over the title                       |
-| `stream`      | `stream_id` | A XVIZ variable stream containing the options to select      |
-| `onchange`    | `onchange`  | Describes what to happen when a new select option is chosen. |
+| **Name**      | **Type**    | **Description**                                                                                       |
+| ------------- | ----------- | ----------------------------------------------------------------------------------------------------- |
+| `title`       | `string`    | Displayed on screen besides the selection box                                                         |
+| `description` | `string`    | Displayed when hovering over the title                                                                |
+| `stream`      | `stream_id` | A [`variable`](/docs/protocol-schema/core-types.md#variables) stream containing the options to select |
+| `onchange`    | `onchange`  | Describes what to happen when a new select option is chosen.                                          |
 
 **onchange** fields
 
