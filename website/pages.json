@@ -76,10 +76,6 @@
             ]
           },
           {
-            "name": "Structure of code for XVIZ conversion",
-            "markdown": "getting-started/convert-structure.md"
-          },
-          {
             "name": "Viewing the generated XVIZ",
             "markdown": "getting-started/running-the-example.md"
           }

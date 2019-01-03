@@ -71,10 +71,13 @@ xvizBuilder
   .id(tracklet.id);
 ```
 
-This is a simple conversion using the [circle()](/docs/api-reference/xviz-builder.md) method.
+This is a simple conversion using the
+[circle()](https://github.com/uber/xviz/tree/master/docs/api-reference/xviz-builder.md#circle)
+method.
 
-This is the the first use of the [id()](/docs/api-reference/xviz-builder.md) method. For the
-complete description read the [XVIZ Object Identity](/docs/protocol-schema/core-types.md)
+This is the the first use of the
+[id()](https://github.com/uber/xviz/tree/master/docs/api-reference/xviz-builder.md#id) method. For
+the complete description read the [XVIZ Object Identity](/docs/protocol-schema/core-types.md)
 documentation. Briefly xviz does not model objects directly, in part due to the fact that various
 systems may emit data related to an object but in a separate domain. Forcing the full definition of
 an object would make this a more difficult for coordinating data about an object across all sources.
@@ -121,10 +124,11 @@ xb.stream(this.TRACKLETS)
   .pose(this.FIXTURE_TRANSFORM_POSE);
 ```
 
-The new element here is the use of the [styleClass()](/docs/api-reference/xviz-builder.md) method.
-This enables a list of style attributes to be reference by the class name, avoiding repeating this
-inline at the actual polygon creation. We can also see that the 'pose()' offset is also applied to
-this stream.
+The new element here is the use of the
+[styleClass()](https://github.com/uber/xviz/tree/master/docs/api-reference/xviz-metadata-builder.md#styleClass)
+method. This enables a list of style attributes to be reference by the class name, avoiding
+repeating this inline at the actual polygon creation. We can also see that the 'pose()' offset is
+also applied to this stream.
 
 Here is how the individual polygon and labels are converted to XVIZ.
 
@@ -139,17 +143,20 @@ xvizBuilder
   .id(tracklet.id);
 ```
 
-The [polygon()](/docs/api-reference/xviz-builder.md) is just a list of vertices.
+The [polygon()](https://github.com/uber/xviz/tree/master/docs/api-reference/xviz-builder.md#polygon)
+is just a list of vertices.
 
-We can see the method [classes()](/docs/api-reference/xviz-builder.md) is called, and because the
-class names where aligned with the strings used in the KITTI data we simply are setting the class to
-the string. Notice that the parameter to the `classes()` method is an array as it supports multiple
-classes for each object. It is important to note that the class resolution order is taken from the
-stream metadata, where the latter definition has highest priority.
+We can see the method
+[classes()](https://github.com/uber/xviz/tree/master/docs/api-reference/xviz-builder.md#classes) is
+called, and because the class names where aligned with the strings used in the KITTI data we simply
+are setting the class to the string. Notice that the parameter to the `classes()` method is an array
+as it supports multiple classes for each object. It is important to note that the class resolution
+order is taken from the stream metadata, where the latter definition has highest priority.
 
-We also see the method [style()](/docs/api-reference/xviz-builder.md) being used along with classes.
-This inline styling take precendence over the others. In this case, the `height` attribute is
-provided per object by KITTI which is taken advantage of here to provide a visual treatment that
-matches the label height of each object in the scene.
+We also see the method
+[style()](https://github.com/uber/xviz/tree/master/docs/api-reference/xviz-builder.md#style) being
+used along with classes. This inline styling take precendence over the others. In this case, the
+`height` attribute is provided per object by KITTI which is taken advantage of here to provide a
+visual treatment that matches the label height of each object in the scene.
 
 See the [style guide](/docs/protocol-schema/style-specification.md) for the full details on styling.

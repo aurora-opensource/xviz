@@ -1,4 +1,4 @@
-# Extra Generated Data
+# Generated Data
 
 The KITTI data does not provide all the data types we would like to demonstrate. Specificially data
 related how it makes predictions about objects and makes plans based on those predictions.
@@ -6,8 +6,8 @@ related how it makes predictions about objects and makes plans based on those pr
 For the sake of demonstration purposes we have generated additional from the base KITTI data set to
 showcase a features to show how XVIZ can be used in a more complete data environment.
 
-The KITTI converter has an option `**--fake-streams**` that can be used to output additional XVIZ
-stream described below.
+The KITTI converter has an option `--fake-streams` that can be used to output additional XVIZ stream
+described below.
 
 ## Vehicle trajectory path
 
