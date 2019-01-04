@@ -7,7 +7,6 @@
 Constants:
 
 - `PRIMARY_POSE_STREAM` (String) - Name of the vehicle pose stream. Default `vehicle-pose`.
-- `OBJECT_STREAM` (String) - Name of the object stream. Default `objects`.
 - `STREAM_BLACKLIST` (Array) - Names of the streams to block. Default empty.
 - `TIMESTAMP_FORMAT` (String) - `milliseconds` or `seconds`. Default `milliseconds`.
 

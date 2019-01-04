@@ -22,8 +22,6 @@ const DEFAULT_XVIZ_CONFIG = {
   TIMESTAMP_FORMAT: 'milliseconds',
 
   PRIMARY_POSE_STREAM: '/vehicle_pose',
-  // TODO - support multiple?
-  OBJECT_STREAM: 'objects',
 
   STREAM_BLACKLIST: new Set(),
 
