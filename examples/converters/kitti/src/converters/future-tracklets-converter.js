@@ -102,24 +102,24 @@ export default class FutureTrackletsConverter {
         fill_color: '#00000080'
       })
       .styleClass('Car', {
-        fill_color: '#7DDDD780',
-        stroke_color: '#7DDDD7'
+        fill_color: '#50B3FF80',
+        stroke_color: '#50B3FF'
       })
       .styleClass('Cyclist', {
-        fill_color: '#DA70BF80',
-        stroke_color: '#DA70BF'
+        fill_color: '#957FCE80',
+        stroke_color: '#957FCE'
       })
       .styleClass('Pedestrian', {
-        fill_color: '#FEC56480',
-        stroke_color: '#FEC564'
+        fill_color: '#FFC6AF80',
+        stroke_color: '#FFC6AF'
       })
       .styleClass('Van', {
-        fill_color: '#267E6380',
-        stroke_color: '#267E63'
+        fill_color: '#5B91F480',
+        stroke_color: '#5B91F4'
       })
       .styleClass('Unknown', {
-        fill_color: '#D6A00080',
-        stroke_color: '#D6A000'
+        fill_color: '#E2E2E280',
+        stroke_color: '#E2E2E2'
       })
       .pose(this.FIXTURE_TRANSFORM_POSE);
   }
