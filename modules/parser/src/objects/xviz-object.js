@@ -26,6 +26,7 @@ export default class XVIZObject extends BaseObject {
 
     // Use Map here for the clear() method without creating a new object
     this.props = new Map();
+    this._geometry = null;
   }
 
   static observe(id, timestamp) {
@@ -55,19 +56,20 @@ export default class XVIZObject extends BaseObject {
 
   // returns a single tracking point for this object
   get position() {
-    const p = this.props.get('geometry');
+    const p = this._geometry;
     if (!p) {
       return null;
     }
     if (Number.isFinite(p[0])) {
-      return [p[0], p[1], p[2] || 0];
+      return p;
     }
-    return getCentroid(p);
+    this._geometry = getCentroid(p);
+    return this._geometry;
   }
 
   // this prop is cleared every time `reset` is called
   get isValid() {
-    return this.props.has('geometry');
+    return Boolean(this._geometry);
   }
 
   getProps() {
@@ -133,14 +135,17 @@ export default class XVIZObject extends BaseObject {
   }
 
   _setGeometry(p) {
-    if (p && !Number.isFinite(p[0]) && this.props.has('geometry')) {
+    if (!p || !Array.isArray(p)) {
+      return;
+    }
+    if (Number.isFinite(p[0])) {
+      p[2] = p[2] || 0;
+    } else if (this._geometry) {
       // Prefer point over point array
       return;
     }
     // store the point(s) as is
-    if (Array.isArray(p)) {
-      this.props.set('geometry', p);
-    }
+    this._geometry = p;
   }
 
   _setState(name, value) {
@@ -154,5 +159,6 @@ export default class XVIZObject extends BaseObject {
     if (this.props.size) {
       this.props.clear();
     }
+    this._geometry = null;
   }
 }
