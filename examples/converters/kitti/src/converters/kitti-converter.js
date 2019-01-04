@@ -108,6 +108,20 @@ export class KittiConverter {
     this.converters.forEach(converter => converter.getMetadata(xb));
     xb.ui(getDeclarativeUI());
 
+    xb.logInfo({
+      description: 'Conversion of KITTI data set into XVIZ',
+      license: 'CC BY-NC-SA 3.0',
+      'license link': '<a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">http://creativecommons.org/licenses/by-nc-sa/3.0/</a>',
+      uri: '<a href="https://github.com/uber/xviz-data">https://github.com/uber/xviz-data</a>',
+      source: {
+        title: 'Vision meets Robotics: The KITTI Dataset',
+        author: 'Andreas Geiger and Philip Lenz and Christoph Stiller and Raquel Urtasun',
+        link: '<a href="http://www.cvlibs.net/datasets/kitti/raw_data.php">http://www.cvlibs.net/datasets/kitti/raw_data.php</a>',
+        copyright:
+          'All datasets and benchmarks on <a href="http://www.cvlibs.net/datasets/kitti">this page</a> are copyright by us and published under the Creative Commons Attribution-NonCommercial-ShareAlike 3.0 License. This means that you must attribute the work in the manner specified by the authors, you may not use this work for commercial purposes and if you alter, transform, or build upon this work, you may distribute the resulting work only under the same license.'
+      }
+    });
+
     return xb.getMetadata();
   }
 }

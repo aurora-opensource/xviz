@@ -157,6 +157,11 @@ export default class XVIZMetadataBuilder {
     return this;
   }
 
+  logInfo(data) {
+    this.tmp_log_info = {...data, ...this.tmp_log_info};
+    return this;
+  }
+
   _flush() {
     if (this.streamId) {
       const streamData = this.tmp_stream;
