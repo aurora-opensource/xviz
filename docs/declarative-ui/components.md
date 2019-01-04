@@ -142,10 +142,10 @@ style these regions apply style information to the `x` stream.
 | --------- | -------------- | ------------------ |
 | `regions` | `list<region>` | The set of regions |
 
-| **Name** | **Type**    | **Description**                                                                                                                 |
-| -------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| **Name** | **Type**    | **Description**                                                                                                              |
+| -------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | `x`      | `stream_id` | The X axis values of the regions, expects a floating point variable stream. Style's on this stream apply to the full region. |
-| `yMin`   | `stream_id` | The visible lower bound of the region on the Y axis, expects a floating point variable stream.                                 |
+| `yMin`   | `stream_id` | The visible lower bound of the region on the Y axis, expects a floating point variable stream.                               |
 | `yMax`   | `stream_id` | The visible upper bound of the region on the Y axis, expects a floating point variable stream.                               |
 
 ### Supported Interactions
