@@ -61,7 +61,7 @@ export function parseXVIZStream(data, convertPrimitive) {
  * data to UI elements.
  */
 export function parseStreamPrimitive(primitives, streamName, time, convertPrimitive) {
-  const {preProcessPrimitive} = getXVIZConfig();
+  const {OBJECT_STREAM, preProcessPrimitive} = getXVIZConfig();
   const PRIMITIVE_SETTINGS =
     getXVIZSettings().currentMajorVersion === 1 ? XVIZPrimitiveSettingsV1 : XVIZPrimitiveSettingsV2;
 
@@ -125,7 +125,12 @@ export function parseStreamPrimitive(primitives, streamName, time, convertPrimit
       if (primitive) {
         primitiveMap[category].push(primitive);
 
-        if (isMainThread && primitive.id && category === 'features') {
+        if (
+          isMainThread &&
+          // OBJECT_STREAM is deprecated, only keeping for backward compatibility
+          (streamName === OBJECT_STREAM ||
+            (!OBJECT_STREAM && primitive.id && category === 'features'))
+        ) {
           XVIZObject.observe(primitive.id, time);
         }
       }
