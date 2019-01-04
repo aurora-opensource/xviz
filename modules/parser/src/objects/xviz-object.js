@@ -1,6 +1,7 @@
 import {Vector2} from 'math.gl';
 
 import BaseObject from './base-object';
+import {getCentroid} from '../utils/geometry';
 
 let defaultCollection = null;
 let serialIndex = 0;
@@ -25,6 +26,7 @@ export default class XVIZObject extends BaseObject {
 
     // Use Map here for the clear() method without creating a new object
     this.props = new Map();
+    this._geometry = null;
   }
 
   static observe(id, timestamp) {
@@ -52,17 +54,22 @@ export default class XVIZObject extends BaseObject {
     return defaultCollection && defaultCollection.prune(startTime, endTime);
   }
 
-  // this prop is cleared every time `reset` is called
+  // returns a single tracking point for this object
   get position() {
-    return this.props.get('trackingPoint');
+    const p = this._geometry;
+    if (!p) {
+      return null;
+    }
+    if (Number.isFinite(p[0])) {
+      return p;
+    }
+    this._geometry = getCentroid(p);
+    return this._geometry;
   }
 
+  // this prop is cleared every time `reset` is called
   get isValid() {
-    return this.props.has('trackingPoint');
-  }
-
-  get label() {
-    return this.props.get('label');
+    return Boolean(this._geometry);
   }
 
   getProps() {
@@ -127,17 +134,18 @@ export default class XVIZObject extends BaseObject {
     this.endTime = Math.max(this.endTime, timestamp);
   }
 
-  _setLabel(objectLabel) {
-    this.props.set('label', objectLabel);
-  }
-
-  _setTrackingPoint(p) {
-    if (!Number.isFinite(p[0])) {
-      // Is point array, take the first one
-      p = p[0];
+  _setGeometry(p) {
+    if (!p || !Array.isArray(p)) {
+      return;
     }
-    // store the point - note only has x, y coords at this time?
-    this.props.set('trackingPoint', [p[0], p[1], p[2] || 0]);
+    if (Number.isFinite(p[0])) {
+      p[2] = p[2] || 0;
+    } else if (this._geometry) {
+      // Prefer point over point array
+      return;
+    }
+    // store the point(s) as is
+    this._geometry = p;
   }
 
   _setState(name, value) {
@@ -151,5 +159,6 @@ export default class XVIZObject extends BaseObject {
     if (this.props.size) {
       this.props.clear();
     }
+    this._geometry = null;
   }
 }
