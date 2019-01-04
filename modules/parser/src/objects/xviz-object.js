@@ -1,6 +1,7 @@
 import {Vector2} from 'math.gl';
 
 import BaseObject from './base-object';
+import {getCentroid} from '../utils/geometry';
 
 let defaultCollection = null;
 let serialIndex = 0;
@@ -52,17 +53,21 @@ export default class XVIZObject extends BaseObject {
     return defaultCollection && defaultCollection.prune(startTime, endTime);
   }
 
-  // this prop is cleared every time `reset` is called
+  // returns a single tracking point for this object
   get position() {
-    return this.props.get('trackingPoint');
+    const p = this.props.get('geometry');
+    if (!p) {
+      return null;
+    }
+    if (Number.isFinite(p[0])) {
+      return [p[0], p[1], p[2] || 0];
+    }
+    return getCentroid(p);
   }
 
+  // this prop is cleared every time `reset` is called
   get isValid() {
-    return this.props.has('trackingPoint');
-  }
-
-  get label() {
-    return this.props.get('label');
+    return this.props.has('geometry');
   }
 
   getProps() {
@@ -127,17 +132,15 @@ export default class XVIZObject extends BaseObject {
     this.endTime = Math.max(this.endTime, timestamp);
   }
 
-  _setLabel(objectLabel) {
-    this.props.set('label', objectLabel);
-  }
-
-  _setTrackingPoint(p) {
-    if (!Number.isFinite(p[0])) {
-      // Is point array, take the first one
-      p = p[0];
+  _setGeometry(p) {
+    if (p && !Number.isFinite(p[0]) && this.props.has('geometry')) {
+      // Prefer point over point array
+      return;
     }
-    // store the point - note only has x, y coords at this time?
-    this.props.set('trackingPoint', [p[0], p[1], p[2] || 0]);
+    // store the point(s) as is
+    if (Array.isArray(p)) {
+      this.props.set('geometry', p);
+    }
   }
 
   _setState(name, value) {

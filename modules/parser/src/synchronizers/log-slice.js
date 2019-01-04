@@ -1,3 +1,4 @@
+import {getXVIZConfig} from '../config/xviz-config';
 import XVIZObject from '../objects/xviz-object';
 import {findInsertPos, INSERT_POSITION} from '../utils/search';
 
@@ -11,6 +12,17 @@ function lookAheadTimesliceAccessor(timeslice) {
   }
 
   throw new Error('Missing entry or timestamp in lookAhead array');
+}
+
+function updateObjectGeometry(features) {
+  for (const feature of features) {
+    const xvizObject = XVIZObject.get(feature.id);
+    if (xvizObject) {
+      xvizObject._setGeometry(feature.center || feature.vertices);
+      // Populate feature with information from other streams
+      Object.assign(feature, xvizObject.getProps());
+    }
+  }
 }
 
 // LOGSLICE CLASS
@@ -36,7 +48,7 @@ export default class LogSlice {
       return null;
     }
 
-    const objects = XVIZObject.getAllInCurrentFrame(); // Map of XVIZ ids in current slice
+    const {OBJECT_STREAM} = getXVIZConfig();
 
     const frame = {
       ...params,
@@ -47,7 +59,6 @@ export default class LogSlice {
       variables: this.variables,
       pointCloud: this.pointCloud,
       components: this.components,
-      objects, // Map of XVIZ object ids in current slice
       streams: this.streams
     };
 
@@ -56,6 +67,20 @@ export default class LogSlice {
     if (postProcessFrame) {
       postProcessFrame(frame);
     }
+
+    // OBJECT_STREAM is deprecated, only keeping for backward compatibility
+    if (OBJECT_STREAM) {
+      updateObjectGeometry(this.features[OBJECT_STREAM] || []);
+    } else {
+      for (const streamName in this.features) {
+        const features = this.features[streamName];
+        if (features.length && features[0].id) {
+          updateObjectGeometry(features);
+        }
+      }
+    }
+
+    frame.objects = XVIZObject.getAllInCurrentFrame(); // Map of XVIZ ids in current slice
 
     return frame;
   }
