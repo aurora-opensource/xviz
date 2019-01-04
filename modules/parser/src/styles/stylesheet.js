@@ -45,7 +45,7 @@ export default class Stylesheet {
     // inline style override any generic rules
     const inlineProp = state.base && state.base.style && state.base.style[propertyName];
     if (inlineProp !== undefined) {
-      return inlineProp;
+      return XVIZStyleProperty.formatValue(propertyName, inlineProp);
     }
 
     const rules = this.properties[propertyName];

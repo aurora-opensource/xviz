@@ -108,6 +108,11 @@ export default class XVIZStyleProperty {
     return DEFAULT_STYLES[key];
   }
 
+  static formatValue(key, value) {
+    const formatter = PROPERTY_FORMATTERS[key] || IDENTITY;
+    return formatter(value);
+  }
+
   constructor(key, value) {
     this.key = key;
 
