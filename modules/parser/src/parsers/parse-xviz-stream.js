@@ -1,4 +1,4 @@
-import {getXVIZConfig, getXVIZSettings} from '../config/xviz-config';
+import {getXVIZConfig} from '../config/xviz-config';
 import {PRIMITIVE_CAT, normalizeXVIZPrimitive} from './parse-xviz-primitive';
 import XVIZObject from '../objects/xviz-object';
 import {isMainThread} from '../utils/globals';
@@ -63,7 +63,7 @@ export function parseXVIZStream(data, convertPrimitive) {
 export function parseStreamPrimitive(primitives, streamName, time, convertPrimitive) {
   const {OBJECT_STREAM, preProcessPrimitive} = getXVIZConfig();
   const PRIMITIVE_SETTINGS =
-    getXVIZSettings().currentMajorVersion === 1 ? XVIZPrimitiveSettingsV1 : XVIZPrimitiveSettingsV2;
+    getXVIZConfig().currentMajorVersion === 1 ? XVIZPrimitiveSettingsV1 : XVIZPrimitiveSettingsV2;
 
   const primitiveData = getPrimitiveData(primitives);
 
@@ -147,7 +147,7 @@ export function parseStreamPrimitive(primitives, streamName, time, convertPrimit
  * data to UI elements.
  */
 export function parseStreamFutures(objects, streamName, time, convertPrimitive) {
-  const {currentMajorVersion} = getXVIZSettings();
+  const {currentMajorVersion} = getXVIZConfig();
 
   return currentMajorVersion === 1
     ? parseStreamFuturesV1(objects, streamName, time, convertPrimitive)
@@ -235,7 +235,7 @@ export function parseStreamFuturesV2(objects, streamName, time, convertPrimitive
  * data to UI elements.
  */
 export function parseStreamVariable(objects, streamName, time) {
-  const {currentMajorVersion} = getXVIZSettings();
+  const {currentMajorVersion} = getXVIZConfig();
 
   return currentMajorVersion === 1
     ? parseStreamVariableV1(objects, streamName, time)
@@ -305,7 +305,7 @@ export function parseStreamVariableV2(objects, streamName, time) {
  * data to UI elements.
  */
 export function parseStreamTimeSeries(seriesArray, streamBlackList) {
-  const {currentMajorVersion} = getXVIZSettings();
+  const {currentMajorVersion} = getXVIZConfig();
 
   if (currentMajorVersion === 2) {
     return parseStreamTimeSeriesV2(seriesArray, streamBlackList);

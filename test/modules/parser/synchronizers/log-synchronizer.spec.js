@@ -1,4 +1,4 @@
-import {LogSynchronizer, setXVIZSettings} from '@xviz/parser';
+import {LogSynchronizer, setXVIZConfig} from '@xviz/parser';
 import tape from 'tape-catch';
 
 import {resetXVIZConfigAndSettings} from '../config/config-utils';
@@ -49,7 +49,7 @@ tape('LogSynchronizer#setTime', t => {
 
 tape('LogSynchronizer#getData', t => {
   resetXVIZConfigAndSettings();
-  setXVIZSettings({TIME_WINDOW: 3});
+  setXVIZConfig({TIME_WINDOW: 3});
   const logSynchronizer = new LogSynchronizer(LOGS);
 
   for (const tc of TEST_CASES) {
