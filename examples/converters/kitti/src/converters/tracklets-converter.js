@@ -142,7 +142,7 @@ export default class TrackletsConverter {
       .type('circle')
       .streamStyle({
         radius: 0.2,
-        fill_color: '#FFFF00'
+        fill_color: '#FFC043'
       })
       .pose(this.FIXTURE_TRANSFORM_POSE)
 
@@ -151,7 +151,7 @@ export default class TrackletsConverter {
       .type('text')
       .streamStyle({
         size: 18,
-        fill_color: '#0040E0'
+        fill_color: '#DCDCCD'
       })
       .pose(this.FIXTURE_TRANSFORM_POSE)
 
@@ -159,7 +159,7 @@ export default class TrackletsConverter {
       .category('primitive')
       .type('polyline')
       .streamStyle({
-        stroke_color: '#FEC557',
+        stroke_color: '#FFC043',
         stroke_width: 0.1,
         stroke_width_min_pixels: 1
       })
