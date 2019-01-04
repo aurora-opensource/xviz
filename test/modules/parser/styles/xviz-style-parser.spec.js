@@ -64,6 +64,8 @@ const CAR = {type: 'car'};
 const TRACKED_CAR = {type: 'car', state: {tracked: true}};
 const TRACKED_BIKE = {type: 'bike', state: {tracked: true}};
 const FANCY_BUS = {type: 'bus', base: {classes: ['fancy']}};
+const SPECIAL_BUS = {type: 'bus', base: {style: {fill_color: '#000'}}};
+
 const GET_PROPERTY_TEST_CASES = [
   {
     propertyName: 'height',
@@ -104,6 +106,11 @@ const GET_PROPERTY_TEST_CASES = [
     propertyName: 'fill_color',
     state: FANCY_BUS,
     output: [16, 16, 16]
+  },
+  {
+    propertyName: 'fill_color',
+    state: SPECIAL_BUS,
+    output: [0, 0, 0]
   }
 ];
 

@@ -56,6 +56,12 @@ export default class Stylesheet {
    * @returns {Number|String|Array} style property value
    */
   getProperty(propertyName, state = {}) {
+    // inline style override any generic rules
+    const inlineProp = state.base && state.base.style && state.base.style[propertyName];
+    if (inlineProp !== undefined) {
+      return XVIZStyleProperty.formatValue(propertyName, inlineProp);
+    }
+
     const rules = this.properties[propertyName];
     const match = rules && rules.find(rule => rule.validate(state));
     return match ? match.properties[propertyName].getValue(state) : null;
