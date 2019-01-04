@@ -19,7 +19,7 @@ const DEFAULT_XVIZ_CONFIG = {
   // Supported major XVIZ versions
   supportedVersions: [1, 2],
 
-  TIMESTAMP_FORMAT: 'milliseconds',
+  TIMESTAMP_FORMAT: 'seconds',
 
   PRIMARY_POSE_STREAM: '/vehicle_pose',
 
@@ -31,7 +31,7 @@ const DEFAULT_XVIZ_CONFIG = {
 const DEFAULT_XVIZ_SETTINGS = {
   currentMajorVersion: 1, // Number set upon parsing metadata
 
-  TIME_WINDOW: 400,
+  TIME_WINDOW: 0.4,
 
   PLAYBACK_FRAME_RATE: 10, // The number of log frames to generate per second
 

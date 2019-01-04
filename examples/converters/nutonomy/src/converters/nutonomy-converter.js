@@ -174,7 +174,7 @@ export default class NuTonomyConverter {
     }
     assert(sample.token === lastSampleToken);
 
-    this.timestamps = this.frames.map(frame => frame.timestamp / 1000);
+    this.timestamps = this.frames.map(frame => frame.timestamp / 1e6);
   }
 
   // decorate calibrated sensors with sensor metadata (filename: stored sensor data)

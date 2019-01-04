@@ -24,7 +24,7 @@ export function getTimestamps(timestampsFilePath) {
 
   const timestamps = lines.map(line => {
     // Note: original KITTI timestamps give nanoseconds
-    const unix = Date.parse(`${line} GMT`);
+    const unix = Date.parse(`${line} GMT`) / 1000;
     return unix;
   });
 
