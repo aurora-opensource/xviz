@@ -1,4 +1,3 @@
-import {getXVIZConfig} from '../config/xviz-config';
 import XVIZObject from '../objects/xviz-object';
 import {findInsertPos, INSERT_POSITION} from '../utils/search';
 
@@ -37,8 +36,6 @@ export default class LogSlice {
       return null;
     }
 
-    const {OBJECT_STREAM} = getXVIZConfig();
-
     const objects = XVIZObject.getAllInCurrentFrame(); // Map of XVIZ ids in current slice
 
     const frame = {
@@ -59,17 +56,6 @@ export default class LogSlice {
     if (postProcessFrame) {
       postProcessFrame(frame);
     }
-
-    const objectFeatures = this.features[OBJECT_STREAM] || [];
-
-    objectFeatures.forEach(feature => {
-      const xvizObject = XVIZObject.get(feature.id);
-      if (xvizObject) {
-        xvizObject._setLabel(feature.label);
-        // Populate feature with information from other streams
-        Object.assign(feature, xvizObject.getProps());
-      }
-    });
 
     return frame;
   }
