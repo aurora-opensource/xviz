@@ -260,3 +260,31 @@ test('XVIZMetadataBuilder#ui', t => {
 
   t.end();
 });
+
+test('XVIZMetadataBuilder#custom log_info', t => {
+  const xb = new XVIZMetadataBuilder();
+  xb.startTime(0)
+    .endTime(1)
+    .logInfo({
+      custom: 'test data',
+      start_time: 'will not match this string'
+    });
+
+  const metadata = xb.getMetadata();
+
+  t.comment(JSON.stringify(metadata));
+
+  const expected = {
+    version: '2.0.0',
+    streams: {},
+    log_info: {
+      start_time: 0,
+      end_time: 1,
+      custom: 'test data'
+    }
+  };
+
+  t.deepEqual(metadata, expected, 'XVIZMetadataBuilder build with pose matches expected output');
+  schemaValidator.validate('session/metadata', metadata);
+  t.end();
+});
