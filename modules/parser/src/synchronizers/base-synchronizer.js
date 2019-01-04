@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {getXVIZConfig, getXVIZSettings} from '../config/xviz-config';
+import {getXVIZConfig} from '../config/xviz-config';
 import xvizStats from '../utils/stats';
 import LogSlice from './log-slice';
 
@@ -96,7 +96,7 @@ export default class BaseSynchronizer {
    * @return {StreamSynchronizer} - returns itself for chaining.
    */
   setTime(time) {
-    const {PLAYBACK_FRAME_RATE} = getXVIZSettings();
+    const {PLAYBACK_FRAME_RATE} = getXVIZConfig();
     this.time = time;
     this.loResTime = Math.round(time * PLAYBACK_FRAME_RATE) / PLAYBACK_FRAME_RATE;
     assert(Number.isFinite(this.time), 'Invalid time');
@@ -126,7 +126,7 @@ export default class BaseSynchronizer {
     }
 
     // Find the right timeslices
-    const {TIME_WINDOW} = getXVIZSettings();
+    const {TIME_WINDOW} = getXVIZConfig();
     this._lastLoResTime = this.loResTime;
     this._streamsByReverseTime = this._getTimeRangeInReverse(
       this.loResTime - TIME_WINDOW,

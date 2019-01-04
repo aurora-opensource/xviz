@@ -12,12 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {setXVIZConfig, getXVIZConfig, getXVIZSettings, setXVIZSettings} from '@xviz/parser';
+import {setXVIZConfig, getXVIZConfig} from '@xviz/parser';
 
 const defaultXVIZConfig = Object.assign({}, getXVIZConfig());
-const defaultXVIZSettings = Object.assign({}, getXVIZSettings());
 
 export function resetXVIZConfigAndSettings() {
   setXVIZConfig(defaultXVIZConfig);
-  setXVIZSettings(defaultXVIZSettings);
 }

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {getXVIZConfig, setXVIZSettings} from '../config/xviz-config';
+import {getXVIZConfig, setXVIZConfig} from '../config/xviz-config';
 import {parseVersionString} from './xviz-v2-common';
 
 // Post-processes log metadata
@@ -31,7 +31,7 @@ export function parseLogMetadata(data) {
   if (!currentMajorVersion) {
     throw new Error('Unable to detect the XVIZ version.');
   } else {
-    setXVIZSettings({currentMajorVersion});
+    setXVIZConfig({currentMajorVersion});
   }
 
   if (supportedVersions && !supportedVersions.includes(currentMajorVersion)) {

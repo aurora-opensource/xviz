@@ -14,8 +14,7 @@
 
 import {
   setXVIZConfig,
-  getXVIZSettings,
-  setXVIZSettings,
+  getXVIZConfig,
   parseStreamDataMessage,
   isEnvelope,
   unpackEnvelope,
@@ -162,7 +161,7 @@ tape('parseStreamLogData metadata', t => {
 
   t.equals(metaMessage.type, LOG_STREAM_MESSAGE.METADATA, 'Metadata type set');
   t.equals(
-    getXVIZSettings().currentMajorVersion,
+    getXVIZConfig().currentMajorVersion,
     2,
     'Metadata currentMajorVersion set after parsing'
   );
@@ -189,7 +188,7 @@ tape('parseStreamLogData metadata v1', t => {
 
   t.equals(metaMessage.type, LOG_STREAM_MESSAGE.METADATA, 'Metadata type set');
   t.equals(
-    getXVIZSettings().currentMajorVersion,
+    getXVIZConfig().currentMajorVersion,
     1,
     'Metadata currentMajorVersion set after parsing'
   );
@@ -251,7 +250,7 @@ tape('parseStreamLogData metadata with full log time only', t => {
 
   t.equals(metaMessage.type, LOG_STREAM_MESSAGE.METADATA, 'Metadata type set');
   t.equals(
-    getXVIZSettings().currentMajorVersion,
+    getXVIZConfig().currentMajorVersion,
     2,
     'Metadata currentMajorVersion set after parsing'
   );
@@ -277,7 +276,7 @@ tape('parseStreamLogData validate test data', t => {
 
 tape('parseStreamLogData validate result when missing updates', t => {
   resetXVIZConfigAndSettings();
-  setXVIZSettings({currentMajorVersion: 2});
+  setXVIZConfig({currentMajorVersion: 2});
 
   const metaMessage = parseStreamLogData(
     {
@@ -294,7 +293,7 @@ tape('parseStreamLogData validate result when missing updates', t => {
 
 tape('parseStreamLogData validate result when updates is empty', t => {
   resetXVIZConfigAndSettings();
-  setXVIZSettings({currentMajorVersion: 2});
+  setXVIZConfig({currentMajorVersion: 2});
 
   const metaMessage = parseStreamLogData(
     {
@@ -312,7 +311,7 @@ tape('parseStreamLogData validate result when updates is empty', t => {
 
 tape('parseStreamLogData validate result when missing timestamp in updates', t => {
   resetXVIZConfigAndSettings();
-  setXVIZSettings({currentMajorVersion: 2});
+  setXVIZConfig({currentMajorVersion: 2});
 
   const metaMessage = parseStreamLogData(
     {
@@ -333,7 +332,7 @@ tape('parseStreamLogData validate result when missing timestamp in updates', t =
 
 tape('parseStreamLogData error', t => {
   resetXVIZConfigAndSettings();
-  setXVIZSettings({currentMajorVersion: 2});
+  setXVIZConfig({currentMajorVersion: 2});
 
   const metaMessage = parseStreamLogData({message: 'my message'}, {v2Type: 'error'});
   t.equals(metaMessage.type, LOG_STREAM_MESSAGE.ERROR, 'Metadata type set to error');
@@ -343,7 +342,7 @@ tape('parseStreamLogData error', t => {
 
 tape('parseStreamLogData timeslice INCOMPLETE', t => {
   resetXVIZConfigAndSettings();
-  setXVIZSettings({currentMajorVersion: 2});
+  setXVIZConfig({currentMajorVersion: 2});
 
   // NOTE: no explicit type for this message yet.
   let metaMessage = parseStreamLogData(
@@ -399,7 +398,7 @@ tape('parseStreamLogData timeslice INCOMPLETE', t => {
 
 tape('parseStreamLogData timeslice', t => {
   resetXVIZConfigAndSettings();
-  setXVIZSettings({currentMajorVersion: 2});
+  setXVIZConfig({currentMajorVersion: 2});
 
   // NOTE: no explicit type for this message yet.
   const metaMessage = parseStreamLogData({...TestTimesliceMessageV2}, {v2Type: 'state_update'});
@@ -418,7 +417,7 @@ tape('parseStreamLogData timeslice without parsing metadata (v1)', t => {
   // before they start sending log data
   resetXVIZConfigAndSettings();
   setXVIZConfig({PRIMARY_POSE_STREAM: '/vehicle_pose'});
-  setXVIZSettings({currentMajorVersion: 1});
+  setXVIZConfig({currentMajorVersion: 1});
 
   // NOTE: no explicit type for this message yet.
   const metaMessage = parseStreamLogData({...TestTimesliceMessageV1});
@@ -439,7 +438,7 @@ tape('parseStreamLogData timeslice without parsing metadata (v1)', t => {
 tape('parseStreamLogData preProcessPrimitive type change', t => {
   let calledPreProcess = false;
   resetXVIZConfigAndSettings();
-  setXVIZSettings({currentMajorVersion: 1});
+  setXVIZConfig({currentMajorVersion: 1});
   setXVIZConfig({
     PRIMARY_POSE_STREAM: '/vehicle_pose',
     preProcessPrimitive: ({primitive, streamName, time}) => {
@@ -463,7 +462,7 @@ tape('parseStreamLogData preProcessPrimitive type change', t => {
 
 tape('parseStreamLogData pointCloud timeslice', t => {
   resetXVIZConfigAndSettings();
-  setXVIZSettings({currentMajorVersion: 2});
+  setXVIZConfig({currentMajorVersion: 2});
   const PointCloudTestTimesliceMessage = TestTimesliceMessageV2;
 
   // NOTE: no explicit type for this message yet.
@@ -481,7 +480,7 @@ tape('parseStreamLogData pointCloud timeslice', t => {
 
 tape('parseStreamLogData polyline flat', t => {
   resetXVIZConfigAndSettings();
-  setXVIZSettings({currentMajorVersion: 2});
+  setXVIZConfig({currentMajorVersion: 2});
   const TestTimeslice = clone(TestTimesliceMessageV2);
   TestTimeslice.updates[0].primitives['/test/stream'] = {
     polylines: [
@@ -511,7 +510,7 @@ tape('parseStreamLogData polyline flat', t => {
 
 tape('parseStreamLogData polygon flat', t => {
   resetXVIZConfigAndSettings();
-  setXVIZSettings({currentMajorVersion: 2});
+  setXVIZConfig({currentMajorVersion: 2});
   const TestTimeslice = clone(TestTimesliceMessageV2);
   TestTimeslice.updates[0].primitives['/test/stream'] = {
     polygons: [
@@ -546,7 +545,7 @@ tape('parseStreamLogData polygon flat', t => {
 
 tape('parseStreamLogData flat JSON pointCloud', t => {
   resetXVIZConfigAndSettings();
-  setXVIZSettings({currentMajorVersion: 2});
+  setXVIZConfig({currentMajorVersion: 2});
   const PointCloudTestTimesliceMessage = clone(TestTimesliceMessageV2);
   PointCloudTestTimesliceMessage.updates[0].primitives['/test/stream'].points.points = [
     1000,
@@ -569,7 +568,7 @@ tape('parseStreamLogData flat JSON pointCloud', t => {
 
 tape('parseStreamLogData pointCloud timeslice TypedArray', t => {
   resetXVIZConfigAndSettings();
-  setXVIZSettings({currentMajorVersion: 2});
+  setXVIZConfig({currentMajorVersion: 2});
 
   const PointCloudTestTimesliceMessage = clone(TestTimesliceMessageV2);
   PointCloudTestTimesliceMessage.updates[0].primitives[
@@ -591,7 +590,7 @@ tape('parseStreamLogData pointCloud timeslice TypedArray', t => {
 
 tape('parseStreamLogData pointCloud timeslice', t => {
   resetXVIZConfigAndSettings();
-  setXVIZSettings({currentMajorVersion: 2});
+  setXVIZConfig({currentMajorVersion: 2});
 
   const PointCloudTestTimesliceMessage = clone(TestTimesliceMessageV2);
   PointCloudTestTimesliceMessage.updates[0].primitives['/test/stream'].points.push({
@@ -619,7 +618,7 @@ tape('parseStreamLogData pointCloud timeslice', t => {
 
 tape('parseStreamLogData variable timeslice', t => {
   resetXVIZConfigAndSettings();
-  setXVIZSettings({currentMajorVersion: 2});
+  setXVIZConfig({currentMajorVersion: 2});
   const VariableTestTimesliceMessage = {
     update_type: 'snapshot',
     updates: [
@@ -667,7 +666,7 @@ tape('parseStreamLogData variable timeslice', t => {
 
 tape('parseStreamLogData futures timeslice v1', t => {
   resetXVIZConfigAndSettings();
-  setXVIZSettings({currentMajorVersion: 1});
+  setXVIZConfig({currentMajorVersion: 1});
 
   const slice = parseStreamLogData({...TestFuturesMessageV1});
   t.equals(slice.type, LOG_STREAM_MESSAGE.TIMESLICE, 'Message type set for timeslice');
@@ -681,7 +680,7 @@ tape('parseStreamLogData futures timeslice v1', t => {
 
 tape('parseStreamDataMessage', t => {
   resetXVIZConfigAndSettings();
-  setXVIZSettings({currentMajorVersion: 2});
+  setXVIZConfig({currentMajorVersion: 2});
 
   let result;
   let error;
@@ -710,7 +709,7 @@ tape('parseStreamDataMessage', t => {
 
 tape('parseStreamDataMessage enveloped', t => {
   resetXVIZConfigAndSettings();
-  setXVIZSettings({currentMajorVersion: 2});
+  setXVIZConfig({currentMajorVersion: 2});
 
   const enveloped = {
     type: 'xviz/state_update',
@@ -744,7 +743,7 @@ tape('parseStreamDataMessage enveloped', t => {
 
 tape('parseStreamDataMessage#enveloped#metadata', t => {
   resetXVIZConfigAndSettings();
-  setXVIZSettings({currentMajorVersion: 2});
+  setXVIZConfig({currentMajorVersion: 2});
 
   const enveloped = {
     type: 'xviz/metadata',
@@ -775,7 +774,7 @@ tape('parseStreamDataMessage#enveloped#metadata', t => {
 
 tape('parseStreamDataMessage#enveloped#transform_log_done', t => {
   resetXVIZConfigAndSettings();
-  setXVIZSettings({currentMajorVersion: 2});
+  setXVIZConfig({currentMajorVersion: 2});
 
   const enveloped = {
     type: 'xviz/transform_log_done',
@@ -806,7 +805,7 @@ tape('parseStreamDataMessage#enveloped#transform_log_done', t => {
 
 tape('parseStreamDataMessage enveloped not xviz', t => {
   resetXVIZConfigAndSettings();
-  setXVIZSettings({currentMajorVersion: 2});
+  setXVIZConfig({currentMajorVersion: 2});
 
   const enveloped = {
     type: 'bar/foo',

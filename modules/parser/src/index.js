@@ -21,7 +21,7 @@ export {default as xvizStats} from './utils/stats';
 export {LOG_STREAM_MESSAGE} from './constants';
 
 // Configuration
-export {setXVIZConfig, getXVIZConfig, setXVIZSettings, getXVIZSettings} from './config/xviz-config';
+export {setXVIZConfig, getXVIZConfig} from './config/xviz-config';
 
 // Synchronizers
 export {default as LogSynchronizer} from './synchronizers/log-synchronizer';

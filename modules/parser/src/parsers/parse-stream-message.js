@@ -16,7 +16,7 @@
 import {parseStreamDataMessage} from './parse-stream-data-message';
 import {WorkerFarm} from '../utils/worker-utils';
 import {postDeserialize} from './serialize';
-import {getXVIZConfig, getXVIZSettings} from '../config/xviz-config';
+import {getXVIZConfig} from '../config/xviz-config';
 import streamDataWorker from '../../dist/workers/stream-data.worker.js';
 
 let workerFarm = null;
@@ -39,7 +39,7 @@ export function initializeWorkers({worker, maxConcurrency = 4}) {
     workerFarm = new WorkerFarm({
       workerURL,
       maxConcurrency,
-      initialMessage: {xvizConfig, xvizSettings: getXVIZSettings()}
+      initialMessage: {xvizConfig}
     });
   }
 }

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {setXVIZConfig, setXVIZSettings} from '../config/xviz-config';
+import {setXVIZConfig} from '../config/xviz-config';
 import {parseStreamDataMessage} from '../parsers/parse-stream-data-message';
 import {preSerialize} from '../parsers/serialize';
 import {getTransferList} from '../utils/worker-utils';
@@ -59,9 +59,8 @@ export default config => self => {
   }
 
   self.onmessage = e => {
-    if (e.data.xvizConfig || e.data.xvizSettings) {
+    if (e.data.xvizConfig) {
       setXVIZConfig(e.data.xvizConfig);
-      setXVIZSettings(e.data.xvizSettings);
     } else {
       parseStreamDataMessage(e.data, onResult, onError);
     }
