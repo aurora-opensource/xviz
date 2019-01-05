@@ -157,7 +157,6 @@ export default class XVIZTimeSeriesBuilder extends XVIZBaseBuilder {
       // for same id different with fieldNames, we store as different ts entries
       tsEntry = new Map();
       tsEntry.set(this._id, this._getIdEntry(fieldName));
-
       this._data.set(this._timestamp, tsEntry);
     }
   }

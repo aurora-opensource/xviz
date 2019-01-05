@@ -29,6 +29,8 @@ export default class GPSConverter extends BaseConverter {
     this.VEHICLE_ACCELERATION = '/vehicle/acceleration';
     this.VEHICLE_VELOCITY = '/vehicle/velocity';
     this.VEHICLE_TRAJECTORY = '/vehicle/trajectory';
+    this.VEHICLE_WHEEL = '/vehicle/wheel';
+    this.VEHICLE_AUTONOMOUS = '/vehicle/autonomous';
   }
 
   load() {
@@ -78,6 +80,17 @@ export default class GPSConverter extends BaseConverter {
       .timestamp(acceleration.timestamp)
       .value(acceleration['acceleration-forward']);
 
+    xvizBuilder
+      .timeSeries(this.VEHICLE_WHEEL)
+      .timestamp(velocity.timestamp)
+      .value(velocity['angular-rate-upward']);
+
+    // kitti dataset is always under autonomous mode
+    xvizBuilder
+      .timeSeries(this.VEHICLE_AUTONOMOUS)
+      .timestamp(velocity.timestamp)
+      .value(true);
+
     const poseTrajectory = _getPoseTrajectory({
       poses: this.poses,
       startFrame: frameNumber,
@@ -104,6 +117,15 @@ export default class GPSConverter extends BaseConverter {
       .category('time_series')
       .type('float')
       .unit('m/s')
+
+      .stream(this.VEHICLE_WHEEL)
+      .category('time_series')
+      .type('float')
+      .unit('rad/s')
+
+      .stream(this.VEHICLE_AUTONOMOUS)
+      .category('time_series')
+      .type('boolean')
 
       .stream(this.VEHICLE_TRAJECTORY)
       .category('primitive')
