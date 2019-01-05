@@ -18,7 +18,7 @@ export default class GPSConverter extends BaseConverter {
     this.VEHICLE_VELOCITY = '/vehicle/velocity';
     this.VEHICLE_TRAJECTORY = '/vehicle/trajectory';
     this.VEHICLE_WHEEL = '/vehicle/wheel_angle';
-    this.VEHICLE_AUTONOMOUS = '/vehicle/autonomous_state';
+    this.VEHICLE_AUTONOMOUS = '/vehicle/autonomy_state';
   }
 
   load() {
