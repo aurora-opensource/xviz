@@ -97,6 +97,49 @@ test('XVIZTimeSeriesBuilder#multiple entry same ts', t => {
   t.end();
 });
 
+/* eslint-disable */
+test('XVIZTimeSeriesBuilder#multiple entry different types same ts', t => {
+  const builder = new XVIZTimeSeriesBuilder({validator});
+  builder
+    .stream('/test')
+    .timestamp(20)
+    .value(1);
+
+  builder
+    .stream('/foo')
+    .timestamp(20)
+    .value(false);
+
+  console.log(JSON.stringify(builder._data[null]));
+
+  const expected = [
+    {
+      timestamp: 20,
+      streams: ['/test'],
+      values: {
+        doubles: [1]
+      }
+    },
+    {
+      timestamp: 20,
+      streams: ['/foo'],
+      values: {
+        bools: [false]
+      }
+    }
+  ];
+  const data = builder.getData();
+  console.log(JSON.stringify(builder._data[null]));
+
+  t.deepEqual(
+    data,
+    expected,
+    'XVIZTimeSeriesBuilder multiple entry different types same ts matches expected output'
+  );
+  data.forEach(d => schemaValidator.validate('core/timeseries_state', d));
+  t.end();
+});
+
 test('XVIZTimeSeriesBuilder#multiple entry different ts', t => {
   const builder = new XVIZTimeSeriesBuilder({validator});
   builder
@@ -307,7 +350,7 @@ test('XVIZTimeSeriesBuilder#single entry id', t => {
   t.end();
 });
 
-test('XVIZTimeSeriesBuilder#multiple entry id same ts', t => {
+test('XVIZTimeSeriesBuilder#multiple entry same id and same ts', t => {
   const builder = new XVIZTimeSeriesBuilder({validator});
   builder
     .stream('/test')
@@ -336,7 +379,51 @@ test('XVIZTimeSeriesBuilder#multiple entry id same ts', t => {
   t.deepEqual(
     data,
     expected,
-    'XVIZTimeSeriesBuilder multiple entry id same ts matches expected output'
+    'XVIZTimeSeriesBuilder multiple entry same id and same ts matches expected output'
+  );
+  data.forEach(d => schemaValidator.validate('core/timeseries_state', d));
+  t.end();
+});
+
+/* eslint-disable */
+test('XVIZTimeSeriesBuilder#multiple entry different types same id and same ts', t => {
+  const builder = new XVIZTimeSeriesBuilder({validator});
+  builder
+    .stream('/test')
+    .timestamp(20)
+    .value(1)
+    .id('123');
+
+  builder
+    .stream('/foo')
+    .timestamp(20)
+    .value('2')
+    .id('123');
+
+  const expected = [
+    {
+      timestamp: 20,
+      object_id: '123',
+      streams: ['/test'],
+      values: {
+        doubles: [1]
+      }
+    },
+    {
+      timestamp: 20,
+      object_id: '123',
+      streams: ['/foo'],
+      values: {
+        strings: ['2']
+      }
+    }
+  ];
+  const data = builder.getData();
+
+  t.deepEqual(
+    data,
+    expected,
+    'XVIZTimeSeriesBuilder multiple entry different types same id and same ts matches expected output'
   );
   data.forEach(d => schemaValidator.validate('core/timeseries_state', d));
   t.end();
