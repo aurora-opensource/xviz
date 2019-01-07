@@ -25,20 +25,26 @@ export default class ImageConverter {
     this.frames = frames;
 
     this.cameraFilePathByToken = toMap(frames, 'token', frame => {
-      const substrings = frame.sensors[this.camera].filename.split('/');
-      const filename = substrings[substrings.length - 1];
-      return path.join(this.rootDir, this.camera, filename);
+      if (frame.sensors[this.camera]) {
+        const substrings = frame.sensors[this.camera].filename.split('/');
+        const filename = substrings[substrings.length - 1];
+        return path.join(this.rootDir, this.camera, filename);
+      }
+      return null;
     });
   }
 
   async convertFrame(frameIndex, xvizBuilder) {
     const frameToken = this.frames[frameIndex].token;
-    const {data, width, height} = await this.loadFrame(frameToken);
+    const frame = await this.loadFrame(frameToken);
+    if (frame) {
+      const {data, width, height} = frame;
 
-    xvizBuilder
-      .primitive(this.streamName)
-      .image(nodeBufferToTypedArray(data), 'jpg')
-      .dimensions(width, height);
+      xvizBuilder
+        .primitive(this.streamName)
+        .image(nodeBufferToTypedArray(data), 'jpg')
+        .dimensions(width, height);
+    }
   }
 
   getMetadata(xvizMetaBuilder) {

@@ -55,6 +55,11 @@ parser.addArgument('--list-scenes', {
   help: 'List available scenes (use with -d or --data-directory).'
 });
 
+parser.addArgument('--keyframes', {
+  action: 'storeTrue',
+  help: 'Convert keyframes.'
+});
+
 // extract args from user input
 module.exports = function getArgs() {
   const args = parser.parseArgs();
@@ -78,6 +83,7 @@ module.exports = function getArgs() {
     imageMaxHeight: Number(args.image_max_height),
     frameLimit: Number(args.frame_limit),
     listScenes: args.list_scenes,
-    scenes
+    scenes,
+    keyframes: Boolean(args.keyframes)
   };
 };
