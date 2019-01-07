@@ -21,6 +21,8 @@ import BaseConverter from './base-converter';
 import {loadOxtsPackets} from '../parsers/parse-gps-data';
 import {MOTION_PLANNING_STEPS, PRIMARY_POSE_STREAM} from './constant';
 
+const RADIAN_TO_DEGREE = 180 / Math.PI;
+
 export default class GPSConverter extends BaseConverter {
   constructor(rootDir, streamDir) {
     super(rootDir, streamDir);
@@ -29,8 +31,8 @@ export default class GPSConverter extends BaseConverter {
     this.VEHICLE_ACCELERATION = '/vehicle/acceleration';
     this.VEHICLE_VELOCITY = '/vehicle/velocity';
     this.VEHICLE_TRAJECTORY = '/vehicle/trajectory';
-    this.VEHICLE_WHEEL = '/vehicle/wheel';
-    this.VEHICLE_AUTONOMOUS = '/vehicle/autonomous';
+    this.VEHICLE_WHEEL = '/vehicle/wheel_angle';
+    this.VEHICLE_AUTONOMOUS = '/vehicle/autonomy_state';
   }
 
   load() {
@@ -83,13 +85,13 @@ export default class GPSConverter extends BaseConverter {
     xvizBuilder
       .timeSeries(this.VEHICLE_WHEEL)
       .timestamp(velocity.timestamp)
-      .value(velocity['angular-rate-upward']);
+      .value(velocity['angular-rate-upward'] * RADIAN_TO_DEGREE);
 
     // kitti dataset is always under autonomous mode
     xvizBuilder
       .timeSeries(this.VEHICLE_AUTONOMOUS)
       .timestamp(velocity.timestamp)
-      .value(true);
+      .value('autonomous');
 
     const poseTrajectory = _getPoseTrajectory({
       poses: this.poses,
@@ -121,11 +123,11 @@ export default class GPSConverter extends BaseConverter {
       .stream(this.VEHICLE_WHEEL)
       .category('time_series')
       .type('float')
-      .unit('rad/s')
+      .unit('deg/s')
 
       .stream(this.VEHICLE_AUTONOMOUS)
       .category('time_series')
-      .type('boolean')
+      .type('string')
 
       .stream(this.VEHICLE_TRAJECTORY)
       .category('primitive')

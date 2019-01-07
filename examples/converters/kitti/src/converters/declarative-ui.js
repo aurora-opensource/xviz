@@ -49,7 +49,7 @@ function getMetricsPanel(builder) {
 
   const metricWheel = builder.metric({
     title: 'Wheel',
-    streams: ['/vehicle/wheel'],
+    streams: ['/vehicle/wheel_angle'],
     description: 'The angular rate of the vehicle'
   });
 
