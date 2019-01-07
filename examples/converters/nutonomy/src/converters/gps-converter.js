@@ -37,7 +37,8 @@ export default class GPSConverter {
       const pose = poses[poseToken];
       const {roll, pitch, yaw} = quaternionToEulerAngle(...pose.rotation);
       const [x, y, z] = pose.translation;
-      const timestamp = pose.timestamp / 1000;
+      // nanoseconds to seconds
+      const timestamp = pose.timestamp / 1e6;
 
       this.timestamps.push(timestamp);
 

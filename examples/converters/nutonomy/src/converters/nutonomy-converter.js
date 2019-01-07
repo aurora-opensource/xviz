@@ -93,13 +93,15 @@ export default class NuTonomyConverter {
       frames: this.frames
     });
 
-    this.converters.filter(converter => converter !== gpsConverter).forEach(converter =>
-      converter.load({
-        staticData: this.staticData,
-        frames: this.frames,
-        posesByFrame: gpsConverter.getPoses()
-      })
-    );
+    this.converters
+      .filter(converter => converter !== gpsConverter)
+      .forEach(converter =>
+        converter.load({
+          staticData: this.staticData,
+          frames: this.frames,
+          posesByFrame: gpsConverter.getPoses()
+        })
+      );
 
     this.metadata = this.getMetadata();
   }
@@ -147,9 +149,21 @@ export default class NuTonomyConverter {
     xb.startTime(timestamps[0]).endTime(timestamps[timestamps.length - 1]);
     xb.ui(getDeclarativeUI());
 
-    const metadata = xb.getMetadata();
+    xb.logInfo({
+      description: 'Conversion of nuScenes dataset into XVIZ',
+      license: 'CC BY-NC-SA 4.0',
+      'license link':
+        '<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode">https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode</a>',
+      uri: '<a href="https://github.com/uber/xviz-data">https://github.com/uber/xviz-data</a>',
+      source: {
+        title: 'nuScenes dataset',
+        link: '<a href="https://www.nuscenes.org/">https://www.nuscenes.org/</a>',
+        copyright:
+          'Copyright © 2018 nuScene <a href="https://www.nuscenes.org/terms-of-use">https://www.nuscenes.org/terms-of-use</a>'
+      }
+    });
 
-    return metadata;
+    return xb.getMetadata();
   }
 
   _loadFrames() {
