@@ -27,8 +27,6 @@ export default class LidarConverter {
     const frameToken = this.frames[frameIndex].token;
 
     let filepath = this.pointCloudFilePathByToken[frameToken];
-    // const match = FILE_PATH_PATTERN.exec(filepath);
-    // const timestamp = match && match[1];
     const buffer = fs.readFileSync(filepath);
     const arraybuffer = toArrayBuffer(buffer);
     const pointCloud = this._parsePointCloud(arraybuffer);

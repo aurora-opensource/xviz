@@ -1,4 +1,5 @@
 import path from 'path';
+import fs from 'fs';
 
 import {resizeImage} from './process-image';
 import {toMap} from '../common';
@@ -15,10 +16,12 @@ export default class ImageConverter {
   async loadFrame(frameToken) {
     // Load the data for this frame
     const filepath = this.cameraFilePathByToken[frameToken];
-    const {maxWidth, maxHeight} = this.options;
-    const {data, width, height} = await resizeImage(filepath, maxWidth, maxHeight);
-
-    return {data, width, height};
+    if (fs.existsSync(filepath)) {
+      const {maxWidth, maxHeight} = this.options;
+      const {data, width, height} = await resizeImage(filepath, maxWidth, maxHeight);
+      return {data, width, height};
+    }
+    return null;
   }
 
   load({frames}) {

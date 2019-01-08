@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import assert from 'assert';
-import { createDir, toMap } from '../common';
+import {createDir, toMap} from '../common';
 
 import GPSConverter from './gps-converter';
 import ObjectsConverter from './objects-converter';
@@ -8,11 +8,11 @@ import LidarConverter from './lidar-converter';
 import CameraConverter from './camera-converter';
 import FutureObjectsConverter from './future-objects-converter';
 
-import { XVIZBuilder, XVIZMetadataBuilder } from '@xviz/builder';
+import {XVIZBuilder, XVIZMetadataBuilder} from '@xviz/builder';
 import RandomDataGenerator from './random-data-generator';
-import { getDeclarativeUI } from './declarative-ui';
+import {getDeclarativeUI} from './declarative-ui';
 
-const TIMW_WINDOW = 50000; // nano seconds
+const TIME_WINDOW = 50000; // nano seconds
 
 export default class NuTonomyConverter {
   constructor(
@@ -54,11 +54,11 @@ export default class NuTonomyConverter {
     const gpsConverter = new GPSConverter(this.inputDir, 'ego_pose.json');
     const objectConverter = new ObjectsConverter(this.inputDir, 'sample_annotation.json');
     const lidarConverter = new LidarConverter(this.samplesDir, 'LIDAR_TOP');
-    // const cameraConverter = new CameraConverter(this.samplesDir, {
-    //   disabledStreams: this.disabledStreams,
-    //   imageMaxWidth: this.imageMaxWidth,
-    //   imageMaxHeight: this.imageMaxHeight
-    // });
+    const cameraConverter = new CameraConverter(this.samplesDir, {
+      disabledStreams: this.disabledStreams,
+      imageMaxWidth: this.imageMaxWidth,
+      imageMaxHeight: this.imageMaxHeight
+    });
     const futureObjectsConverter = new FutureObjectsConverter(
       this.inputDir,
       'sample_annotation.json'
@@ -69,7 +69,7 @@ export default class NuTonomyConverter {
       gpsConverter,
       objectConverter,
       lidarConverter,
-      // cameraConverter,
+      cameraConverter,
       futureObjectsConverter
     ];
 
@@ -82,15 +82,13 @@ export default class NuTonomyConverter {
       frames: this.frames
     });
 
-    this.converters
-      .filter(converter => converter !== gpsConverter)
-      .forEach(converter =>
-        converter.load({
-          staticData: this.staticData,
-          frames: this.frames,
-          posesByFrame: gpsConverter.getPoses()
-        })
-      );
+    this.converters.filter(converter => converter !== gpsConverter).forEach(converter =>
+      converter.load({
+        staticData: this.staticData,
+        frames: this.frames,
+        posesByFrame: gpsConverter.getPoses()
+      })
+    );
 
     this.metadata = this.getMetadata();
   }
@@ -157,8 +155,9 @@ export default class NuTonomyConverter {
 
   _loadFrames() {
     const {scenes, sampleDataByToken} = this.staticData;
-    const {first_sample_token: firstSampleToken, last_sample_token: lastSampleToken} =
-      scenes[this.sceneName];
+    const {first_sample_token: firstSampleToken, last_sample_token: lastSampleToken} = scenes[
+      this.sceneName
+      ];
 
     this.frames = [];
 
@@ -170,6 +169,7 @@ export default class NuTonomyConverter {
     // retrieve samples until next token is empty
     while (sample) {
       // if only convert key frames
+      // keyframe is 5-10 less frequent than frame sample
       if (this.keyframes) {
         while (sample && !sample.is_key_frame) {
           sample = sampleDataByToken[sample.next];
@@ -204,7 +204,7 @@ export default class NuTonomyConverter {
       const samples = sensorsMetadata[channel];
       let i = 0;
       // look for the sample of other sensors with timestamp >= lidar timestamp of current frame
-      while (i < samples.length && samples[i].timestamp < timestamp - TIMW_WINDOW)  {
+      while (i < samples.length && samples[i].timestamp < timestamp - TIME_WINDOW) {
         i++;
       }
       if (samples[i]) {
@@ -233,6 +233,7 @@ export default class NuTonomyConverter {
     [lidarSample, ...cameraSamples].forEach(sample => {
       while (sample) {
         // if only convert keyframes
+        // keyframe is 5-10 less frequent than frame sample
         if (this.keyframes) {
           while (sample && !sample.is_key_frame) {
             sample = sampleDataByToken[sample.next];
@@ -245,6 +246,7 @@ export default class NuTonomyConverter {
             sensorsMetadata[sensor.channel] = [];
           }
           sensorsMetadata[sensor.channel].push({
+            timestamp: sample.timestamp,
             calibrated_sensor_token: sample.calibrated_sensor_token,
             filename: sample.filename,
             ego_pose_token: sample.ego_pose_token,

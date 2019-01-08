@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
-import { parseJsonFile } from '../common';
-import { loadObjects } from '../parsers/parse-objects';
+import {parseJsonFile} from '../common';
+import {loadObjects} from '../parsers/parse-objects';
 
 export const OBJECT_PALATTE = {
   ['/human/pedestrian/adult']: {
@@ -117,6 +117,8 @@ export default class ObjectsConverter {
 
   convertFrame(frameIndex, xvizBuilder) {
     // only key frames have objects data
+    // each frame has a unique token,
+    // each keyframe has a unique sample_token
     const frameToken = this.frames[frameIndex].sample_token;
 
     // objects of given sample
