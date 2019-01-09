@@ -168,8 +168,8 @@ export default class NuTonomyConverter {
 
     // retrieve samples until next token is empty
     while (sample) {
-      // if only convert key frames
-      // keyframe is 5-10 less frequent than frame sample
+      // if only convert keyframes
+      // keyframe is 5-10 times less frequent than frame sample
       if (this.keyframes) {
         while (sample && !sample.is_key_frame) {
           sample = sampleDataByToken[sample.next];
@@ -191,7 +191,7 @@ export default class NuTonomyConverter {
   }
 
   // lidar frame is synchronized with ego pose
-  // use lidar frame's timestamp as the frame refernce timestamp
+  // use lidar frame's timestamp as the frame reference timestamp
   _getFrameSensors(frameIndex, sensorsMetadata) {
     const lidar = sensorsMetadata['LIDAR_TOP'][frameIndex];
     const timestamp = lidar.timestamp;

@@ -57,7 +57,7 @@ parser.addArgument('--list-scenes', {
 
 parser.addArgument('--keyframes', {
   action: 'storeTrue',
-  help: 'Convert keyframes.'
+  help: 'Convert keyframes only.'
 });
 
 // extract args from user input
@@ -84,6 +84,6 @@ module.exports = function getArgs() {
     frameLimit: Number(args.frame_limit),
     listScenes: args.list_scenes,
     scenes,
-    keyframes: Boolean(args.keyframes)
+    keyframes
   };
 };
