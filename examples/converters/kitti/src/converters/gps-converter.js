@@ -49,10 +49,11 @@ export default class GPSConverter extends BaseConverter {
     // the core reference point for other data and usually drives the timing
     // of the system.
     xvizBuilder
-      .pose(PRIMARY_POSE_STREAM)
+      .pose('/vehicle_pose')
       .timestamp(pose.timestamp)
       .mapOrigin(pose.longitude, pose.latitude, pose.altitude)
-      .orientation(pose.roll, pose.pitch, pose.yaw);
+      .orientation(pose.roll, pose.pitch, pose.yaw)
+      .position(0, 0, 0);
 
     // This is an example of using the XVIZBuilder to convert your data
     // into XVIZ.
@@ -93,7 +94,7 @@ export default class GPSConverter extends BaseConverter {
     // This helps validate data consistency and has automatic
     // behavior tied to the viewer.
     const xb = xvizMetaBuilder;
-    xb.stream(PRIMARY_POSE_STREAM)
+    xb.stream('/vehicle_pose')
       .category('pose')
 
       .stream(this.VEHICLE_ACCELERATION)

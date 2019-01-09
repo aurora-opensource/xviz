@@ -63,6 +63,12 @@ vehicle. Each time time you get an update to a variable stream, the full list of
 Time stamped values can be included in streams. Each time the stream updates you get a new
 timestamp, value pair.
 
+## Declarative UI
+
+A structured data schema that will map UI elements, such as plots, controls, tables, and video
+panels along with the stream name data bindings. This data is sent with the metadata to keep it
+closely coupled to the data source.
+
 ## Video
 
 XVIZ can sync with external video sources provided that they have been encoded in a suitable way.
