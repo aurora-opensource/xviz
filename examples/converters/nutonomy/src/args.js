@@ -69,6 +69,11 @@ parser.addArgument('--list-scenes', {
   help: 'List available scenes (use with -d or --data-directory).'
 });
 
+parser.addArgument('--keyframes', {
+  action: 'storeTrue',
+  help: 'Convert keyframes only.'
+});
+
 // extract args from user input
 module.exports = function getArgs() {
   const args = parser.parseArgs();
@@ -87,11 +92,12 @@ module.exports = function getArgs() {
     outputDir,
     samplesDir,
     disabledStreams,
-    fakeStreams: Boolean(args.fake_streams),
+    fakeStreams: args.fake_streams,
     imageMaxWidth: Number(args.image_max_width),
     imageMaxHeight: Number(args.image_max_height),
     frameLimit: Number(args.frame_limit),
     listScenes: args.list_scenes,
-    scenes
+    scenes,
+    keyframes: args.keyframes
   };
 };

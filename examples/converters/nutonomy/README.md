@@ -29,10 +29,24 @@ e.g load `scene-0006`
 ```bash
 yarn start
    -d <path-to-data-source>/nutonomy/nuscenes_teaser_meta_v1/v0.1   # metadata and annotation directory
-   -o <path-to-output>
    --samples-directory=<path-to-data-source>/nutonomy/samples       # lidar, radar, camera data directory
+   -o <path-to-output>
    --scenes=6   # could pass more than 1 --scenes=1,2,3
 ```
+
+Other options may be useful:
+
+```bash
+   --keyframes # only convert keyframes
+
+   --image-max-width
+   --image-max-height # reduce image size
+   
+   --disable-streams=CAM_FRONT_LEFT,CAM_FRONT_RIGHT # disable streams
+```
+
+To get a full list of acceptable parameters, run `yarn start --help`
+
 
 ### Structure of nuTonomy data
 Detailed [schema](https://github.com/nutonomy/nuscenes-devkit/blob/master/schema.md)

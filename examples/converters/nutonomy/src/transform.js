@@ -28,7 +28,8 @@ module.exports = async function main(args) {
     frameLimit,
     scenes,
     imageMaxWidth,
-    imageMaxHeight
+    imageMaxHeight,
+    keyframes
   } = args;
 
   const staticData = new StaticData(inputDir);
@@ -42,7 +43,8 @@ module.exports = async function main(args) {
       sceneName,
       fakeStreams,
       imageMaxWidth,
-      imageMaxHeight
+      imageMaxHeight,
+      keyframes
     });
 
     console.log(`Converting NuScenes data scene ${sceneName} at ${inputDir}`); // eslint-disable-line

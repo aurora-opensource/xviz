@@ -14,7 +14,6 @@
 
 /* eslint-disable camelcase */
 import {parseJsonFile} from '../common';
-
 import {loadObjects} from '../parsers/parse-objects';
 
 export const OBJECT_PALATTE = {
@@ -119,10 +118,8 @@ export default class ObjectsConverter {
     this.objectsByFrame = {};
     this.timestamps = [];
 
-    this.OBJECTS = '/objects/objects';
     this.OBJECTS_TRACKING_POINT = '/objects/tracking_point';
     this.OBJECTS_TRAJECTORY = '/objects/trajectory';
-    this.OBJECTS_LABEL = '/objects/label';
   }
 
   load({staticData, frames}) {
@@ -133,17 +130,19 @@ export default class ObjectsConverter {
   }
 
   convertFrame(frameIndex, xvizBuilder) {
-    const frameToken = this.frames[frameIndex].token;
+    // only key frames have objects data
+    // each frame has a unique token,
+    // each keyframe has a unique sample_token
+    const frameToken = this.frames[frameIndex].sample_token;
 
     // objects of given sample
     const objects = this.objectsByFrame[frameToken];
-
     if (objects) {
       Object.keys(objects).forEach((objectToken, i) => {
         const object = objects[objectToken];
 
         xvizBuilder
-          .primitive(this.OBJECTS)
+          .primitive(object.category)
           .polygon(object.vertices)
           .classes([object.category])
           .style({
@@ -171,19 +170,20 @@ export default class ObjectsConverter {
 
   getMetadata(xvizMetaBuilder, {staticData}) {
     const xb = xvizMetaBuilder;
-    xb.stream(this.OBJECTS)
-      .category('primitive')
-      .type('polygon')
-      .coordinate('IDENTITY')
-
-      .streamStyle({
-        extruded: true,
-        wireframe: true,
-        fill_color: '#00000080'
-      });
 
     Object.values(staticData.categories).forEach(category => {
-      xb.styleClass(category.streamName, OBJECT_PALATTE[category.streamName]);
+      xb.stream(category.streamName)
+        .category('primitive')
+        .type('polygon')
+        .coordinate('IDENTITY')
+
+        .streamStyle({
+          extruded: true,
+          wireframe: true,
+          fill_color: '#00000080'
+        })
+
+        .styleClass(category.streamName, OBJECT_PALATTE[category.streamName]);
     });
 
     xb.stream(this.OBJECTS_TRACKING_POINT)
@@ -209,10 +209,10 @@ export default class ObjectsConverter {
   _getObjectTrajectory(targetObject, startFrame, endFrame) {
     const trajectory = [];
     for (let i = startFrame; i < endFrame; i++) {
-      const startFrameToken = this.frames[startFrame].token;
+      const startFrameToken = this.frames[startFrame].sample_token;
       const startObject = this.objectsByFrame[startFrameToken][targetObject.instance_token];
 
-      const frameToken = this.frames[i].token;
+      const frameToken = this.frames[i].sample_token;
       const frameObject = this.objectsByFrame[frameToken][targetObject.instance_token];
       if (!frameObject) {
         return trajectory;
