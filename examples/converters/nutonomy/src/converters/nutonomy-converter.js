@@ -157,7 +157,7 @@ export default class NuTonomyConverter {
     const {scenes, sampleDataByToken} = this.staticData;
     const {first_sample_token: firstSampleToken, last_sample_token: lastSampleToken} = scenes[
       this.sceneName
-      ];
+    ];
 
     this.frames = [];
 
