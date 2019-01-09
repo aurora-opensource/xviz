@@ -57,7 +57,7 @@ module.exports = function getArgs() {
     inputDir,
     outputDir,
     disabledStreams,
-    fakeStreams: Boolean(args.fake_streams),
+    fakeStreams: args.fake_streams,
     imageMaxWidth: Number(args.image_max_width),
     imageMaxHeight: Number(args.image_max_height),
     frameLimit: Number(args.frame_limit),
