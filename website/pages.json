@@ -211,20 +211,24 @@
         "name": "@xviz/builder",
         "children": [
           {
-            "name": "XVIZ Builder",
+            "name": "XVIZBuilder",
             "markdown": "api-reference/xviz-builder.md"
           },
           {
-            "name": "XVIZ Metadata Builder",
+            "name": "XVIZMetadataBuilder",
             "markdown": "api-reference/xviz-metadata-builder.md"
           },
           {
-            "name": "XVIZ UI Builder",
+            "name": "XVIZUIBuilder",
             "markdown": "api-reference/xviz-ui-builder.md"
           },
           {
-            "name": "XVIZ Trajectory Helper",
-            "markdown": "api-reference/xviz-trajectory-helper.md"
+            "name": "XVIZWriter",
+            "markdown": "api-reference/xviz-writer.md"
+          },
+          {
+            "name": "Trajectory Helpers",
+            "markdown": "api-reference/xviz-trajectory-helpers.md"
           }
         ]
       },
@@ -232,32 +236,28 @@
         "name": "@xviz/parser",
         "children": [
           {
-            "name": "XVIZ Configuration",
+            "name": "setXVIZConfig",
             "markdown": "api-reference/xviz-configuration.md"
           },
           {
-            "name": "XVIZ Parsing",
+            "name": "parseStreamMessage",
             "markdown": "api-reference/parse-xviz.md"
           },
           {
-            "name": "XVIZ Synchronizer",
-            "markdown": "api-reference/xviz-synchronizer.md"
+            "name": "StreamSynchronizer",
+            "markdown": "api-reference/stream-synchronizer.md"
           },
           {
-            "name": "XVIZ LogSlice",
-            "markdown": "api-reference/xviz-log-slice.md"
+            "name": "XVIZStreamBuffer",
+            "markdown": "api-reference/xviz-stream-buffer.md"
           },
           {
-            "name": "XVIZ Object",
+            "name": "XVIZStyleParser",
+            "markdown": "api-reference/xviz-stream-buffer.md"
+          },
+          {
+            "name": "XVIZObject",
             "markdown": "api-reference/xviz-object.md"
-          },
-          {
-            "name": "XVIZ Object Collection",
-            "markdown": "api-reference/xviz-object-collection.md"
-          },
-          {
-            "name": "XVIZ Loader",
-            "markdown": "api-reference/xviz-loader.md"
           }
         ]
       },
@@ -265,7 +265,7 @@
         "name": "@xviz/schema",
         "children": [
           {
-            "name": "XVIZ Validator",
+            "name": "XVIZValidator",
             "markdown": "api-reference/xviz-validator.md"
           }
         ]

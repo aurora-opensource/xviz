@@ -1,8 +1,6 @@
-# XVIZ Configuration and Settings
+# XVIZ Configuration
 
-## Functions
-
-### setXVIZConfig(config)
+##### setXVIZConfig(config)
 
 Constants:
 
@@ -17,7 +15,7 @@ Parser plugins:
 - `preProcessPrimitive` (Function) - Pre process a primitive. This can be used to change the type of
   a primitive (e.g. from `point` to `text`) and/or modify their properties.
 
-### getXVIZConfig(config)
+##### getXVIZConfig(config)
 
 Parameters:
 
