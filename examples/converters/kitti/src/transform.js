@@ -32,12 +32,11 @@ module.exports = async function main(args) {
   converter.initialize();
 
   // This abstracts the details of the filenames expected by our server
-  const xvizWriter = new XVIZWriter();
-  const writerOptions = {writeBinary: !writeJson, writeJson};
+  const xvizWriter = new XVIZWriter({binary: !writeJson, json: writeJson});
 
   // Write metadata file
   const xvizMetadata = converter.getMetadata();
-  xvizWriter.writeMetadata(outputDir, xvizMetadata, writerOptions);
+  xvizWriter.writeMetadata(outputDir, xvizMetadata);
 
   const start = Date.now();
 
@@ -54,7 +53,7 @@ module.exports = async function main(args) {
   // any unnecessary complications
   for (let i = 0; i < limit; i++) {
     const xvizFrame = await converter.convertFrame(i);
-    xvizWriter.writeFrame(outputDir, i, xvizFrame, writerOptions);
+    xvizWriter.writeFrame(outputDir, i, xvizFrame);
   }
 
   xvizWriter.writeFrameIndex(outputDir);

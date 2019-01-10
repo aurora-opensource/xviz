@@ -50,17 +50,17 @@ test('XVIZWriter#default-ctor', t => {
 
 test('XVIZWriter#default-ctor sink', t => {
   /* eslint-disable no-unused-vars */
-  const builder = new XVIZWriter(new MemorySink());
+  const builder = new XVIZWriter({dataSink: new MemorySink()});
   t.end();
   /* eslint-enable no-unused-vars */
 });
 
 test('XVIZWriter#writeMetadata empty', t => {
   const sink = new MemorySink();
-  const builder = new XVIZWriter(sink, {envelope: false});
+  const builder = new XVIZWriter({dataSink: sink, envelope: false, binary: true, json: true});
 
   const data = {};
-  builder.writeMetadata('test', data, {writeBinary: true, writeJson: true});
+  builder.writeMetadata('test', data);
 
   t.ok(sink.has('test', '1-frame.json'), 'wrote json metadata frame');
   t.ok(sink.has('test', '1-frame.glb'), 'wrote binary metadata frame');
@@ -70,10 +70,10 @@ test('XVIZWriter#writeMetadata empty', t => {
 
 test('XVIZWriter#writeMetadata empty, write options off', t => {
   const sink = new MemorySink();
-  const builder = new XVIZWriter(sink, {envelope: false});
+  const builder = new XVIZWriter({dataSink: sink, envelope: false, binary: false, json: false});
 
   const data = {};
-  builder.writeMetadata('test', data, {writeBinary: false, writeJson: false});
+  builder.writeMetadata('test', data);
 
   t.not(sink.has('test', '1-frame.json'), 'did not write json metadata frame');
   t.not(sink.has('test', '1-frame.glb'), 'did not write binary metadata frame');
@@ -82,11 +82,11 @@ test('XVIZWriter#writeMetadata empty, write options off', t => {
 
 test('XVIZWriter#writeMetadata', t => {
   const sink = new MemorySink();
-  const builder = new XVIZWriter(sink, {envelope: false});
+  const builder = new XVIZWriter({dataSink: sink, envelope: false, binary: true, json: true});
 
   const data = SAMPLE_METADATA;
 
-  builder.writeMetadata('test', data, {writeBinary: true, writeJson: true});
+  builder.writeMetadata('test', data);
 
   t.ok(sink.has('test', '1-frame.json'), 'wrote json metadata frame');
   t.ok(sink.has('test', '1-frame.glb'), 'wrote binary metadata frame');
@@ -96,7 +96,7 @@ test('XVIZWriter#writeMetadata', t => {
 
 test('XVIZWriter#writeMetadataEnvelope', t => {
   const sink = new MemorySink();
-  const builder = new XVIZWriter(sink, {envelope: true});
+  const builder = new XVIZWriter({dataSink: sink, envelope: true, binary: false, json: true});
 
   const data = SAMPLE_METADATA;
 
@@ -105,7 +105,7 @@ test('XVIZWriter#writeMetadataEnvelope', t => {
     data
   };
 
-  builder.writeMetadata('test', data, {writeJson: true});
+  builder.writeMetadata('test', data);
 
   t.ok(sink.has('test', '1-frame.json'), 'wrote json metadata frame');
   t.deepEquals(
@@ -118,7 +118,7 @@ test('XVIZWriter#writeMetadataEnvelope', t => {
 
 test('XVIZWriter#writeFrame missing updates', t => {
   const sink = new MemorySink();
-  const builder = new XVIZWriter(sink, {envelope: false});
+  const builder = new XVIZWriter({dataSink: sink, envelope: false});
 
   const data = {};
 
@@ -132,7 +132,7 @@ test('XVIZWriter#writeFrame missing updates', t => {
 
 test('XVIZWriter#writeFrame updates missing timestamp', t => {
   const sink = new MemorySink();
-  const builder = new XVIZWriter(sink, {envelope: false});
+  const builder = new XVIZWriter({dataSink: sink, envelope: false});
 
   const data = {
     updates: []
@@ -148,11 +148,11 @@ test('XVIZWriter#writeFrame updates missing timestamp', t => {
 
 test('XVIZWriter#writeFrame', t => {
   const sink = new MemorySink();
-  const builder = new XVIZWriter(sink, {envelope: false});
+  const builder = new XVIZWriter({dataSink: sink, envelope: false, binary: false, json: true});
 
   const data = SAMPLE_STATE_UPDATE;
 
-  builder.writeFrame('test', 0, data, {writeJson: true});
+  builder.writeFrame('test', 0, data);
 
   t.ok(sink.has('test', '2-frame.json'), 'wrote json frame');
   t.deepEquals(JSON.parse(sink.get('test', '2-frame.json')), data, 'json frame fetched matches');
@@ -161,7 +161,7 @@ test('XVIZWriter#writeFrame', t => {
 
 test('XVIZWriter#writeFrameEnveloped', t => {
   const sink = new MemorySink();
-  const builder = new XVIZWriter(sink, {envelope: true});
+  const builder = new XVIZWriter({dataSink: sink, envelope: true, binary: false, json: true});
 
   const data = SAMPLE_STATE_UPDATE;
   const expected = {
@@ -169,7 +169,7 @@ test('XVIZWriter#writeFrameEnveloped', t => {
     data
   };
 
-  builder.writeFrame('test', 0, data, {writeJson: true});
+  builder.writeFrame('test', 0, data);
 
   t.ok(sink.has('test', '2-frame.json'), 'wrote json frame');
   t.deepEquals(
@@ -182,7 +182,7 @@ test('XVIZWriter#writeFrameEnveloped', t => {
 
 test('XVIZWriter#default-ctor frames writeFrameIndex', t => {
   const sink = new MemorySink();
-  const builder = new XVIZWriter(sink, {envelope: false});
+  const builder = new XVIZWriter({dataSink: sink, envelope: false});
 
   const data = SAMPLE_STATE_UPDATE;
 
@@ -205,7 +205,7 @@ test('XVIZWriter#default-ctor frames writeFrameIndex', t => {
 
 test('XVIZWriter#default-ctor frames writeFrame after writeFrameIndex', t => {
   const sink = new MemorySink();
-  const builder = new XVIZWriter(sink, {envelope: false});
+  const builder = new XVIZWriter({dataSink: sink, envelope: false});
 
   const data = SAMPLE_STATE_UPDATE;
 
