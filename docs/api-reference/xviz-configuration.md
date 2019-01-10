@@ -1,8 +1,6 @@
-# XVIZ Configuration and Settings
+# XVIZ Configuration
 
-## Functions
-
-### setXVIZConfig(config)
+##### setXVIZConfig(config)
 
 Constants:
 
@@ -12,12 +10,12 @@ Constants:
   any available data. Default `400`.
 - `PLAYBACK_FRAME_RATE` (Number) - The number of frames to generate per second. Default `10`.
 
-Parser plugins:
+Parser hooks:
 
 - `preProcessPrimitive` (Function) - Pre process a primitive. This can be used to change the type of
   a primitive (e.g. from `point` to `text`) and/or modify their properties.
 
-### getXVIZConfig(config)
+##### getXVIZConfig(config)
 
 Parameters:
 
