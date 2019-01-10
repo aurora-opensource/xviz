@@ -1,7 +1,8 @@
 # StreamSynchronizer
 
-The `StreamSynchronizer` class looks into a stream buffer and retrieves the most relevant datum from
-each stream that "matches" the current timestamp.
+The `StreamSynchronizer` class looks into a
+[XVIZStreamBuffer](/docs/api-reference/xviz-stream-buffer.md) and retrieves the most relevant datum
+from each stream that "matches" the current timestamp.
 
 ```js
 import {XVIZStreamBuffer, StreamSynchronizer} from '@xviz/parser';
@@ -50,12 +51,16 @@ Parameters:
 
 Returns an object with the following fields:
 
-- **vehiclePose** (Object)
+- **vehiclePose** (Object) - the current [vehicle pose](/docs/protocol-schema/core-types/md#Pose).
 - **origin** (Array) - map origin in `[lng, lat, alt]`
 - **vehicleRelativeTransform** (Matrix4)
 - **trackPosition** (Array) - vehicle position in `[lng, lat, alt]`
 - **heading** (Number) - the heading of the vehicle
-- **features** (Array)
-- **lookAheads** (Array)
-- **variables** (Array)
-- **streams** (Object)
+- **features** (Object) - a map from stream names to arrays of
+  [geometry primitives](/docs/protocol-schema/core-types/md#Primitive-State). This is a subset of
+  `streams`.
+- **lookAheads** (Object) - a map from stream names to arrays of
+  [futures](/docs/protocol-schema/core-types/md#Future-Instances). This is a subset of `streams`.
+- **variables** (Object) - a map from stream names to
+  [variables](/docs/protocol-schema/core-types/md#Variable-State). This is a subset of `streams`.
+- **streams** (Object) - the current state of all streams.
