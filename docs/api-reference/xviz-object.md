@@ -34,11 +34,6 @@ The XVIZ object id.
 
 The app state of the object, such as `tracked` and `selected`.
 
-##### props (Map)
-
-The properties of the object from the XVIZ log, such as `label` and `soc`. `props` is empty if the
-object does not exist in the current frame.
-
 ##### position (array)
 
 The coordinates of the tracking point of the object. `undefined` if the object does not exist in the
