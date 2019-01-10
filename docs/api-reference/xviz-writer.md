@@ -34,13 +34,21 @@ const xvizWriter = new XVIZWriter();
 Parameters:
 
 - **options** (Object)
-  - **options.dataSink** (Object) - by default, XVIZWriter writes the output to files on a disk.
-    Provide this option to override the behavior. `dataSink` must contain the following fields:
-    - **writeSync(scope, name, data)** (Function)
-  - **options.envelop** (Boolean) - whether to wrap the data object with a typed container. Default
+  - **options.envelope** (Boolean) - whether to wrap the data object with a typed container. Default
     `true`.
   - **options.binary** (Boolean) - output binary (GLB) format. Default `true`.
   - **options.json** (Boolean) - output JSON format. Default `false`.
+  - **options.dataSink** (Object) - by default, XVIZWriter writes the output to files on a disk.
+    Provide this option to override the behavior. `dataSink` must contain the following fields:
+    - **writeSync(directory, filename, data)** (Function) - write data to the specified destination.
+    ```js
+    new XVIZWriter({
+      dataSink: {
+        writeSync: (directory, filename, data) =>
+          fs.writeFileSync(path.resolve(directory, filename), data)
+      }
+    });
+    ```
 
 ### Methods
 
