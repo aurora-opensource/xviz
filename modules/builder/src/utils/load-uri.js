@@ -1,10 +1,11 @@
 // Based on binary-gltf-utils under MIT license: Copyright (c) 2016-17 Karl Cheng
-import path from 'path';
-import fs from 'fs';
 
 /* global Buffer */
 
 export function loadUri(uri, rootFolder = '.') {
+  const path = module.require('path');
+  const fs = module.require('fs');
+
   if (uri.startsWith('http:') || uri.startsWith('https:')) {
     return Promise.reject(new Error('request based loading of URIs not implemented'));
   }
