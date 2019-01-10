@@ -1,18 +1,38 @@
 import {parseLogMetadata} from '@xviz/parser';
-import metadataMessage from 'test-data/sample-metadata-message';
+import metadataMessageV1 from 'test-data/sample-metadata-message-v1';
+import metadataMessageV2 from 'test-data/sample-metadata-message';
 
 import tape from 'tape-catch';
 
 // xviz data uses snake_case
 /* eslint-disable camelcase */
 
-tape('parseLogMetadata#streams is empty object', t => {
-  const metadata = {...metadataMessage};
+tape('parseLogMetadata', t => {
+  let result;
+
+  t.comment('parse v1 metadata');
+  result = parseLogMetadata(metadataMessageV1);
+  t.ok(result.eventStartTime && result.eventEndTime, 'polulated timestamps');
+
+  t.comment('parse v2 metadata');
+  result = parseLogMetadata(metadataMessageV2);
+  t.ok(result.eventStartTime && result.eventEndTime, 'polulated timestamps');
+
+  result = parseLogMetadata({
+    version: '2.0.0',
+    log_info: {
+      start_time: 0,
+      end_time: 10
+    }
+  });
+  t.is(result.start_time, 0, 'handles start_time 0');
+
+  const metadata = {...metadataMessageV2};
   delete metadata.streams;
 
   // verify if no 'streams' in source data, the empty object is in output
-  const result = parseLogMetadata(metadata);
+  result = parseLogMetadata(metadata);
 
-  t.deepEqual(result.streams, {}, '"streams" is empty object');
+  t.deepEqual(result.streams, {}, 'handles missing streams');
   t.end();
 });
