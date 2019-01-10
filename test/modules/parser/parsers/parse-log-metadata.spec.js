@@ -13,12 +13,10 @@ tape('parseLogMetadata', t => {
   t.comment('parse v1 metadata');
   result = parseLogMetadata(metadataMessageV1);
   t.ok(result.eventStartTime && result.eventEndTime, 'polulated timestamps');
-  t.is(result.map, metadataMessageV1.map, 'kept custom fields');
 
   t.comment('parse v2 metadata');
   result = parseLogMetadata(metadataMessageV2);
   t.ok(result.eventStartTime && result.eventEndTime, 'polulated timestamps');
-  t.is(result.map_info, metadataMessageV2.map_info, 'kept custom fields');
 
   result = parseLogMetadata({
     version: '2.0.0',
@@ -27,7 +25,7 @@ tape('parseLogMetadata', t => {
       end_time: 10
     }
   });
-  t.is(result.start_time, 0, 'handles start_time 0')
+  t.is(result.start_time, 0, 'handles start_time 0');
 
   const metadata = {...metadataMessageV2};
   delete metadata.streams;
