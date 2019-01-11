@@ -54,7 +54,7 @@ test('XVIZObjectCollection#resetAll, getAllInCurrentFrame', t => {
   const object1 = collection.get('A');
   const object2 = collection.get('B');
 
-  object1._setGeometry([0, 1]);
+  object1._addFeature('/a', {center: [0, 1]});
   t.deepEquals(
     collection.getAllInCurrentFrame(),
     {A: object1},
@@ -64,7 +64,7 @@ test('XVIZObjectCollection#resetAll, getAllInCurrentFrame', t => {
   collection.resetAll();
   t.deepEquals(collection.getAllInCurrentFrame(), {}, 'returns all XVIZ objects in current frame');
 
-  object2._setGeometry([0, 1]);
+  object2._addFeature('/a', {center: [0, 1]});
   t.deepEquals(
     collection.getAllInCurrentFrame(),
     {B: object2},

@@ -39,7 +39,8 @@ export default class XVIZObject extends BaseObject {
     this.endTime = timestamp;
 
     // Use Map here for the clear() method without creating a new object
-    this.props = new Map();
+    this._props = new Map();
+    this._streams = new Map();
     this._geometry = null;
   }
 
@@ -86,15 +87,8 @@ export default class XVIZObject extends BaseObject {
     return Boolean(this._geometry);
   }
 
-  getProps() {
-    const result = {
-      index: this.index,
-      state: this.state
-    };
-    this.props.forEach((value, name) => {
-      result[name] = value;
-    });
-    return result;
+  get streamNames() {
+    return this._streams.keys();
   }
 
   getBearingToObject(object) {
@@ -134,11 +128,11 @@ export default class XVIZObject extends BaseObject {
   }
 
   getProp(name) {
-    return this.props.get(name);
+    return this._props.get(name);
   }
 
-  setProp(name, value) {
-    this.props.set(name, value);
+  getFeature(streamName) {
+    return this._streams.get(streamName);
   }
 
   // PRIVATE METHODS
@@ -148,7 +142,19 @@ export default class XVIZObject extends BaseObject {
     this.endTime = Math.max(this.endTime, timestamp);
   }
 
-  _setGeometry(p) {
+  _addFeature(streamName, feature) {
+    this._streams.set(streamName, feature);
+
+    // populate the feature with object props
+    feature.index = this.index;
+    feature.state = this.state;
+    for (const entry of this._props) {
+      feature[entry[0]] = entry[1];
+    }
+
+    // save feature geometry for tracking
+    const p = feature.center || feature.vertices;
+
     if (!p || !Array.isArray(p)) {
       return;
     }
@@ -168,11 +174,19 @@ export default class XVIZObject extends BaseObject {
     }
   }
 
+  _setProp(name, value) {
+    this._props.set(name, value);
+  }
+
   // This should be called at the beginning of `getCurrentFrame`
   _reset() {
-    if (this.props.size) {
-      this.props.clear();
+    if (this._props.size) {
+      this._props.clear();
     }
+    if (this._streams.size) {
+      this._streams.clear();
+    }
+    // clear the cached position
     this._geometry = null;
   }
 }

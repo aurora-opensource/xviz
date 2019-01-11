@@ -30,7 +30,7 @@ test('XVIZObject#constructor', t => {
   t.ok(object, 'creates OBJECT object successfully');
   t.is(object.id, 11, 'OBJECT object id is correct');
   t.ok(object.state, 'creates state object');
-  t.ok(object.props, 'creates props object');
+  t.ok(object._props, 'creates props object');
   t.is(object.startTime, 1000, 'has startTime');
   t.is(object.endTime, 1000, 'has endTime');
   t.end();
@@ -50,31 +50,32 @@ test('XVIZObject#observe', t => {
   t.end();
 });
 
-test('XVIZObject#_reset, _setGeometry, isValid', t => {
+test('XVIZObject#_reset, _addFeature, isValid', t => {
   const object = new XVIZObject({id: 11, index: 0, timestamp: 1000});
 
   t.not(object.isValid, 'object should be empty');
 
-  object._setGeometry(null);
+  object._addFeature('/a', {});
   t.not(object.isValid, 'point is not valid');
 
-  object._setGeometry(0);
+  object._addFeature('/b', {center: 1});
   t.not(object.isValid, 'point is not valid');
 
-  object._setGeometry([0, 1]);
+  object._addFeature('/c', {center: [0, 1]});
   t.deepEquals(object.position, [0, 1, 0], 'sets geometry from single point');
   t.ok(object.isValid, 'object should not be empty');
+  t.deepEquals(Array.from(object.streamNames), ['/a', '/b', '/c'], 'gets streamNames');
 
   object._reset();
   t.not(object.isValid, 'object should be empty');
-  object._setGeometry([[0, 1], [1, 2], [2, 3]]);
+  object._addFeature('/a', {vertices: [[0, 1], [1, 2], [2, 3]]});
   t.deepEquals(object.position, [1, 2, 0], 'sets geometry from polygon');
   t.ok(object.isValid, 'object should not be empty');
 
-  object._setGeometry([0, 1, 2]);
+  object._addFeature('/b', {center: [0, 1, 2]});
   t.deepEquals(object.position, [0, 1, 2], 'overwrites geometry from single point');
 
-  object._setGeometry([[0, 1], [1, 2]]);
+  object._addFeature('/c', {vertices: [[0, 1], [1, 2]]});
   t.deepEquals(object.position, [0, 1, 2], 'prefers point geometry over polygons');
 
   t.end();
