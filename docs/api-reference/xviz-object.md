@@ -26,23 +26,42 @@ Returns: all XVIZ objects in the current frame. Keys are ids and values are `XVI
 
 ## Properties
 
-##### id (string)
+##### id (String)
 
 The XVIZ object id.
 
-##### state (object)
+##### state (Object)
 
 The app state of the object, such as `tracked` and `selected`.
 
-##### position (array)
+##### startTime (Number)
 
-The coordinates of the tracking point of the object. `undefined` if the object does not exist in the
+Timestamp from when this object was first observed.
+
+##### endTime (Number)
+
+Timestamp from when this object was last observed.
+
+##### position (Array)
+
+The coordinates of the tracking point of the object. `null` if the object does not exist in the
 current frame.
 
-##### isValid (bool)
+##### streamNames (Iterable)
+
+A list of stream names where this object showed up. Empty if the object does not exist in the
+current frame.
+
+##### isValid (Bool)
 
 `true` if the object is in the current frame.
 
 ## Methods
 
-Apps should not directly call any methods on the XVIZObject objects.
+##### getProp(name)
+
+Returns the value of the specified property in the current frame.
+
+##### getFeature(streamName)
+
+Returns the object's feature from the specified streamName in the current frame.

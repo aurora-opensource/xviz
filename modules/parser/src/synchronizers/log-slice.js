@@ -14,13 +14,11 @@ function lookAheadTimesliceAccessor(timeslice) {
   throw new Error('Missing entry or timestamp in lookAhead array');
 }
 
-function updateObjectGeometry(features) {
+function updateObjects(streamName, features) {
   for (const feature of features) {
     const xvizObject = XVIZObject.get(feature.id);
     if (xvizObject) {
-      xvizObject._setGeometry(feature.center || feature.vertices);
-      // Populate feature with information from other streams
-      Object.assign(feature, xvizObject.getProps());
+      xvizObject._addFeature(streamName, feature);
     }
   }
 }
@@ -70,12 +68,12 @@ export default class LogSlice {
 
     // OBJECT_STREAM is deprecated, only keeping for backward compatibility
     if (OBJECT_STREAM) {
-      updateObjectGeometry(this.features[OBJECT_STREAM] || []);
+      updateObjects(OBJECT_STREAM, this.features[OBJECT_STREAM] || []);
     } else {
       for (const streamName in this.features) {
         const features = this.features[streamName];
         if (features.length && features[0].id) {
-          updateObjectGeometry(features);
+          updateObjects(streamName, features);
         }
       }
     }
@@ -159,7 +157,7 @@ export default class LogSlice {
 
         // For streams that do not follow the simple pattern in STREAM_REGEXP
         // Lookup for exact matches for labels first.
-        object.setProp(label.labelName, label.value);
+        object._setProp(label.labelName, label.value);
       }
     });
   }
