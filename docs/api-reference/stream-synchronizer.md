@@ -64,3 +64,4 @@ Returns an object with the following fields:
 - **variables** (Object) - a map from stream names to
   [variables](/docs/protocol-schema/core-types/md#Variable-State). This is a subset of `streams`.
 - **streams** (Object) - the current state of all streams.
+- **objects** (Object) - a map of [XVIZObject](/docs/api-reference/xviz-object.md) instances that are in the current frame.

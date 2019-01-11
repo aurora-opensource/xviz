@@ -131,7 +131,7 @@ export default class XVIZObject extends BaseObject {
   _addFeature(streamName, feature) {
     this._streams.set(streamName, feature);
 
-    // populate the feature with object props 
+    // populate the feature with object props
     feature.index = this.index;
     feature.state = this.state;
     for (const entry of this._props) {
