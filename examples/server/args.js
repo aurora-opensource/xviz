@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 const {ArgumentParser} = require('argparse');
 const path = require('path');
 
@@ -7,7 +8,6 @@ const parser = new ArgumentParser({
 });
 
 parser.addArgument(['-d', '--data_directory'], {
-  required: true,
   help: 'Directory to serve data from. Relative path will be resolved relative to /data/generated/'
 });
 
@@ -24,13 +24,25 @@ parser.addArgument(['--frame_limit'], {
 parser.addArgument(['--delay'], {
   defaultValue: 50,
   type: Number,
-  help: 'Message send interval, 50ms as default'
+  help: 'Message send interval in milliseconds. 50ms as default'
 });
 
 parser.addArgument(['--duration'], {
-  defaultValue: 30000,
+  defaultValue: 30,
   type: Number,
-  help: 'Set duration of log data if not specified, 30 seconds default'
+  help: 'Set duration in seconds of log data. 30s as default'
+});
+
+parser.addArgument(['--scenario'], {
+  defaultValue: '',
+  type: String,
+  help: 'Select from available scenarios: "circle", "straight"'
+});
+
+parser.addArgument(['--live'], {
+  defaultValue: false,
+  action: 'storeTrue',
+  help: 'Behave like a live system and send XVIZ data immediately after metadata.'
 });
 
 parser.addArgument(['--skip_images'], {
@@ -40,7 +52,9 @@ parser.addArgument(['--skip_images'], {
 
 module.exports = function getArgs() {
   const args = parser.parseArgs();
-  // eslint-disable-next-line camelcase
-  args.data_directory = path.resolve(__dirname, '../../data/generated/', args.data_directory);
+  if (args.data_directory) {
+    args.data_directory = path.resolve(__dirname, '../../data/generated/', args.data_directory);
+  }
+
   return args;
 };
