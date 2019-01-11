@@ -110,6 +110,7 @@ export default class TrackletsConverter {
     xb.stream(this.TRACKLETS)
       .category('primitive')
       .type('polygon')
+      .coordinate('VEHICLE_RELATIVE')
       .streamStyle({
         extruded: true,
         wireframe: true,

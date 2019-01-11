@@ -119,6 +119,7 @@ export default class GPSConverter extends BaseConverter {
       .stream(this.VEHICLE_TRAJECTORY)
       .category('primitive')
       .type('polyline')
+      .coordinate('VEHICLE_RELATIVE')
 
       // This styling information is applied to *all* objects for this stream.
       // It is possible to apply inline styling on individual objects.
