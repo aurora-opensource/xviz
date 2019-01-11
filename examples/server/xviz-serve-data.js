@@ -22,6 +22,8 @@ const process = require('process');
 const {deltaTimeMs, extractZipFromFile} = require('./serve');
 const {parseBinaryXVIZ} = require('@xviz/parser');
 
+const {loadScenario} = require('./scenarios');
+
 // TODO: auxillary timestamp tracking & images are not handled
 
 const FRAME_DATA_SUFFIX = '-frame.glb';
@@ -276,8 +278,10 @@ function connectionId() {
 
 // Connection State
 class ConnectionContext {
-  constructor(settings, metadata, frames, frameTiming) {
+  constructor(settings, metadata, frames, frameTiming, loadFrameData) {
     this.metadata = metadata;
+
+    this._loadFrameData = loadFrameData;
 
     this.connectionId = connectionId();
 
@@ -312,6 +316,12 @@ class ConnectionContext {
 
     // On connection send metadata
     this.sendMetadataResp();
+
+    // 'live' mode will not get the 'xviz/transform_log' message
+    // so start sending immediately
+    if (this.settings.live) {
+      this.sendPlayResp({});
+    }
   }
 
   onClose(event) {
@@ -328,8 +338,8 @@ class ConnectionContext {
         // TODO: support choosing log here
         break;
       case 'xviz/transform_log': {
-        this.log(`| ts: ${msg.timestamp} duration: ${msg.duration}`);
-        this.sendPlayResp(msg);
+        this.log(`| start: ${msg.data.start_timestamp} end: ${msg.data.end_timestamp}`);
+        this.sendPlayResp(msg.data);
         break;
       }
       default:
@@ -407,7 +417,7 @@ class ConnectionContext {
   }
 
   sendMetadata() {
-    const frame = getFrameData(this.metadata);
+    const frame = this._loadFrameData(this.metadata);
     const isBuffer = frame instanceof Buffer;
 
     const frame_send_time = process.hrtime();
@@ -451,7 +461,7 @@ class ConnectionContext {
 
     // get frame info
     const frame_index = getFrameIndex(ii, frames.length);
-    const frame = getFrameData(frames[frame_index]);
+    const frame = this._loadFrameData(frames[frame_index]);
 
     // TODO images are not supported here, but glb data is
     // old image had a binary header
@@ -522,10 +532,10 @@ class ConnectionContext {
 
 // Comms handling
 
-function setupWebSocketHandling(wss, settings, metadata, frames, frameTiming) {
+function setupWebSocketHandling(wss, settings, metadata, frames, frameTiming, loadFrameData) {
   // Setups initial connection state
   wss.on('connection', ws => {
-    const context = new ConnectionContext(settings, metadata, frames, frameTiming);
+    const context = new ConnectionContext(settings, metadata, frames, frameTiming, loadFrameData);
     context.onConnection(ws);
   });
 }
@@ -533,8 +543,17 @@ function setupWebSocketHandling(wss, settings, metadata, frames, frameTiming) {
 // Main
 
 module.exports = function main(args) {
-  console.log(`Loading frames from ${args.data_directory}`);
-  const frames = loadFrames(args.data_directory);
+  const runScenario = args.scenario.length > 0;
+
+  if (runScenario) {
+    console.log(`Loading frames for scenario ${args.scenario}`);
+  } else {
+    console.log(`Loading frames from ${args.data_directory}`);
+  }
+
+  const frames = runScenario
+    ? loadScenario(args.scenario, args.live, args.duration)
+    : loadFrames(args.data_directory);
 
   if (frames.frames.length === 0) {
     console.error('No frames where loaded, exiting.');
@@ -542,7 +561,7 @@ module.exports = function main(args) {
   }
 
   // Try to load from and timing index
-  let frameTiming = loadTimingIndex(args.data_directory);
+  let frameTiming = runScenario ? frames.timing : loadTimingIndex(args.data_directory);
   const frameTimingValue = frameTiming.length === frames.frames.length;
 
   if (!frameTiming || !frameTimingValue) {
@@ -558,6 +577,7 @@ module.exports = function main(args) {
   console.log(`Loaded ${frames.frames.length} frames`);
 
   const settings = {
+    live: args.live,
     duration: args.duration,
     send_interval: args.delay,
     skip_images: args.skip_images,
@@ -565,5 +585,12 @@ module.exports = function main(args) {
   };
 
   const wss = new WebSocket.Server({port: args.port});
-  setupWebSocketHandling(wss, settings, frames.metadata, frames.frames, frameTiming);
+  setupWebSocketHandling(
+    wss,
+    settings,
+    frames.metadata,
+    frames.frames,
+    frameTiming,
+    runScenario ? x => x : getFrameData
+  );
 };
