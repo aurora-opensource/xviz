@@ -144,6 +144,7 @@ export default class TrackletsConverter {
         radius: 0.2,
         fill_color: '#FFC043'
       })
+      .coordinate('VEHICLE_RELATIVE')
       .pose(this.FIXTURE_TRANSFORM_POSE)
 
       .stream(this.TRACKLETS_LABEL)
@@ -153,6 +154,7 @@ export default class TrackletsConverter {
         size: 18,
         fill_color: '#DCDCCD'
       })
+      .coordinate('VEHICLE_RELATIVE')
       .pose(this.FIXTURE_TRANSFORM_POSE)
 
       .stream(this.TRACKLETS_TRAJECTORY)
@@ -163,6 +165,7 @@ export default class TrackletsConverter {
         stroke_width: 0.1,
         stroke_width_min_pixels: 1
       })
+      .coordinate('VEHICLE_RELATIVE')
       .pose(this.FIXTURE_TRANSFORM_POSE);
   }
 
