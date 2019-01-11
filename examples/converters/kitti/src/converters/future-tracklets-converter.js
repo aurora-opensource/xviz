@@ -121,6 +121,7 @@ export default class FutureTrackletsConverter {
         fill_color: '#E2E2E280',
         stroke_color: '#E2E2E2'
       })
+      .coordinate('VEHICLE_RELATIVE')
       .pose(this.FIXTURE_TRANSFORM_POSE);
   }
 

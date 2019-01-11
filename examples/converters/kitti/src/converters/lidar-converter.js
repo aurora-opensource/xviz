@@ -56,6 +56,7 @@ export default class LidarConverter extends BaseConverter {
       })
       // laser scanner relative to GPS position
       // http://www.cvlibs.net/datasets/kitti/setup.php
+      .coordinate('VEHICLE_RELATIVE')
       .pose({
         x: 0.81,
         y: -0.32,
