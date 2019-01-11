@@ -39,41 +39,37 @@ class FileSink {
 }
 
 export default class XVIZWriter {
-  constructor(dataSink, options = {envelope: true}) {
-    this.sink = dataSink || new FileSink();
+  constructor(options = {}) {
+    const {dataSink = new FileSink(), envelope = true, binary = true, json = false} = options;
+    this.sink = dataSink;
     this.frameTimings = {
       frames: new Map()
     };
     this.wroteFrameIndex = null;
-    this.options = options;
+    this.options = {envelope, binary, json};
   }
 
   // xvizMetadata is the object returned
   // from a Builder.
-  writeMetadata(xvizDirectory, xvizMetadata, options = {writeBinary: true, writeJson: false}) {
+  writeMetadata(xvizDirectory, xvizMetadata) {
     this._saveTimestamp(xvizMetadata);
 
     if (this.options.envelope) {
       xvizMetadata = {type: 'xviz/metadata', data: xvizMetadata};
     }
 
-    if (options.writeBinary) {
+    if (this.options.binary) {
       writeBinaryXVIZtoFile(this.sink, xvizDirectory, '1-frame', xvizMetadata, {
         flattenArrays: false
       });
     }
 
-    if (options.writeJson) {
+    if (this.options.json) {
       this.sink.writeSync(xvizDirectory, '1-frame.json', JSON.stringify(xvizMetadata));
     }
   }
 
-  writeFrame(
-    xvizDirectory,
-    frameNumber,
-    xvizFrame,
-    options = {writeBinary: true, writeJson: false}
-  ) {
+  writeFrame(xvizDirectory, frameIndex, xvizFrame) {
     if (this.wroteFrameIndex !== null) {
       throw new Error(
         `writeFrame() was called after writeFrameIndex().  The index was written with last frame of ${frameName(
@@ -82,19 +78,19 @@ export default class XVIZWriter {
       );
     }
 
-    this._saveTimestamp(xvizFrame, frameNumber);
+    this._saveTimestamp(xvizFrame, frameIndex);
 
     if (this.options.envelope) {
       xvizFrame = {type: 'xviz/state_update', data: xvizFrame};
     }
 
-    if (options.writeBinary) {
-      writeBinaryXVIZtoFile(this.sink, xvizDirectory, frameName(frameNumber), xvizFrame, {
+    if (this.options.binary) {
+      writeBinaryXVIZtoFile(this.sink, xvizDirectory, frameName(frameIndex), xvizFrame, {
         flattenArrays: false
       });
     }
 
-    if (options.writeJson) {
+    if (this.options.json) {
       // Limit precision to save space
       const numberRounder = (k, value) => {
         if (typeof value === 'number') {
@@ -107,7 +103,7 @@ export default class XVIZWriter {
       const jsonXVIZFrame = xvizConvertJson(xvizFrame);
       this.sink.writeSync(
         xvizDirectory,
-        `${frameName(frameNumber)}.json`,
+        `${frameName(frameIndex)}.json`,
         JSON.stringify(jsonXVIZFrame, numberRounder)
       );
     }
