@@ -19,6 +19,10 @@ export function getCentroid(polygon) {
   let sz = 0;
 
   let len = polygon.length;
+  if (len === 1) {
+    return polygon[0];
+  }
+
   if (polygon[0] === polygon[len - 1]) {
     // the last vertex is the same as the first, ignore
     len -= 1;
