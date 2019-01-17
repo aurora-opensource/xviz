@@ -3,7 +3,7 @@
  * for movement indication
  * - no start end time in metadata
  * - no streams in metadata
- *   - this forces everything to be vehicle_relative
+ *   - this means primitives have the coordinate IDENTITY
  */
 
 const DEG_1_AS_RAD = Math.PI / 180;
@@ -26,6 +26,7 @@ class StraightScenario {
   constructor(ts) {
     // Get starting timestamp
     this.timestamp = ts || Date.now() * 1000;
+    this.lineGap = 5;
   }
 
   getFrame(frameNumber) {
@@ -55,30 +56,46 @@ class StraightScenario {
       '/vehicle_pose': {
         timestamp,
         orientation: [0, 0, 0],
-        position: [0, frameNumber, 0]
+        position: [frameNumber, 0, 0]
       }
     };
   }
 
-  _drawLines(frameNumber) {
-    const lineSpacing = [-15, -10, -5, 0, 5, 10, 15, 20];
+  _range(start, end, increment = 1) {
+    const range = [];
+    for (let i = start; i <= end; i += increment) {
+      range.push(i * this.lineGap);
+    }
 
-    const offset = frameNumber % 5;
-    const colorCycle = Math.cos(frameNumber * 2 * DEG_1_AS_RAD);
-    const lineSpacingXVIZ = lineSpacing.map((x, index) => {
+    console.log(start, end);
+    return range;
+  }
+
+  _lineColor(x) {
+    return [
+      // Generate cyclical colors
+      120 + Math.cos(x * 2 * DEG_1_AS_RAD) * 90,
+      200 + Math.cos(x * DEG_1_AS_RAD) * 30,
+      170 + Math.sin(x * 3 * DEG_1_AS_RAD) * 60
+    ];
+  }
+
+  _drawLines(frameNumber) {
+    // Car position matches the frameNumber
+    // place the farthest 20
+    const lineStart = (frameNumber - 15) / this.lineGap;
+    const lineEnd = (frameNumber + 20) / this.lineGap;
+
+    const lineSpacing = this._range(Math.ceil(lineStart), Math.floor(lineEnd));
+    const lineSpacingXVIZ = lineSpacing.map(x => {
       return {
         base: {
           style: {
             stroke_width: 0.2,
-            stroke_color: [
-              // Generate cyclical colors
-              120 + Math.cos(frameNumber * 2 * DEG_1_AS_RAD) * 90,
-              60 + Math.cos(frameNumber * DEG_1_AS_RAD) * 30,
-              90 + Math.sin(frameNumber * 3 * DEG_1_AS_RAD) * 60
-            ]
+            stroke_color: this._lineColor(x)
           }
         },
-        vertices: [x - offset, -40, 0, x - offset, 40, 0]
+        vertices: [x, -40, 0, x, 40, 0]
       };
     });
 
