@@ -64,5 +64,9 @@ test('XVIZObject#_reset, _addFeature, isValid', t => {
   object._addFeature('/c', {vertices: [[0, 1], [1, 2]]});
   t.deepEquals(object.position, [0, 1, 2], 'prefers point geometry over polygons');
 
+  object._reset();
+  object._addFeature('/a', {vertices: [[0, 1]]});
+  t.deepEquals(object.position, [0, 1], 'valid position if array has a single point');
+
   t.end();
 });
