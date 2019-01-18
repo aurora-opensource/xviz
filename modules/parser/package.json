@@ -1,6 +1,7 @@
 {
   "name": "@xviz/parser",
   "description": "Utility library for converting XVIZ messages into JSON objects",
+  "license": "Apache 2.0",
   "version": "0.1.0",
   "repository": {
     "type": "git",
@@ -10,8 +11,7 @@
   "module": "dist/esm/index.js",
   "esnext": "dist/es6/index.js",
   "files": [
-    "dist",
-    "src"
+    "dist"
   ],
   "browser": {
     "text-encoding": false
@@ -37,6 +37,5 @@
     "node": ">= 8",
     "npm": ">= 5",
     "yarn": ">= 1.10.0"
-  },
-  "private": true
+  }
 }
