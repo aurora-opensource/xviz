@@ -16,7 +16,8 @@
     "flow": "flow check",
     "cover": "NODE_ENV=cover nyc node test/start",
     "lint": "scripts/lint.sh",
-    "publish": "scripts/publish.sh",
+    "publish-prod": "npm run bootstrap && npm run test && npm run test dist && scripts/publish.sh prod",
+    "publish-beta": "npm run bootstrap && npm run test && npm run test dist && scripts/publish.sh beta",
     "test": "scripts/test.sh",
     "test-browser": "webpack-dev-server --config test/webpack.config.js --hot --open"
   },
