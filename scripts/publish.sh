@@ -4,17 +4,18 @@
 set -e
 
 # beta or prod
-PUBLISH_DIRECTORY=dist
 MODE=$1
-PACKAGE_VERSION="$(node -pe "require('./package.json').version")"
 
-# transpile module
-npm run build
+case $MODE in
+  "beta")
+    # npm-tag argument: npm publish --tag <beta>
+    # cd-version argument: increase <prerelease> version
+    lerna publish --npm-tag beta --cd-version prerelease
+    break;;
 
-NODE_ENV=test node test/start dist
+  "prod")
+    lerna publish --cd-version minor
+    break;;
 
-if [[ "$PACKAGE_VERSION" =~ 'alpha' || "$PACKAGE_VERSION" =~ 'beta' ]]; then
-  cd $PUBLISH_DIRECTORY && npm publish --tag beta #beta
-else
-  cd $PUBLISH_DIRECTORY && npm publish #prod
-fi
+  *) ;;
+esac
