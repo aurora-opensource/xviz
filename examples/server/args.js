@@ -45,6 +45,12 @@ parser.addArgument(['--live'], {
   help: 'Behave like a live system and send XVIZ data immediately after metadata.'
 });
 
+parser.addArgument(['--loop'], {
+  defaultValue: false,
+  action: 'storeTrue',
+  help: 'Play forever, jumping to the beginning, after playback is done (timestamps will be fixed)'
+});
+
 parser.addArgument(['--skip_images'], {
   defaultValue: false,
   help: 'Will not send video frames'
