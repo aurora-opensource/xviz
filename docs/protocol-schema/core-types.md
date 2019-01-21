@@ -264,8 +264,8 @@ example, the following three streams would represent three variable states
     /plan/jerk
 
 Each stream would contain the same number of values and then the velocity and jerk streams could be
-plotted as a function of the time stream. For more details on how to plot see the UI Metadata
-section.
+plotted as a function of the time stream. For more details on how to plot see the
+[Declarative UI docs](/docs/declarative-ui/overview.md).
 
 The base variable fields:
 
