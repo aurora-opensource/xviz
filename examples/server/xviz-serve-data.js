@@ -142,16 +142,10 @@ function loadFrameTimings(frames) {
   let lastTime = 0;
   const timings = frames.map(frame => {
     const data = getFrameData(frame);
-    let jsonFrame = null;
-    if (data instanceof Buffer) {
-      jsonFrame = parseBinaryXVIZ(
-        data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength)
-      );
-    } else if (typeof data === 'string') {
-      jsonFrame = JSON.parse(data);
-    }
 
-    const ts = getTimestamp(jsonFrame);
+    const result = unpackFrame(data);
+
+    const ts = getTimestamp(result.json);
     if (Number.isFinite(ts)) {
       lastTime = ts;
     }
@@ -265,7 +259,7 @@ function connectionId() {
 
 // Connection State
 class ConnectionContext {
-  constructor(settings, metadata, frames, frameTiming, loadFrameData) {
+  constructor(settings, metadata, allFrameData, loadFrameData) {
     this.metadata = metadata;
 
     this._loadFrameData = loadFrameData;
@@ -273,9 +267,16 @@ class ConnectionContext {
     this.connectionId = connectionId();
 
     // Remove metadata so we only deal with data frames
-    this.frames = frames;
-    this.frames_timing = frameTiming;
-    this.frame_time_offset = null;
+
+    // Cache json version of frames for faster re-writes
+    // during looping.
+    this.json_frames = [];
+    this.is_frame_binary = [];
+    this.frame_update_times = [];
+
+    Object.assign(this, allFrameData);
+
+    this.frame_time_advance = null;
 
     this.settings = settings;
     this.t_start_time = null;
@@ -287,57 +288,10 @@ class ConnectionContext {
     this.replaceFrameRequest = null;
     this.inflight = false;
 
-    // Cache json version of frames for faster re-writes
-    // during looping.
-    this.json_frames = [];
-    this.is_frame_binary = [];
-    this.frame_update_times = [];
-
-    if (this.settings.loop) {
-      this.unpackFrames();
-    }
-
     this.onConnection.bind(this);
     this.onClose.bind(this);
     this.onMessage.bind(this);
     this.sendFrame.bind(this);
-
-    console.log('Waiting for connection');
-  }
-
-  unpackFrames() {
-    console.log(`Unpacking ${this.frames.length} frames into memory`);
-    console.log('WARNING: for long logs you might not have enough memory');
-    for (let i = 0; i < this.frames.length; ++i) {
-      const frame = this._loadFrameData(this.frames[i]);
-
-      const update_times = [];
-
-      let jsonFrame;
-      let isBinary = false;
-
-      if (frame instanceof Buffer) {
-        jsonFrame = parseBinaryXVIZ(
-          frame.buffer.slice(frame.byteOffset, frame.byteOffset + frame.byteLength)
-        );
-        isBinary = true;
-      } else if (typeof frame === 'string') {
-        jsonFrame = JSON.parse(frame);
-      } else {
-        throw new Error('Unknown frame type');
-      }
-
-      if (jsonFrame.data.updates) {
-        const updates = jsonFrame.data.updates;
-        for (let y = 0; y < updates.length; y++) {
-          update_times.push(updates[y].timestamp);
-        }
-      }
-
-      this.json_frames.push(jsonFrame);
-      this.is_frame_binary.push(isBinary);
-      this.frame_update_times.push(update_times);
-    }
   }
 
   onConnection(ws) {
@@ -455,10 +409,15 @@ class ConnectionContext {
   }
 
   sendMetadata() {
-    const frame = this._loadFrameData(this.metadata);
+    let frame = this._loadFrameData(this.metadata);
     const isBuffer = frame instanceof Buffer;
 
     const frame_send_time = process.hrtime();
+
+    // When in live mode
+    if (this.settings.live) {
+      frame = this.removeMetadataTimestamps(frame);
+    }
 
     // Send data
     if (isBuffer) {
@@ -509,7 +468,7 @@ class ConnectionContext {
       if (this.settings.loop) {
         // In loop mode determine how much data we just play then update
         // our offset.
-        frameRequest.index = this.loopPlayback(frame_index, frameRequest.start) - 1;
+        frameRequest.index = this.loopPlayback(last_index, frameRequest.start) - 1;
 
         // We are past the limit don't send this frame
         skipSending = true;
@@ -549,10 +508,10 @@ class ConnectionContext {
           this.sendNextFrame(frameRequest);
         });
       } else {
-        // this.ws.send(updatedFrame, {compress: true}, () => {
-        //   this.logMsgSent(frame_send_time, ii, frame_index, 'json', next_ts);
-        //   this.sendNextFrame(frameRequest);
-        // });
+        this.ws.send(updatedFrame, {compress: true}, () => {
+          this.logMsgSent(frame_send_time, ii, frame_index, 'json', next_ts);
+          this.sendNextFrame(frameRequest);
+        });
       }
     }
   }
@@ -560,24 +519,32 @@ class ConnectionContext {
   loopPlayback(frame_index, start_index) {
     const duration = this.frames_timing[frame_index - 1] - this.frames_timing[start_index];
 
-    if (this.frame_time_offset === null) {
-      this.frame_time_offset = 0;
+    if (this.frame_time_advance === null) {
+      this.frame_time_advance = 0;
     }
-    this.frame_time_offset = this.frame_time_offset + duration;
+
+    this.frame_time_advance += duration;
 
     return start_index;
   }
+
+  // Take a frame at time t, and make it appears as it occured
+  // frame_time_advance in the future.
   adjustFrameTime(frame, frame_index) {
-    if (this.frame_time_offset) {
+    if (this.frame_time_advance) {
       // Determine if binary and unpack
       const jsonFrame = this.json_frames[frame_index];
-      const updateTimes = this.frame_update_times[frame_index];
-      // console.log(this.frame_time_offset);
 
       // Update the snapshot times
       for (let i = 0; i < jsonFrame.data.updates.length; ++i) {
         const update = jsonFrame.data.updates[i];
-        update.timestamp = updateTimes[i] + this.frame_time_offset;
+        update.timestamp += this.frame_time_advance;
+
+        if (update.time_series) {
+          for (let y = 0; y < update.time_series.length; ++y) {
+            update.time_series[y].timestamp += this.frame_time_advance;
+          }
+        }
       }
 
       // Repack based on binary-ness
@@ -586,6 +553,25 @@ class ConnectionContext {
       } else {
         frame = JSON.stringify(jsonFrame);
       }
+    }
+
+    return frame;
+  }
+
+  removeMetadataTimestamps(frame) {
+    const result = unpackFrame(frame);
+
+    const log_info = result.json.data.log_info;
+
+    if (log_info) {
+      delete log_info.start_time;
+      delete log_info.end_time;
+    }
+
+    if (result.isBinary) {
+      frame = encodeBinaryXVIZ(result.json, {});
+    } else {
+      frame = JSON.stringify(result.json);
     }
 
     return frame;
@@ -615,13 +601,56 @@ class ConnectionContext {
 }
 
 // Comms handling
-
-function setupWebSocketHandling(wss, settings, metadata, frames, frameTiming, loadFrameData) {
+function setupWebSocketHandling(wss, settings, metadata, allFrameData, loadFrameData) {
   // Setups initial connection state
   wss.on('connection', ws => {
-    const context = new ConnectionContext(settings, metadata, frames, frameTiming, loadFrameData);
+    const context = new ConnectionContext(settings, metadata, allFrameData, loadFrameData);
     context.onConnection(ws);
   });
+}
+
+function unpackFrames(frames, loadFrameData) {
+  console.log(`Unpacking ${frames.length} frames into memory`);
+  console.log('WARNING: for long logs you might not have enough memory');
+
+  const json_frames = [];
+  const is_frame_binary = [];
+
+  for (let i = 0; i < frames.length; ++i) {
+    const frame = loadFrameData(frames[i]);
+
+    const result = unpackFrame(frame, {shouldThrow: false});
+
+    json_frames.push(result.json);
+    is_frame_binary.push(result.isBinary);
+  }
+
+  console.log('All data loaded, ready.');
+
+  return {
+    json_frames,
+    is_frame_binary
+  };
+}
+
+function unpackFrame(frame, options = {}) {
+  const shouldThrow = options.shouldThrow || true;
+
+  let json;
+  let isBinary = false;
+
+  if (frame instanceof Buffer) {
+    json = parseBinaryXVIZ(
+      frame.buffer.slice(frame.byteOffset, frame.byteOffset + frame.byteLength)
+    );
+    isBinary = true;
+  } else if (typeof frame === 'string') {
+    json = JSON.parse(frame);
+  } else if (shouldThrow) {
+    throw new Error('Unknown frame type');
+  }
+
+  return {json, isBinary};
 }
 
 // Main
@@ -669,13 +698,21 @@ module.exports = function main(args) {
     loop: args.loop
   };
 
+  const allFrameData = {
+    frames: frames.frames,
+    frames_timing: frameTiming
+  };
+
+  if (settings.loop) {
+    Object.assign(allFrameData, unpackFrames(frames.frames, getFrameData));
+  }
+
   const wss = new WebSocket.Server({port: args.port});
   setupWebSocketHandling(
     wss,
     settings,
     frames.metadata,
-    frames.frames,
-    frameTiming,
+    allFrameData,
     runScenario ? x => x : getFrameData
   );
 };
