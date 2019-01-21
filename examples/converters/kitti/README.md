@@ -1,4 +1,4 @@
-### KITTI XVIZ Conversion Example
+# KITTI XVIZ Conversion
 
 This public KITTI data set is used to demonstrate how to convert data into the XVIZ format.
 
@@ -11,66 +11,57 @@ such that it can be processed by a *frame*, which is all the data required for a
 In this example, the data has been synchronized for us, but XVIZ does support data sources operating at
 different rates.
 
-Follow the comments to get an understanding of the how's and why's of converting data to XVIZ.
+Please see the [Getting Started](https://github.com/uber/xviz/blob/master/docs/getting-started/README.md) guide for details this XVIZ conversion.
 
-### KITTI Data Set
+# Structure of the XVIZ conversion code
 
-* [kitti dataset](http://www.cvlibs.net/datasets/kitti/raw_data.php)**
+The [Getting Started](https://github.com/uber/xviz/blob/master/docs/getting-started/README.md) covers the
+details of the XVIZ conversion. Here we briefly describe the structure of the conversion code itself.
 
-* [python lib](https://github.com/utiasSTARS/pykitti)
-* [Jupyter notebook](https://github.com/navoshta/KITTI-Dataset/blob/master/kitti-dataset.ipynb)
+We have defined a conversion class for each data source in the original KITTI data. Specifically we want this class to handle the following:
 
+1. Handle data dependencies
+2. Load KITTI data source
+3. Define XVIZ stream metadata this converter produces
+4. Convert data to XVIZ streams based on the current frame
 
-### Download Kitti Data
+## Defining the XVIZ converter class structure
 
-1. Go to **[kitti dataset](http://www.cvlibs.net/datasets/kitti/raw_data.php)**
-2. Select any category and drive you are interested in
-3. Download 3 archives: `[synced+rectified data] [calibration] [tracklets]`
+We will map each of these requirements to a function of our class. Each conversion class will
+share the following structure.
 
+```js
+  // #1 Accept dependencies during construction
+  constructor(...) {}
 
-## Transform Kitti to XVIZ format
+  // #2 Load and parse data
+  load(...) {}
 
-E.g date=2011_09_26 drive=0005
+  // #3 Generate the XVIZ stream metadata for streams output from this converter
+  getMetadata(...) {}
 
-Unzip these archives and put them in one directory. 
-
-```
-yarn start -d <path-to-data-source>/2011_09_26/2011_09_26_drive_0005_sync -o <path-to-output>
-```
-
-
-## Available Streams in KITTI data sets
-
-```
-  /vehicle_pose
-  /vehicle/velocity
-  /vehicle/acceleration
-  /vehicle/trajectory
-  /lidar/points
-  /tracklets/objects
-  /tracklets/trajectory
+  // #4 Generate XVIZ stream data for the current frame
+  convertFrame(...) {}
 ```
 
-### Structure of KITTI data
+## Coordinating the conversion
 
-```
-|--data
-     |--2011_09_26     
-            |--2011_09_26_drive_005_sync                    // synced original data
-            |             |--oxts                           // GPS data  
-            |             |    |--data               
-            |             |    |   |--0000000000.txt        // per frame per file
-            |             |    |   |--...
-            |             |    |--timestamps.txt
-            |             |--velodyne_points
-            |             |         |--data
-            |             |         |    |--0000000000.bin
-            |             |         |    |--...
-            |             |         |--timestamps.txt
-            |             |--tracklet_labels.xml
+We need to coordinate constructing each converter as well as managing data dependencies between any
+of the converters. We will do this in the
+[kitti-converter.js](/examples/converters/kitti/src/converters/kitti-converter.js).
 
-|--output                                                   // generated data dir
-      |--0-frame.json                                       // timimg index file 
-      |--1-frame.glb                                        // per frame per .glb file
-      |--2-frame.glb                            
-```
+This class simply constructs each individual converter and then delegates calls for metadata and
+frame generation.
+
+## Main application flow
+
+With our classes defined, the main convertion code flow will be as follows
+
+1. Process args and options
+2. Construct the KITTI Converter
+3. Construct an [XVIZWriter](/docs/api-reference/xviz-writer.md)
+4. Collect and write out [XVIZ Metadata](/docs/protocol-schema/session-protocol.md#metadata)
+5. Process frames and write out with
+   [XVIZWriter.writeFrame](/docs/api-reference/xviz-writer.md#writeframe)
+6. Write out an [XVIZWriter.writeFrameIndex](/docs/api-reference/xviz-writer.md#writeframeindex) to
+   support fast loading and random seek in the XVIZ Server

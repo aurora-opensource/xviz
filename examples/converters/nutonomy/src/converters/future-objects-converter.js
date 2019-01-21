@@ -16,7 +16,7 @@ export default class FutureObjectsConverter {
     this.OBJECTS_FUTURES = '/objects/futures';
   }
 
-  // sample_token is unique id for a log sample
+  // sample_token is unique id for a log keyframe sample
   // instance_token is unique id for an object across different frames of the sample
   load({staticData, posesByFrame, frames}) {
     const objects = parseJsonFile(this.rootDir, this.streamFile);
@@ -67,10 +67,10 @@ export default class FutureObjectsConverter {
 
   // create set of data for the currentFrameIndex that represents the objects from the futureFrameIndex
   _convertObjectsFutureFrame(currentFrameIndex, futureFrameIndex) {
-    const currentFrameToken = this.frames[currentFrameIndex].token;
+    const currentFrameToken = this.frames[currentFrameIndex].sample_token;
     const currentObjects = this.objectsByFrame[currentFrameToken];
 
-    const futureFrameToken = this.frames[futureFrameIndex].token;
+    const futureFrameToken = this.frames[futureFrameIndex].sample_token;
     const futureObjects = this.objectsByFrame[futureFrameToken];
 
     return Object.keys(currentObjects)

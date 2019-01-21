@@ -32,9 +32,63 @@
       }
     ]
   },
-
   {
-    "name": "Developer's Guide",
+    "name": "Getting Started",
+    "children": [
+      {
+        "name": "Converting KITTI to XVIZ",
+        "children": [
+          {
+            "name": "Overview",
+            "markdown": "getting-started/README.md"
+          },
+          {
+            "name": "Downloading KITTI Data",
+            "markdown": "getting-started/downloading-kitti-data.md"
+          },
+          {
+            "name": "Mapping KITTI data to XVIZ",
+            "children" : [
+              {
+                "name": "Overview",
+                "markdown": "getting-started/overview.md"
+              },
+              {
+                "name": "Vehicle Data",
+                "markdown": "getting-started/mapping-vehicle-data.md"
+              },
+              {
+                "name": "Objects",
+                "markdown": "getting-started/mapping-objects.md"
+              },
+              {
+                "name": "Camera",
+                "markdown": "getting-started/mapping-camera.md"
+              },
+              {
+                "name": "Lidar",
+                "markdown": "getting-started/mapping-lidar.md"
+              },
+              {
+                "name": "Extra Generated Data",
+                "markdown": "getting-started/mapping-generated-data.md"
+              }
+            ]
+          },
+          {
+            "name": "Viewing the generated XVIZ",
+            "markdown": "getting-started/running-the-example.md"
+          }
+        ]
+      },
+      {
+        "name": "Example XVIZ Server",
+        "markdown": "getting-started/xviz-server.md"
+      }
+    ]
+  },
+  {
+    "name": "User Guide",
     "children": [
       {
         "name": "Overview",
@@ -78,77 +132,78 @@
       }
     ]
   },
-
   {
-    "name": "Declarative UI",
+    "name": "Protocol",
     "children": [
       {
-        "name": "Overview",
-        "markdown": "declarative-ui/overview.md"
+        "name": "Schema",
+        "children": [
+          {
+            "name": "Introduction",
+            "markdown": "protocol-schema/introduction.md"
+          },
+          {
+            "name": "Core Types",
+            "markdown": "protocol-schema/core-types.md"
+          },
+          {
+            "name": "Session Protocol",
+            "markdown": "protocol-schema/session-protocol.md"
+          },
+          {
+            "name": "Geometry Primitives",
+            "markdown": "protocol-schema/geometry-primitives.md"
+          },
+          {
+            "name": "Styling Specification",
+            "markdown": "protocol-schema/style-specification.md"
+          },
+          {
+            "name": "UI Primitives",
+            "markdown": "protocol-schema/ui-primitives.md"
+          }
+        ]
       },
       {
-        "name": "Layout Types",
-        "markdown": "declarative-ui/layout-types.md"
+        "name": "Declarative UI",
+        "children": [
+          {
+            "name": "Overview",
+            "markdown": "declarative-ui/overview.md"
+          },
+          {
+            "name": "Layout Types",
+            "markdown": "declarative-ui/layout-types.md"
+          },
+          {
+            "name": "Interactions",
+            "markdown": "declarative-ui/interactions.md"
+          },
+          {
+            "name": "Layout Elements",
+            "markdown": "declarative-ui/layout-elements.md"
+          },
+          {
+            "name": "Components",
+            "markdown": "declarative-ui/components.md"
+          }
+        ]
       },
       {
-        "name": "Interactions",
-        "markdown": "declarative-ui/interactions.md"
-      },
-      {
-        "name": "Layout Elements",
-        "markdown": "declarative-ui/layout-elements.md"
-      },
-      {
-        "name": "Components",
-        "markdown": "declarative-ui/components.md"
+        "name": "Protocol Implementations",
+        "children": [
+          {
+            "name": "JSON Protocol",
+            "markdown": "protocol-formats/json-protocol.md"
+          },
+          {
+            "name": "Binary Protocol",
+            "markdown": "protocol-formats/binary-protocol.md"
+          }
+        ]
       }
     ]
   },
-
-  {
-    "name": "Protocol Schema",
-    "children": [
-      {
-        "name": "Introduction",
-        "markdown": "protocol-schema/introduction.md"
-      },
-      {
-        "name": "Core Types",
-        "markdown": "protocol-schema/core-types.md"
-      },
-      {
-        "name": "Session Protocol",
-        "markdown": "protocol-schema/session-protocol.md"
-      },
-      {
-        "name": "Geometry Primitives",
-        "markdown": "protocol-schema/geometry-primitives.md"
-      },
-      {
-        "name": "Styling Specification",
-        "markdown": "protocol-schema/style-specification.md"
-      },
-      {
-        "name": "UI Primitives",
-        "markdown": "protocol-schema/ui-primitives.md"
-      }
-    ]
-  },
-
-  {
-    "name": "Protocol Implementations",
-    "children": [
-      {
-        "name": "JSON Protocol",
-        "markdown": "protocol-formats/json-protocol.md"
-      },
-      {
-        "name": "Binary Protocol",
-        "markdown": "protocol-formats/binary-protocol.md"
-      }
-    ]
-  },
-
   {
     "name": "API Reference",
     "children": [
@@ -156,20 +211,24 @@
         "name": "@xviz/builder",
         "children": [
           {
-            "name": "XVIZ Builder",
+            "name": "XVIZBuilder",
             "markdown": "api-reference/xviz-builder.md"
           },
           {
-            "name": "XVIZ Metadata Builder",
+            "name": "XVIZMetadataBuilder",
             "markdown": "api-reference/xviz-metadata-builder.md"
           },
           {
-            "name": "XVIZ UI Builder",
+            "name": "XVIZUIBuilder",
             "markdown": "api-reference/xviz-ui-builder.md"
           },
           {
-            "name": "XVIZ Trajectory Helper",
-            "markdown": "api-reference/xviz-trajectory-helper.md"
+            "name": "XVIZWriter",
+            "markdown": "api-reference/xviz-writer.md"
+          },
+          {
+            "name": "Trajectory Helpers",
+            "markdown": "api-reference/xviz-trajectory-helpers.md"
           }
         ]
       },
@@ -177,32 +236,28 @@
         "name": "@xviz/parser",
         "children": [
           {
-            "name": "XVIZ Configuration",
+            "name": "setXVIZConfig",
             "markdown": "api-reference/xviz-configuration.md"
           },
           {
-            "name": "XVIZ Parsing",
+            "name": "parseStreamMessage",
             "markdown": "api-reference/parse-xviz.md"
           },
           {
-            "name": "XVIZ Synchronizer",
-            "markdown": "api-reference/xviz-synchronizer.md"
+            "name": "StreamSynchronizer",
+            "markdown": "api-reference/stream-synchronizer.md"
           },
           {
-            "name": "XVIZ LogSlice",
-            "markdown": "api-reference/xviz-log-slice.md"
+            "name": "XVIZStreamBuffer",
+            "markdown": "api-reference/xviz-stream-buffer.md"
           },
           {
-            "name": "XVIZ Object",
+            "name": "XVIZStyleParser",
+            "markdown": "api-reference/xviz-stream-buffer.md"
+          },
+          {
+            "name": "XVIZObject",
             "markdown": "api-reference/xviz-object.md"
-          },
-          {
-            "name": "XVIZ Object Collection",
-            "markdown": "api-reference/xviz-object-collection.md"
-          },
-          {
-            "name": "XVIZ Loader",
-            "markdown": "api-reference/xviz-loader.md"
           }
         ]
       },
@@ -210,7 +265,7 @@
         "name": "@xviz/schema",
         "children": [
           {
-            "name": "XVIZ Validator",
+            "name": "XVIZValidator",
             "markdown": "api-reference/xviz-validator.md"
           }
         ]

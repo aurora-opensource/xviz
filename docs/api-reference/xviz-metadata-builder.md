@@ -203,3 +203,19 @@ Parameters:
   supported style properties.
 
 Returns: `this`
+
+###### logInfo(customFields)
+
+Adds custom fields that will be added to the `log_info` field in the metadata. Certain keys are
+special and cannot be overwritten.
+
+Special keys:
+
+- `start_time`
+- `end_time`
+
+Parameters:
+
+- `customFields` (Object) - The object which entries will be added to the `log_info` field.
+
+Returns: `this`

@@ -1,4 +1,4 @@
-import {getXVIZConfig, setXVIZSettings} from '../config/xviz-config';
+import {getXVIZConfig, setXVIZConfig} from '../config/xviz-config';
 import {parseVersionString} from './xviz-v2-common';
 
 // Post-processes log metadata
@@ -17,7 +17,7 @@ export function parseLogMetadata(data) {
   if (!currentMajorVersion) {
     throw new Error('Unable to detect the XVIZ version.');
   } else {
-    setXVIZSettings({currentMajorVersion});
+    setXVIZConfig({currentMajorVersion});
   }
 
   if (supportedVersions && !supportedVersions.includes(currentMajorVersion)) {
@@ -42,11 +42,7 @@ export function parseLogMetadataV1(data) {
     }
   });
 
-  const logStartTime = data.log_start_time || null;
-  const logEndTime = data.log_end_time || null;
-  // Fallback to complete log time if we don't have a specific playback time range
-  const eventStartTime = data.start_time || logStartTime;
-  const eventEndTime = data.end_time || logEndTime;
+  const {logStartTime, logEndTime, eventStartTime, eventEndTime} = getTimestamps(data);
 
   const metadata = {
     ...data,
@@ -79,12 +75,7 @@ export function parseLogMetadataV2(data) {
   }
 
   const logInfo = data.log_info || {};
-  const logStartTime = logInfo.log_start_time || null;
-  const logEndTime = logInfo.log_end_time || null;
-  // Fallback to complete log time if we don't have a specific playback time range
-  const eventStartTime = logInfo.start_time || logStartTime;
-  const eventEndTime = logInfo.end_time || logEndTime;
-
+  const {logStartTime, logEndTime, eventStartTime, eventEndTime} = getTimestamps(logInfo);
   const styles = collectStreamStyles(streams);
 
   const metadata = {
@@ -106,6 +97,16 @@ export function parseLogMetadataV2(data) {
   };
 
   return metadata;
+}
+
+function getTimestamps(info) {
+  const logStartTime = Number.isFinite(info.log_start_time) ? info.log_start_time : null;
+  const logEndTime = Number.isFinite(info.log_end_time) ? info.log_end_time : null;
+  // Fallback to complete log time if we don't have a specific playback time range
+  const eventStartTime = Number.isFinite(info.start_time) ? info.start_time : logStartTime;
+  const eventEndTime = Number.isFinite(info.end_time) ? info.end_time : logEndTime;
+
+  return {logStartTime, logEndTime, eventStartTime, eventEndTime};
 }
 
 /**

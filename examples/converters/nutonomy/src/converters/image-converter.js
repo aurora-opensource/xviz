@@ -1,4 +1,5 @@
 import path from 'path';
+import fs from 'fs';
 
 import {resizeImage} from './process-image';
 import {toMap} from '../common';
@@ -15,30 +16,38 @@ export default class ImageConverter {
   async loadFrame(frameToken) {
     // Load the data for this frame
     const filepath = this.cameraFilePathByToken[frameToken];
-    const {maxWidth, maxHeight} = this.options;
-    const {data, width, height} = await resizeImage(filepath, maxWidth, maxHeight);
-
-    return {data, width, height};
+    if (fs.existsSync(filepath)) {
+      const {maxWidth, maxHeight} = this.options;
+      const {data, width, height} = await resizeImage(filepath, maxWidth, maxHeight);
+      return {data, width, height};
+    }
+    return null;
   }
 
   load({frames}) {
     this.frames = frames;
 
     this.cameraFilePathByToken = toMap(frames, 'token', frame => {
-      const substrings = frame.sensors[this.camera].filename.split('/');
-      const filename = substrings[substrings.length - 1];
-      return path.join(this.rootDir, this.camera, filename);
+      if (frame.sensors[this.camera]) {
+        const substrings = frame.sensors[this.camera].filename.split('/');
+        const filename = substrings[substrings.length - 1];
+        return path.join(this.rootDir, this.camera, filename);
+      }
+      return null;
     });
   }
 
   async convertFrame(frameIndex, xvizBuilder) {
     const frameToken = this.frames[frameIndex].token;
-    const {data, width, height} = await this.loadFrame(frameToken);
+    const frame = await this.loadFrame(frameToken);
+    if (frame) {
+      const {data, width, height} = frame;
 
-    xvizBuilder
-      .primitive(this.streamName)
-      .image(nodeBufferToTypedArray(data), 'jpg')
-      .dimensions(width, height);
+      xvizBuilder
+        .primitive(this.streamName)
+        .image(nodeBufferToTypedArray(data), 'jpg')
+        .dimensions(width, height);
+    }
   }
 
   getMetadata(xvizMetaBuilder) {

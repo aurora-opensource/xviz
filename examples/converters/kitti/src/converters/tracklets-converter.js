@@ -110,30 +110,31 @@ export default class TrackletsConverter {
     xb.stream(this.TRACKLETS)
       .category('primitive')
       .type('polygon')
+      .coordinate('VEHICLE_RELATIVE')
       .streamStyle({
         extruded: true,
         wireframe: true,
         fill_color: '#00000080'
       })
       .styleClass('Car', {
-        fill_color: '#7DDDD760',
-        stroke_color: '#7DDDD7'
+        fill_color: '#50B3FF80',
+        stroke_color: '#50B3FF'
       })
       .styleClass('Cyclist', {
-        fill_color: '#DA70BF60',
-        stroke_color: '#DA70BF'
+        fill_color: '#957FCE80',
+        stroke_color: '#957FCE'
       })
       .styleClass('Pedestrian', {
-        fill_color: '#FEC56460',
-        stroke_color: '#FEC564'
+        fill_color: '#FFC6AF80',
+        stroke_color: '#FFC6AF'
       })
       .styleClass('Van', {
-        fill_color: '#267E6360',
-        stroke_color: '#267E63'
+        fill_color: '#5B91F480',
+        stroke_color: '#5B91F4'
       })
       .styleClass('Unknown', {
-        fill_color: '#D6A00060',
-        stroke_color: '#D6A000'
+        fill_color: '#E2E2E280',
+        stroke_color: '#E2E2E2'
       })
       .pose(this.FIXTURE_TRANSFORM_POSE)
 
@@ -142,8 +143,9 @@ export default class TrackletsConverter {
       .type('circle')
       .streamStyle({
         radius: 0.2,
-        fill_color: '#FFFF00'
+        fill_color: '#FFC043'
       })
+      .coordinate('VEHICLE_RELATIVE')
       .pose(this.FIXTURE_TRANSFORM_POSE)
 
       .stream(this.TRACKLETS_LABEL)
@@ -151,18 +153,20 @@ export default class TrackletsConverter {
       .type('text')
       .streamStyle({
         size: 18,
-        fill_color: '#0040E0'
+        fill_color: '#DCDCCD'
       })
+      .coordinate('VEHICLE_RELATIVE')
       .pose(this.FIXTURE_TRANSFORM_POSE)
 
       .stream(this.TRACKLETS_TRAJECTORY)
       .category('primitive')
       .type('polyline')
       .streamStyle({
-        stroke_color: '#FEC557',
+        stroke_color: '#FFC043',
         stroke_width: 0.1,
         stroke_width_min_pixels: 1
       })
+      .coordinate('VEHICLE_RELATIVE')
       .pose(this.FIXTURE_TRANSFORM_POSE);
   }
 

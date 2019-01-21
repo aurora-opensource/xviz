@@ -1,4 +1,4 @@
-import {StreamSynchronizer, XVIZStreamBuffer, setXVIZSettings} from '@xviz/parser';
+import {StreamSynchronizer, XVIZStreamBuffer, setXVIZConfig} from '@xviz/parser';
 import tape from 'tape-catch';
 
 import {resetXVIZConfigAndSettings} from '../config/config-utils';
@@ -82,7 +82,7 @@ tape('StreamSynchronizer#setTime', t => {
 
 tape('StreamSynchronizer#getData', t => {
   resetXVIZConfigAndSettings();
-  setXVIZSettings({TIME_WINDOW: 3});
+  setXVIZConfig({TIME_WINDOW: 3});
   const logSynchronizer = new StreamSynchronizer(TEST_BUFFER);
 
   for (const tc of TEST_CASES) {

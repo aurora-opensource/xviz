@@ -14,6 +14,15 @@ function lookAheadTimesliceAccessor(timeslice) {
   throw new Error('Missing entry or timestamp in lookAhead array');
 }
 
+function updateObjects(streamName, features) {
+  for (const feature of features) {
+    const xvizObject = XVIZObject.get(feature.id);
+    if (xvizObject) {
+      xvizObject._addFeature(streamName, feature);
+    }
+  }
+}
+
 // LOGSLICE CLASS
 
 // One time slice, one datum from each stream.
@@ -39,8 +48,6 @@ export default class LogSlice {
 
     const {OBJECT_STREAM} = getXVIZConfig();
 
-    const objects = XVIZObject.getAllInCurrentFrame(); // Map of XVIZ ids in current slice
-
     const frame = {
       ...params,
       ...getTransformsFromPose(vehiclePose),
@@ -50,7 +57,6 @@ export default class LogSlice {
       variables: this.variables,
       pointCloud: this.pointCloud,
       components: this.components,
-      objects, // Map of XVIZ object ids in current slice
       streams: this.streams
     };
 
@@ -60,16 +66,19 @@ export default class LogSlice {
       postProcessFrame(frame);
     }
 
-    const objectFeatures = this.features[OBJECT_STREAM] || [];
-
-    objectFeatures.forEach(feature => {
-      const xvizObject = XVIZObject.get(feature.id);
-      if (xvizObject) {
-        xvizObject._setLabel(feature.label);
-        // Populate feature with information from other streams
-        Object.assign(feature, xvizObject.getProps());
+    // OBJECT_STREAM is deprecated, only keeping for backward compatibility
+    if (OBJECT_STREAM) {
+      updateObjects(OBJECT_STREAM, this.features[OBJECT_STREAM] || []);
+    } else {
+      for (const streamName in this.features) {
+        const features = this.features[streamName];
+        if (features.length && features[0].id) {
+          updateObjects(streamName, features);
+        }
       }
-    });
+    }
+
+    frame.objects = XVIZObject.getAllInCurrentFrame(); // Map of XVIZ ids in current slice
 
     return frame;
   }
@@ -148,7 +157,7 @@ export default class LogSlice {
 
         // For streams that do not follow the simple pattern in STREAM_REGEXP
         // Lookup for exact matches for labels first.
-        object.setProp(label.labelName, label.value);
+        object._setProp(label.labelName, label.value);
       }
     });
   }

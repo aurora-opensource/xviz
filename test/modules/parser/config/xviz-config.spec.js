@@ -1,8 +1,8 @@
-import {setXVIZConfig, getXVIZConfig, getXVIZSettings, setXVIZSettings} from '@xviz/parser';
+import {setXVIZConfig, getXVIZConfig} from '@xviz/parser';
 import {resetXVIZConfigAndSettings} from './config-utils';
 import test from 'tape-catch';
 
-test('setXVIZConfig setXVIZSettings', t => {
+test('setXVIZConfig', t => {
   const preProcessPrimitive = () => {};
   resetXVIZConfigAndSettings();
 
@@ -18,14 +18,14 @@ test('setXVIZConfig setXVIZSettings', t => {
   );
   t.deepEquals(getXVIZConfig().supportedVersions, [1], 'XVIZ config is set');
 
-  setXVIZSettings({currentMajorVersion: 2});
+  setXVIZConfig({currentMajorVersion: 2});
   t.is(
     getXVIZConfig().preProcessPrimitive,
     preProcessPrimitive,
-    'XVIZ config preProcessPrimitive is not changed after setXVIZSettings'
+    'XVIZ config preProcessPrimitive is not changed'
   );
 
-  t.is(getXVIZSettings().currentMajorVersion, 2, 'XVIZ settings is set');
+  t.is(getXVIZConfig().currentMajorVersion, 2, 'XVIZ config currentMajorVersion is set');
 
   t.end();
 });

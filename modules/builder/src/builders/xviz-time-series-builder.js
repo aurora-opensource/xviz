@@ -74,18 +74,22 @@ export default class XVIZTimeSeriesBuilder extends XVIZBaseBuilder {
 
     const timeSeriesData = [];
     for (const [timestamp, ids] of this._data) {
-      for (const [id, tsdata] of ids) {
-        const entry = {
-          timestamp,
-          streams: tsdata.streams,
-          values: tsdata.values
-        };
+      for (const [id, fields] of ids) {
+        for (const tsdata of fields.values()) {
+          const entry = {
+            timestamp,
+            streams: tsdata.streams,
+            values: tsdata.values
+          };
 
-        if (id !== null) {
-          entry.object_id = id; // eslint-disable-line camelcase
+          /* eslint-disable camelcase, max-depth */
+          if (id !== null) {
+            entry.object_id = id;
+          }
+          /* eslint-enable camelcase, max-depth */
+
+          timeSeriesData.push(entry);
         }
-
-        timeSeriesData.push(entry);
       }
     }
 
@@ -94,6 +98,15 @@ export default class XVIZTimeSeriesBuilder extends XVIZBaseBuilder {
 
   // Lookup by timestamp, then id to store [streamId, value]
   _addTimestampEntry() {
+    // this._data structure
+    // timestamp: {
+    //   id: {
+    //     fieldName: {
+    //       streams: []
+    //       values: []
+    //     }
+    //   }
+    // }
     if (!this._dataPending()) {
       return;
     }
@@ -107,32 +120,44 @@ export default class XVIZTimeSeriesBuilder extends XVIZBaseBuilder {
     }
 
     // Building up the [(stream, value)] list
-    const tsEntry = this._data.get(this._timestamp);
+    let tsEntry = this._data.get(this._timestamp);
     if (tsEntry) {
       // We have timestamp, now get id
       const idEntry = tsEntry.get(this._id);
       if (idEntry) {
-        // append entry to existing array
-        idEntry.streams.push(this._streamId);
-        idEntry.values[fieldName].push(this._value);
+        const fieldEntry = idEntry.get(fieldName);
+        if (fieldEntry) {
+          // append entry to existing array
+          fieldEntry.streams.push(this._streamId);
+          fieldEntry.values[fieldName].push(this._value);
+        } else {
+          idEntry.set(fieldName, this._getFieldEntry(fieldName));
+        }
       } else {
         // create new mapping of id -> array of entries
-        tsEntry.set(this._id, {
-          streams: [this._streamId],
-          values: {[fieldName]: [this._value]}
-        });
+        tsEntry.set(this._id, this._getIdEntry(fieldName));
       }
     } else {
       // No timestamp entry
-      // create new id -> arrry of entries
-      const idEntry = new Map();
-      idEntry.set(this._id, {
-        streams: [this._streamId],
-        values: {[fieldName]: [this._value]}
-      });
-      // create timestamp entry
-      this._data.set(this._timestamp, idEntry);
+      // create new id -> array of entries
+      // for same id different with fieldNames, we store as different ts entries
+      tsEntry = new Map();
+      tsEntry.set(this._id, this._getIdEntry(fieldName));
+      this._data.set(this._timestamp, tsEntry);
     }
+  }
+
+  _getIdEntry(fieldName) {
+    const idEntry = new Map();
+    idEntry.set(fieldName, this._getFieldEntry(fieldName));
+    return idEntry;
+  }
+
+  _getFieldEntry(fieldName) {
+    return {
+      streams: [this._streamId],
+      values: {[fieldName]: [this._value]}
+    };
   }
 
   _dataPending() {

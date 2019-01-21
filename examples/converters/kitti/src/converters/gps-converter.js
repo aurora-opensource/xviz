@@ -7,6 +7,8 @@ import BaseConverter from './base-converter';
 import {loadOxtsPackets} from '../parsers/parse-gps-data';
 import {MOTION_PLANNING_STEPS, PRIMARY_POSE_STREAM} from './constant';
 
+const RADIAN_TO_DEGREE = 180 / Math.PI;
+
 export default class GPSConverter extends BaseConverter {
   constructor(rootDir, streamDir) {
     super(rootDir, streamDir);
@@ -15,6 +17,8 @@ export default class GPSConverter extends BaseConverter {
     this.VEHICLE_ACCELERATION = '/vehicle/acceleration';
     this.VEHICLE_VELOCITY = '/vehicle/velocity';
     this.VEHICLE_TRAJECTORY = '/vehicle/trajectory';
+    this.VEHICLE_WHEEL = '/vehicle/wheel_angle';
+    this.VEHICLE_AUTONOMOUS = '/vehicle/autonomy_state';
   }
 
   load() {
@@ -45,10 +49,11 @@ export default class GPSConverter extends BaseConverter {
     // the core reference point for other data and usually drives the timing
     // of the system.
     xvizBuilder
-      .pose(PRIMARY_POSE_STREAM)
+      .pose('/vehicle_pose')
       .timestamp(pose.timestamp)
       .mapOrigin(pose.longitude, pose.latitude, pose.altitude)
-      .orientation(pose.roll, pose.pitch, pose.yaw);
+      .orientation(pose.roll, pose.pitch, pose.yaw)
+      .position(0, 0, 0);
 
     // This is an example of using the XVIZBuilder to convert your data
     // into XVIZ.
@@ -64,6 +69,17 @@ export default class GPSConverter extends BaseConverter {
       .timestamp(acceleration.timestamp)
       .value(acceleration['acceleration-forward']);
 
+    xvizBuilder
+      .timeSeries(this.VEHICLE_WHEEL)
+      .timestamp(velocity.timestamp)
+      .value(velocity['angular-rate-upward'] * RADIAN_TO_DEGREE);
+
+    // kitti dataset is always under autonomous mode
+    xvizBuilder
+      .timeSeries(this.VEHICLE_AUTONOMOUS)
+      .timestamp(velocity.timestamp)
+      .value('autonomous');
+
     const poseTrajectory = _getPoseTrajectory({
       poses: this.poses,
       startFrame: frameNumber,
@@ -78,7 +94,7 @@ export default class GPSConverter extends BaseConverter {
     // This helps validate data consistency and has automatic
     // behavior tied to the viewer.
     const xb = xvizMetaBuilder;
-    xb.stream(PRIMARY_POSE_STREAM)
+    xb.stream('/vehicle_pose')
       .category('pose')
 
       .stream(this.VEHICLE_ACCELERATION)
@@ -91,14 +107,24 @@ export default class GPSConverter extends BaseConverter {
       .type('float')
       .unit('m/s')
 
+      .stream(this.VEHICLE_WHEEL)
+      .category('time_series')
+      .type('float')
+      .unit('deg/s')
+
+      .stream(this.VEHICLE_AUTONOMOUS)
+      .category('time_series')
+      .type('string')
+
       .stream(this.VEHICLE_TRAJECTORY)
       .category('primitive')
       .type('polyline')
+      .coordinate('VEHICLE_RELATIVE')
 
       // This styling information is applied to *all* objects for this stream.
       // It is possible to apply inline styling on individual objects.
       .streamStyle({
-        stroke_color: '#57AD57AA',
+        stroke_color: '#47B27588',
         stroke_width: 1.4,
         stroke_width_min_pixels: 1
       });
