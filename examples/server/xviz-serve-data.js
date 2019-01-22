@@ -21,6 +21,7 @@ const process = require('process');
 
 const {deltaTimeMs, extractZipFromFile} = require('./serve');
 const {parseBinaryXVIZ} = require('@xviz/parser');
+const {encodeBinaryXVIZ} = require('@xviz/builder');
 
 const {loadScenario} = require('./scenarios');
 
@@ -155,16 +156,10 @@ function loadFrameTimings(frames) {
   let lastTime = 0;
   const timings = frames.map(frame => {
     const data = getFrameData(frame);
-    let jsonFrame = null;
-    if (data instanceof Buffer) {
-      jsonFrame = parseBinaryXVIZ(
-        data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength)
-      );
-    } else if (typeof data === 'string') {
-      jsonFrame = JSON.parse(data);
-    }
 
-    const ts = getTimestamp(jsonFrame);
+    const result = unpackFrame(data);
+
+    const ts = getTimestamp(result.json);
     if (Number.isFinite(ts)) {
       lastTime = ts;
     }
@@ -278,7 +273,7 @@ function connectionId() {
 
 // Connection State
 class ConnectionContext {
-  constructor(settings, metadata, frames, frameTiming, loadFrameData) {
+  constructor(settings, metadata, allFrameData, loadFrameData) {
     this.metadata = metadata;
 
     this._loadFrameData = loadFrameData;
@@ -286,8 +281,16 @@ class ConnectionContext {
     this.connectionId = connectionId();
 
     // Remove metadata so we only deal with data frames
-    this.frames = frames;
-    this.frames_timing = frameTiming;
+
+    // Cache json version of frames for faster re-writes
+    // during looping.
+    this.json_frames = [];
+    this.is_frame_binary = [];
+    this.frame_update_times = [];
+
+    Object.assign(this, allFrameData);
+
+    this.frame_time_advance = null;
 
     this.settings = settings;
     this.t_start_time = null;
@@ -370,7 +373,7 @@ class ConnectionContext {
     if (!timestampEnd) {
       timestampEnd = timestampStart + duration;
     }
-
+    console.log(`time ${timestampStart} ${timestampEnd} ${duration}`);
     // bounds checking
     if (timestampStart > log_time_end || timestampEnd < log_time_start) {
       return null;
@@ -382,6 +385,7 @@ class ConnectionContext {
     }
 
     let end = frames_timing.findIndex(ts => ts >= timestampEnd);
+    console.log(`found ${end}`);
     if (end === -1) {
       end = frames.length;
     }
@@ -389,6 +393,7 @@ class ConnectionContext {
     if (end > frame_limit) {
       end = frame_limit;
     }
+    console.log(`End ${end} limit:  ${frame_limit}`);
 
     return {
       start,
@@ -406,6 +411,7 @@ class ConnectionContext {
 
   sendPlayResp(clientMessage) {
     const frameRequest = this.setupFrameRequest(clientMessage);
+    console.log(frameRequest);
     if (frameRequest) {
       if (this.inflight) {
         this.replaceFrameRequest = frameRequest;
@@ -417,10 +423,15 @@ class ConnectionContext {
   }
 
   sendMetadata() {
-    const frame = this._loadFrameData(this.metadata);
+    let frame = this._loadFrameData(this.metadata);
     const isBuffer = frame instanceof Buffer;
 
     const frame_send_time = process.hrtime();
+
+    // When in live mode
+    if (this.settings.live) {
+      frame = this.removeMetadataTimestamps(frame);
+    }
 
     // Send data
     if (isBuffer) {
@@ -456,27 +467,37 @@ class ConnectionContext {
 
     const {skip_images} = this.settings;
     const frame_send_time = process.hrtime();
-    const frames = this.frames;
-    const frames_timing = this.frames_timing;
 
     // get frame info
-    const frame_index = getFrameIndex(ii, frames.length);
-    const frame = this._loadFrameData(frames[frame_index]);
+    const frame_index = getFrameIndex(ii, this.frames.length);
+    const frame = this._loadFrameData(this.frames[frame_index]);
 
     // TODO images are not supported here, but glb data is
     // old image had a binary header
     const isBuffer = frame instanceof Buffer;
-    const skipSending = isBuffer && skip_images;
+    let skipSending = isBuffer && skip_images;
 
     // End case
     if (ii >= last_index) {
-      // When last_index reached send 'transform_log_done' message
-      this.sendEnveloped('transform_log_done', {}, {}, () => {
-        this.logMsgSent(frame_send_time, -1, frame_index, 'json');
-      });
+      if (this.settings.loop) {
+        // In loop mode determine how much data we just play then update
+        // our offset.
+        frameRequest.index = this.loopPlayback(last_index, frameRequest.start) - 1;
 
-      this.inflight = false;
-      return;
+        // We are past the limit don't send this frame
+        skipSending = true;
+      } else {
+        // When last_index reached send 'transform_log_done' message
+        if (!this.settings.live) {
+          this.sendEnveloped('transform_log_done', {}, {}, () => {
+            this.logMsgSent(frame_send_time, -1, frame_index, 'json');
+          });
+        }
+
+        this.inflight = false;
+
+        return;
+      }
     }
 
     // Advance frame
@@ -490,21 +511,84 @@ class ConnectionContext {
     if (skipSending) {
       this.sendNextFrame(frameRequest);
     } else {
-      const next_ts = frames_timing[frame_index];
+      const next_ts = this.frames_timing[frame_index];
+
+      const updatedFrame = this.adjustFrameTime(frame, frame_index);
 
       // Send data
       if (isBuffer) {
-        this.ws.send(frame, {}, () => {
+        this.ws.send(updatedFrame, {}, () => {
           this.logMsgSent(frame_send_time, ii, frame_index, 'binary', next_ts);
           this.sendNextFrame(frameRequest);
         });
       } else {
-        this.ws.send(frame, {compress: true}, () => {
+        this.ws.send(updatedFrame, {compress: true}, () => {
           this.logMsgSent(frame_send_time, ii, frame_index, 'json', next_ts);
           this.sendNextFrame(frameRequest);
         });
       }
     }
+  }
+
+  loopPlayback(frame_index, start_index) {
+    const duration = this.frames_timing[frame_index - 1] - this.frames_timing[start_index];
+
+    if (this.frame_time_advance === null) {
+      this.frame_time_advance = 0;
+    }
+
+    this.frame_time_advance += duration;
+
+    return start_index;
+  }
+
+  // Take a frame at time t, and make it appears as it occured
+  // frame_time_advance in the future.
+  adjustFrameTime(frame, frame_index) {
+    if (this.frame_time_advance) {
+      // Determine if binary and unpack
+      const jsonFrame = this.json_frames[frame_index];
+
+      // Update the snapshot times
+      for (let i = 0; i < jsonFrame.data.updates.length; ++i) {
+        const update = jsonFrame.data.updates[i];
+        update.timestamp += this.frame_time_advance;
+
+        if (update.time_series) {
+          for (let y = 0; y < update.time_series.length; ++y) {
+            update.time_series[y].timestamp += this.frame_time_advance;
+          }
+        }
+      }
+
+      // Repack based on binary-ness
+      if (this.is_frame_binary[frame_index]) {
+        frame = encodeBinaryXVIZ(jsonFrame, {});
+      } else {
+        frame = JSON.stringify(jsonFrame);
+      }
+    }
+
+    return frame;
+  }
+
+  removeMetadataTimestamps(frame) {
+    const result = unpackFrame(frame);
+
+    const log_info = result.json.data.log_info;
+
+    if (log_info) {
+      delete log_info.start_time;
+      delete log_info.end_time;
+    }
+
+    if (result.isBinary) {
+      frame = encodeBinaryXVIZ(result.json, {});
+    } else {
+      frame = JSON.stringify(result.json);
+    }
+
+    return frame;
   }
 
   sendEnveloped(type, msg, options, callback) {
@@ -525,19 +609,62 @@ class ConnectionContext {
     const t_from_start_ms = deltaTimeMs(this.t_start_time);
     const t_msg_send_time_ms = deltaTimeMs(send_time);
     this.log(
-      ` < Frame(${tag}) ${index}:${real_index} ts:${ts} in self: ${t_msg_send_time_ms}ms start: ${t_from_start_ms}ms`
+      ` < Frame(${tag}) ts:${ts} ${index}:${real_index} in self: ${t_msg_send_time_ms}ms start: ${t_from_start_ms}ms`
     );
   }
 }
 
 // Comms handling
-
-function setupWebSocketHandling(wss, settings, metadata, frames, frameTiming, loadFrameData) {
+function setupWebSocketHandling(wss, settings, metadata, allFrameData, loadFrameData) {
   // Setups initial connection state
   wss.on('connection', ws => {
-    const context = new ConnectionContext(settings, metadata, frames, frameTiming, loadFrameData);
+    const context = new ConnectionContext(settings, metadata, allFrameData, loadFrameData);
     context.onConnection(ws);
   });
+}
+
+function unpackFrames(frames, loadFrameData) {
+  console.log(`Unpacking ${frames.length} frames into memory`);
+  console.log('WARNING: for long logs you might not have enough memory');
+
+  const json_frames = [];
+  const is_frame_binary = [];
+
+  for (let i = 0; i < frames.length; ++i) {
+    const frame = loadFrameData(frames[i]);
+
+    const result = unpackFrame(frame, {shouldThrow: false});
+
+    json_frames.push(result.json);
+    is_frame_binary.push(result.isBinary);
+  }
+
+  console.log('All data loaded, ready.');
+
+  return {
+    json_frames,
+    is_frame_binary
+  };
+}
+
+function unpackFrame(frame, options = {}) {
+  const shouldThrow = options.shouldThrow || true;
+
+  let json;
+  let isBinary = false;
+
+  if (frame instanceof Buffer) {
+    json = parseBinaryXVIZ(
+      frame.buffer.slice(frame.byteOffset, frame.byteOffset + frame.byteLength)
+    );
+    isBinary = true;
+  } else if (typeof frame === 'string') {
+    json = JSON.parse(frame);
+  } else if (shouldThrow) {
+    throw new Error('Unknown frame type');
+  }
+
+  return {json, isBinary};
 }
 
 // Main
@@ -581,16 +708,25 @@ module.exports = function main(args) {
     duration: args.duration,
     send_interval: args.delay,
     skip_images: args.skip_images,
-    frame_limit: args.frame_limit || frames.length
+    frame_limit: args.frame_limit || frames.length,
+    loop: args.loop
   };
+
+  const allFrameData = {
+    frames: frames.frames,
+    frames_timing: frameTiming
+  };
+
+  if (settings.loop) {
+    Object.assign(allFrameData, unpackFrames(frames.frames, getFrameData));
+  }
 
   const wss = new WebSocket.Server({port: args.port});
   setupWebSocketHandling(
     wss,
     settings,
     frames.metadata,
-    frames.frames,
-    frameTiming,
+    allFrameData,
     runScenario ? x => x : getFrameData
   );
 };

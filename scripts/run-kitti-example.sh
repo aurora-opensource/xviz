@@ -19,7 +19,7 @@
 # Runs server & client in background
 # Terminates background process if signal is triggered
 
-set -e
+set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
@@ -55,13 +55,18 @@ trap exit_script SIGINT SIGTERM
 
 # Run KITTI XVIZ conversion
 # check for both json & glb files
-if [ "$force_xviz_conversion" = "true" ] || ([ ! -f "${SCRIPT_DIR}/../data/generated/kitti/2011_09_26/2011_09_26_drive_0005_sync/1-frame.json" ] && [ ! -f "${SCRIPT_DIR}/../data/generated/kitti/2011_09_26/2011_09_26_drive_0005_sync/1-frame.glb" ]) ; then
-  echo "Generating default KITTI XVIZ data"
-  (cd "${SCRIPT_DIR}/../examples/converters/kitti" && yarn start -d 2011_09_26/2011_09_26_drive_0005_sync)
+INPUT_DIR="${SCRIPT_DIR}/../data/kitti/2011_09_26/2011_09_26_drive_0005_sync"
+OUTPUT_DIR="${SCRIPT_DIR}/../data/generated/kitti/2011_09_26/2011_09_26_drive_0005_sync/"
+
+
+if [ "$force_xviz_conversion" = "true" ] || ([ ! -f "${OUTPUT_DIR}/1-frame.json" ] && [ ! -f "${OUTPUT_DIR}/1-frame.glb" ]) ; then
+    echo "Generating default KITTI XVIZ data"
+    mkdir -p "${OUTPUT_DIR}"
+    (cd "${SCRIPT_DIR}/../examples/converters/kitti" && yarn start -d ${INPUT_DIR} -o "${OUTPUT_DIR}")
 fi
 
 # Start server & web app
-cd "${SCRIPT_DIR}/../examples/server" && node ./index.js  -d "${SCRIPT_DIR}/../data/generated/kitti/2011_09_26/2011_09_26_drive_0005_sync/" &
+cd "${SCRIPT_DIR}/../examples/server" && node ./index.js  -d "${OUTPUT_DIR}" &
 pids[1]=$!
 
 echo "##"
