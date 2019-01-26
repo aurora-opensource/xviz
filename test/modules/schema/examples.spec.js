@@ -18,7 +18,7 @@ import * as path from 'path';
 
 test('validateXVIZExamples', t => {
   // Do it by directory path first
-  const schemaDir = path.join(__dirname, '..', '..', '..', 'modules', 'schema');
+  const schemaDir = path.join(__dirname, '..', '..', '..', 'modules', 'schema', 'schema');
   const examplesDir = path.join(schemaDir, 'examples');
 
   t.ok(validateExampleFiles(schemaDir, examplesDir), 'all examples match schema');

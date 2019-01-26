@@ -1,72 +1,58 @@
-// Copyright (c) 2019 Uber Technologies, Inc.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
 // DO NOT EDIT - run "node genimports.js" to remake
 
-import coreAnnotationBaseSchemaJson from '../core/annotation_base.schema.json';
-import coreAnnotationListSchemaJson from '../core/_annotation_list.schema.json';
-import coreAnnotationStateSchemaJson from '../core/annotation_state.schema.json';
-import coreAnnotationVisualSchemaJson from '../core/annotation_visual.schema.json';
-import coreFutureInstancesSchemaJson from '../core/future_instances.schema.json';
-import corePoseSchemaJson from '../core/pose.schema.json';
-import corePrimitiveBaseSchemaJson from '../core/primitive_base.schema.json';
-import corePrimitiveStateSchemaJson from '../core/primitive_state.schema.json';
-import coreStreamSetSchemaJson from '../core/stream_set.schema.json';
-import coreTimeseriesStateSchemaJson from '../core/timeseries_state.schema.json';
-import coreUiPrimitiveStateSchemaJson from '../core/ui_primitive_state.schema.json';
-import coreValueSchemaJson from '../core/value.schema.json';
-import coreValuesSchemaJson from '../core/values.schema.json';
-import coreVariableSchemaJson from '../core/variable.schema.json';
-import coreVariableStateSchemaJson from '../core/variable_state.schema.json';
-import declarativeUiComponentBaseSchemaJson from '../declarative-ui/component_base.schema.json';
-import declarativeUiComponentsMetricSchemaJson from '../declarative-ui/components/metric.schema.json';
-import declarativeUiComponentsOnchangeSchemaJson from '../declarative-ui/components/_onchange.schema.json';
-import declarativeUiComponentsPlotSchemaJson from '../declarative-ui/components/plot.schema.json';
-import declarativeUiComponentsSelectSchemaJson from '../declarative-ui/components/select.schema.json';
-import declarativeUiComponentsTableSchemaJson from '../declarative-ui/components/table.schema.json';
-import declarativeUiComponentsTabularSchemaJson from '../declarative-ui/components/_tabular.schema.json';
-import declarativeUiComponentsTreetableSchemaJson from '../declarative-ui/components/treetable.schema.json';
-import declarativeUiComponentsVideoSchemaJson from '../declarative-ui/components/video.schema.json';
-import declarativeUiPanelSchemaJson from '../declarative-ui/panel.schema.json';
-import envelopeSchemaJson from '../envelope.schema.json';
-import mathMatrix3x3SchemaJson from '../math/matrix3x3.schema.json';
-import mathMatrix4x4SchemaJson from '../math/matrix4x4.schema.json';
-import mathPoint3dListSchemaJson from '../math/point3d_list.schema.json';
-import mathVector3x1SchemaJson from '../math/vector3x1.schema.json';
-import primitivesCircleSchemaJson from '../primitives/circle.schema.json';
-import primitivesImageSchemaJson from '../primitives/image.schema.json';
-import primitivesPointSchemaJson from '../primitives/point.schema.json';
-import primitivesPolygonSchemaJson from '../primitives/polygon.schema.json';
-import primitivesPolylineSchemaJson from '../primitives/polyline.schema.json';
-import primitivesStadiumSchemaJson from '../primitives/stadium.schema.json';
-import primitivesTextSchemaJson from '../primitives/text.schema.json';
-import sessionCameraInfoSchemaJson from '../session/camera_info.schema.json';
-import sessionErrorSchemaJson from '../session/error.schema.json';
-import sessionMetadataSchemaJson from '../session/metadata.schema.json';
-import sessionReconfigureSchemaJson from '../session/reconfigure.schema.json';
-import sessionStartSchemaJson from '../session/start.schema.json';
-import sessionStateUpdateSchemaJson from '../session/state_update.schema.json';
-import sessionStreamMetadataSchemaJson from '../session/stream_metadata.schema.json';
-import sessionTransformLogDoneSchemaJson from '../session/transform_log_done.schema.json';
-import sessionTransformLogSchemaJson from '../session/transform_log.schema.json';
-import sessionTransformPointInTimeSchemaJson from '../session/transform_point_in_time.schema.json';
-import sessionUiPanelInfoSchemaJson from '../session/ui_panel_info.schema.json';
-import styleClassSchemaJson from '../style/class.schema.json';
-import styleColorSchemaJson from '../style/_color.schema.json';
-import styleObjectValueSchemaJson from '../style/object_value.schema.json';
-import styleStreamValueSchemaJson from '../style/stream_value.schema.json';
-import uiPrimitivesTreetableSchemaJson from '../ui-primitives/treetable.schema.json';
+import coreAnnotationBaseSchemaJson from '../schema/core/annotation_base.schema.json';
+import coreAnnotationListSchemaJson from '../schema/core/_annotation_list.schema.json';
+import coreAnnotationStateSchemaJson from '../schema/core/annotation_state.schema.json';
+import coreAnnotationVisualSchemaJson from '../schema/core/annotation_visual.schema.json';
+import coreFutureInstancesSchemaJson from '../schema/core/future_instances.schema.json';
+import corePoseSchemaJson from '../schema/core/pose.schema.json';
+import corePrimitiveBaseSchemaJson from '../schema/core/primitive_base.schema.json';
+import corePrimitiveStateSchemaJson from '../schema/core/primitive_state.schema.json';
+import coreStreamSetSchemaJson from '../schema/core/stream_set.schema.json';
+import coreTimeseriesStateSchemaJson from '../schema/core/timeseries_state.schema.json';
+import coreUiPrimitiveStateSchemaJson from '../schema/core/ui_primitive_state.schema.json';
+import coreValueSchemaJson from '../schema/core/value.schema.json';
+import coreValuesSchemaJson from '../schema/core/values.schema.json';
+import coreVariableSchemaJson from '../schema/core/variable.schema.json';
+import coreVariableStateSchemaJson from '../schema/core/variable_state.schema.json';
+import declarativeUiComponentBaseSchemaJson from '../schema/declarative-ui/component_base.schema.json';
+import declarativeUiComponentsMetricSchemaJson from '../schema/declarative-ui/components/metric.schema.json';
+import declarativeUiComponentsOnchangeSchemaJson from '../schema/declarative-ui/components/_onchange.schema.json';
+import declarativeUiComponentsPlotSchemaJson from '../schema/declarative-ui/components/plot.schema.json';
+import declarativeUiComponentsSelectSchemaJson from '../schema/declarative-ui/components/select.schema.json';
+import declarativeUiComponentsTableSchemaJson from '../schema/declarative-ui/components/table.schema.json';
+import declarativeUiComponentsTabularSchemaJson from '../schema/declarative-ui/components/_tabular.schema.json';
+import declarativeUiComponentsTreetableSchemaJson from '../schema/declarative-ui/components/treetable.schema.json';
+import declarativeUiComponentsVideoSchemaJson from '../schema/declarative-ui/components/video.schema.json';
+import declarativeUiPanelSchemaJson from '../schema/declarative-ui/panel.schema.json';
+import envelopeSchemaJson from '../schema/envelope.schema.json';
+import mathMatrix3x3SchemaJson from '../schema/math/matrix3x3.schema.json';
+import mathMatrix4x4SchemaJson from '../schema/math/matrix4x4.schema.json';
+import mathPoint3dListSchemaJson from '../schema/math/point3d_list.schema.json';
+import mathVector3x1SchemaJson from '../schema/math/vector3x1.schema.json';
+import primitivesCircleSchemaJson from '../schema/primitives/circle.schema.json';
+import primitivesImageSchemaJson from '../schema/primitives/image.schema.json';
+import primitivesPointSchemaJson from '../schema/primitives/point.schema.json';
+import primitivesPolygonSchemaJson from '../schema/primitives/polygon.schema.json';
+import primitivesPolylineSchemaJson from '../schema/primitives/polyline.schema.json';
+import primitivesStadiumSchemaJson from '../schema/primitives/stadium.schema.json';
+import primitivesTextSchemaJson from '../schema/primitives/text.schema.json';
+import sessionCameraInfoSchemaJson from '../schema/session/camera_info.schema.json';
+import sessionErrorSchemaJson from '../schema/session/error.schema.json';
+import sessionMetadataSchemaJson from '../schema/session/metadata.schema.json';
+import sessionReconfigureSchemaJson from '../schema/session/reconfigure.schema.json';
+import sessionStartSchemaJson from '../schema/session/start.schema.json';
+import sessionStateUpdateSchemaJson from '../schema/session/state_update.schema.json';
+import sessionStreamMetadataSchemaJson from '../schema/session/stream_metadata.schema.json';
+import sessionTransformLogDoneSchemaJson from '../schema/session/transform_log_done.schema.json';
+import sessionTransformLogSchemaJson from '../schema/session/transform_log.schema.json';
+import sessionTransformPointInTimeSchemaJson from '../schema/session/transform_point_in_time.schema.json';
+import sessionUiPanelInfoSchemaJson from '../schema/session/ui_panel_info.schema.json';
+import styleClassSchemaJson from '../schema/style/class.schema.json';
+import styleColorSchemaJson from '../schema/style/_color.schema.json';
+import styleObjectValueSchemaJson from '../schema/style/object_value.schema.json';
+import styleStreamValueSchemaJson from '../schema/style/stream_value.schema.json';
+import uiPrimitivesTreetableSchemaJson from '../schema/ui-primitives/treetable.schema.json';
 
 export const SCHEMA_DATA = {
   'core/annotation_base.schema.json': coreAnnotationBaseSchemaJson,

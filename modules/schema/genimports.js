@@ -25,16 +25,18 @@ const fs = require('fs');
 const OUTPUT_PATH = 'src/data.js';
 
 function main() {
-  const schemaDir = path.resolve(__dirname);
+  const moduleDir = path.resolve(__dirname);
+  const schemaDir = path.join(moduleDir, 'schema');
 
-  const schemaMap = loadAllSchemas(schemaDir);
+  console.log(`SD: ${schemaDir}`);
+  const schemaMap = loadAllSchemas(moduleDir, schemaDir);
 
-  const outputPath = path.join(schemaDir, OUTPUT_PATH);
+  const outputPath = path.join(moduleDir, OUTPUT_PATH);
 
   dumpSchemas(schemaMap, outputPath);
 }
 
-function loadAllSchemas(schemaDir) {
+function loadAllSchemas(moduleDir, schemaDir) {
   const schemaMap = {};
   const schemaOptions = {
     listeners: {
@@ -42,10 +44,11 @@ function loadAllSchemas(schemaDir) {
         if (stat.name.endsWith('.schema.json')) {
           // Build the path to the matching schema
           const fullPath = path.join(fpath, stat.name);
-          const relPath = path.relative(schemaDir, fullPath);
+          const schemaRelPath = path.relative(schemaDir, fullPath);
+          const relPath = path.relative(moduleDir, fullPath);
 
           try {
-            const cleanedPath = relPath
+            const cleanedPath = schemaRelPath
               .replace(/\//g, '_')
               .replace(/\./g, '_')
               .replace(/-/g, '_')
@@ -53,6 +56,7 @@ function loadAllSchemas(schemaDir) {
             const identifier = snakeToCamel(cleanedPath);
             schemaMap[identifier] = {
               relPath,
+              schemaRelPath,
               data: loadSchema(fullPath)
             };
           } catch (e) {
@@ -89,7 +93,7 @@ function dumpSchemas(schemaMap, outputPath) {
       trailer = '';
     }
 
-    contents += `  '${item.relPath}': ${key}${trailer}\n`;
+    contents += `  '${item.schemaRelPath}': ${key}${trailer}\n`;
   }
   contents += '};\n';
 
