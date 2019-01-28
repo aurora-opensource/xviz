@@ -19,7 +19,7 @@ import test from 'tape-catch';
 import * as path from 'path';
 
 test('schemaDataContents', t => {
-  const schemaDir = path.join(__dirname, '..', '..', '..', 'modules', 'schema');
+  const schemaDir = path.join(__dirname, '..', '..', '..', 'modules', 'schema', 'schema');
   const ajv = loadValidator(schemaDir);
 
   // Check that every core schema is in the in the data list

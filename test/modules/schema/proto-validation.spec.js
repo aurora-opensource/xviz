@@ -48,23 +48,28 @@ const UNSUPPORTED_EXAMPLES = [
 // The JSON stringify check is not happy about the extra fields ignore for now
 const EXTRA_FIELDS_EXAMPLES = ['schema/examples/core/pose/extrafields.json'];
 
-test('loadProtos', t => {
-  const schemaDir = path.join(__dirname, '..', '..', '..', 'modules', 'schema');
-  const protoDir = path.join(schemaDir, 'proto', 'v2');
+function getModuleDir() {
+  const moduleDir = path.join(__dirname, '..', '..', '..', 'modules', 'schema');
+  return moduleDir;
+}
 
-  const protoRoot = loadProtos(protoDir);
+function getProtoDir() {
+  return path.join(getModuleDir(), 'proto', 'v2');
+}
+
+test('loadProtos', t => {
+  const protoRoot = loadProtos(getProtoDir());
   t.ok(protoRoot.files.length > 5, 'Loaded protofiles');
 
   t.end();
 });
 
 test('protosCorrect', t => {
-  const schemaDir = path.join(__dirname, '..', '..', '..', 'modules', 'schema');
-  const protoDir = path.join(schemaDir, 'proto', 'v2');
-  const protoRoot = loadProtos(protoDir);
+  const protoRoot = loadProtos(getProtoDir());
 
   // Test a basic primitive out
-  const examplesDir = path.join(schemaDir, 'examples');
+  const examplesDir = path.join(getModuleDir(), 'examples');
+  const schemaDir = path.join(getModuleDir(), 'schema');
 
   const validator = new XVIZValidator();
 
