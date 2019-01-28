@@ -1,12 +1,12 @@
 {
-  "name": "@xviz/schema",
-  "description": "XVIZ JSON schema",
-  "license": "Apache-2.0",
+  "name": "xviztool",
   "version": "0.1.0",
+  "description": "A CLI tool for the XVIZ protocol",
   "repository": {
     "type": "git",
     "url": "https://github.com/uber/xviz.git"
   },
+  "bin": { "xviztool" : "./bin/xviztool" },
   "main": "dist/es5/index.js",
   "module": "dist/esm/index.js",
   "esnext": "dist/es6/index.js",
@@ -15,21 +15,17 @@
     "src"
   ],
   "dependencies": {
-    "ajv": "^6.5.2",
-    "ajv-cli": "^3.0.0",
-    "is": "^3.2.1",
-    "jsonlint": "^1.6.3",
-    "protobufjs": "~6.8.8",
-    "walk": "^2.3.14"
+    "cli-table3": "^0.5.1",
+    "indent-string": "^3.2.0",
+    "websocket": "^1.0.28",
+    "yargs": "^12.0.5"
   },
   "scripts": {
     "clean": "rm -fr dist && mkdir -p dist",
     "build-es6": "BABEL_ENV=es6 babel src --config-file ../../babel.config.js --out-dir dist/es6 --source-maps --ignore 'node_modules/'",
     "build-esm": "BABEL_ENV=esm babel src --config-file ../../babel.config.js --out-dir dist/esm --source-maps --ignore 'node_modules/'",
     "build-es5": "BABEL_ENV=es5 babel src --config-file ../../babel.config.js --out-dir dist/es5 --source-maps --ignore 'node_modules/'",
-    "build-schema": "mkdir -p dist && cp -r proto schema dist",
-    "build": "npm run clean && npm run build-es6 && npm run build-esm && npm run build-es5 && npm run && npm run build-schema",
-    "check": "node validate.js"
+    "build": "npm run clean && npm run build-es6 && npm run build-esm && npm run build-es5"
   },
   "private": true
 }

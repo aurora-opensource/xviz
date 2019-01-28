@@ -39,7 +39,24 @@ test('sessionValidator#connect-then-close', t => {
   // Creation == connect
   const validator = new XVIZSessionValidator();
 
-  validator.close();
+  validator.onConnect();
+  validator.onClose();
+
+  const s = validator.stats;
+
+  t.deepEqual({}, s.messages, 'no messages');
+  t.deepEqual(s.validationErrors, {}, 'all valid');
+  t.equal(1, Object.keys(s.stateErrors).length, 'close after open is an error');
+  t.end();
+});
+
+// Test connect then close works OK (good counts, no errors)
+test('sessionValidator#connect-reset-state', t => {
+  // Creation == connect
+  const validator = new XVIZSessionValidator();
+
+  validator.onConnect();
+  validator.onClose();
 
   const s = validator.stats;
 
@@ -54,6 +71,7 @@ test('sessionValidator#connect-metadata', t => {
   // Creation == connect
   const validator = new XVIZSessionValidator();
 
+  validator.onConnect();
   validator.onMetadata({version: '2.0.0'});
 
   const s = validator.stats;
@@ -72,6 +90,7 @@ test('sessionValidator#connect-metadata', t => {
   // Creation == connect
   const validator = new XVIZSessionValidator();
 
+  validator.onConnect();
   validator.onStart({version: '2.0.0'});
   validator.onMetadata({version: '2.0.0'});
 
@@ -92,6 +111,7 @@ test('sessionValidator#connect-start-error', t => {
   // Creation == connect
   const validator = new XVIZSessionValidator();
 
+  validator.onConnect();
   validator.onStart({version: '3.0.0'});
   validator.onError({message: 'unsupported version'});
 
@@ -112,6 +132,7 @@ test('sessionValidator#metadata-not-valid', t => {
   // Creation == connect
   const validator = new XVIZSessionValidator();
 
+  validator.onConnect();
   validator.onMetadata({version: '2.0.0', foo: 'bra'});
 
   const s = validator.stats;
@@ -128,6 +149,7 @@ test('sessionValidator#connect-metadata', t => {
   // Creation == connect
   const validator = new XVIZSessionValidator();
 
+  validator.onConnect();
   validator.onStart({version: '2.0.0'});
   validator.onMetadata({version: '2.0.0'});
   validator.onTransformLog({
@@ -158,6 +180,7 @@ test('sessionValidator#connect-metadata', t => {
 test('sessionValidator#connect-metadata-live-data', t => {
   const validator = new XVIZSessionValidator();
 
+  validator.onConnect();
   validator.onStart({
     version: '2.0.0',
     session_type: 'live' // eslint-disable-line camelcase
