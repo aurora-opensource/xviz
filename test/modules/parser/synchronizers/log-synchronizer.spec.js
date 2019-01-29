@@ -32,6 +32,7 @@ const LOGS = {
     {time: 100, value: 20},
     {time: 101},
     {time: 250, value: 30},
+    {},
     {time: 300.1, value: 40}
   ]
 };
@@ -42,6 +43,7 @@ const TEST_CASES = [
   {time: 100, log1: 1, log2: 20}, // both in range
   {time: 102, log1: 'empty_entry', log2: 'empty_entry'}, // empty entry
   {time: 200, log1: 2}, // one in range
+  {time: 252, log1: undefined, log2: undefined}, // ensure with 3 second TIME_WINDOW, the value at time 250 is not returned
   {time: 3000}, // out of range too late
   {time: -1000}, // out of range way too early
   {time: 0}, // re-check

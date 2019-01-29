@@ -115,6 +115,10 @@ export default class LogSynchronizer extends BaseSynchronizer {
       } else if (timestamp > endTime) {
         // Beyond our target window, so exit early
         break;
+      } else if (timestamp === undefined) {
+        // We have an empty object which signals a non-data entry
+        log.time = 0;
+        log.index = null;
       }
     }
 
@@ -122,8 +126,6 @@ export default class LogSynchronizer extends BaseSynchronizer {
   }
 
   _getTimeFromObject(object) {
-    const timestamp = object.time || (object.attributes && object.attributes.transmission_time);
-    assert(Number.isFinite(timestamp), 'log entry missing timestamp');
-    return timestamp;
+    return object.time || (object.attributes && object.attributes.transmission_time);
   }
 }
