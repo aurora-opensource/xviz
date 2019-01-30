@@ -100,7 +100,7 @@ The `map_origin` object describes a location in geographic coordinates and altit
 ## Primitive State
 
 This holds a lists of primitives of each type XVIZ supports. It's used by higher level to map
-streams, `stream_set` or future points in time, `future_instances` to applicable primitives.
+streams, [`stream_set`](/docs/protocol-schema/core-protocol.md#stream-set) or future points in time, `future_instances` to applicable primitives.
 
 /object/bounds -> [<polygon>, <polygon>]
 
@@ -130,7 +130,7 @@ Example:
 
 ## UI Primitive State
 
-This holds a lists of UI primitives XVIZ. It's used by higher level to map streams, `stream_set`.
+This holds a lists of UI primitives XVIZ. It's used by higher level to map streams, [`stream_set`](/docs/protocol-schema/core-protocol.md#stream-set).
 
 | Name        | Type        | Description                   |
 | ----------- | ----------- | ----------------------------- |
