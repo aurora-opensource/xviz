@@ -81,22 +81,24 @@ export default class FutureObjectsConverter {
 
   // create set of data for the currentFrameIndex that represents the objects from the futureFrameIndex
   _convertObjectsFutureFrame(currentFrameIndex, futureFrameIndex) {
-    const currentFrameToken = this.frames[currentFrameIndex].sample_token;
-    const currentObjects = this.objectsByFrame[currentFrameToken];
+    const currentFrameToken = this.frames[currentFrameIndex].token;
+    const currentPose = this.posesByFrame[currentFrameToken];
 
-    const futureFrameToken = this.frames[futureFrameIndex].sample_token;
-    const futureObjects = this.objectsByFrame[futureFrameToken];
+    const currentKeyFrameToken = this.frames[currentFrameIndex].sample_token;
+    const currentObjects = this.objectsByFrame[currentKeyFrameToken];
+
+    const futureKeyFrameToken = this.frames[futureFrameIndex].sample_token;
+    const futureObjects = this.objectsByFrame[futureKeyFrameToken];
 
     return Object.keys(currentObjects)
       .filter(token => futureObjects[token])
       .map(token => {
-        const currObject = currentObjects[token];
         const futureObject = futureObjects[token];
 
-        // assign current object's z to the future object
+        // assign current autonomous vehicle's z to the future object
         return {
           ...futureObject,
-          vertices: futureObject.vertices.map((v, i) => [v[0], v[1], currObject.vertices[i][2]])
+          vertices: futureObject.vertices.map((v, i) => [v[0], v[1], currentPose.z])
         };
       });
   }

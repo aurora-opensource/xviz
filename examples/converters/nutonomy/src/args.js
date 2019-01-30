@@ -65,7 +65,7 @@ parser.addArgument('--fake-streams', {
 });
 
 parser.addArgument('--list-scenes', {
-  defaultValue: false,
+  action: 'storeTrue',
   help: 'List available scenes (use with -d or --data-directory).'
 });
 
