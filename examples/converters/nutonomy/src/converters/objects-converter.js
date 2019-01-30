@@ -122,8 +122,9 @@ export default class ObjectsConverter {
     this.OBJECTS_TRAJECTORY = '/objects/trajectory';
   }
 
-  load({staticData, frames}) {
+  load({staticData, frames, posesByFrame}) {
     this.frames = frames;
+    this.posesByFrame = posesByFrame;
 
     const objects = parseJsonFile(this.rootDir, this.streamFile);
     this.objectsByFrame = loadObjects(objects, staticData.instances);
@@ -133,17 +134,21 @@ export default class ObjectsConverter {
     // only key frames have objects data
     // each frame has a unique token,
     // each keyframe has a unique sample_token
-    const frameToken = this.frames[frameIndex].sample_token;
+    const keyFrameToken = this.frames[frameIndex].sample_token;
+    const frameToken = this.frames[frameIndex].token;
 
     // objects of given sample
-    const objects = this.objectsByFrame[frameToken];
+    const objects = this.objectsByFrame[keyFrameToken];
     if (objects) {
+      const pose = this.posesByFrame[frameToken];
       Object.keys(objects).forEach((objectToken, i) => {
         const object = objects[objectToken];
 
+        // use z from autonomous vehicle pose of required frame
+        // in order to make the objects horizontally aligned with autonomous vehicle
         xvizBuilder
           .primitive(object.category)
-          .polygon(object.vertices)
+          .polygon(object.vertices.map(v => [v[0], v[1], pose.z]))
           .classes([object.category])
           .style({
             height: object.size[2]
@@ -152,7 +157,7 @@ export default class ObjectsConverter {
 
         xvizBuilder
           .primitive(this.OBJECTS_TRACKING_POINT)
-          .circle([object.x, object.y, object.z])
+          .circle([object.x, object.y, pose.z])
           .id(object.token);
       });
 
@@ -208,17 +213,18 @@ export default class ObjectsConverter {
 
   _getObjectTrajectory(targetObject, startFrame, endFrame) {
     const trajectory = [];
+    const startFrameToken = this.frames[startFrame].token;
+    const startPose = this.posesByFrame[startFrameToken];
     for (let i = startFrame; i < endFrame; i++) {
-      const startFrameToken = this.frames[startFrame].sample_token;
-      const startObject = this.objectsByFrame[startFrameToken][targetObject.instance_token];
-
-      const frameToken = this.frames[i].sample_token;
-      const frameObject = this.objectsByFrame[frameToken][targetObject.instance_token];
+      const keyFrameToken = this.frames[i].sample_token;
+      const frameObject = this.objectsByFrame[keyFrameToken][targetObject.instance_token];
       if (!frameObject) {
         return trajectory;
       }
 
-      trajectory.push([frameObject.x, frameObject.y, startObject.z]);
+      // use z from autonomous vehicle pose of startFrame
+      // in order to make the object trajectory horizontally aligned with autonomous vehicle
+      trajectory.push([frameObject.x, frameObject.y, startPose.z]);
     }
     return trajectory;
   }
