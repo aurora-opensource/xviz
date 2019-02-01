@@ -1,27 +1,40 @@
-_Uber Confidential Information_
-
 # XVIZ
 
-XVIZ protocol and utility libraries.
+XVIZ is a protocol for real-time transfer and visualization of autonomy data.
 
-## Development
+[XVIZ Specification](http://avs.auto/#/xviz)
 
-### Dependencies
+## Tools and examples
 
-To build this repository you need:
+This repo contains the following submodules:
 
-- Node.js, tested with 8.11.3, compatible with 8.x
-- Yarn, tested with 1.10.0, compatible with 1.x
+- `@xviz/builder` - Node.js utilities for converting data to the XVIZ protocol.
+- `@xviz/cli` - CLI utilities for the XVIZ protocol.
+- `@xviz/parser` - Client-side decoder and synchronizer for consuming XVIZ data.
+- `@xviz/schema` - Validator for the XVIZ protocol.
 
-To install dependencies, run:
+And examples:
+
+- Sample converters that convert open datasets such as
+  [KITTI](http://www.cvlibs.net/datasets/kitti/raw_data.php) and [Nutonomy](https://nuscenes.org) to
+  the XVIZ protocol.
+- A minimal Node.js-based XVIZ stream server.
+
+## Quick start
+
+You need [Node.js](https://nodejs.org/en/) and [yarn](https://yarnpkg.com/lang/en/docs/install) to
+run the examples.
 
 ```bash
+# Clone XVIZ
 $ git clone https://github.com/uber/xviz.git
 $ cd xviz
+
+# Install dependencies
 $ yarn bootstrap
 ```
 
-### Run KITTI example
+Convert and serve KITTI data:
 
 ```bash
 # Download KITTI data
@@ -30,32 +43,3 @@ $ ./scripts/download-kitti-data.sh
 # Convert KITTI data if necessary and run the XVIZ Server and Client
 $ ./scripts/run-kitti-example.sh
 ```
-
-### Test
-
-Run tests under Node.js:
-
-```bash
-$ yarn test
-```
-
-Run tests in a browser:
-
-```bash
-$ yarn test-browser
-```
-
-## Docs
-
-The website version of the documentation can be viewed via the streetscape.gl project:
-
-```
-$ cd ../streetscape.gl/website # the streetscape.gl repo must be cloned into the same parent directory as xviz
-$ yarn  # install dependencies
-$ yarn start-local
-```
-
-## Coding Standard
-
-xviz uses a pinned version of the
-[uber-es2015](https://www.npmjs.com/package/eslint-config-uber-es2015) linter rules.
