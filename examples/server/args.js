@@ -22,7 +22,8 @@ const parser = new ArgumentParser({
 });
 
 parser.addArgument(['-d', '--data_directory'], {
-  help: 'Directory to serve data from. Relative path will be resolved relative to /data/generated/'
+  help:
+    'Directory to serve data from. Relative path will be resolved relative to /data/generated/, and absolute paths directly.'
 });
 
 parser.addArgument(['--port'], {
@@ -73,7 +74,9 @@ parser.addArgument(['--skip_images'], {
 module.exports = function getArgs() {
   const args = parser.parseArgs();
   if (args.data_directory) {
-    args.data_directory = path.resolve(__dirname, '../../data/generated/', args.data_directory);
+    if (!args.data_directory.startsWith('/')) {
+      args.data_directory = path.resolve(__dirname, '../../data/generated/', args.data_directory);
+    }
   }
 
   return args;

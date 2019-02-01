@@ -1,0 +1,81 @@
+{
+  "type": "xviz/state_update",
+  "data": {
+    "update_type": "snapshot",
+    "updates": [
+      {
+        "timestamp": 1000.1,
+        "poses": {
+          "/vehicle_pose": {
+            "timestamp": 1000.1,
+            "orientation": [0, 0, 0],
+            "position": [0, 0, 0],
+            "mapOrigin": {
+              "longitude": -122.4,
+              "latitude": 37.8,
+              "altitude": 0
+            }
+          }
+        },
+        "primitives": {
+
+          "/circle/inline/radius": {
+            "circles": [
+              {
+                "center": [10, 10, 0],
+                "radius_m": 1.0,
+                "base": {
+                  "inline_style": {
+                    "radius": 5
+                  }
+                }
+              }
+            ]
+          },
+
+          "/circle/inline/fill_color": {
+            "circles": [
+              {
+                "center": [10, -10, 0],
+                "radius_m": 1.0,
+                "base": {
+                  "inline_style": {
+                    "fill_color": "#0f0"
+                  }
+                }
+              }
+            ]
+          },
+
+          "/circle/stream/fill_color": {
+            "circles": [
+              {
+                "center": [-10, 10, 0],
+                "radius_m": 1.0
+              }
+            ]
+          },
+
+          "/circle/stream/radius_min_pixels": {
+            "circles": [
+              {
+                "center": [-10, -10, 0],
+                "radius_m": 1.0
+              }
+            ]
+          },
+
+          "/circle/stream/radius_max_pixels": {
+            "circles": [
+              {
+                "center": [-15, -25, 0],
+                "radius_m": 1.0
+              }
+            ]
+          }
+
+        }
+      }
+    ]
+  }
+}

@@ -62,7 +62,7 @@ export function command(args) {
   const printSummary = () => {
     if (!printed) {
       printErrorSummary(validator.stats, args);
-      printed = false;
+      printed = true;
     }
   };
 

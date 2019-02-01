@@ -174,7 +174,9 @@ function loadFrameTimings(frames) {
 // Determine the actual index into frames when looping over data repeatedly
 // Happens when frame_limit > framesLength
 function getFrameIndex(index, framesLength) {
-  if (index >= framesLength) {
+  if (framesLength === 1) {
+    return 0;
+  } else if (index >= framesLength) {
     // do not include count metadata
     const xviz_count = framesLength - 1;
 
@@ -301,6 +303,7 @@ class ConnectionContext {
     // Used to manage changing an inflight request
     this.replaceFrameRequest = null;
     this.inflight = false;
+    this.transformId = '';
 
     this.onConnection.bind(this);
     this.onClose.bind(this);
@@ -342,6 +345,7 @@ class ConnectionContext {
         break;
       case 'xviz/transform_log': {
         this.log(`| start: ${msg.data.start_timestamp} end: ${msg.data.end_timestamp}`);
+        this.transformId = msg.data.id;
         this.sendPlayResp(msg.data);
         break;
       }
@@ -489,7 +493,7 @@ class ConnectionContext {
       } else {
         // When last_index reached send 'transform_log_done' message
         if (!this.settings.live) {
-          this.sendEnveloped('transform_log_done', {}, {}, () => {
+          this.sendEnveloped('transform_log_done', {id: this.transformId}, {}, () => {
             this.logMsgSent(frame_send_time, -1, frame_index, 'json');
           });
         }
