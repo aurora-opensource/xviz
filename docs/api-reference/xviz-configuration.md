@@ -12,8 +12,16 @@ Constants:
 
 Parser hooks:
 
-- `preProcessPrimitive` (Function) - Pre process a primitive. This can be used to change the type of
+- `preProcessPrimitive` (Function) - Pre-process a primitive. This can be used to change the type of
   a primitive (e.g. from `point` to `text`) and/or modify their properties.
+
+Parameters:
+
+- `object` (Object)
+  - `primitive` (Object) - The primitive object being processed.
+  - `type` (String) - The type of the primitive.
+  - `streamName` (String) - The stream name of the primitive.
+  - `time` (Number) - The timestamp of the primitive.
 
 ##### getXVIZConfig(config)
 

@@ -101,7 +101,7 @@ export function parseStreamPrimitive(primitives, streamName, time, convertPrimit
 
       for (let j = 0; j < object.length; j++) {
         // Apply custom XVIZ pre processing to this primitive
-        preProcessPrimitive({primitive: object[j], streamName, time});
+        preProcessPrimitive({primitive: object[j], type: primType, streamName, time});
 
         // process each primitive
         const primitive = normalizeXVIZPrimitive(
@@ -121,7 +121,7 @@ export function parseStreamPrimitive(primitives, streamName, time, convertPrimit
       // single primitive
 
       // Apply custom XVIZ postprocessing to this primitive
-      preProcessPrimitive({primitive: object, streamName, time});
+      preProcessPrimitive({primitive: object, type: primType, streamName, time});
 
       // normalize primitive
       const primitive = normalizeXVIZPrimitive(
@@ -368,9 +368,9 @@ function parseStreamTimeSeriesV2(seriesArray, streamBlackList) {
         }
 
         const tsStream = timeSeriesStreams[streamName];
-        if (tsStream) {
-          throw new Error('Unexpected time_series duplicate');
-        } else {
+        // TODO(twojtasz):
+        // We should warn/log if a duplicate entry is seen
+        if (!tsStream) {
           timeSeriesStreams[streamName] = entry;
         }
       }
