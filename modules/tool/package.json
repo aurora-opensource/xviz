@@ -1,5 +1,5 @@
 {
-  "name": "xviztool",
+  "name": "@xviz/cli",
   "version": "0.1.0",
   "description": "A CLI tool for the XVIZ protocol",
   "repository": {
