@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {WebSocketInterface} from '@xviz/tool';
+import {WebSocketInterface} from '@xviz/cli';
 
 import test from 'tape-catch';
 
