@@ -2,6 +2,8 @@
 
 XVIZ is the data layer for AVS.
 
+![XVIZ high-level data flow](./overview/images/data-flow.png)
+
 ## Main Features
 
 XVIZ allows you to describe:
