@@ -1,0 +1,4 @@
+#! /usr/bin/env node
+
+// Run
+require('../dist/es5').main()

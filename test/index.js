@@ -15,4 +15,4 @@
 import './modules/builder';
 import './modules/parser';
 import './modules/schema';
-import './modules/tool';
+import './modules/cli';

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {XVIZMiddlewareStack} from '@xviz/tool';
+import {XVIZMiddlewareStack} from '@xviz/cli';
 
 import test from 'tape-catch';
 

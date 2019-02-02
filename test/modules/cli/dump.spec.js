@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {DumpXVIZ, DumpMode} from '@xviz/tool';
+import {DumpXVIZ, DumpMode} from '@xviz/cli';
 
 import test from 'tape-catch';
 
