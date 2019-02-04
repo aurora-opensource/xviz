@@ -1,13 +1,13 @@
 {
   "name": "@xviz/cli",
-  "version": "0.1.0",
+  "version": "1.0.0-alpha.2",
   "description": "A CLI tool for the XVIZ protocol",
   "repository": {
     "type": "git",
     "url": "https://github.com/uber/xviz.git"
   },
   "bin": {
-    "xviz" : "./bin/xviz"
+    "xviz": "./bin/xviz"
   },
   "main": "dist/es5/index.js",
   "module": "dist/esm/index.js",
@@ -18,8 +18,8 @@
   ],
   "dependencies": {
     "@xviz/builder": "^1.0.0-alpha.1",
-    "@xviz/parser": "^1.0.0-alpha.1",
-    "@xviz/schema": "^1.0.0-alpha.1",
+    "@xviz/parser": "^1.0.0-alpha.2",
+    "@xviz/schema": "^1.0.0-alpha.2",
     "cli-table3": "^0.5.1",
     "indent-string": "^3.2.0",
     "websocket": "^1.0.28",
