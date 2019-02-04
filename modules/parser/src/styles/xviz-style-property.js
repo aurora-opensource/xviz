@@ -112,7 +112,7 @@ const DEFAULT_STYLES = {
   radius_min_pixels: 0,
   radius_max_pixels: Number.MAX_SAFE_INTEGER,
 
-  stroke_width: 1,
+  stroke_width: 0.1,
   stroke_width_min_pixels: 0,
   stroke_width_max_pixels: Number.MAX_SAFE_INTEGER
 };

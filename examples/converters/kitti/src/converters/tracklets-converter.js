@@ -157,6 +157,7 @@ export default class TrackletsConverter {
       .type('circle')
       .streamStyle({
         radius: 0.2,
+        stroke_width: 0,
         fill_color: '#FFC043'
       })
       .coordinate('VEHICLE_RELATIVE')
