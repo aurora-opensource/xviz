@@ -374,9 +374,14 @@ function parseStreamTimeSeriesV2(seriesArray, streamBlackList) {
         }
 
         const tsStream = timeSeriesStreams[streamName];
-        if (tsStream) {
-          throw new Error('Unexpected time_series duplicate');
-        } else {
+        // TODO(twojtasz): We can't throw while parsing as it aborts the flow.
+        //                 Details for fix are at https://github.com/uber/xviz/issues/303
+        //
+        // We should warn/log if a duplicate entry is seen,
+        // for now we leave the first entry.
+        if (!tsStream) {
+          // Note: Next line kept for reference on issue https://github.com/uber/xviz/issues/275
+          // throw new Error('Unexpected time_series duplicate');
           timeSeriesStreams[streamName] = entry;
         }
       }
