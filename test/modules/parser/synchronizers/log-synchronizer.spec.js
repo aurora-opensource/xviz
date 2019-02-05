@@ -20,6 +20,7 @@ import {resetXVIZConfigAndSettings} from '../config/config-utils';
 // xviz data uses snake_case
 /* eslint-disable camelcase */
 
+/* NOTE: keep in sync with tests in stream-synchronizer.spec.js */
 const LOGS = {
   log1: [
     {attributes: {transmission_time: 100}, value: 1},
@@ -32,7 +33,6 @@ const LOGS = {
     {time: 100, value: 20},
     {time: 101},
     {time: 250, value: 30},
-    {},
     {time: 300.1, value: 40}
   ]
 };
@@ -43,7 +43,6 @@ const TEST_CASES = [
   {time: 100, log1: 1, log2: 20}, // both in range
   {time: 102, log1: 'empty_entry', log2: 'empty_entry'}, // empty entry
   {time: 200, log1: 2}, // one in range
-  {time: 252, log1: undefined, log2: undefined}, // ensure with 3 second TIME_WINDOW, the value at time 250 is not returned
   {time: 3000}, // out of range too late
   {time: -1000}, // out of range way too early
   {time: 0}, // re-check
@@ -93,6 +92,65 @@ tape('LogSynchronizer#getData', t => {
       t.equals(data.streams.log2, undefined, 'Got undefined log2 value');
     }
   }
+
+  t.end();
+});
+
+tape('LogSynchronizer#correct lookup with empty entries (explicit no-data)', t => {
+  resetXVIZConfigAndSettings();
+  setXVIZConfig({TIME_WINDOW: 3});
+  const LOGS_WITH_NO_DATA_ENTRIES = {
+    stream1: [
+      {attributes: {transmission_time: 90}},
+      {attributes: {transmission_time: 100}, value: 1},
+      {attributes: {transmission_time: 101}, value: 1.5},
+      {attributes: {transmission_time: 103}},
+      {attributes: {transmission_time: 110}, value: 2},
+      {attributes: {transmission_time: 115}},
+      {attributes: {transmission_time: 120}, value: 3}
+    ],
+    stream2: [
+      {time: 90},
+      {time: 102, value: 10},
+      {time: 103},
+      {time: 110, value: 20},
+      {time: 115},
+      {time: 121, value: 40},
+      {time: 122}
+    ]
+  };
+
+  const logSynchronizer = new LogSynchronizer(LOGS_WITH_NO_DATA_ENTRIES);
+
+  // Test a time before any valid entries
+  logSynchronizer.setTime(99);
+  let data = logSynchronizer.getLogSlice();
+  t.equals(data.streams.stream1, undefined, 'stream1 is undefined at time 99');
+  t.equals(data.streams.stream2, undefined, 'stream2 is undefined at time 99');
+
+  // Test with a valid entry for stream1 and no entry in the window for stream2
+  logSynchronizer.setTime(100);
+  data = logSynchronizer.getLogSlice();
+  t.equals(data.streams.stream1.value, 1, 'stream1 is 1 at time 100');
+  t.equals(data.streams.stream2, undefined, 'stream2 is undefined at time 100');
+
+  // Test with a valid entry for both logs
+  logSynchronizer.setTime(102);
+  data = logSynchronizer.getLogSlice();
+  t.equals(data.streams.stream1.value, 1.5, 'stream1 is 1.5 at time 102');
+  t.equals(data.streams.stream2.value, 10, 'stream2 is 10 at time 102');
+
+  // Test a time that has no-data entry for both streams
+  logSynchronizer.setTime(103);
+  data = logSynchronizer.getLogSlice();
+  t.equals(data.streams.stream1.value, undefined, 'stream1 is undefined at time 103');
+  t.equals(data.streams.stream2.value, undefined, 'stream2 is undefined at time 103');
+
+  // Test a time that has an entry for both
+  logSynchronizer.setTime(110);
+  data = logSynchronizer.getLogSlice();
+  t.equals(data.streams.stream1.value, 2, 'stream1 is 2 at time 110');
+  t.equals(data.streams.stream2.value, 20, 'stream2 is 20 at time 110');
 
   t.end();
 });
