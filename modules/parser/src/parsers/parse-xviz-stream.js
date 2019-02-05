@@ -36,7 +36,13 @@ export function parseXVIZStream(data, convertPrimitive) {
   // Each object is [{primitives, variables, timestamp},...]
   // Each object represents a timestamp and array of objects
 
+  // V1 has a no-data entry that results in setting all top-level types to an
+  // empty array. See the test cases.
+  //
+  // Usually only one of these fields is valid and thus only one is normally
+  // iterated below.
   const {primitives, ui_primitives, variables, futures} = data[0];
+
   // At this point, we either have one or the other.
   // TODO(twojtasz): BUG: there is an assumption that
   // streamNames will be unique.  Need to put in a detection if
@@ -258,7 +264,7 @@ export function parseStreamVariable(objects, streamName, time) {
 
 export function parseStreamVariableV1(objects, streamName, time) {
   if (Array.isArray(objects)) {
-    return {};
+    return {time};
   }
 
   let variable;
@@ -281,7 +287,7 @@ export function parseStreamVariableV1(objects, streamName, time) {
 
 export function parseStreamVariableV2(objects, streamName, time) {
   if (Array.isArray(objects)) {
-    return {};
+    return {time};
   }
 
   const variables = objects.variables;

@@ -17,7 +17,8 @@ import {setXVIZConfig} from '@xviz/parser';
 import {
   parseStreamTimeSeries,
   parseStreamVariable,
-  parseStreamUIPrimitives
+  parseStreamUIPrimitives,
+  parseXVIZStream
 } from '@xviz/parser/parsers/parse-xviz-stream';
 import {XVIZValidator} from '@xviz/schema';
 
@@ -231,6 +232,102 @@ tape('parseStreamVariable#simple v1', t => {
     const result = parseStreamVariable(testCase.xviz, '/test', time);
     t.deepEquals(result, testCase.expected, `variables type ${testCase.name} parsed properly`);
   });
+
+  t.end();
+});
+
+tape('parseXVIZStream#variable no-data entries', t => {
+  resetXVIZConfigAndSettings();
+  setXVIZConfig({currentMajorVersion: 1});
+
+  const data = [
+    {
+      timestamp: 100.5425,
+      variables: {
+        '/vehicle_intentions/stop/distance_to_object': {
+          timestamps: [100.54],
+          type: 'float',
+          values: [-0.003]
+        }
+      }
+    },
+    {
+      // A no-data entry
+      timestamp: 101.84,
+      futures: {'/vehicle_intentions/stop/distance_to_object': []},
+      primitives: {'/vehicle_intentions/stop/distance_to_object': []},
+      variables: {'/vehicle_intentions/stop/distance_to_object': []}
+    }
+  ];
+
+  const expected = [
+    {
+      time: 100.5425,
+      variable: -0.003
+    },
+    {
+      time: 101.84
+    }
+  ];
+
+  const result = parseXVIZStream(data, () => {});
+  t.deepEquals(result, expected, 'Variable stream with no-data entry matches expect object');
+
+  t.end();
+});
+
+tape('parseXVIZStream#primitive no-data entries', t => {
+  resetXVIZConfigAndSettings();
+  setXVIZConfig({currentMajorVersion: 1});
+
+  const data = [
+    {
+      timestamp: 100.5425,
+      primitives: {
+        '/object': [
+          {
+            type: 'polygon2d',
+            vertices: [[-10, 10], [10, 10], [10, -10], [-10, -10]]
+          }
+        ]
+      }
+    },
+    {
+      timestamp: 101.84,
+      futures: {'/object': []},
+      primitives: {'/object': []},
+      variables: {'/object': []}
+    }
+  ];
+
+  const expected = [
+    {
+      lookAheads: [],
+      features: [
+        {
+          type: 'polygon2d',
+          vertices: [[-10, 10, 0], [10, 10, 0], [10, -10, 0], [-10, -10, 0], [-10, 10, 0]]
+        }
+      ],
+      labels: [],
+      pointCloud: null,
+      images: [],
+      components: [],
+      time: 100.5425
+    },
+    {
+      lookAheads: [],
+      features: [],
+      labels: [],
+      pointCloud: null,
+      images: [],
+      components: [],
+      time: 101.84
+    }
+  ];
+
+  const result = parseXVIZStream(data, () => {});
+  t.deepEquals(result, expected, 'Variable stream with no-data entry matches expect object');
 
   t.end();
 });

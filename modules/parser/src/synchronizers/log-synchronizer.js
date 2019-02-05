@@ -57,8 +57,9 @@ export default class LogSynchronizer extends BaseSynchronizer {
    * Find and process stream data in the range (start, end] for process
    * Returns a list of streams sorted by decending time
    *
-   * Since we have all samples and can find the exact datum for the stream i
-   * there is no "range" of samples to process and the reverse ordering does not apply.
+   * Since we have all samples and can find the correct datum for every stream
+   * and only send back an array of 1 element. To do this we will apply the
+   * reverse search here, stopping when we find the entry closest to endTime.
    *
    * @param Number startTime - The time to start from.
    * @param Number endTime - The time to end at.
@@ -101,29 +102,37 @@ export default class LogSynchronizer extends BaseSynchronizer {
     }
 
     const startIndex = log.index || 0;
+    let endIndex = null;
+    let endTimestamp;
+
     // invalidate
     log.index = null;
 
+    // Find the range of indices for the given start and end time
     for (let i = startIndex; i < log.data.length; ++i) {
       const timestamp = this._getTimeFromObject(log.data[i]);
-
       // If timestamp < startTime, sample before our target window, so don't update index
       if (timestamp > startTime && timestamp <= endTime) {
         // Within our target window, so update index
-        log.index = i;
-        log.time = timestamp;
+        endIndex = i;
+        endTimestamp = timestamp;
       } else if (timestamp > endTime) {
         // Beyond our target window, so exit early
         break;
       }
     }
 
-    return log.index === null ? null : log.data[log.index];
+    // Found no entry
+    if (endIndex === null) {
+      return null;
+    }
+
+    log.index = endIndex;
+    log.time = endTimestamp;
+    return log.data[endIndex];
   }
 
   _getTimeFromObject(object) {
-    const timestamp = object.time || (object.attributes && object.attributes.transmission_time);
-    assert(Number.isFinite(timestamp), 'log entry missing timestamp');
-    return timestamp;
+    return object.time || (object.attributes && object.attributes.transmission_time);
   }
 }
