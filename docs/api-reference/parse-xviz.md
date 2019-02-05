@@ -55,8 +55,8 @@ parsing process.
 import {streamDataWorker} from './stream-data-worker';
 
 streamDataWorker({
-  preProcessPrimitive: primitive => {
-    if (primitive.type === 'circle') {
+  preProcessPrimitive: (primitive, type) => {
+    if (type === 'circle') {
       primitive.center[2] += 0.1;
     }
   }

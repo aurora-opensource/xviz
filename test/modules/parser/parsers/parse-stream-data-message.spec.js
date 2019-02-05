@@ -441,7 +441,7 @@ tape('parseStreamLogData preProcessPrimitive type change', t => {
   setXVIZConfig({currentMajorVersion: 1});
   setXVIZConfig({
     PRIMARY_POSE_STREAM: '/vehicle_pose',
-    preProcessPrimitive: ({primitive, streamName, time}) => {
+    preProcessPrimitive: ({primitive, type, streamName, time}) => {
       calledPreProcess = true;
       primitive.type = 'circle2d';
     }
