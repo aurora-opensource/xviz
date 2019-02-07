@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/* eslint-env node */
+/* eslint no-console: ["error", { allow: ["log"] }] */
+
 import {XVIZMiddlewareStack} from './middleware';
 import {WebSocketInterface} from './websocket';
 import {TransformLogFlow, OnlyMetadata} from './core';
@@ -48,6 +51,21 @@ export function openSource(args, middlewares) {
       middleware.client = client;
     }
   }
+
+  // Setup graceful shutdown
+  let sigintCount = 0;
+  process.on('SIGINT', () => {
+    if (sigintCount === 0) {
+      console.log('Closing');
+      socket.close();
+    } else {
+      // If the user or system is really mashing Ctrl-C, then abort
+      console.log('Aborting');
+      process.exit(1); // eslint-disable-line no-process-exit
+    }
+
+    sigintCount++;
+  });
 
   return client;
 }
