@@ -178,16 +178,15 @@ has just the single `/object/polygon` containing a
     "updates": [
         {
             "timestamp": 1001.3,
-            "primitives": [
-                {
-                    "name": "/object/polygon",
-                    "primitives": [
+            "primitives": {
+                "/object/polygon": {
+                    "polygons": [
                         {
                             "vertices": [[9, 15, 3], [20, 13, 3], [20, 5, 3]]
                         }
                     ]
                 }
-            ]
+            }
         }
     ]
 }
