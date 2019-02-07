@@ -14,14 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# This file allow for quick iterative development of the XVIZ cli using ES6
+# This file allows for quick iterative development of the XVIZ cli using ES6
 # code.  Simply save your files then run the tool and it will automatically
 # compile for you.
 
 # Where are we
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-# Enable the automatic babel in the CLI tool
+# Enable automatic babel in the "xviz" program
 export XVIZ_DEV=1
 
 # Call the main CLI
