@@ -28,6 +28,7 @@ export class WebSocketInterface {
     this.middleware = options.middleware;
     this.start = options.start;
     this.socket = options.socket;
+    this.unknownMessageTypes = new Set([]);
 
     this.socket.onerror = error => {
       console.log('WebSocket Error: ', error);
@@ -83,17 +84,18 @@ export class WebSocketInterface {
   }
 
   processMessage(parsed) {
-    // TODO(jlisee): handle unknown namespace and messages
     if (isEnvelope(parsed)) {
       const unpacked = unpackEnvelope(parsed);
 
       if (unpacked.namespace === 'xviz') {
         this.callMiddleware(unpacked.type, unpacked.data);
-      } else {
-        console.log('UNKNOWN NAMESPACE', unpacked.namespace);
+      } else if (!this.unknownMessageTypes.has(parsed.type)) {
+        // Report each unknown type just once
+        this.unknownMessageTypes.add(parsed.type);
+        console.log(`Unknown message namespace: "${unpacked.namespace}" type: "${unpacked.type}"`);
       }
     } else {
-      console.log('UNKNOWN MESSAGE', parsed);
+      console.log('Unknown message format', parsed);
     }
   }
   sendMessage(msgType, data) {
