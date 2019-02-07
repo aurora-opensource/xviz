@@ -58,15 +58,26 @@ export function command(args) {
 
   const validator = new XVIZSessionValidator(options);
 
+  let printed = false;
+  const printSummary = () => {
+    if (!printed) {
+      printErrorSummary(validator.stats, args);
+      printed = false;
+    }
+  };
+
   // Report validation as we go
   const reportValidation = {
     onMetadata: msg => {
       if (args.metadata) {
-        printErrorSummary(validator.stats, args);
+        printSummary();
       }
     },
     onTransformLogDone: msg => {
-      printErrorSummary(validator.stats, args);
+      printSummary();
+    },
+    onClose: () => {
+      printSummary();
     }
   };
 
