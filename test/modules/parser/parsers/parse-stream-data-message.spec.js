@@ -135,6 +135,14 @@ tape('unpackEnvelope name parsing', t => {
   t.equals('', empty.namespace);
   t.equals('', empty.type);
 
+  const nonXVIZ = unpackEnvelope({type: 'foo/bar', data: {a: 42}});
+  t.equals('foo', nonXVIZ.namespace);
+  t.equals('bar', nonXVIZ.type);
+
+  const leadingSlash = unpackEnvelope({type: '/foo/bar', data: {a: 42}});
+  t.equals('', leadingSlash.namespace);
+  t.equals('foo/bar', leadingSlash.type);
+
   t.end();
 });
 
