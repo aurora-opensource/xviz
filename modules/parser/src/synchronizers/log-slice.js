@@ -26,7 +26,7 @@ function lookAheadTimesliceAccessor(timeslice) {
     return timeslice[0].timestamp;
   }
 
-  log.error('Missing entry or timestamp in lookAhead array');
+  log.warn('Missing entry or timestamp in lookAhead array')();
   return 0;
 }
 

@@ -143,7 +143,7 @@ export default class XVIZStyleProperty {
       }
     }
     if (this._value === null) {
-      log.error(`illegal ${key} value: ${value}`);
+      log.warn(`illegal ${key} value: ${value}`)();
     }
   }
 

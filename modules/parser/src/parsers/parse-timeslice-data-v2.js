@@ -49,7 +49,7 @@ export default function parseStreamSet(data, convertPrimitive) {
   }
 
   if (updates.length > 1) {
-    log.error(
+    log.warn(
       `Only XVIZ first update of "snapshot" is currently supported. Current updates has "${
         updates.length
       }" entries.`

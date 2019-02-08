@@ -332,7 +332,7 @@ export function parseStreamTimeSeries(seriesArray, streamBlackList) {
     return parseStreamTimeSeriesV2(seriesArray, streamBlackList);
   }
 
-  log.error(`Invalid time_series data in XVIZ version ${currentMajorVersion}`);
+  log.error(`Invalid time_series data in XVIZ version ${currentMajorVersion}`)();
   return null;
 }
 
@@ -379,7 +379,7 @@ function parseStreamTimeSeriesV2(seriesArray, streamBlackList) {
 
         if (tsStream) {
           // a duplicate entry is seen, leave the first entry.
-          log.warn(`Unexpected time_series duplicate: ${streamName}`);
+          log.warn(`Unexpected time_series duplicate: ${streamName}`)();
         } else {
           timeSeriesStreams[streamName] = entry;
         }
