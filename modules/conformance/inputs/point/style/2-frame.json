@@ -1,0 +1,60 @@
+{
+  "type": "xviz/state_update",
+  "data": {
+    "update_type": "snapshot",
+    "updates": [
+      {
+        "timestamp": 1000.1,
+        "poses": {
+          "/vehicle_pose": {
+            "timestamp": 1000.1,
+            "orientation": [0, 0, 0],
+            "position": [0, 0, 0],
+            "mapOrigin": {
+              "longitude": -122.4,
+              "latitude": 37.8,
+              "altitude": 0
+            }
+          }
+        },
+        "primitives": {
+
+          "/point/inline/radius": {
+            "points": [
+              {
+                "points": [[10, 10, 0]],
+                "base": {
+                  "inline_style": {
+                    "radius": 5
+                  }
+                }
+              }
+            ]
+          },
+
+          "/point/inline/fill_color": {
+            "points": [
+              {
+                "points": [[10, -10, 0]],
+                "base": {
+                  "inline_style": {
+                    "fill_color": "#0f0"
+                  }
+                }
+              }
+            ]
+          },
+
+          "/point/stream/fill_color": {
+            "points": [
+              {
+                "points": [[-10, 10, 0]]
+              }
+            ]
+          }
+
+        }
+      }
+    ]
+  }
+}

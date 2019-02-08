@@ -1,0 +1,61 @@
+{
+  "type": "xviz/metadata",
+  "data": {
+    "version": "2.0.0",
+    "streams": {
+      "/vehicle_pose": {
+        "category": "pose"
+      },
+
+      "/circle/inline/radius": {
+        "category": "primitive",
+        "primitive_type": "circle",
+        "coordinate": "VEHICLE_RELATIVE"
+      },
+
+      "/circle/inline/fill_color": {
+        "category": "primitive",
+        "primitive_type": "circle",
+        "coordinate": "VEHICLE_RELATIVE"
+      },
+
+      "/circle/stream/fill_color": {
+        "category": "primitive",
+        "primitive_type": "circle",
+        "coordinate": "VEHICLE_RELATIVE",
+        "stream_style": {
+          "fill_color": "#f00",
+          "stroke_width": 0,
+          "radius": 1
+        }
+      },
+
+      "/circle/stream/radius_min_pixel": {
+        "category": "primitive",
+        "primitive_type": "circle",
+        "coordinate": "VEHICLE_RELATIVE",
+        "stream_style": {
+          "radius_min_pixels": 50,
+          "fill_color": "#00f"
+        }
+      },
+
+      "/circle/stream/radius_max_pixels": {
+        "category": "primitive",
+        "primitive_type": "circle",
+        "coordinate": "VEHICLE_RELATIVE",
+        "stream_style": {
+          "radius_max_pixels": 100,
+          "fill_color": "#00f"
+        }
+      }
+
+    },
+    "log_info": {
+      "description": "XVIZ Client Test - Circle Styling",
+      "license": "Apache 2.0",
+      "start_time": 1000,
+      "end_time": 1010
+    }
+  }
+}
