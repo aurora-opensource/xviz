@@ -16,6 +16,7 @@ import {getXVIZConfig} from '../config/xviz-config';
 import {PRIMITIVE_CAT, normalizeXVIZPrimitive} from './parse-xviz-primitive';
 import XVIZObject from '../objects/xviz-object';
 import {isMainThread} from '../utils/globals';
+import log from '../utils/log';
 import {getPrimitiveData} from './xviz-v2-common';
 
 import XVIZPrimitiveSettingsV1 from './xviz-primitives-v1';
@@ -331,7 +332,8 @@ export function parseStreamTimeSeries(seriesArray, streamBlackList) {
     return parseStreamTimeSeriesV2(seriesArray, streamBlackList);
   }
 
-  throw new Error(`Invalid time_series data in XVIZ version ${currentMajorVersion}`);
+  log.error(`Invalid time_series data in XVIZ version ${currentMajorVersion}`)();
+  return null;
 }
 
 const ValueTypes = ['doubles', 'int32s', 'bools', 'strings'];
@@ -374,14 +376,11 @@ function parseStreamTimeSeriesV2(seriesArray, streamBlackList) {
         }
 
         const tsStream = timeSeriesStreams[streamName];
-        // TODO(twojtasz): We can't throw while parsing as it aborts the flow.
-        //                 Details for fix are at https://github.com/uber/xviz/issues/303
-        //
-        // We should warn/log if a duplicate entry is seen,
-        // for now we leave the first entry.
-        if (!tsStream) {
-          // Note: Next line kept for reference on issue https://github.com/uber/xviz/issues/275
-          // throw new Error('Unexpected time_series duplicate');
+
+        if (tsStream) {
+          // a duplicate entry is seen, leave the first entry.
+          log.warn(`Unexpected time_series duplicate: ${streamName}`)();
+        } else {
           timeSeriesStreams[streamName] = entry;
         }
       }

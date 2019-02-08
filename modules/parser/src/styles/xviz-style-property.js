@@ -14,6 +14,7 @@
 
 /* eslint-disable camelcase */
 import Color from 'color';
+import log from '../utils/log';
 
 /* Utils for type check */
 function getColor(value) {
@@ -142,7 +143,7 @@ export default class XVIZStyleProperty {
       }
     }
     if (this._value === null) {
-      throw new Error(`illegal ${key} value: ${value}`);
+      log.warn(`illegal ${key} value: ${value}`)();
     }
   }
 

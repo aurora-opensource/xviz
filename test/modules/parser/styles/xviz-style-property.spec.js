@@ -45,13 +45,13 @@ tape('XVIZStyleProperty', t => {
     {
       key: 'height',
       value: 'undefined',
-      shouldThrow: true,
+      output: null,
       message: 'illegal number'
     },
     {
       key: 'height',
       value: undefined,
-      shouldThrow: true,
+      output: null,
       message: 'illegal number'
     },
     {
@@ -87,7 +87,7 @@ tape('XVIZStyleProperty', t => {
     {
       key: 'extruded',
       value: null,
-      shouldThrow: true,
+      output: null,
       message: 'illegal boolean'
     },
     {
@@ -119,28 +119,20 @@ tape('XVIZStyleProperty', t => {
     {
       key: 'fill_color',
       value: 'undefined',
-      shouldThrow: true,
+      output: null,
       message: 'illegal color'
     },
     {
       key: 'fill_color',
       value: undefined,
-      shouldThrow: true,
+      output: null,
       message: 'illegal color'
     }
   ];
 
   testCases.forEach(testCase => {
-    if (testCase.shouldThrow) {
-      t.throws(
-        () => new XVIZStyleProperty(testCase.key, testCase.value),
-        /illegal/i,
-        testCase.message
-      );
-    } else {
-      const property = new XVIZStyleProperty(testCase.key, testCase.value);
-      t.deepEquals(property.getValue(testCase.context || {}), testCase.output, testCase.message);
-    }
+    const property = new XVIZStyleProperty(testCase.key, testCase.value);
+    t.deepEquals(property.getValue(testCase.context || {}), testCase.output, testCase.message);
   });
 
   t.end();
