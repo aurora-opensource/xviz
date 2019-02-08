@@ -32,6 +32,8 @@ import * as fs from 'fs';
 const UNSUPPORTED_EXAMPLES = [
   // Colors only arrays (no variant fields)
   'schema/examples/style/object_value/hexcolor.json',
+  'schema/examples/style/object_value/hexcolor_short.json',
+  'schema/examples/style/object_value/hexcolor_short_alpha.json',
   'schema/examples/style/object_value/hexcolor_alpha.json',
 
   // Points only flat (no variant fields)
