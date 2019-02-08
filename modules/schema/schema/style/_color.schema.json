@@ -16,7 +16,7 @@
     },
     {
       "type": "string",
-      "pattern": "^#[0-9a-fA-F]{6,8}$"
+      "pattern": "^#([0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$"
     }
   ]
 }
