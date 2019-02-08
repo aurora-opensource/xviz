@@ -29,8 +29,8 @@ run_lint() {
 
 run_full_test() {
   run_lint
-  node test/start.js test src
-  node test/start.js test browser
+  node test/start.js src
+  node test/start.js browser-headless
   # node test/start.js render
 }
 

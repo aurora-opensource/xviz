@@ -19,7 +19,7 @@ require('@babel/register')({
   configFile: resolve(__dirname, '../babel.config.js')
 });
 
-const {BrowserTestDriver} = require('probe.gl/test-utils');
+const {BrowserTestDriver} = require('@probe.gl/test-utils');
 
 const mode = process.argv.length >= 3 ? process.argv[2] : 'default';
 
@@ -59,10 +59,11 @@ switch (mode) {
     break;
 
   case 'browser':
+  case 'browser-headless':
     new BrowserTestDriver().run({
-      process: 'webpack-dev-server',
-      parameters: ['--config', 'test/webpack.config.js', '--env.testBrowser'],
-      exposeFunction: 'testDone'
+      command: 'webpack-dev-server',
+      arguments: ['--config', 'test/webpack.config.js', '--env.testBrowser'],
+      headless: mode === 'browser-headless'
     });
     break;
 
