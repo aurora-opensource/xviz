@@ -40,6 +40,7 @@ const TEST_BROWSER_CONFIG = {
       webworkify$: resolve(__dirname, '../node_modules/webworkify-webpack'),
       'test-data': resolve(TEST_DIR, 'data'),
       '@xviz/builder': resolve(TEST_DIR, '../modules/builder/src'),
+      '@xviz/conformance': resolve(TEST_DIR, '../modules/conformance'),
       '@xviz/parser': resolve(TEST_DIR, '../modules/parser/src'),
       '@xviz/schema': resolve(TEST_DIR, '../modules/schema/src')
     }

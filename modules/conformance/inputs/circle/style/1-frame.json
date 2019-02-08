@@ -10,13 +10,22 @@
       "/circle/inline/radius": {
         "category": "primitive",
         "primitive_type": "circle",
-        "coordinate": "VEHICLE_RELATIVE"
+        "coordinate": "VEHICLE_RELATIVE",
+        "stream_style": {
+          "fill_color": "#ff0",
+          "stroke_color": "#000",
+          "stroke_width": 3
+        }
       },
 
       "/circle/inline/fill_color": {
         "category": "primitive",
         "primitive_type": "circle",
-        "coordinate": "VEHICLE_RELATIVE"
+        "coordinate": "VEHICLE_RELATIVE",
+        "stream_style": {
+          "radius": 10,
+          "stroked": false
+        }
       },
 
       "/circle/stream/fill_color": {
@@ -25,28 +34,31 @@
         "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
           "fill_color": "#f00",
-          "stroke_width": 0,
-          "radius": 1
+          "radius": 10,
+          "stroked": false
         }
       },
 
-      "/circle/stream/radius_min_pixel": {
+      "/circle/stream/radius_min_pixels": {
         "category": "primitive",
         "primitive_type": "circle",
         "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
-          "radius_min_pixels": 50,
-          "fill_color": "#00f"
+          "radius_min_pixels": 20,
+          "fill_color": "#00f",
+          "stroked": false
         }
       },
 
-      "/circle/stream/radius_max_pixels": {
+      "/circle/stream/stroke_width_min_pixels": {
         "category": "primitive",
         "primitive_type": "circle",
         "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
-          "radius_max_pixels": 100,
-          "fill_color": "#00f"
+          "stroke_width_min_pixels": 6,
+          "radius": 12,
+          "filled": false,
+          "stroke_color": "#00f"
         }
       }
 
