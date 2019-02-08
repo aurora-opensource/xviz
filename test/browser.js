@@ -32,16 +32,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-require('tap-browser-color')();
-
+/* global window */
 const test = require('tape');
 
-const {callExposedFunction} = require('probe.gl/test-utils');
+test.onFinish(window.browserTestDriver_finish);
+test.onFailure(window.browserTestDriver_fail);
 
-test.onFinish(() => callExposedFunction('testDone', {success: true}));
-test.onFailure(() => callExposedFunction('testDone', {success: false}));
-
-test('Browser tests', t => {
-  require('./index');
-  t.end();
-});
+require('./modules/builder');
+require('./modules/parser');

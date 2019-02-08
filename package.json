@@ -19,7 +19,7 @@
     "publish-prod": "npm run bootstrap && npm run test && npm run test dist && scripts/publish.sh prod",
     "publish-beta": "npm run bootstrap && npm run test && npm run test dist && scripts/publish.sh beta",
     "test": "scripts/test.sh",
-    "test-browser": "webpack-dev-server --config test/webpack.config.js --hot --open"
+    "test-browser": "node test/start.js browser"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0",
@@ -27,6 +27,7 @@
     "@babel/plugin-proposal-class-properties": "^7.0.0",
     "@babel/preset-env": "^7.0.0",
     "@babel/register": "^7.0.0",
+    "@probe.gl/test-utils": "^3.0.0-alpha.2",
     "ajv": "^6.5.2",
     "ajv-cli": "^3.0.0",
     "babel-eslint": "^7.1.1",
@@ -47,7 +48,6 @@
     "pre-commit": "^1.2.2",
     "prettier": "^1.9.2",
     "prettier-check": "^2.0.0",
-    "puppeteer": "^1.7.0",
     "source-map-loader": "^0.2.1",
     "tap-browser-color": "^0.1.2",
     "tape": "^4.9",
