@@ -23,6 +23,7 @@ import {
   parseStreamTimeSeries,
   parseStreamUIPrimitives
 } from './parse-xviz-stream';
+import log from '../utils/log';
 
 /* eslint-disable camelcase */
 
@@ -30,9 +31,10 @@ export default function parseStreamSet(data, convertPrimitive) {
   const {update_type, updates} = data;
 
   if (update_type !== 'snapshot') {
-    throw new Error(
+    log.error(
       `Only XVIZ update_type of "snapshot" is currently supported. Type "${update_type}" is not supported.`
-    );
+    )();
+    return {type: LOG_STREAM_MESSAGE.INCOMPLETE, message: 'Unsupported update type'};
   }
 
   if (!updates) {
@@ -47,11 +49,11 @@ export default function parseStreamSet(data, convertPrimitive) {
   }
 
   if (updates.length > 1) {
-    throw new Error(
+    log.error(
       `Only XVIZ first update of "snapshot" is currently supported. Current updates has "${
         updates.length
       }" entries.`
-    );
+    )();
   }
 
   const streamSets = updates;

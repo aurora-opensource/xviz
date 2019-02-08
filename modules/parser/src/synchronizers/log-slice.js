@@ -15,6 +15,7 @@
 import {getXVIZConfig} from '../config/xviz-config';
 import XVIZObject from '../objects/xviz-object';
 import {findInsertPos, INSERT_POSITION} from '../utils/search';
+import log from '../utils/log';
 
 import {getTransformsFromPose} from '../parsers/parse-vehicle-pose';
 
@@ -25,7 +26,8 @@ function lookAheadTimesliceAccessor(timeslice) {
     return timeslice[0].timestamp;
   }
 
-  throw new Error('Missing entry or timestamp in lookAhead array');
+  log.error('Missing entry or timestamp in lookAhead array');
+  return 0;
 }
 
 function updateObjects(streamName, features) {
