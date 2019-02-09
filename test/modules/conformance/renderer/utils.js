@@ -34,7 +34,18 @@ export function parseFrame(frame) {
 
 export function getTransform({vehiclePose, streamMetadata, viewport}) {
   // TODO - handle coordinate systems
-  return p => [p[0] + viewport.width / 2, p[1] + viewport.height / 2, p[2]];
+  const SCALE = 10;
+
+  return p => {
+    if (Number.isFinite(p)) {
+      return p * SCALE;
+    }
+    return [
+      p[0] * SCALE + viewport.width / 2,
+      p[1] * SCALE + viewport.height / 2,
+      p[2] * SCALE
+    ];
+  };
 }
 
 export function getStyles(stylesheet, propertyNames, feature) {

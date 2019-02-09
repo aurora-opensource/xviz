@@ -101,7 +101,7 @@ const DEFAULT_STYLES = {
   wireframe: false,
   height: 0,
 
-  stroke_color: [255, 255, 255],
+  stroke_color: [0, 0, 0],
   fill_color: [255, 255, 255],
 
   size: 12,

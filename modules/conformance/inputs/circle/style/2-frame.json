@@ -19,38 +19,37 @@
         },
         "primitives": {
 
-          "/circle/inline/radius": {
+          "/circle/stream/stroked": {
             "circles": [
               {
-                "center": [20, 20, 0],
-                "radius_m": 1.0,
-                "base": {
-                  "style": {
-                    "radius": 15
-                  }
-                }
+                "center": [6, -3, 0],
+                "radius_m": 1.0
               }
             ]
           },
 
-          "/circle/inline/fill_color": {
+          "/circle/stream/filled": {
             "circles": [
               {
-                "center": [20, -20, 0],
-                "radius_m": 1.0,
-                "base": {
-                  "style": {
-                    "fill_color": "#0f0"
-                  }
-                }
+                "center": [6, 0, 0],
+                "radius_m": 1.0
               }
             ]
           },
 
-          "/circle/stream/fill_color": {
+          "/circle/stream/opacity": {
             "circles": [
               {
-                "center": [-20, 20, 0],
+                "center": [6, 3, 0],
+                "radius_m": 1.0
+              }
+            ]
+          },
+
+          "/circle/stream/radius": {
+            "circles": [
+              {
+                "center": [-6, -3, 0],
                 "radius_m": 1.0
               }
             ]
@@ -59,7 +58,25 @@
           "/circle/stream/radius_min_pixels": {
             "circles": [
               {
-                "center": [-40, -40, 0],
+                "center": [-6, 0, 0],
+                "radius_m": 1.0
+              }
+            ]
+          },
+
+          "/circle/stream/radius_max_pixels": {
+            "circles": [
+              {
+                "center": [-6, 3, 0],
+                "radius_m": 1.0
+              }
+            ]
+          },
+
+          "/circle/stream/stroke_width": {
+            "circles": [
+              {
+                "center": [-3, -6, 0],
                 "radius_m": 1.0
               }
             ]
@@ -68,8 +85,121 @@
           "/circle/stream/stroke_width_min_pixels": {
             "circles": [
               {
-                "center": [45, -65, 0],
+                "center": [0, -6, 0],
                 "radius_m": 1.0
+              }
+            ]
+          },
+
+          "/circle/stream/stroke_width_max_pixels": {
+            "circles": [
+              {
+                "center": [3, -6, 0],
+                "radius_m": 1.0
+              }
+            ]
+          },
+
+          "/circle/stream/fill_color": {
+            "circles": [
+              {
+                "center": [-3, 6, 0],
+                "radius_m": 1.0
+              }
+            ]
+          },
+
+          "/circle/stream/stroke_color": {
+            "circles": [
+              {
+                "center": [3, 6, 0],
+                "radius_m": 1.0
+              }
+            ]
+          },
+
+          "/circle/inline": {
+            "circles": [
+              {
+                "center": [-3, -3, 0],
+                "radius_m": 1.0,
+                "base": {
+                  "style": {
+                    "radius": 0.5
+                  }
+                }
+              },
+              {
+                "center": [0, -3, 0],
+                "radius_m": 1.0,
+                "base": {
+                  "style": {
+                    "fill_color": "#f00"
+                  }
+                }
+              },
+              {
+                "center": [3, -3, 0],
+                "radius_m": 1.0,
+                "base": {
+                  "style": {
+                    "stroke_color": "#f00"
+                  }
+                }
+              },
+              {
+                "center": [-3, 0, 0],
+                "radius_m": 1.0,
+                "base": {
+                  "style": {
+                    "stroke_width": 0.5
+                  }
+                }
+              },
+              {
+                "center": [0, 0, 0],
+                "radius_m": 1.0,
+                "base": {
+                  "style": {
+                    "opacity": 0.5
+                  }
+                }
+              },
+              {
+                "center": [3, 0, 0],
+                "radius_m": 1.0,
+                "base": {
+                  "style": {
+                    "radius_min_pixels": 50
+                  }
+                }
+              },
+              {
+                "center": [-3, 3, 0],
+                "radius_m": 1.0,
+                "base": {
+                  "style": {
+                    "stroke_width_min_pixels": 10
+                  }
+                }
+              },
+              {
+                "center": [0, 3, 0],
+                "radius_m": 1.0,
+                "base": {
+                  "style": {
+                    "stroked": false
+                  }
+                }
+              },
+              {
+                "center": [3, 3, 0],
+                "radius_m": 1.0,
+                "base": {
+                  "style": {
+                    "filled": false
+                  }
+                }
               }
             ]
           }

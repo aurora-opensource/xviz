@@ -14,48 +14,52 @@
 
 import {getStyles, getCSSColor} from './utils';
 
-const CIRCLE_STYLES = [
+const STREAM_STYLES = [
   'opacity',
   'radius_min_pixels',
   'radius_max_pixels',
-  'radius',
   'stroked',
   'filled',
   'stroke_width_min_pixels',
-  'stroke_width_max_pixels',
+  'stroke_width_max_pixels'
+];
+
+const OBJECT_STYLES = [
+  'radius',
   'stroke_width',
   'stroke_color',
   'fill_color'
 ];
 
 export default function renderCircle({context, feature, stylesheet, project}) {
-  const styles = getStyles(stylesheet, CIRCLE_STYLES, feature);
+  const streamStyles = getStyles(stylesheet, STREAM_STYLES, {});
+  const objectStyles = getStyles(stylesheet, OBJECT_STYLES, feature);
 
   // Resolve styles
-  const center = project(feature.center);
+  const center = feature.center;
   const radius = Math.min(
-    Math.max(styles.radius_min_pixels, styles.radius),
-    styles.radius_max_pixels
+    Math.max(streamStyles.radius_min_pixels, objectStyles.radius),
+    streamStyles.radius_max_pixels
   );
   const strokeWidth = Math.min(
-    Math.max(styles.stroke_width_min_pixels, styles.stroke_width),
-    styles.stroke_width_max_pixels
+    Math.max(streamStyles.stroke_width_min_pixels, objectStyles.stroke_width),
+    streamStyles.stroke_width_max_pixels
   );
-  const strokeColor = getCSSColor(styles.stroke_color, styles.opacity);
-  const fillColor = getCSSColor(styles.fill_color, styles.opacity);
+  const strokeColor = getCSSColor(objectStyles.stroke_color, streamStyles.opacity);
+  const fillColor = getCSSColor(objectStyles.fill_color, streamStyles.opacity);
 
   // Render to canvas
   context.beginPath();
-  context.arc(center[0], center[1], radius, 0, Math.PI * 2);
+  context.arc(project(center)[0], project(center)[1], project(radius), 0, Math.PI * 2);
   context.closePath();
 
-  if (styles.stroked) {
-    context.lineWidth = strokeWidth;
-    context.strokeStyle = strokeColor;
-    context.stroke();
-  }
-  if (styles.filled) {
+  if (streamStyles.filled) {
     context.fillStyle = fillColor;
     context.fill();
+  }
+  if (streamStyles.stroked) {
+    context.lineWidth = project(strokeWidth);
+    context.strokeStyle = strokeColor;
+    context.stroke();
   }
 }

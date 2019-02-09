@@ -46,6 +46,9 @@ function run(testCase) {
     canvas.height = 200;
     document.body.append(canvas);
     const context = canvas.getContext('2d');
+    context.fillStyle = '#ccc';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
     renderXVIZ(context, testCase.frames);
 
     window
