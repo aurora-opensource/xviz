@@ -61,6 +61,9 @@ export default config => self => {
   self.onmessage = e => {
     if (e.data.xvizConfig) {
       setXVIZConfig(e.data.xvizConfig);
+
+      // Expected to return a message with a field 'type'
+      onResult({type: 'update_xvizConfig'});
     } else {
       parseStreamDataMessage(e.data, onResult, onError);
     }

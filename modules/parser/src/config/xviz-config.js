@@ -14,6 +14,7 @@
 
 import XVIZObjectCollection from '../objects/xviz-object-collection';
 import XVIZObject from '../objects/xviz-object';
+import {updateWorkerXVIZVersion} from '../parsers/parse-stream-workerfarm';
 
 const DEFAULT_XVIZ_CONFIG = {
   // Supported major XVIZ versions
@@ -46,10 +47,20 @@ XVIZObject.setDefaultCollection(new XVIZObjectCollection());
 
 // CONFIG contains the static configuration of XVIZ (streams, how to postprocess etc)
 export function setXVIZConfig(config) {
+  let updateWorkers = false;
+  if (xvizConfig.currentMajorVersion !== config.currentMajorVersion) {
+    updateWorkers = true;
+  }
+
   Object.assign(xvizConfig, config);
 
   if (Array.isArray(xvizConfig.STREAM_BLACKLIST)) {
     xvizConfig.STREAM_BLACKLIST = new Set(xvizConfig.STREAM_BLACKLIST);
+  }
+
+  if (updateWorkers) {
+    // Broadcast message to update xvizVersion in any web workers
+    updateWorkerXVIZVersion();
   }
 }
 

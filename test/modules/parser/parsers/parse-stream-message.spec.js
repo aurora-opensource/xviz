@@ -12,22 +12,55 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {parseStreamMessage} from '@xviz/parser';
+import {initializeWorkers, getXVIZConfig, parseStreamMessage, setXVIZConfig} from '@xviz/parser';
 
 import tape from 'tape-catch';
+import TestMetadataMessage from 'test-data/sample-metadata-message';
 
 // xviz data uses snake_case
 /* eslint-disable camelcase */
 
-// Metadata is the first message
-// const TestMetadataMessage = xvizStreamMessages[0];
-
 // TOOD: blacklisted streams in xviz common
-//
-tape('parseStreamMessage#import', t => {
-  // TODO - issues under Node.js
-  // const metaMessage = parseStreamMessage(TestMetadataMessage);
 
-  t.ok(parseStreamMessage, 'parseStreamMessage imported ok');
-  t.end();
+const metadataMessage = {
+  type: 'xviz/metadata',
+  data: TestMetadataMessage
+};
+
+tape('parseStreamMessage#parseMetadata', t => {
+  const onResult = result => {
+    t.equal(result.type, 'METADATA', 'Message type detected as metadata');
+    t.equal(getXVIZConfig().currentMajorVersion, 2, 'XVIZ Version set to 2');
+    t.end();
+  };
+
+  // TODO - issues under Node.js
+  const metaMessage = parseStreamMessage({
+    message: metadataMessage,
+    onResult,
+    onError: err => t.fail(err),
+    debug: msg => console.log(msg),
+    worker: false,
+    maxConcurrency: 1
+  });
+});
+
+tape.skip('parseStreamMessage#parseMetadata worker', t => {
+  initializeWorkers({worker: true, maxConcurrency: 2});
+
+  const onResult = result => {
+    console.log(result);
+    // t.equal(result.type, 'METADATA', 'Message type detected as metadata');
+    // t.equal(getXVIZConfig().currentMajorVersion, 2, 'XVIZ Version set to 2');
+    // t.end();
+  };
+
+  // TODO - issues under Node.js
+  const metaMessage = parseStreamMessage({
+    message: metadataMessage,
+    onResult,
+    onError: err => t.fail(err),
+    debug: msg => console.log(msg),
+    worker: true
+  });
 });

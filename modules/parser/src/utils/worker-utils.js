@@ -108,6 +108,21 @@ export class WorkerFarm {
     return this.workers.find(worker => !worker.isBusy);
   }
 
+  broadcast(data, onResult, onError) {
+    const promises = this.workers.map(worker => {
+      this.debug({
+        message: 'broadcast',
+        worker: worker.metadata.name
+      });
+
+      return worker.process(data);
+    });
+
+    Promise.all(promises)
+      .then(onResult)
+      .catch(onError);
+  }
+
   next() {
     const {queue} = this;
 
