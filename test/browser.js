@@ -38,5 +38,6 @@ const test = require('tape');
 test.onFinish(window.browserTestDriver_finish);
 test.onFailure(window.browserTestDriver_fail);
 
+require('./modules/conformance');
 require('./modules/builder');
 require('./modules/parser');

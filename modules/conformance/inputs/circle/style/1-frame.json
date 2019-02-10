@@ -7,36 +7,48 @@
         "category": "pose"
       },
 
-      "/circle/inline/radius": {
-        "category": "primitive",
-        "primitive_type": "circle",
-        "coordinate": "VEHICLE_RELATIVE"
-      },
-
-      "/circle/inline/fill_color": {
-        "category": "primitive",
-        "primitive_type": "circle",
-        "coordinate": "VEHICLE_RELATIVE"
-      },
-
-      "/circle/stream/fill_color": {
+      "/circle/stream/stroked": {
         "category": "primitive",
         "primitive_type": "circle",
         "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
-          "fill_color": "#f00",
-          "stroke_width": 0,
-          "radius": 1
+          "stroked": false
         }
       },
 
-      "/circle/stream/radius_min_pixel": {
+      "/circle/stream/filled": {
         "category": "primitive",
         "primitive_type": "circle",
         "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
-          "radius_min_pixels": 50,
-          "fill_color": "#00f"
+          "filled": false
+        }
+      },
+
+      "/circle/stream/opacity": {
+        "category": "primitive",
+        "primitive_type": "circle",
+        "coordinate": "VEHICLE_RELATIVE",
+        "stream_style": {
+          "opacity": 0.5
+        }
+      },
+
+      "/circle/stream/radius": {
+        "category": "primitive",
+        "primitive_type": "circle",
+        "coordinate": "VEHICLE_RELATIVE",
+        "stream_style": {
+          "radius": 0.5
+        }
+      },
+
+      "/circle/stream/radius_min_pixels": {
+        "category": "primitive",
+        "primitive_type": "circle",
+        "coordinate": "VEHICLE_RELATIVE",
+        "stream_style": {
+          "radius_min_pixels": 1.2
         }
       },
 
@@ -45,9 +57,59 @@
         "primitive_type": "circle",
         "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
-          "radius_max_pixels": 100,
-          "fill_color": "#00f"
+          "radius_max_pixels": 0.8
         }
+      },
+
+      "/circle/stream/stroke_width": {
+        "category": "primitive",
+        "primitive_type": "circle",
+        "coordinate": "VEHICLE_RELATIVE",
+        "stream_style": {
+          "stroke_width": 0.5
+        }
+      },
+
+      "/circle/stream/stroke_width_min_pixels": {
+        "category": "primitive",
+        "primitive_type": "circle",
+        "coordinate": "VEHICLE_RELATIVE",
+        "stream_style": {
+          "stroke_width_min_pixels": 0.2
+        }
+      },
+
+      "/circle/stream/stroke_width_max_pixels": {
+        "category": "primitive",
+        "primitive_type": "circle",
+        "coordinate": "VEHICLE_RELATIVE",
+        "stream_style": {
+          "stroke_width_max_pixels": 0.05
+        }
+      },
+
+      "/circle/stream/fill_color": {
+        "category": "primitive",
+        "primitive_type": "circle",
+        "coordinate": "VEHICLE_RELATIVE",
+        "stream_style": {
+          "fill_color": "#0f0"
+        }
+      },
+
+      "/circle/stream/stroke_color": {
+        "category": "primitive",
+        "primitive_type": "circle",
+        "coordinate": "VEHICLE_RELATIVE",
+        "stream_style": {
+          "stroke_color": "#0f0"
+        }
+      },
+
+      "/circle/inline": {
+        "category": "primitive",
+        "primitive_type": "circle",
+        "coordinate": "VEHICLE_RELATIVE"
       }
 
     },
