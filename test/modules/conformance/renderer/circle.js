@@ -24,12 +24,7 @@ const STREAM_STYLES = [
   'stroke_width_max_pixels'
 ];
 
-const OBJECT_STYLES = [
-  'radius',
-  'stroke_width',
-  'stroke_color',
-  'fill_color'
-];
+const OBJECT_STYLES = ['radius', 'stroke_width', 'stroke_color', 'fill_color'];
 
 export default function renderCircle({context, feature, stylesheet, project}) {
   const streamStyles = getStyles(stylesheet, STREAM_STYLES, {});
