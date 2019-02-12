@@ -50,9 +50,9 @@ Upon start of a live session the server will immediately, and continuously send 
 Optionally the unstable [`reconfigure`](#reconfigure-warning-unstable-feature-) message can be sent
 to the server to change future data send to the server.
 
-![Session Log Sequence](./images/session-log-sequence.png)
+![Session Log Sequence](./images/session-live-sequence.png)
 
-_UML Sequence diagram of transforming a log with XVIZ_
+_UML Sequence diagram of transforming a live session with XVIZ_
 
 ### Data Transfer - Logs
 
@@ -64,9 +64,9 @@ with an indeterminate number of [`state_update`](#state_update) messages. When c
 Optionally the unstable [`reconfigure`](#reconfigure-warning-unstable-feature-) message can be sent
 to the server to change way data is transformed for future requests.
 
-![Session Live Sequence](./images/session-live-sequence.png)
+![Session Live Sequence](./images/session-log-sequence.png)
 
-_UML Sequence diagram of viewing a live session with XVIZ_
+_UML Sequence diagram of viewing a log with XVIZ_
 
 ### Data Transfer - Point In Time
 
