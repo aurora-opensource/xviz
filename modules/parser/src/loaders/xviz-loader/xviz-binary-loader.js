@@ -19,12 +19,8 @@ const MAGIC_GLTF = 0x676c5446; // glTF in Big-Endian ASCII
 const BE = false; // Magic needs to be written as BE
 
 export function parseBinaryXVIZ(arrayBuffer) {
-  const gltfParser = new GLTFParser(arrayBuffer);
-  gltfParser.parse({magic: MAGIC_XVIZ});
-
-  // TODO/ib - the following options would break backwards compatibility
-  // return gltfParser.getExtras('xviz')
-  // return gltfParser.getExtension('UBER_xviz');
+  const gltfParser = new GLTFParser();
+  gltfParser.parse(arrayBuffer, {createImages: false});
 
   // TODO/ib - Fix when loaders.gl API is fixed
   return gltfParser.getApplicationData('xviz');

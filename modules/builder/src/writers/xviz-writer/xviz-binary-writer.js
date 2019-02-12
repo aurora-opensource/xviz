@@ -14,17 +14,16 @@
 
 import {GLTFBuilder} from '@loaders.gl/gltf';
 import {toBuffer} from '@loaders.gl/core';
+import {packBinaryJson} from './xviz-pack-binary';
 
 export function encodeBinaryXVIZ(xvizJson, options) {
-  const gltfBuilder = new GLTFBuilder();
+  const gltfBuilder = new GLTFBuilder(options);
 
-  // TODO/ib - the following options would break backwards compatibility
-  // gltfBuilder.addExtraData('xviz', xvizJson, options)
-  // gltfBuilder.addExtension('UBER_xviz', xvizJson, options);
-  // gltfBuilder.addRequiredExtension('UBER_xviz', xvizJson, options);
+  // Pack appropriate large data elements (point clouds and images) in binary
+  const packedData = packBinaryJson(xvizJson, gltfBuilder, null, options);
 
   // As permitted by glTF, we put all XVIZ data in a top-level subfield.
-  gltfBuilder.addApplicationData('xviz', xvizJson, options);
+  gltfBuilder.addApplicationData('xviz', packedData, {nopack: true});
 
   return gltfBuilder.encodeAsGLB(options);
 }

@@ -639,19 +639,27 @@
     lodash "^4.17.10"
     to-fast-properties "^2.0.0"
 
-"@loaders.gl/core@^0.4.6":
-  version "0.4.6"
-  resolved "https://registry.yarnpkg.com/@loaders.gl/core/-/core-0.4.6.tgz#8778348fe915d5f43a90446a5c58053e446777e7"
-  integrity sha512-NYWyxKdEt3Muws41IlXaMSVJZVgGRV9DNXH+0qWWRHeuPGMZTpHrwy+cZxXVk/VmETl4NFkffLm4NnA2bB43JQ==
+"@loaders.gl/core@^0.6.1":
+  version "0.6.1"
+  resolved "https://registry.yarnpkg.com/@loaders.gl/core/-/core-0.6.1.tgz#8c55288927d58a3c0f0eac86afd0c83404ab38c7"
+  integrity sha512-F5o3ivIv+znyZJwvHWUvsbaSRU+3dsJr3UHntJiS7oGYfh11v+podmBgNytgixI3uboPo66xNXjyhNEzg26BQg==
   dependencies:
     text-encoding "^0.6.4"
 
-"@loaders.gl/gltf@^0.4.8":
-  version "0.4.8"
-  resolved "https://registry.yarnpkg.com/@loaders.gl/gltf/-/gltf-0.4.8.tgz#66b167ca73d32e0acef809944d6b6f10f42c272c"
-  integrity sha512-omU4cXCkRqmuzF10IXHS7xUqk+fLA9PCU6coCl/8Ce7z4yEN62/oKiw2UX0CSvYWXynUJe98ZFiNbKl3yDoNTw==
+"@loaders.gl/draco@^0.6.1":
+  version "0.6.1"
+  resolved "https://registry.yarnpkg.com/@loaders.gl/draco/-/draco-0.6.1.tgz#60197b5b18cf58d5793e24d0516272620d1ab51e"
+  integrity sha512-BcTufVpHUQ2H5OfiuRV0fUOyr3uqrNi10lejgSJZNQr0bKIaMEQ7pb6q47Ww2evlC63P09ThUwHRO2yQLNnQKQ==
   dependencies:
-    "@loaders.gl/core" "^0.4.6"
+    "@loaders.gl/core" "^0.6.1"
+    draco3d "^1.3.4"
+
+"@loaders.gl/gltf@^0.6.1":
+  version "0.6.1"
+  resolved "https://registry.yarnpkg.com/@loaders.gl/gltf/-/gltf-0.6.1.tgz#96467af7249756f957575bfe1c7d919bfc2a6365"
+  integrity sha512-tWOpk++aJi/2TSB1ZBod4uBmeLinggXkBaOcX6IaKLlewWfLaSicGtKQ/3+f/Rf83HDESXk/teWFfFeS6Yjq3g==
+  dependencies:
+    "@loaders.gl/core" "^0.6.1"
 
 "@probe.gl/test-utils@^3.0.0-alpha.2":
   version "3.0.0-alpha.2"
@@ -2815,10 +2823,10 @@ camelcase@^5.0.0:
   resolved "https://registry.yarnpkg.com/camelcase/-/camelcase-5.0.0.tgz#03295527d58bd3cd4aa75363f35b2e8d97be2f42"
   integrity sha512-faqwZqnWxbxn+F1d399ygeamQNy3lPp/H9H6rNrqYh4FSVCtcY+3cub1MxA8o9mDd55mM8Aghuu/kuyYA6VTsA==
 
-caniuse-lite@^1.0.30000884:
-  version "1.0.30000887"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000887.tgz#1769458c27bbdcf61b0cb6b5072bb6cd11fd9c23"
-  integrity sha512-AHpONWuGFWO8yY9igdXH94tikM6ERS84286r0cAMAXYFtJBk76lhiMhtCxBJNBZsD6hzlvpWZ2AtbVFEkf4JQA==
+caniuse-lite@^1.0.30000912:
+  version "1.0.30000936"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30000936.tgz#5d33b118763988bf721b9b8ad436d0400e4a116b"
+  integrity sha512-orX4IdpbFhdNO7bTBhSbahp1EBpqzBc+qrvTRVUFfZgA4zta7TdM6PN5ZxkEUgDnz36m+PfWGcdX7AVfFWItJw==
 
 capture-stack-trace@^1.0.0:
   version "1.0.1"
@@ -3852,6 +3860,11 @@ dot-prop@^3.0.0:
   integrity sha1-G3CK8JSknJoOfbyteQq6U52sEXc=
   dependencies:
     is-obj "^1.0.0"
+
+draco3d@^1.3.4:
+  version "1.3.4"
+  resolved "https://registry.yarnpkg.com/draco3d/-/draco3d-1.3.4.tgz#b17e4fedd4b4b946c9eb8df2e1d2f470a953cdb8"
+  integrity sha512-I7kAKyiSIb++K5VdWGeIC9xXWkoQ1HZ8wSCQhaRMf41KKxYX5jYmy+rRna/o7o3CrunxvCGbZBl6d6bdWVcJXw==
 
 duplexer3@^0.1.4:
   version "0.1.4"
@@ -6413,12 +6426,7 @@ mute-stream@0.0.7:
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.7.tgz#3075ce93bc21b8fab43e1bc4da7e8115ed1e7bab"
   integrity sha1-MHXOk7whuPq0PhvE2n6BFe0ee6s=
 
-nan@^2.11.0:
-  version "2.11.1"
-  resolved "https://registry.yarnpkg.com/nan/-/nan-2.11.1.tgz#90e22bccb8ca57ea4cd37cc83d3819b52eea6766"
-  integrity sha512-iji6k87OSXa0CcrLl9z+ZiYSuR2o+c0bGuNmXdrhTQTakxytAFsC56SArGYoiHlJlFoHSnvmhpceZJaXkVuOtA==
-
-nan@^2.9.2:
+nan@^2.11.0, nan@^2.9.2:
   version "2.11.1"
   resolved "https://registry.yarnpkg.com/nan/-/nan-2.11.1.tgz#90e22bccb8ca57ea4cd37cc83d3819b52eea6766"
   integrity sha512-iji6k87OSXa0CcrLl9z+ZiYSuR2o+c0bGuNmXdrhTQTakxytAFsC56SArGYoiHlJlFoHSnvmhpceZJaXkVuOtA==
@@ -7312,14 +7320,14 @@ puppeteer@1.8.0:
   resolved "https://registry.yarnpkg.com/puppeteer/-/puppeteer-1.8.0.tgz#9e8bbd2f5448cc19cac220efc0512837104877ad"
   integrity sha512-wJ7Fxs03l4dy/ZXQACUKBBobIuJaS4NHq44q7/QinpAXFMwJMJFEIPjzoksVzUhZxQe+RXnjXH69mg13yMh0BA==
   dependencies:
-    debug "^4.1.0"
+    debug "^3.1.0"
     extract-zip "^1.6.6"
     https-proxy-agent "^2.2.1"
     mime "^2.0.3"
-    progress "^2.0.1"
+    progress "^2.0.0"
     proxy-from-env "^1.0.0"
     rimraf "^2.6.1"
-    ws "^6.1.0"
+    ws "^5.1.1"
 
 q@^1.4.1, q@^1.5.1:
   version "1.5.1"
@@ -9358,7 +9366,7 @@ yargs@12.0.2:
     y18n "^3.2.1 || ^4.0.0"
     yargs-parser "^10.1.0"
 
-yargs@^12.0.5:
+yargs@^12.0.2, yargs@^12.0.5:
   version "12.0.5"
   resolved "https://registry.yarnpkg.com/yargs/-/yargs-12.0.5.tgz#05f5997b609647b64f66b81e3b4b10a368e7ad13"
   integrity sha512-Lhz8TLaYnxq/2ObqHDql8dX8CJi97oHxrjUcYtzKbbykPtVW9WB+poxI+NM2UIzsMgNCZTIf0AQwsjK5yMAqZw==

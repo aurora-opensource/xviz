@@ -14,6 +14,7 @@
 
 import {writeBinaryXVIZtoFile} from './xviz-binary-writer';
 import {xvizConvertJson} from './xviz-json-encoder.js';
+import {DracoEncoder, DracoDecoder} from '@loaders.gl/draco';
 
 // 0-frame is an index file for timestamp metadata
 // 1-frame is the metadata file for the log
@@ -40,13 +41,19 @@ class FileSink {
 
 export default class XVIZWriter {
   constructor(options = {}) {
-    const {dataSink = new FileSink(), envelope = true, binary = true, json = false} = options;
+    const {
+      dataSink = new FileSink(),
+      envelope = true,
+      binary = true,
+      json = false,
+      draco = false
+    } = options;
     this.sink = dataSink;
     this.frameTimings = {
       frames: new Map()
     };
     this.wroteFrameIndex = null;
-    this.options = {envelope, binary, json};
+    this.options = {envelope, binary, json, draco};
   }
 
   // xvizMetadata is the object returned
@@ -59,9 +66,11 @@ export default class XVIZWriter {
     }
 
     if (this.options.binary) {
-      writeBinaryXVIZtoFile(this.sink, xvizDirectory, '1-frame', xvizMetadata, {
+      const options = {
         flattenArrays: false
-      });
+      };
+
+      writeBinaryXVIZtoFile(this.sink, xvizDirectory, '1-frame', xvizMetadata, options);
     }
 
     if (this.options.json) {
@@ -85,9 +94,16 @@ export default class XVIZWriter {
     }
 
     if (this.options.binary) {
-      writeBinaryXVIZtoFile(this.sink, xvizDirectory, frameName(frameIndex), xvizFrame, {
+      const options = {
         flattenArrays: false
-      });
+      };
+
+      if (this.options.draco) {
+        options.DracoEncoder = DracoEncoder;
+        options.DracoDecoder = DracoDecoder;
+      }
+
+      writeBinaryXVIZtoFile(this.sink, xvizDirectory, frameName(frameIndex), xvizFrame, options);
     }
 
     if (this.options.json) {
