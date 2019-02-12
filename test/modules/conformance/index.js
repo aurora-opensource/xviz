@@ -16,18 +16,25 @@
 import test from 'tape-catch';
 import renderXVIZ from './renderer';
 
+// Path here is relative from "modules/conformance/inputs" and
+// expects the following in that directory:
+//  - 1-frame.json - metadata file
+//  - 2-frame.json - state_update file
+//  - output.png - golden image
+const TEST_CASES = [makeTestCase('circle/style')];
+
 // `require` is resolved by webpack
 // `goldenImage` is resolved in node, relative to root
-const TEST_CASES = [
-  {
-    name: 'circle',
+function makeTestCase(name) {
+  return {
+    name,
     frames: [
-      require('@xviz/conformance/inputs/circle/style/1-frame.json'),
-      require('@xviz/conformance/inputs/circle/style/2-frame.json')
+      require(`@xviz/conformance/inputs/${name}/1-frame.json`),
+      require(`@xviz/conformance/inputs/${name}/2-frame.json`)
     ],
-    goldenImage: 'modules/conformance/inputs/circle/style/output.png'
-  }
-];
+    goldenImage: `modules/conformance/inputs/${name}/output.png`
+  };
+}
 
 function getBoundingBoxInPage(canvas) {
   const bbox = canvas.getBoundingClientRect();
