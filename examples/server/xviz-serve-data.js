@@ -432,9 +432,12 @@ class ConnectionContext {
 
     const frame_send_time = process.hrtime();
 
-    // When in live mode
     if (this.settings.live) {
+      // When in live mode make sure there are no times
       frame = this.removeMetadataTimestamps(frame);
+    } else {
+      // When in normal mode add timestamps if needed
+      frame = this.addMetadataTimestamps(frame);
     }
 
     // Send data
@@ -586,13 +589,24 @@ class ConnectionContext {
       delete log_info.end_time;
     }
 
-    if (result.isBinary) {
-      frame = encodeBinaryXVIZ(result.json, {});
-    } else {
-      frame = JSON.stringify(result.json);
+    return packFrame(result);
+  }
+
+  addMetadataTimestamps(frame, start_time, end_time) {
+    const result = unpackFrame(frame);
+
+    let log_info = result.json.data.log_info;
+
+    if (!log_info) {
+      console.log('-- Warning: no metadata log_info adding with start & end times');
+      log_info = {
+        start_time: this.frames_timing[0],
+        end_time: this.frames_timing[this.frames_timing.length - 1]
+      };
+      result.json.data.log_info = log_info;
     }
 
-    return frame;
+    return packFrame(result);
   }
 
   sendEnveloped(type, msg, options, callback) {
@@ -669,6 +683,16 @@ function unpackFrame(frame, options = {}) {
   }
 
   return {json, isBinary};
+}
+
+function packFrame({json, isBinary}) {
+  let frame;
+  if (isBinary) {
+    frame = encodeBinaryXVIZ(json, {});
+  } else {
+    frame = JSON.stringify(json);
+  }
+  return frame;
 }
 
 // Main
