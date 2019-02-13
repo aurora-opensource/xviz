@@ -14,8 +14,6 @@
 
 /* global Worker */
 
-const noop = () => {};
-
 export function getTransferList(object, recursive = true, transfers) {
   // Make sure that items in the transfer list is unique
   const transfersSet = transfers || new Set();
@@ -94,11 +92,10 @@ export class WorkerFarm {
         url: this.workerURL,
         metadata: {name: `${i}/${maxConcurrency}`}
       });
+    }
 
-      if (initialMessage) {
-        this.queue.push({initialMessage, onResult: noop, onError: noop, affinity: i});
-        this.next();
-      }
+    if (initialMessage) {
+      this.broadcast(initialMessage);
     }
   }
 
@@ -106,38 +103,27 @@ export class WorkerFarm {
     this.workers.forEach(worker => worker.terminate());
   }
 
-  getAvailableWorker(affinity) {
-    if (!affinity) {
-      return this.workers.find(worker => !worker.isBusy);
-    }
-
-    if (affinity < this.workers.length) {
-      return this.workers[affinity].isBusy ? null : this.workers[affinity];
-    }
-
-    return null;
+  getAvailableWorker() {
+    return this.workers.find(worker => !worker.isBusy);
   }
 
-  broadcast(data, onResult, onError) {
+  broadcast(data) {
     const count = this.workers.length;
     // queue in reverse order as bias worker searching in getAvailableWorker()
     for (let i = count - 1; i >= 0; i--) {
-      this.queue.push({data, onResult, onError, affinity: i});
+      this.workers[i].worker.postMessage(data, getTransferList(data));
     }
-    this.next();
   }
 
   next() {
     const {queue} = this;
-    while (queue.length) {
-      const job = queue.shift();
-      const {affinity} = job;
 
-      const worker = this.getAvailableWorker(affinity);
+    while (queue.length) {
+      const worker = this.getAvailableWorker();
       if (!worker) {
-        queue.unshift(job);
         break;
       }
+      const job = queue.shift();
 
       this.debug({
         message: 'processing',

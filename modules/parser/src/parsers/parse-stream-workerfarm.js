@@ -54,13 +54,12 @@ export function initializeWorkerFarm({worker, maxConcurrency = 4}) {
   }
 }
 
-const noop = () => {};
-export function updateWorkerXVIZVersion(context = {onResult: noop, onError: noop}) {
+export function updateWorkerXVIZVersion() {
   if (workerFarm) {
     const xvizConfig = {...getXVIZConfig()};
     delete xvizConfig.preProcessPrimitive;
 
-    workerFarm.broadcast({xvizConfig}, context.onResult, context.onError);
+    workerFarm.broadcast({xvizConfig});
   }
 }
 

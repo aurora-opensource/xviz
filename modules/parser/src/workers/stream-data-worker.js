@@ -61,14 +61,8 @@ export default config => self => {
   self.onmessage = e => {
     if (e.data && e.data.xvizConfig) {
       setXVIZConfig(e.data.xvizConfig);
-
-      // Expected to return a message with a field 'type'
-      onResult({type: 'worker_update_XVIZConfig'});
     } else if (e.data) {
       parseStreamDataMessage(e.data, onResult, onError);
-    } else {
-      // If there is no data, return so the worker is made available
-      onResult({type: 'worker_invalid_input'});
     }
   };
 };

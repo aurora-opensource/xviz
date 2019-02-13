@@ -40,6 +40,12 @@ test('WorkerFarm', t => {
 
   let processed = 0;
 
+  const workerFarm = new WorkerFarm({
+    workerURL: testWorker,
+    maxConcurrency: MAX_CONCURRENCY,
+    debug: callback
+  });
+
   const callback = message =>
     t.comment(`Processing with worker ${message.worker}, backlog ${message.backlog}`);
 
@@ -47,15 +53,10 @@ test('WorkerFarm', t => {
     processed++;
     t.deepEquals(result, expected, 'worker returns expected result');
     if (processed === CHUNKS_TOTAL) {
+      workerFarm.destroy();
       t.end();
     }
   };
-
-  const workerFarm = new WorkerFarm({
-    workerURL: testWorker,
-    maxConcurrency: MAX_CONCURRENCY,
-    debug: callback
-  });
 
   for (let i = 0; i < CHUNKS_TOTAL; i++) {
     const testData = {chunk: i};
