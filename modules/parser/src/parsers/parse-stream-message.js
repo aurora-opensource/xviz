@@ -14,12 +14,11 @@
 
 import {parseStreamDataMessage} from './parse-stream-data-message';
 import {postDeserialize} from './serialize';
-import streamDataWorker from '../../dist/workers/stream-data.worker.js';
-
 import {getWorkerFarm, initializeWorkerFarm} from './parse-stream-workerfarm';
 
+// Public function for initializing workers
 export function initializeWorkers({worker, maxConcurrency = 4}) {
-  initializeWorkerFarm(streamDataWorker, {worker, maxConcurrency});
+  initializeWorkerFarm({worker, maxConcurrency});
 }
 
 export function parseStreamMessage({

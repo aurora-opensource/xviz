@@ -14,7 +14,6 @@
 
 import XVIZObjectCollection from '../objects/xviz-object-collection';
 import XVIZObject from '../objects/xviz-object';
-import {updateWorkerXVIZVersion} from '../parsers/parse-stream-workerfarm';
 
 const DEFAULT_XVIZ_CONFIG = {
   // Supported major XVIZ versions
@@ -45,23 +44,27 @@ const xvizConfig = Object.assign({}, DEFAULT_XVIZ_CONFIG);
 
 XVIZObject.setDefaultCollection(new XVIZObjectCollection());
 
+// Allow subscribing to XVIZConfig changes
+const subscribers = [];
+
+// func is a function that takes no arguments
+export function subscribeXVIZConfigChange(func) {
+  subscribers.push(func);
+}
+
+function notifySubscribers() {
+  subscribers.forEach(sub => sub());
+}
+
 // CONFIG contains the static configuration of XVIZ (streams, how to postprocess etc)
 export function setXVIZConfig(config) {
-  let updateWorkers = false;
-  if (xvizConfig.currentMajorVersion !== config.currentMajorVersion) {
-    updateWorkers = true;
-  }
-
   Object.assign(xvizConfig, config);
 
   if (Array.isArray(xvizConfig.STREAM_BLACKLIST)) {
     xvizConfig.STREAM_BLACKLIST = new Set(xvizConfig.STREAM_BLACKLIST);
   }
 
-  if (updateWorkers) {
-    // Broadcast message to update xvizVersion in any web workers
-    updateWorkerXVIZVersion();
-  }
+  notifySubscribers();
 }
 
 export function getXVIZConfig() {

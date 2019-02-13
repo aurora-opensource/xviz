@@ -14,7 +14,8 @@
 
 /* global Blob, URL */
 import {WorkerFarm} from '../utils/worker-utils';
-import {getXVIZConfig} from '../config/xviz-config';
+import {getXVIZConfig, subscribeXVIZConfigChange} from '../config/xviz-config';
+import streamDataWorker from '../../dist/workers/stream-data.worker.js';
 
 let workerFarm = null;
 
@@ -22,7 +23,7 @@ export function getWorkerFarm() {
   return workerFarm;
 }
 
-export function initializeWorkerFarm(defaultWorker, {worker, maxConcurrency = 4}) {
+export function initializeWorkerFarm({worker, maxConcurrency = 4}) {
   if (!workerFarm) {
     const xvizConfig = {...getXVIZConfig()};
     delete xvizConfig.preProcessPrimitive;
@@ -33,7 +34,7 @@ export function initializeWorkerFarm(defaultWorker, {worker, maxConcurrency = 4}
       workerURL = worker;
     } else {
       // use default worker
-      const blob = new Blob([defaultWorker], {type: 'application/javascript'});
+      const blob = new Blob([streamDataWorker], {type: 'application/javascript'});
       workerURL = URL.createObjectURL(blob);
     }
 
@@ -54,3 +55,7 @@ export function updateWorkerXVIZVersion(context = {onResult: noop, onError: noop
     workerFarm.broadcast({xvizConfig}, context.onResult, context.onError);
   }
 }
+
+// Subscribe to XVIZConfig changes so we can
+// update WebWorkers to adapt to XVIZ version changes
+subscribeXVIZConfigChange(updateWorkerXVIZVersion);
