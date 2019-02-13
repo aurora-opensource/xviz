@@ -44,6 +44,18 @@ const xvizConfig = Object.assign({}, DEFAULT_XVIZ_CONFIG);
 
 XVIZObject.setDefaultCollection(new XVIZObjectCollection());
 
+// Allow subscribing to XVIZConfig changes
+const subscribers = [];
+
+// func is a function that takes no arguments
+export function subscribeXVIZConfigChange(func) {
+  subscribers.push(func);
+}
+
+function notifySubscribers() {
+  subscribers.forEach(sub => sub());
+}
+
 // CONFIG contains the static configuration of XVIZ (streams, how to postprocess etc)
 export function setXVIZConfig(config) {
   Object.assign(xvizConfig, config);
@@ -51,6 +63,8 @@ export function setXVIZConfig(config) {
   if (Array.isArray(xvizConfig.STREAM_BLACKLIST)) {
     xvizConfig.STREAM_BLACKLIST = new Set(xvizConfig.STREAM_BLACKLIST);
   }
+
+  notifySubscribers();
 }
 
 export function getXVIZConfig() {

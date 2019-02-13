@@ -41,14 +41,10 @@ export function getTransferList(object, recursive = true, transfers) {
  * A worker in the WorkerFarm
  */
 class WorkerThread {
-  constructor({url, metadata, initialMessage}) {
+  constructor({url, metadata}) {
     this.worker = new Worker(url);
     this.isBusy = false;
     this.metadata = metadata;
-
-    if (initialMessage) {
-      this.worker.postMessage(initialMessage, getTransferList(initialMessage));
-    }
   }
 
   process(data) {
@@ -94,9 +90,12 @@ export class WorkerFarm {
     for (let i = 0; i < maxConcurrency; i++) {
       this.workers[i] = new WorkerThread({
         url: this.workerURL,
-        metadata: {name: `${i}/${maxConcurrency}`},
-        initialMessage
+        metadata: {name: `${i}/${maxConcurrency}`}
       });
+    }
+
+    if (initialMessage) {
+      this.broadcast(initialMessage);
     }
   }
 
@@ -106,6 +105,14 @@ export class WorkerFarm {
 
   getAvailableWorker() {
     return this.workers.find(worker => !worker.isBusy);
+  }
+
+  broadcast(data) {
+    const count = this.workers.length;
+    // queue in reverse order as bias worker searching in getAvailableWorker()
+    for (let i = count - 1; i >= 0; i--) {
+      this.workers[i].worker.postMessage(data, getTransferList(data));
+    }
   }
 
   next() {

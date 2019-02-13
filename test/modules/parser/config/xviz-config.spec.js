@@ -13,8 +13,25 @@
 // limitations under the License.
 
 import {setXVIZConfig, getXVIZConfig} from '@xviz/parser';
+import {subscribeXVIZConfigChange} from '@xviz/parser/config/xviz-config';
 import {resetXVIZConfigAndSettings} from './config-utils';
 import test from 'tape-catch';
+
+test('setXVIZConfig#subscribeXVIZConfigChange', t => {
+  let changeCallCount = 0;
+
+  subscribeXVIZConfigChange(() => {
+    changeCallCount++;
+  });
+
+  setXVIZConfig({supportedVersions: [1]});
+  t.is(changeCallCount, 1, 'XVIZConfig change notification fired');
+
+  setXVIZConfig({supportedVersions: [2]});
+  t.is(changeCallCount, 2, 'XVIZConfig change notification fired');
+
+  t.end();
+});
 
 test('setXVIZConfig', t => {
   const preProcessPrimitive = () => {};

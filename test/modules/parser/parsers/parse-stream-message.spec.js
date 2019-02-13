@@ -12,22 +12,123 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {parseStreamMessage} from '@xviz/parser';
+import {initializeWorkers, getXVIZConfig, setXVIZConfig, parseStreamMessage} from '@xviz/parser';
+import {destroyWorkerFarm} from '@xviz/parser/parsers/parse-stream-workerfarm';
 
 import tape from 'tape-catch';
+import TestMetadataMessageV2 from 'test-data/sample-metadata-message';
 
 // xviz data uses snake_case
 /* eslint-disable camelcase */
 
-// Metadata is the first message
-// const TestMetadataMessage = xvizStreamMessages[0];
-
 // TOOD: blacklisted streams in xviz common
-//
-tape('parseStreamMessage#import', t => {
-  // TODO - issues under Node.js
-  // const metaMessage = parseStreamMessage(TestMetadataMessage);
 
-  t.ok(parseStreamMessage, 'parseStreamMessage imported ok');
-  t.end();
+const isBrowser = typeof window !== 'undefined';
+
+const metadataMessageV2 = {
+  type: 'xviz/metadata',
+  data: TestMetadataMessageV2
+};
+
+const xvizUpdateV2 = {
+  type: 'xviz/state_update',
+  data: {
+    update_type: 'snapshot',
+    updates: [
+      {
+        timestamp: 1001.3,
+        primitives: {
+          '/object/points': {
+            points: [
+              {
+                points: [9, 15, 3, 20, 13, 3, 20, 5, 3]
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+};
+
+tape('parseStreamMessage#parseMetadata', t => {
+  parseStreamMessage({
+    message: metadataMessageV2,
+    onResult: result => {
+      t.equal(result.type, 'METADATA', 'Message type detected as metadata');
+      t.equal(getXVIZConfig().currentMajorVersion, 2, 'XVIZ Version set to 2');
+      t.end();
+    },
+    onError: err => t.fail(err),
+    debug: msg => t.comment(msg),
+    worker: false,
+    maxConcurrency: 1
+  });
+});
+
+/* global window */
+tape('parseStreamMessage#parseMetadata worker wrong version', t => {
+  if (isBrowser) {
+    // Ensure the version is 1
+    setXVIZConfig({currentMajorVersion: 1});
+
+    // XVIZ Version of workers would be set to 1 by default
+    initializeWorkers({worker: true, maxConcurrency: 4});
+
+    // Verify the XVIZ v2 message is properly parsed
+    parseStreamMessage({
+      message: xvizUpdateV2,
+      onResult: result => {
+        t.equal(
+          result.type,
+          'INCOMPLETE',
+          'XVIZ message returns INCOMPLETE due to XVIZ Version mismatch'
+        );
+
+        destroyWorkerFarm();
+        t.end();
+      },
+      onError: err => t.fail(err),
+      debug: msg => t.comment(JSON.stringify(msg)),
+      worker: true
+    });
+  } else {
+    t.comment('-- browser only test');
+    t.end();
+  }
+});
+
+tape('parseStreamMessage#parseMetadata worker', t => {
+  if (isBrowser) {
+    // XVIZ Version of workers would be set to 1 by default
+    initializeWorkers({worker: true, maxConcurrency: 4});
+
+    // After parsing on main thread, this will call setXVIZConfig, which
+    // should trigger workers to have their XVIZ version updated
+    parseStreamMessage({
+      message: metadataMessageV2,
+      onResult: result => {
+        t.equal(result.type, 'METADATA', 'Message type detected as metadata');
+        t.equal(getXVIZConfig().currentMajorVersion, 2, 'XVIZ Version set to 2');
+      },
+      onError: err => t.fail(err),
+      debug: msg => t.comment(msg),
+      worker: false
+    });
+
+    // Verify the XVIZ v2 message is properly parsed
+    parseStreamMessage({
+      message: xvizUpdateV2,
+      onResult: result => {
+        t.equal(result.type, 'TIMESLICE', 'XVIZ message properly parsed on worker');
+        t.end();
+      },
+      onError: err => t.fail(err),
+      debug: msg => t.comment(JSON.stringify(msg)),
+      worker: true
+    });
+  } else {
+    t.comment('-- browser only test');
+    t.end();
+  }
 });

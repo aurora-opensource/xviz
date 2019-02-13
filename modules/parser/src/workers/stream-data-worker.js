@@ -59,9 +59,9 @@ export default config => self => {
   }
 
   self.onmessage = e => {
-    if (e.data.xvizConfig) {
+    if (e.data && e.data.xvizConfig) {
       setXVIZConfig(e.data.xvizConfig);
-    } else {
+    } else if (e.data) {
       parseStreamDataMessage(e.data, onResult, onError);
     }
   };
