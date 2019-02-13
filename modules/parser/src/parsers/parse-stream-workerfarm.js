@@ -23,6 +23,14 @@ export function getWorkerFarm() {
   return workerFarm;
 }
 
+// Mainly for testing
+export function destroyWorkerFarm() {
+  if (workerFarm) {
+    workerFarm.destroy();
+    workerFarm = null;
+  }
+}
+
 export function initializeWorkerFarm({worker, maxConcurrency = 4}) {
   if (!workerFarm) {
     const xvizConfig = {...getXVIZConfig()};
