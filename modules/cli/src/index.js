@@ -17,11 +17,13 @@ const yargs = require('yargs');
 // Tool interface (move most of these somewhere else)
 import {XVIZMiddlewareStack} from './middleware';
 import {DumpXVIZ, DumpMode} from './dump';
+import {LogXVIZ} from './log';
 import {WebSocketInterface} from './websocket';
 
 // Pull in sub commands
 import {validateArgs} from './cmds/validate';
 import {dumpArgs} from './cmds/dump';
+import {logArgs} from './cmds/log';
 
 /**
  * Main function for entire tool
@@ -31,6 +33,7 @@ function main() {
 
   args = dumpArgs(args);
   args = validateArgs(args);
+  args = logArgs(args);
 
   return args.argv;
 }
