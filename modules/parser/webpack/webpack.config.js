@@ -48,5 +48,10 @@ module.exports = {
         ]
       }
     ]
+  },
+
+  // TODO/ib - workaround for @loaders.gl/core fs dependency, remove when loaders.gl fixes this
+  node: {
+    fs: 'empty'
   }
 };

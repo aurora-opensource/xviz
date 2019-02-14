@@ -69,7 +69,7 @@ $ cd examples/clients/config
 
 - An example is xviz-config-kitti.js, for complete xviz configs, check
   [xviz-config](https://github.com/uber/xviz/blob/master/docs/api-reference/xviz-configuration.md)
-- Config file naming convention: xviz-config-${appName}.js
+- Config file naming convention: xviz-config-\${appName}.js
 
 In another terminal, run the client app:
 

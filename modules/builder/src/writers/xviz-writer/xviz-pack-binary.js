@@ -12,84 +12,53 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import GLBEncoder from '../glb-writer/glb-encoder';
-import GLBBufferPacker from '../glb-writer/glb-buffer-packer';
-import packJsonArrays from '../glb-writer/pack-json-arrays';
+import {flattenToTypedArray} from '@loaders.gl/core';
 
-const MAGIC_XVIZ = 0x5856495a; // XVIZ in Big-Endian ASCII
-
-// const tokenize = index => `$$$${index}`;
-
-export function packXVIZ(xvizJson, opts) {
-  const bufferPacker = new GLBBufferPacker();
-  const packedXVIZ = {};
-
-  const xvizTopKeys = Object.keys(xvizJson);
-  for (const key of xvizTopKeys) {
-    switch (key) {
-      case 'updates':
-        packedXVIZ[key] = packXVIZStateUpdates(xvizJson[key], bufferPacker, opts);
-        break;
-      default:
-        packedXVIZ[key] = xvizJson[key];
-        break;
-    }
+function packBinaryJsonTypedArray(gltfBuilder, object, objectKey) {
+  if (gltfBuilder.isImage(object)) {
+    const imageIndex = gltfBuilder.addImage(object);
+    return `#/images/${imageIndex}`;
   }
-
-  const {json, arrayBuffer} = bufferPacker.packBuffers();
-  packedXVIZ.buffers = json;
-
-  return GLBEncoder.createGlbBuffer(packedXVIZ, arrayBuffer, MAGIC_XVIZ);
+  // if not an image, pack as accessor
+  const opts = objectKey === 'colors' ? {size: 4} : {size: 3};
+  const bufferIndex = gltfBuilder.addBuffer(object, opts);
+  return `#/accessors/${bufferIndex}`;
 }
 
-function packXVIZStateUpdates(stateUpdates, bufferPacker, opts) {
-  const packedUpdates = [];
+// Follows a convention used by @loaders.gl to use JSONPointers
+// to encode where the binary data for a XVIZ element resides.
+// The unpacking is handled automatically by @loaders.gl
+export function packBinaryJson(json, gltfBuilder, objectKey = null, options = {}) {
+  const {flattenArrays = false} = options;
+  let object = json;
 
-  stateUpdates.forEach(xvizUpdate => {
-    const newUpdate = {};
-    for (const key in xvizUpdate) {
-      switch (key) {
-        case 'primitives':
-          newUpdate[key] = packXVIZPrimitives(xvizUpdate[key], bufferPacker, opts);
-          break;
-        case 'future_instances':
-        case 'timestamp':
-        case 'variables':
-        default:
-          newUpdate[key] = xvizUpdate[key];
-      }
-    }
-
-    packedUpdates.push(newUpdate);
-  });
-
-  return packedUpdates;
-}
-
-function packXVIZPrimitives(primitives, bufferPacker, opts) {
-  if (!primitives) {
-    return primitives;
+  // Check if string has same syntax as our "JSON pointers", if so "escape it".
+  if (typeof object === 'string' && object.indexOf('#/') === 0) {
+    return `#${object}`;
   }
 
-  const newPrimitives = {};
-  const {streams = []} = opts;
-
-  for (const key in primitives) {
-    if (streams.includes(key)) {
-      const newPrimitive = [];
-      for (const element of primitives[key].primitives) {
-        const elem = {...element};
-        // eslint-disable-next-line max-depth
-        if (elem.vertices.length > 3) {
-          elem.vertices = packJsonArrays(elem.vertices, bufferPacker);
-        }
-        newPrimitive.push(elem);
-      }
-      newPrimitives[key] = {primitives: newPrimitive};
+  if (Array.isArray(object)) {
+    // TODO - handle numeric arrays, flatten them etc.
+    const typedArray = flattenArrays && flattenToTypedArray(object);
+    if (typedArray) {
+      object = typedArray;
     } else {
-      newPrimitives[key] = primitives[key];
+      return object.map(element => packBinaryJson(element, gltfBuilder, options));
     }
   }
 
-  return newPrimitives;
+  // Typed arrays, pack them as binary
+  if (ArrayBuffer.isView(object) && gltfBuilder) {
+    return packBinaryJsonTypedArray(gltfBuilder, object, objectKey);
+  }
+
+  if (object !== null && typeof object === 'object') {
+    const newObject = {};
+    for (const key in object) {
+      newObject[key] = packBinaryJson(object[key], gltfBuilder, key, options);
+    }
+    return newObject;
+  }
+
+  return object;
 }

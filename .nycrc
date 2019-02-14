@@ -7,10 +7,7 @@
   ],
   "exclude": [
     "test/**/*.js",
-    "modules/builder/src/writers/glb-writer/*.js",
     "modules/builder/src/utils/*.js",
-    "modules/parser/src/loaders/glb-loader/*.js",
-    "modules/parser/src/loaders/ply-loader/*.js",
     "modules/parser/src/utils/*.js"
   ]
 }
