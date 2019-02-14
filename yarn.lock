@@ -639,27 +639,27 @@
     lodash "^4.17.10"
     to-fast-properties "^2.0.0"
 
-"@loaders.gl/core@^0.6.1":
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/@loaders.gl/core/-/core-0.6.1.tgz#8c55288927d58a3c0f0eac86afd0c83404ab38c7"
-  integrity sha512-F5o3ivIv+znyZJwvHWUvsbaSRU+3dsJr3UHntJiS7oGYfh11v+podmBgNytgixI3uboPo66xNXjyhNEzg26BQg==
+"@loaders.gl/core@^0.6.2":
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/@loaders.gl/core/-/core-0.6.2.tgz#d4260e27c367e4c41ea7ba69a2d9525ee608511b"
+  integrity sha512-dG8mTy+c+xqgkYKe/We6mgLfesCy3ITlEdfWccKjWupIa6iKPBnf/CgDQE8+C4IOzKR5njDCMMKKOM0kZIdDQw==
   dependencies:
     text-encoding "^0.6.4"
 
-"@loaders.gl/draco@^0.6.1":
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/@loaders.gl/draco/-/draco-0.6.1.tgz#60197b5b18cf58d5793e24d0516272620d1ab51e"
-  integrity sha512-BcTufVpHUQ2H5OfiuRV0fUOyr3uqrNi10lejgSJZNQr0bKIaMEQ7pb6q47Ww2evlC63P09ThUwHRO2yQLNnQKQ==
+"@loaders.gl/draco@^0.6.2":
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/@loaders.gl/draco/-/draco-0.6.2.tgz#8e0268fcaa5770c421dcb7376b77405a6e13575d"
+  integrity sha512-J15/vwvroTwDwea0vJ4UhXvukqAmmCKnjmayHXcT8/UTEL4l9iDRFr3Lz9PumNzLsoQpb+0u9pcoU9hTH10Ecg==
   dependencies:
-    "@loaders.gl/core" "^0.6.1"
+    "@loaders.gl/core" "^0.6.2"
     draco3d "^1.3.4"
 
-"@loaders.gl/gltf@^0.6.1":
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/@loaders.gl/gltf/-/gltf-0.6.1.tgz#96467af7249756f957575bfe1c7d919bfc2a6365"
-  integrity sha512-tWOpk++aJi/2TSB1ZBod4uBmeLinggXkBaOcX6IaKLlewWfLaSicGtKQ/3+f/Rf83HDESXk/teWFfFeS6Yjq3g==
+"@loaders.gl/gltf@^0.6.2":
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/@loaders.gl/gltf/-/gltf-0.6.2.tgz#03f4546840d0bf6c2e64cb0c08c3723af3106a6f"
+  integrity sha512-vZZV029K0ZOg/7lOJ/FF7mu5a1UZg0OTNrDMBpUFLlyX7gEheErGOpLD3WlDA+SxBdsdb4RLA7rCdpRLN5yyAQ==
   dependencies:
-    "@loaders.gl/core" "^0.6.1"
+    "@loaders.gl/core" "^0.6.2"
 
 "@probe.gl/test-utils@^3.0.0-alpha.2":
   version "3.0.0-alpha.2"
@@ -7206,7 +7206,7 @@ process@~0.5.1:
   resolved "https://registry.yarnpkg.com/process/-/process-0.5.2.tgz#1638d8a8e34c2f440a91db95ab9aeb677fc185cf"
   integrity sha1-FjjYqONML0QKkduVq5rrZ3/Bhc8=
 
-progress@^2.0.0, progress@^2.0.1:
+progress@^2.0.0:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/progress/-/progress-2.0.3.tgz#7e8cf8d8f5b8f239c1bc68beb4eb78567d572ef8"
   integrity sha512-7PiHtLll5LdnKIMw100I+8xJXR5gW2QwWYkT6iJva0bXitZKa/XMrSbdmg3r2Xnaidz9Qumd0VPaMrZlF9V9sA==
@@ -9252,10 +9252,10 @@ write@^0.2.1:
   dependencies:
     mkdirp "^0.5.1"
 
-ws@^6.1.0:
-  version "6.1.2"
-  resolved "https://registry.yarnpkg.com/ws/-/ws-6.1.2.tgz#3cc7462e98792f0ac679424148903ded3b9c3ad8"
-  integrity sha512-rfUqzvz0WxmSXtJpPMX2EeASXabOrSMk1ruMOV3JBTBjo4ac2lDjGGsbQSyxj8Odhw5fBib8ZKEjDNvgouNKYw==
+ws@^5.1.1:
+  version "5.2.2"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-5.2.2.tgz#dffef14866b8e8dc9133582514d1befaf96e980f"
+  integrity sha512-jaHFD6PFv6UgoIVda6qZllptQsMlDEJkTQcybzzXDYM1XO9Y8em691FGMPmM46WGyLU4z9KMgQN+qrux/nhlHA==
   dependencies:
     async-limiter "~1.0.0"
 
