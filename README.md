@@ -1,8 +1,9 @@
 # XVIZ
 
-XVIZ is a protocol for real-time transfer and visualization of autonomy data.
+XVIZ is a protocol for real-time transfer and visualization of autonomy data. Learn more in the
+[docs and specification](http://avs.auto/#/xviz).
 
-[XVIZ Specification](http://avs.auto/#/xviz)
+![High Level Overview](docs/overview/images/high-level.png)
 
 ## Tools and examples
 
@@ -11,7 +12,7 @@ This repo contains the following submodules:
 - `@xviz/builder` - Node.js utilities for converting data to the XVIZ protocol.
 - `@xviz/cli` - CLI utilities for the XVIZ protocol.
 - `@xviz/parser` - Client-side decoder and synchronizer for consuming XVIZ data.
-- `@xviz/schema` - Validator for the XVIZ protocol.
+- `@xviz/schema` - Validation and schemas for the XVIZ protocol.
 
 And examples:
 
@@ -34,7 +35,7 @@ $ cd xviz
 $ yarn bootstrap
 ```
 
-Convert and serve KITTI data:
+Convert and serve KITTI example data:
 
 ```bash
 # Download KITTI data
