@@ -2,16 +2,7 @@
   "timestamp": 1001.3,
 
   "poses": {
-    "/vehicle_pose": {
-      "timestamp": 1001.3,
-      "mapOrigin": {
-        "longitude": 40.4641969,
-        "latitude": -79.9733218,
-        "altitude": 219
-      },
-      "position": [238.4, 1002.5, 5.0],
-      "orientation": [0.008726646259971648, 0.17453292519943295, 1.4748032179352084]
-    },
+    "/vehicle_pose": 2.0,
     "/original/vehicle_pose": {
       "timestamp": 1001.3,
       "mapOrigin": {

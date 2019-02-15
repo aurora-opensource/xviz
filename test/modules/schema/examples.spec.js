@@ -16,12 +16,17 @@ import {validateExampleFiles, validateInvalidFiles} from '@xviz/schema';
 import test from 'tape-catch';
 import * as path from 'path';
 
-test('validateXVIZExamples', t => {
-  // Do it by directory path first
-  const schemaDir = path.join(__dirname, '..', '..', '..', 'modules', 'schema', 'schema');
-  const examplesDir = path.join(schemaDir, 'examples');
+const EXAMPLE_COUNT = 143;
 
-  t.ok(validateExampleFiles(schemaDir, examplesDir), 'all examples match schema');
+test.only('validateXVIZExamples', t => {
+  // Do it by directory path first
+  const schemaModule = path.join(__dirname, '..', '..', '..', 'modules', 'schema');
+  const schemaDir = path.join(schemaModule, 'schema');
+  const examplesDir = path.join(schemaModule, 'examples');
+
+  const {invalidCount, totalCount} = validateExampleFiles(schemaDir, examplesDir);
+  t.equal(invalidCount, 0, 'All examples valid');
+  t.equal(totalCount, EXAMPLE_COUNT, `We found ${EXAMPLE_COUNT} examples`);
 
   const invalidDir = path.join(schemaDir, 'invalid');
   t.ok(validateInvalidFiles(schemaDir, invalidDir), 'all invalid examples fail');

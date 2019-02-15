@@ -29,6 +29,7 @@ export function validateExampleFiles(schemaDir, examplesDir) {
   let valid = loadAllSchemas(validator, schemaDir);
 
   if (valid) {
+    // console.log(`FOO`);
     valid = validateFiles(validator, examplesDir, true);
   }
 
@@ -111,22 +112,27 @@ function loadSchema(validator, schemaDir, relativePath) {
 }
 
 function validateFiles(validator, examplesDir, expectGood) {
-  let valid = true;
+  // console.log(`BAR! ${examplesDir}`);
+  let totalCount = 0;
+  let invalidCount = 0;
+
   const options = {
     listeners: {
       file(fpath, stat, next) {
         if (!stat.name.endsWith('~')) {
           // Build the path to the matching schema
           const examplePath = path.join(fpath, stat.name);
+          totalCount += 1;
+          // console.log(`TRY? ${examplePath}`);
           try {
-            valid = valid & validateFile(validator, examplesDir, examplePath, expectGood);
+            validateFile(validator, examplesDir, examplePath, expectGood);
           } catch (e) {
             if (e instanceof ParseError) {
-              valid = false;
-              console.log(`${e.message}`);
+              invalidCount += 1;
+              console.log(`JOE ${e.message}`);
             } else {
-              console.log(`${examplePath}:0: error validating: ${e.message}`);
-              valid = false;
+              console.log(`FOO ${examplePath}:0: error validating: ${e.message}`);
+              invalidCount += 1;
             }
           }
         }
@@ -137,7 +143,7 @@ function validateFiles(validator, examplesDir, expectGood) {
 
   walk.walkSync(examplesDir, options);
 
-  return valid;
+  return {invalidCount, totalCount};
 }
 
 // eslint-disable-next-line max-statements
@@ -165,6 +171,8 @@ function validateFile(validator, examplesDir, examplePath, expectGood) {
     );
     return false;
   }
+
+  // console.log(`Validate: ${examplePath} against ${schemaRelPath}`);
 
   const valid = validate(data);
 
