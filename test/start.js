@@ -26,26 +26,17 @@ const mode = process.argv.length >= 3 ? process.argv[2] : 'default';
 require('source-map-support').install();
 
 // Registers aliases for virtual packages in this module
-const moduleAlias = require('module-alias');
-moduleAlias.addAliases({
-  'test-data': resolve(__dirname, 'data'),
-  '@xviz/builder':
-    mode === 'dist'
-      ? resolve(__dirname, '../modules/builder/dist/es5')
-      : resolve(__dirname, '../modules/builder/src'),
-  '@xviz/parser':
-    mode === 'dist'
-      ? resolve(__dirname, '../modules/parser/dist/es5')
-      : resolve(__dirname, '../modules/parser/src'),
-  '@xviz/schema':
-    mode === 'dist'
-      ? resolve(__dirname, '../modules/schema/dist/es5')
-      : resolve(__dirname, '../modules/schema/src'),
-  '@xviz/cli':
-    mode === 'dist'
-      ? resolve(__dirname, '../modules/cli/dist/es5')
-      : resolve(__dirname, '../modules/cli/src')
-});
+if (mode !== 'dist') {
+  const moduleAlias = require('module-alias');
+  moduleAlias.addAliases({
+    'test-data': resolve(__dirname, 'data'),
+    '@xviz/builder': resolve(__dirname, '../modules/builder/src'),
+    '@xviz/parser': resolve(__dirname, '../modules/parser/src'),
+    '@xviz/schema/dist': resolve(__dirname, '../modules/schema/dist'),
+    '@xviz/schema': resolve(__dirname, '../modules/schema/src'),
+    '@xviz/cli': resolve(__dirname, '../modules/cli/src')
+  });
+}
 
 switch (mode) {
   case 'test':

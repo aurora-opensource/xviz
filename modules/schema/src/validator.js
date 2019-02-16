@@ -13,8 +13,7 @@
 // limitations under the License.
 
 // See: https://github.com/epoberezkin/ajv/issues/687
-const Ajv = require('ajv');
-
+import Ajv from 'ajv';
 import {SCHEMA_DATA} from './data';
 
 export class ValidationError extends Error {

@@ -661,14 +661,14 @@
   dependencies:
     "@loaders.gl/core" "^0.6.2"
 
-"@probe.gl/test-utils@^3.0.0-alpha.2":
-  version "3.0.0-alpha.2"
-  resolved "https://registry.yarnpkg.com/@probe.gl/test-utils/-/test-utils-3.0.0-alpha.2.tgz#3cd2810683ed2860157dbe7477581bad8571c888"
-  integrity sha512-64A3FL4CWG2ys0tr4rX1P6FJ1r1FIP+0DU8z/EI8dFiJBETn0qaL+NNk+UtZyr9qzUXTAgfwLtdNGEMTjYLgww==
+"@probe.gl/test-utils@^3.0.0-alpha.4":
+  version "3.0.0-alpha.4"
+  resolved "https://registry.yarnpkg.com/@probe.gl/test-utils/-/test-utils-3.0.0-alpha.4.tgz#86d80115144f0d087f2816c1dd770722a7bc8406"
+  integrity sha512-bDtVcspwLkuPuV/rNIN+yLPFhZ0e4rQNKOLFCvF530+UEYsFqjBDglxrXftajHqMbFC/6skzAKGZFHUu9ZCAdQ==
   dependencies:
     "@babel/runtime" "^7.0.0"
     pixelmatch "^4.0.2"
-    probe.gl "^3.0.0-alpha.1"
+    probe.gl "^3.0.0-alpha.3"
     puppeteer "1.8.0"
 
 "@protobufjs/aspromise@^1.1.1", "@protobufjs/aspromise@^1.1.2":
@@ -7184,10 +7184,10 @@ probe.gl@^2.0.1:
   dependencies:
     "@babel/runtime" "^7.0.0"
 
-probe.gl@^3.0.0-alpha.1:
-  version "3.0.0-alpha.1"
-  resolved "https://registry.yarnpkg.com/probe.gl/-/probe.gl-3.0.0-alpha.1.tgz#13fa9d81b961fd537e374b247d87a44d3c55a3c7"
-  integrity sha512-TfdTAT/WCn9N5GW3qg5sQn43OtRgSyI5LrH8+4RMB3IsYOKJrLy+kWtmLvyr8U9qPT3XLDPLQFHuSLSRAJcaRw==
+probe.gl@^3.0.0-alpha.3:
+  version "3.0.0-alpha.3"
+  resolved "https://registry.yarnpkg.com/probe.gl/-/probe.gl-3.0.0-alpha.3.tgz#183bbf05634906fd12d25bf702fa042705dc5d0f"
+  integrity sha512-+IDi1LQ8iC/7DeaxCK0b2Qdu1MF8Adsx/icZMFsioA8pdwJu3ut8h8CTAOyzM6ccuPj6mIum2Rfc2ZffAP0yDw==
   dependencies:
     "@babel/runtime" "^7.0.0"
 

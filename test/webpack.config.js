@@ -25,6 +25,7 @@ const TEST_BROWSER_CONFIG = {
     stats: {
       warnings: false
     },
+    contentBase: [resolve(TEST_DIR, '..')],
     progress: true
   },
 
@@ -44,6 +45,7 @@ const TEST_BROWSER_CONFIG = {
       '@xviz/builder': resolve(TEST_DIR, '../modules/builder/src'),
       '@xviz/conformance': resolve(TEST_DIR, '../modules/conformance'),
       '@xviz/parser': resolve(TEST_DIR, '../modules/parser/src'),
+      '@xviz/schema/dist': resolve(TEST_DIR, '../modules/schema/dist'),
       '@xviz/schema': resolve(TEST_DIR, '../modules/schema/src')
     }
   },

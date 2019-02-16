@@ -12,19 +12,40 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {validateExampleFiles, validateInvalidFiles} from '@xviz/schema';
+import {XVIZValidator} from '@xviz/schema';
 import test from 'tape-catch';
-import * as path from 'path';
+import path from 'path';
+
+import {loadJSON} from '../../../modules/schema/scripts/parse-json';
+import EXAMPLES from './examples.json';
 
 test('validateXVIZExamples', t => {
   // Do it by directory path first
-  const schemaDir = path.join(__dirname, '..', '..', '..', 'modules', 'schema', 'schema');
+  const schemaDir = path.join(__dirname, '..', '..', '..', 'modules', 'schema');
+
   const examplesDir = path.join(schemaDir, 'examples');
-
-  t.ok(validateExampleFiles(schemaDir, examplesDir), 'all examples match schema');
-
   const invalidDir = path.join(schemaDir, 'invalid');
-  t.ok(validateInvalidFiles(schemaDir, invalidDir), 'all invalid examples fail');
 
-  t.end();
+  validateFiles(examplesDir, EXAMPLES.examples, t.doesNotThrow)
+    .then(() => {
+      validateFiles(invalidDir, EXAMPLES.invalid, t.throws);
+    })
+    .then(t.end);
 });
+
+function validateFiles(dir, filePaths, assert) {
+  const validator = new XVIZValidator();
+
+  filePaths = filePaths.map(filePath => path.join(dir, filePath));
+
+  return Promise.all(filePaths.map(loadJSON)).then(jsons => {
+    let index = 0;
+    for (const data of jsons) {
+      const relPath = path.relative(dir, filePaths[index]);
+      const schemaPath = path.dirname(relPath);
+
+      assert(() => validator.validate(schemaPath, data), relPath);
+      index++;
+    }
+  });
+}
