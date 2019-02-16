@@ -41,9 +41,26 @@ function validateFiles(dir, filePaths, assert) {
   return Promise.all(filePaths.map(loadJSON)).then(jsons => {
     let index = 0;
     for (const data of jsons) {
-      const relPath = path.relative(dir, filePaths[index]);
-      const schemaPath = path.dirname(relPath);
+      const examplePath = filePaths[index];
+      const relPath = path.relative(dir, examplePath);
+      const directoryPath = path.dirname(relPath);
 
+      // Find the proper schema, using either the directory name of
+      // the file name.
+      let schemaPath = directoryPath;
+
+      if (!validator.hasSchema(schemaPath)) {
+        schemaPath = relPath.replace('.json', '.schema.json');
+      }
+
+      if (!validator.hasSchema(schemaPath)) {
+        assert(
+          false,
+          `ERROR: While checking: ${examplePath}, failed to load: ${schemaPath} and ${directoryPath}`
+        );
+      }
+
+      // Validate the data
       assert(() => validator.validate(schemaPath, data), relPath);
       index++;
     }

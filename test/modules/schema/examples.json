@@ -179,6 +179,7 @@
     "session/error/no_message.json",
     "primitives/point/bad_colors.json",
     "primitives/point/bad_colors_object.json",
+    "primitives/point/invalid_style.json",
     "math/vector3x1/toolong.json",
     "math/vector3x1/tooshort.json",
     "math/matrix4x4/flat_long.json",
