@@ -115,7 +115,7 @@ function validateAgainstExample(t, validator, protoType, examplePath, jsonExampl
 
   // Sanity check out input data
   const schemaName = protoType.options[EXTENSION_PROPERTY];
-  validator.validate(schemaName, originalJsonExample);
+  validateXVIZJSON(t, validator, schemaName, originalJsonExample, 'Example JSON');
 
   // Verify content "works" as protobuf
   const err = protoType.verify(jsonExample);
@@ -148,7 +148,10 @@ function validateAgainstExample(t, validator, protoType, examplePath, jsonExampl
 }
 
 function validateXVIZJSON(t, validator, schemaName, object, description) {
-  t.doesNotThrow(() => validator.validate(schemaName, object), `${schemaName} ${description}`);
+  t.doesNotThrow(
+    () => validator.validate(schemaName, object),
+    `JSON valid: ${schemaName} ${description}`
+  );
 }
 
 function isSupportedExample(examplePath) {
