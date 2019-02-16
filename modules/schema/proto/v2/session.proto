@@ -55,20 +55,6 @@ message TransformLog
 }
 
 
-message TransformLog
-{
-    option (xviz_json_schema) = "session/transform_log";
-
-    string id = 1;
-
-    double start_timestamp = 2;
-
-    double end_timestamp = 3;
-
-    repeated string desired_streams = 4;
-}
-
-
 message StateUpdate
 {
     option (xviz_json_schema) = "session/state_update";

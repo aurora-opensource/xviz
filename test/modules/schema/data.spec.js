@@ -12,15 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {loadValidator} from '@xviz/schema';
+import {XVIZValidator} from '@xviz/schema';
 import {SCHEMA_DATA} from '@xviz/schema';
 
 import test from 'tape-catch';
-import * as path from 'path';
 
 test('schemaDataContents', t => {
-  const schemaDir = path.join(__dirname, '..', '..', '..', 'modules', 'schema', 'schema');
-  const ajv = loadValidator(schemaDir);
+  const ajv = new XVIZValidator().ajv;
 
   // Check that every core schema is in the in the data list
   for (const key in ajv._schemas) {

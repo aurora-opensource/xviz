@@ -13,8 +13,7 @@
 // limitations under the License.
 
 // See: https://github.com/epoberezkin/ajv/issues/687
-const Ajv = require('ajv');
-
+import Ajv from 'ajv';
 import {SCHEMA_DATA} from './data';
 
 export class ValidationError extends Error {
@@ -76,11 +75,7 @@ export class XVIZValidator {
 
   // utility methods
   validate(schemaName, data) {
-    if (!schemaName.endsWith('.schema.json')) {
-      schemaName += '.schema.json';
-    }
-
-    const schemaValidator = this.ajv.getSchema(schemaName);
+    const schemaValidator = this._getSchema(schemaName);
 
     if (schemaValidator === undefined) {
       const error = `Could not load schema: ${schemaName}`;
@@ -97,6 +92,18 @@ export class XVIZValidator {
 
   schemaCount() {
     return Object.keys(this.ajv._schemas).length;
+  }
+
+  hasSchema(schemaName) {
+    return this._getSchema(schemaName) !== undefined;
+  }
+
+  _getSchema(schemaName) {
+    if (!schemaName.endsWith('.schema.json')) {
+      schemaName += '.schema.json';
+    }
+
+    return this.ajv.getSchema(schemaName);
   }
 }
 

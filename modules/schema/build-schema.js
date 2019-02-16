@@ -12,21 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {validateExampleFiles} from '@xviz/schema';
+/* eslint-env node, browser */
 
-import test from 'tape-catch';
-import * as path from 'path';
+// This program populates the schema.js which includes the full JSON
+// schema content
 
-test('validateExamplesFiles', t => {
-  const dataDir = path.join(__dirname, 'data');
-  const schemaDir = path.join(dataDir, 'schema');
-  const examplesDir = path.join(dataDir, 'examples');
+const path = require('path');
+const {walkDir, dump, loadJSONSync} = require('../../scripts/file-utils');
 
-  const badExamples = path.join(examplesDir, 'bad');
-  t.notOk(validateExampleFiles(schemaDir, badExamples), 'bad example fails');
+function main() {
+  const schemaMap = walkDir(path.resolve(__dirname, 'schema/'), '.schema.json', loadJSONSync);
+  dump(schemaMap, path.resolve(__dirname, 'dist/schema.json'));
+}
 
-  const goodExamples = path.join(examplesDir, 'good');
-  t.ok(validateExampleFiles(schemaDir, goodExamples), 'good example passes');
-
-  t.end();
-});
+// Invoke
+main();
