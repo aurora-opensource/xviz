@@ -49,8 +49,8 @@ switch (mode) {
   case 'browser':
   case 'browser-headless':
     new BrowserTestDriver().run({
-      command: 'webpack-dev-server',
-      arguments: ['--config', 'test/webpack.config.js', '--env.testBrowser'],
+      command: 'npx',
+      arguments: ['webpack-dev-server', '--config', 'test/webpack.config.js', '--env.testBrowser'],
       headless: mode === 'browser-headless'
     });
     break;
