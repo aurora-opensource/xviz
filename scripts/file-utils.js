@@ -1,6 +1,9 @@
-/* global ParseError, fetch */
-const {parse: jsonlintParse} = require('jsonlint');
+/* eslint-disable no-console */
+/* global ParseError, fetch, console */
+const path = require('path');
+const walk = require('walk');
 const fs = require('fs');
+const {parse: jsonlintParse} = require('jsonlint');
 
 function parseJSON(string, filePath) {
   let data;
@@ -49,8 +52,35 @@ function loadJSON(filePath) {
     .then(data => parseJSON(data, filePath));
 }
 
-// Exports for testing
+function walkDir(dir, extension, getContent) {
+  const fileMap = {};
+
+  walk.walkSync(dir, {
+    listeners: {
+      file(fpath, stat, next) {
+        if (!extension || stat.name.endsWith(extension)) {
+          // Build the path to the matching schema
+          const fullPath = path.join(fpath, stat.name);
+          const relPath = path.relative(dir, fullPath);
+          fileMap[relPath] = getContent && getContent(fullPath);
+        }
+        next();
+      }
+    }
+  });
+
+  console.log(`${Object.keys(fileMap).length} files loaded from ${dir}`);
+  return fileMap;
+}
+
+function dump(data, outputPath) {
+  console.log(`\u001b[92mWriting to file\u001b[39m ${outputPath}`);
+  fs.writeFileSync(outputPath, JSON.stringify(data, null, 2));
+}
+
 module.exports = {
+  walkDir,
+  loadJSON,
   loadJSONSync,
-  loadJSON
+  dump
 };

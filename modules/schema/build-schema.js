@@ -18,14 +18,11 @@
 // schema content
 
 const path = require('path');
-const {loadAllFiles, dump} = require('./file-utils');
-const {loadJSONSync} = require('./parse-json');
-
-const MODULE_DIR = path.resolve(__dirname, '..');
+const {walkDir, dump, loadJSONSync} = require('../../scripts/file-utils');
 
 function main() {
-  const schemaMap = loadAllFiles(path.resolve(MODULE_DIR, 'schema/'), '.schema.json', loadJSONSync);
-  dump(schemaMap, path.resolve(MODULE_DIR, 'dist/schema.json'));
+  const schemaMap = walkDir(path.resolve(__dirname, 'schema/'), '.schema.json', loadJSONSync);
+  dump(schemaMap, path.resolve(__dirname, 'dist/schema.json'));
 }
 
 // Invoke

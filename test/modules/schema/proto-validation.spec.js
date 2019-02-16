@@ -16,7 +16,7 @@
 import {loadProtos} from '@xviz/schema';
 import {XVIZValidator, protoEnumsToInts, getXVIZProtoTypes, EXTENSION_PROPERTY} from '@xviz/schema';
 
-import {loadJSON} from '../../../modules/schema/scripts/parse-json';
+import {loadJSON} from '../../../scripts/file-utils';
 import EXAMPLES from './examples.json';
 
 import test from 'tape-catch';

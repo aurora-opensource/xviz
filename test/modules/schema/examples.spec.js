@@ -16,7 +16,7 @@ import {XVIZValidator} from '@xviz/schema';
 import test from 'tape-catch';
 import path from 'path';
 
-import {loadJSON} from '../../../modules/schema/scripts/parse-json';
+import {loadJSON} from '../../../scripts/file-utils';
 import EXAMPLES from './examples.json';
 
 test('validateXVIZExamples', t => {
