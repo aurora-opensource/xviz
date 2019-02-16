@@ -172,3 +172,31 @@ tape('XVIZStyleParser#Stylesheet', t => {
 
   t.end();
 });
+
+tape('XVIZStyleParser#Stylesheet#getPropertyDefault', t => {
+  let stylesheet = new Stylesheet();
+  t.is(stylesheet.getPropertyDefault('radius'), 1, 'gets correct radius');
+  t.deepEquals(
+    stylesheet.getPropertyDefault('fill_color'),
+    [255, 255, 255],
+    'gets correct fill color'
+  );
+  t.deepEquals(
+    stylesheet.getPropertyDefault('point_color_domain'),
+    [0, 0],
+    'gets correct point color domain'
+  );
+
+  stylesheet = new Stylesheet([
+    {
+      style: {point_color_mode: 'elevation'}
+    }
+  ]);
+  t.deepEquals(
+    stylesheet.getPropertyDefault('point_color_domain'),
+    [0, 3],
+    'gets correct point color domain'
+  );
+
+  t.end();
+});

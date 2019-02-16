@@ -73,7 +73,11 @@ export default class Stylesheet {
    * @returns {Number|String|Array} style property default value
    */
   getPropertyDefault(propertyName) {
-    return XVIZStyleProperty.getDefault(propertyName);
+    const value = XVIZStyleProperty.getDefault(propertyName);
+    if (typeof value === 'function') {
+      return value(this);
+    }
+    return value;
   }
 
   /**
