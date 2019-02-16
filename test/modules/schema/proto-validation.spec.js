@@ -21,7 +21,6 @@ import EXAMPLES from './examples.json';
 
 import test from 'tape-catch';
 import path from 'path';
-import fs from 'fs';
 import clone from 'clone';
 
 // Protobuf has a primitive type system, while it produces valid XVIZ JSON
@@ -64,7 +63,6 @@ test('protosCorrect', t => {
 
   // Test a basic primitive out
   const examplesDir = path.join(getModuleDir(), 'examples');
-  const schemaDir = path.join(getModuleDir(), 'schema');
 
   const validator = new XVIZValidator();
 
@@ -81,11 +79,7 @@ test('protosCorrect', t => {
     t.comment(schemaName);
 
     // Make sure we have a matching JSON schema
-    const schemaPath = path.join(schemaDir, `${schemaName}.schema.json`);
-    if (fs.existsSync) {
-      // node only
-      t.ok(fs.existsSync(schemaPath), `"${schemaName}" is a real schema`);
-    }
+    t.ok(validator.hasSchema(schemaName), `"${schemaName}" is a real schema`);
 
     // Validate every example
     const exampleFiles = EXAMPLES.examples

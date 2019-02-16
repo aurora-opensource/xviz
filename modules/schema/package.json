@@ -26,7 +26,7 @@
   },
   "scripts": {
     "clean": "rm -fr dist && mkdir -p dist",
-    "build-schema": "node ./scripts/genimports",
+    "build-schema": "node ./scripts/build-schema",
     "build-protos": "pbjs --keep-case --target json --path ./proto/v2/*.proto --out dist/proto.v2.json",
     "build-es6": "BABEL_ENV=es6 babel src --config-file ../../babel.config.js --out-dir dist/es6 --source-maps --ignore 'node_modules/'",
     "build-esm": "BABEL_ENV=esm babel src --config-file ../../babel.config.js --out-dir dist/esm --source-maps --ignore 'node_modules/'",
