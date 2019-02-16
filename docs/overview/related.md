@@ -12,6 +12,7 @@ evolves.
 ## Visualization
 
 - [rviz](https://github.com/ros-visualization/rviz) - ROS 3D Robot Visualizer
+- [webviz](https://github.com/cruise-automation/webviz) - Web based ROS bag visualizer
 - [x3dom](https://www.x3dom.org/) - declarative 3D content format, built in WebGL support.
 - [A-Frame](https://aframe.io/) - declarative DOM style system for 3D VR applications.
 - [VRML 2.0](http://gun.teipir.gr/VRML-amgem/spec/index.html) - 1990’s format for full 3D scene
