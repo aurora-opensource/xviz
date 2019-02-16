@@ -510,7 +510,7 @@ tape('parseStreamLogData polyline flat', t => {
   const features = slice.streams['/test/stream'].features;
   t.equals(features.length, 1, 'has has object');
   t.equals(features[0].type, 'polyline', 'type is polyline');
-  t.deepEquals(features[0].vertices, [[1000, 1000, 200], [1000, 1000, 250]], 'array is nested');
+  t.deepEquals(features[0].vertices, [1000, 1000, 200, 1000, 1000, 250], 'flat vertices array is returned');
 
   t.end();
 });
@@ -543,8 +543,8 @@ tape('parseStreamLogData polygon flat', t => {
   t.deepEquals(
     features[0].vertices,
     // We automatically close loops...
-    [[1000, 1000, 200], [1000, 1000, 250], [1000, 1000, 300], [1000, 1000, 200]],
-    'array is nested and looped back'
+    [1000, 1000, 200, 1000, 1000, 250, 1000, 1000, 300],
+    'flat vertices array is returned'
   );
 
   t.end();
