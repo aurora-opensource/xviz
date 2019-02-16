@@ -490,7 +490,9 @@ function joinObjectPointCloudsToTypedArrays(objects) {
         colors[i * vertexColorStride + 0] = color[0];
         colors[i * vertexColorStride + 1] = color[1];
         colors[i * vertexColorStride + 2] = color[2];
-        colors[i * vertexColorStride + 3] = color[3] || 255;
+        if (vertexColorStride === 4) {
+          colors[i * vertexColorStride + 3] = color[3] || 255;
+        }
       }
     }
   });
