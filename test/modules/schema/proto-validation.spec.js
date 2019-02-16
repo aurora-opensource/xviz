@@ -89,7 +89,11 @@ test('protosCorrect', t => {
 
     // Validate every example
     const exampleFiles = EXAMPLES.examples
-      .filter(filePath => filePath.startsWith(schemaName))
+      .filter(
+        // Some schemas start with the name of other so we have to match againg
+        // a concreate file path or directory not plain prefix.
+        filePath => filePath.match(new RegExp(`^${schemaName}[\./\]`, 'g'))
+      )
       .map(filePath => path.join(examplesDir, filePath));
 
     for (let j = 0; j < exampleFiles.length; j++) {
@@ -98,6 +102,7 @@ test('protosCorrect', t => {
       if (isSupportedExample(examplePath)) {
         tests.push(
           loadJSON(examplePath).then(json => {
+            t.comment(`Checking: Proto ${type} (Schema: ${schemaName}) Example: ${examplePath}`);
             validateAgainstExample(t, validator, type, examplePath, json);
           })
         );
@@ -105,7 +110,7 @@ test('protosCorrect', t => {
     }
   }
 
-  Promise.all(tests).then(t.end);
+  Promise.all(tests).then(() => t.end());
 });
 
 function validateAgainstExample(t, validator, protoType, examplePath, jsonExample) {
@@ -135,22 +140,18 @@ function validateAgainstExample(t, validator, protoType, examplePath, jsonExampl
   const fromProtoObject = protoType.toObject(protoData, options);
 
   // Validate JSON with JSON schema
-  validateXVIZJSON(t, validator, schemaName, fromProtoObject, 'Proto round trip valid');
+  validateXVIZJSON(t, validator, schemaName, fromProtoObject, 'Proto round trip JSON');
 
   // Now lets make sure we handled all fields
   if (!exampleHasExtraFields(examplePath)) {
-    t.deepEquals(
-      originalJsonExample,
-      fromProtoObject,
-      `Full round trip: ${examplePath} for: ${examplePath}`
-    );
+    t.deepEquals(originalJsonExample, fromProtoObject, `Full round trip equivalent`);
   }
 }
 
 function validateXVIZJSON(t, validator, schemaName, object, description) {
   t.doesNotThrow(
     () => validator.validate(schemaName, object),
-    `JSON valid: ${schemaName} ${description}`
+    `Valid (schema: ${schemaName}): ${description}`
   );
 }
 

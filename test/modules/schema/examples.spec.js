@@ -26,14 +26,14 @@ test('validateXVIZExamples', t => {
   const examplesDir = path.join(schemaDir, 'examples');
   const invalidDir = path.join(schemaDir, 'invalid');
 
-  validateFiles(examplesDir, EXAMPLES.examples, t.doesNotThrow)
+  validateFiles(examplesDir, EXAMPLES.examples, t, t.doesNotThrow)
     .then(() => {
-      validateFiles(invalidDir, EXAMPLES.invalid, t.throws);
+      validateFiles(invalidDir, EXAMPLES.invalid, t, t.throws);
     })
     .then(t.end);
 });
 
-function validateFiles(dir, filePaths, assert) {
+function validateFiles(dir, filePaths, t, assert) {
   const validator = new XVIZValidator();
 
   filePaths = filePaths.map(filePath => path.join(dir, filePath));
@@ -48,20 +48,22 @@ function validateFiles(dir, filePaths, assert) {
       // Find the proper schema, using either the directory name of
       // the file name.
       let schemaPath = directoryPath;
+      const directPath = relPath.replace('.json', '.schema.json');
 
       if (!validator.hasSchema(schemaPath)) {
-        schemaPath = relPath.replace('.json', '.schema.json');
+        schemaPath = directPath;
       }
 
-      if (!validator.hasSchema(schemaPath)) {
-        assert(
-          false,
-          `ERROR: While checking: ${examplePath}, failed to load: ${schemaPath} and ${directoryPath}`
-        );
-      }
+      t.ok(
+        validator.hasSchema(schemaPath),
+        `${relPath} schema either: ${schemaPath} or ${directPath}`
+      );
 
       // Validate the data
-      assert(() => validator.validate(schemaPath, data), relPath);
+      assert(
+        () => validator.validate(schemaPath, data),
+        `${relPath} valid with schema: ${schemaPath}`
+      );
       index++;
     }
   });
