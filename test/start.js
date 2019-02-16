@@ -38,6 +38,9 @@ if (mode !== 'dist') {
   });
 }
 
+// Update JSON list of examples
+require('./modules/update-test-cases');
+
 switch (mode) {
   case 'test':
   case 'src':
