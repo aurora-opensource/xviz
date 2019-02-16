@@ -481,7 +481,6 @@ tape('parseStreamLogData pointCloud timeslice', t => {
   const pointCloud = slice.streams['/test/stream'].pointCloud;
   t.equals(pointCloud.numInstances, 1, 'Has 1 instance');
   t.equals(pointCloud.positions.length, 3, 'Has 3 values in positions');
-  t.equals(pointCloud.colors.length, 4, 'Has 4 values in colors');
 
   t.end();
 });
@@ -555,21 +554,35 @@ tape('parseStreamLogData flat JSON pointCloud', t => {
   resetXVIZConfigAndSettings();
   setXVIZConfig({currentMajorVersion: 2});
   const PointCloudTestTimesliceMessage = clone(TestTimesliceMessageV2);
-  PointCloudTestTimesliceMessage.updates[0].primitives['/test/stream'].points.points = [
-    1000,
-    1000,
-    200
-  ];
+  const stream = PointCloudTestTimesliceMessage.updates[0].primitives['/test/stream'];
 
   // NOTE: no explicit type for this message yet.
-  const slice = parseStreamLogData({...PointCloudTestTimesliceMessage});
+  let slice = parseStreamLogData({...PointCloudTestTimesliceMessage});
   t.equals(slice.type, LOG_STREAM_MESSAGE.TIMESLICE, 'Message type set for timeslice');
   t.ok(slice.streams['/test/stream'].pointCloud, 'has a point cloud');
 
-  const pointCloud = slice.streams['/test/stream'].pointCloud;
+  let pointCloud = slice.streams['/test/stream'].pointCloud;
   t.equals(pointCloud.numInstances, 1, 'Has 1 instance');
-  t.deepEquals(pointCloud.positions, [1000, 1000, 200], 'Has 3 values in positions');
-  t.equals(pointCloud.colors.length, 4, 'Has 4 values in colors');
+  t.deepEquals(pointCloud.positions, [1000, 1000, 200], 'Has correct values in positions');
+  t.deepEquals(pointCloud.colors, null, 'Does not contain colors');
+
+  // v1 inline color
+  stream.points[0].color = [0, 0, 255];
+  slice = parseStreamLogData({...PointCloudTestTimesliceMessage});
+  pointCloud = slice.streams['/test/stream'].pointCloud;
+  t.deepEquals(pointCloud.colors, [0, 0, 255], 'Has correct values in colors');
+
+  // flattened colors stride = 3
+  stream.points[0].colors = [[0, 0, 255]];
+  slice = parseStreamLogData({...PointCloudTestTimesliceMessage});
+  pointCloud = slice.streams['/test/stream'].pointCloud;
+  t.deepEquals(pointCloud.colors, [0, 0, 255], 'Has correct values in colors');
+
+  // flattened colors stride = 4
+  stream.points[0].colors = [[0, 0, 255, 255]];
+  slice = parseStreamLogData({...PointCloudTestTimesliceMessage});
+  pointCloud = slice.streams['/test/stream'].pointCloud;
+  t.deepEquals(pointCloud.colors, [0, 0, 255, 255], 'Has correct values in colors');
 
   t.end();
 });
@@ -579,19 +592,30 @@ tape('parseStreamLogData pointCloud timeslice TypedArray', t => {
   setXVIZConfig({currentMajorVersion: 2});
 
   const PointCloudTestTimesliceMessage = clone(TestTimesliceMessageV2);
-  PointCloudTestTimesliceMessage.updates[0].primitives[
-    '/test/stream'
-  ].points.points = new Float32Array([1000, 1000, 200]);
+  const stream = PointCloudTestTimesliceMessage.updates[0].primitives['/test/stream'];
+  stream.points[0].points = new Float32Array([500, 500, 200]);
 
   // NOTE: no explicit type for this message yet.
-  const slice = parseStreamLogData({...PointCloudTestTimesliceMessage});
+  let slice = parseStreamLogData({...PointCloudTestTimesliceMessage});
   t.equals(slice.type, LOG_STREAM_MESSAGE.TIMESLICE, 'Message type set for timeslice');
   t.ok(slice.streams['/test/stream'].pointCloud, 'has a point cloud');
 
-  const pointCloud = slice.streams['/test/stream'].pointCloud;
+  let pointCloud = slice.streams['/test/stream'].pointCloud;
   t.equals(pointCloud.numInstances, 1, 'Has 1 instance');
-  t.equals(pointCloud.positions.length, 3, 'Has 3 values in positions');
-  t.equals(pointCloud.colors.length, 4, 'Has 4 values in colors');
+  t.deepEquals(pointCloud.positions, [500, 500, 200], 'Has correct values in positions');
+  t.deepEquals(pointCloud.colors, null, 'Does not contain colors');
+
+  // flattened colors stride = 3
+  stream.points[0].colors = new Uint8Array([0, 0, 255]);
+  slice = parseStreamLogData({...PointCloudTestTimesliceMessage});
+  pointCloud = slice.streams['/test/stream'].pointCloud;
+  t.deepEquals(pointCloud.colors, [0, 0, 255], 'Has correct values in colors');
+
+  // flattened colors stride = 4
+  stream.points[0].colors = new Uint8Array([0, 0, 255, 255]);
+  slice = parseStreamLogData({...PointCloudTestTimesliceMessage});
+  pointCloud = slice.streams['/test/stream'].pointCloud;
+  t.deepEquals(pointCloud.colors, [0, 0, 255, 255], 'Has correct values in colors');
 
   t.end();
 });
@@ -619,7 +643,6 @@ tape('parseStreamLogData pointCloud timeslice', t => {
   const pointCloud = slice.streams['/test/stream'].pointCloud;
   t.equals(pointCloud.numInstances, 2, 'Has 2 instance');
   t.equals(pointCloud.positions.length, 6, 'Has 6 values in positions');
-  t.equals(pointCloud.colors.length, 8, 'Has 8 values in colors');
 
   t.end();
 });

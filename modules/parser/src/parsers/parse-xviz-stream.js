@@ -395,8 +395,32 @@ function parseStreamTimeSeriesV2(seriesArray, streamBlackList) {
 }
 
 function getVertexCount(vertices) {
-  return vertices instanceof Float32Array ? vertices.length / 3 : vertices.length;
+  return Number.isFinite(vertices[0]) ? vertices.length / 3 : vertices.length;
 }
+
+function getColorStride(colors, vertexCount) {
+  if (colors) {
+    if (colors.length / 4 === vertexCount) {
+      return 4;
+    }
+    if (colors.length / 3 === vertexCount) {
+      return 3;
+    }
+    let stride;
+    if (Array.isArray(colors[0])) {
+      stride = colors[0].length;
+    } else {
+      stride = colors.length;
+    }
+    if (stride === 3 || stride === 4) {
+      return stride;
+    }
+    log.error('Unknown point color format');
+  }
+  return 0;
+}
+
+const DEFAULT_COLOR = [0, 0, 0, 255];
 
 // Joins a set of point clouds extracted from objects into a single point cloud
 // generates typed arrays that can be displayed efficiently by deck.gl
@@ -405,12 +429,12 @@ function joinObjectPointCloudsToTypedArrays(objects) {
     return null;
   }
 
-  const DEFAULT_COLOR = [0, 0, 0, 255];
-
   let numInstances = 0;
   for (const object of objects) {
     numInstances += getVertexCount(object.vertices);
   }
+
+  let vertexColorStride = null;
 
   const positions = new Float32Array(numInstances * 3);
   const colors = new Uint8ClampedArray(numInstances * 4);
@@ -421,52 +445,54 @@ function joinObjectPointCloudsToTypedArrays(objects) {
 
   let i = 0;
   objects.forEach(object => {
-    const vertexCount = getVertexCount(object.vertices);
+    const vertexPositions = object.vertices;
+    // object.color is V1 and should be removed when deprecated
+    const vertexColors = object.colors;
+    const vertexCount = getVertexCount(vertexPositions);
+
+    if (vertexCount === 0) {
+      return;
+    }
 
     // Setup for per-point color
-    let vertexColors = object.colors;
-    let vertexColorStride = null;
-    if (vertexColors) {
-      if (vertexColors.length / 4 === vertexCount) {
-        vertexColorStride = 4;
-      } else if (vertexColors.length / 3 === vertexCount) {
-        vertexColorStride = 4;
-      } else {
-        vertexColors = null;
-      }
+    const colorStride = getColorStride(vertexColors || object.color, vertexCount);
+    if (vertexColorStride !== null && vertexColorStride !== colorStride) {
+      log.error('Inconsistent point color format');
+    }
+    vertexColorStride = colorStride;
+
+    const isColorFlattenedArray =
+      vertexColors && vertexColors.length === vertexCount * vertexColorStride;
+    if (isColorFlattenedArray) {
+      colors.set(vertexColors, i * vertexColorStride);
     }
 
-    const isColorFlattenedArray = ArrayBuffer.isView(object.colors);
-    const vertexColorTyped = isColorFlattenedArray && vertexColorStride === 4;
-    if (vertexColorTyped) {
-      colors.set(object.colors, i * 4);
-    }
-
-    const isPositionFlattenedArray = ArrayBuffer.isView(object.vertices);
+    const isPositionFlattenedArray = vertexPositions.length === vertexCount * 3;
     if (isPositionFlattenedArray) {
-      positions.set(object.vertices, i * 3);
+      positions.set(vertexPositions, i * 3);
     }
 
+    let color = object.color || DEFAULT_COLOR;
     for (let j = 0; j < vertexCount; j++, i++) {
       ids[i] = object.id;
 
       if (!isPositionFlattenedArray) {
-        const vertex = object.vertices[j];
+        const vertex = vertexPositions[j];
         positions[i * 3 + 0] = vertex[0];
         positions[i * 3 + 1] = vertex[1];
         positions[i * 3 + 2] = vertex[2];
       }
 
-      if (!vertexColorTyped) {
-        let color = object.color || DEFAULT_COLOR;
+      if (!isColorFlattenedArray && vertexColorStride) {
         if (vertexColors) {
-          color = vertexColors[j * vertexColorStride];
+          color = vertexColors[j];
         }
-
-        colors[i * 4 + 0] = color[0];
-        colors[i * 4 + 1] = color[1];
-        colors[i * 4 + 2] = color[2];
-        colors[i * 4 + 3] = color[3] || 255;
+        colors[i * vertexColorStride + 0] = color[0];
+        colors[i * vertexColorStride + 1] = color[1];
+        colors[i * vertexColorStride + 2] = color[2];
+        if (vertexColorStride === 4) {
+          colors[i * vertexColorStride + 3] = color[3] || 255;
+        }
       }
     }
   });
@@ -475,7 +501,7 @@ function joinObjectPointCloudsToTypedArrays(objects) {
     type: objects[0].type,
     numInstances,
     positions,
-    colors,
+    colors: vertexColorStride ? colors.subarray(0, vertexColorStride * numInstances) : null,
     ids
   };
 }
