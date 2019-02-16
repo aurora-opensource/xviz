@@ -13,6 +13,7 @@
 // limitations under the License.
 
 const {resolve} = require('path');
+const ALIASES = require('../aliases');
 
 /* global process */
 require('@babel/register')({
@@ -28,14 +29,7 @@ require('source-map-support').install();
 // Registers aliases for virtual packages in this module
 if (mode !== 'dist') {
   const moduleAlias = require('module-alias');
-  moduleAlias.addAliases({
-    'test-data': resolve(__dirname, 'data'),
-    '@xviz/builder': resolve(__dirname, '../modules/builder/src'),
-    '@xviz/parser': resolve(__dirname, '../modules/parser/src'),
-    '@xviz/schema/dist': resolve(__dirname, '../modules/schema/dist'),
-    '@xviz/schema': resolve(__dirname, '../modules/schema/src'),
-    '@xviz/cli': resolve(__dirname, '../modules/cli/src')
-  });
+  moduleAlias.addAliases(ALIASES);
 }
 
 // Update JSON list of examples

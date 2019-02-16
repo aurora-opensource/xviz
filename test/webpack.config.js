@@ -15,6 +15,7 @@
 // Webpack 2 configuration file for running tests in browser
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const {resolve} = require('path');
+const ALIASES = require('../aliases');
 
 const TEST_DIR = './test';
 
@@ -39,15 +40,7 @@ const TEST_BROWSER_CONFIG = {
   resolve: {
     // Adding `esnext` imports untranspiled source, easier for debugging
     // mainFields: ['esnext', 'browser', 'module', 'main'],
-    alias: {
-      webworkify$: resolve(__dirname, '../node_modules/webworkify-webpack'),
-      'test-data': resolve(TEST_DIR, 'data'),
-      '@xviz/builder': resolve(TEST_DIR, '../modules/builder/src'),
-      '@xviz/conformance': resolve(TEST_DIR, '../modules/conformance'),
-      '@xviz/parser': resolve(TEST_DIR, '../modules/parser/src'),
-      '@xviz/schema/dist': resolve(TEST_DIR, '../modules/schema/dist'),
-      '@xviz/schema': resolve(TEST_DIR, '../modules/schema/src')
-    }
+    alias: ALIASES
   },
 
   module: {
