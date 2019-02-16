@@ -103,7 +103,13 @@ Default: `1`
 
 ##### `radius` (number)
 
-The radius of a `point` or `circle` primitive in meters.
+The radius of a `circle` primitive in meters.
+
+Default: `1`
+
+##### `radius_pixels` (number)
+
+The radius of a `point` primitive in pixels.
 
 Default: `1`
 
@@ -202,6 +208,26 @@ Default: `false`
 Whether to draw 3D outline for extruded `polygon` primitives.
 
 Default: `false`
+
+##### `point_color_mode` (string)
+
+How to color `point` primitives. Can be one of 3 values:
+
+- `default` - use inline colors if provided, or `fill_colors` style otherwise
+- `elevation` - color by elevation from the ground.
+- `distance_to_vehicle` - color by distance to the vehicle.
+
+Default: `default`
+
+##### `point_color_domain` (array)
+
+The lower and upper bounds of elevation/distance if `point_color_mode` is `elevation` or
+`distance_to_vehicle`, in meters.
+
+Default:
+
+- If `point_color_mode` is `elevation`: `[0, 3]`
+- If `point_color_domain` is `distance_to_vehicle`: `[0, 60]`
 
 ## Explanation of Object Property and Stream Property
 

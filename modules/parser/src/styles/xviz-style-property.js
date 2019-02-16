@@ -110,12 +110,15 @@ const DEFAULT_STYLES = {
   alignment_baseline: 'center',
 
   radius: 1,
+  radius_pixels: 1,
   radius_min_pixels: 0,
   radius_max_pixels: Number.MAX_SAFE_INTEGER,
 
   stroke_width: 0.1,
   stroke_width_min_pixels: 0,
-  stroke_width_max_pixels: Number.MAX_SAFE_INTEGER
+  stroke_width_max_pixels: Number.MAX_SAFE_INTEGER,
+
+  point_color_mode: 'default'
 };
 
 export default class XVIZStyleProperty {
