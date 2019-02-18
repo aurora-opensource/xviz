@@ -70,7 +70,6 @@ export default class FutureObjectsConverter {
       .streamStyle({
         stroke_width: 0.1,
         extruded: false,
-        wireframe: true,
         fill_color: '#00000080'
       });
 
