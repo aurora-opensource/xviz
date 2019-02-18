@@ -27,14 +27,10 @@ Stream styles are defined as part of the stream's metadata.
     '/object/shape': {
       "category": "primitive",
       "primitive_type": "polygon",
-      "stream_style": [
-        {
-          "style": {
-            "stroked": false,
-            "fill_color": "#9D9DA3"
-          }
-        }
-      ]
+      "stream_style": {
+        "stroked": false,
+        "fill_color": "#9D9DA3"
+      }
     }
   }
 }
@@ -59,13 +55,11 @@ objects in that stream based on their classes.
     '/object/shape': {
       "category": "primitive",
       "primitive_type": "polygon",
-      "stream_style": [
-        {
-          "style": {
-            "stroked": false,
-            "fill_color": "#9D9DA3"
-          }
-        },
+      "stream_style": {
+        "stroked": false,
+        "fill_color": "#9D9DA3"
+      },
+      "style_classes": [
         {
           "name": "Pedestrian",            // class selector
           "style": {
@@ -87,6 +81,7 @@ objects in that stream based on their classes.
 In later frames, consider the following objects:
 
 ```js
+// snapshot
 "primitives": {
   "/object/shape": {
     "polygons": [
@@ -128,6 +123,7 @@ and `classes()` functions.
 An object can define its own style inline. Inline styles override any other styles.
 
 ```js
+// snapshot
 "primitives": {
   "/object/shape": {
     "polygons": [
