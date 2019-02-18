@@ -20,30 +20,41 @@ import {getXVIZConfig} from '../config/xviz-config';
 // Ensure points at least a certain distance away from each other
 // This reduces data size and works around an issue in the deck.gl PathLayer
 export function filterVertices(vertices) {
-  // TODO - Can't handle flat arrays
-  if (!Array.isArray(vertices)) {
-    return vertices;
-  }
-
   const THRESHOLD = getXVIZConfig().pathDistanceThreshold;
+  const isFlatArray = Number.isFinite(vertices[0]);
+  const vertexCount = isFlatArray ? vertices.length / 3 : vertices.length;
 
   const newVertices = [];
-  let lastEmittedVertex = -1;
-  for (let i = 0; i < vertices.length; ++i) {
-    const shouldAddVert =
-      lastEmittedVertex === -1 ||
-      new Vector3(vertices[lastEmittedVertex]).distance(vertices[i]) > THRESHOLD;
+  let index = 0;
+  let lastEmittedVertex = null;
+  let lastEmittedIndex = -1;
+  for (let i = 0; i < vertexCount; i++) {
+    const v = getPointAtIndex(vertices, i, isFlatArray);
+    const shouldAddVert = lastEmittedIndex === -1 || lastEmittedVertex.distance(v) > THRESHOLD;
     if (shouldAddVert) {
-      newVertices.push(vertices[i]);
-      lastEmittedVertex = i;
+      newVertices[index++] = v[0];
+      newVertices[index++] = v[1];
+      newVertices[index++] = v[2];
+      lastEmittedVertex = new Vector3(v);
+      lastEmittedIndex = i;
     }
   }
 
-  // Make sure we always emitted the last vertex
-  if (lastEmittedVertex !== vertices.length - 1) {
-    newVertices.pop();
-    newVertices.push(vertices[vertices.length - 1]);
+  // Make sure we always emit the last vertex
+  if (lastEmittedIndex !== vertexCount - 1) {
+    const lastVertex = getPointAtIndex(vertices, vertexCount - 1, isFlatArray);
+    index -= 3;
+    newVertices[index++] = lastVertex[0];
+    newVertices[index++] = lastVertex[1];
+    newVertices[index++] = lastVertex[2];
   }
 
   return newVertices;
+}
+
+function getPointAtIndex(vertices, i, isFlatArray = false) {
+  if (isFlatArray) {
+    return vertices.slice(i * 3, i * 3 + 3);
+  }
+  return vertices[i];
 }
