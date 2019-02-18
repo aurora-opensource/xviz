@@ -1,0 +1,64 @@
+{
+  "type": "xviz/metadata",
+  "data": {
+    "version": "2.0.0",
+    "streams": {
+      "/vehicle_pose": {
+        "category": "pose"
+      },
+
+      "/polyline/stream/stroke_width": {
+        "category": "primitive",
+        "primitive_type": "polyline",
+        "stream_style": {
+          "stroke_width": 0.3
+        }
+      },
+
+      "/polyline/stream/stroke_color": {
+        "category": "primitive",
+        "primitive_type": "polyline",
+        "stream_style": {
+          "stroke_color": "#f00"
+        }
+      },
+
+      "/polyline/stream/opacity": {
+        "category": "primitive",
+        "primitive_type": "polyline",
+        "stream_style": {
+          "opacity": 0.5
+        }
+      },
+
+      "/polyline/stream/stroke_width_min_pixels": {
+        "category": "primitive",
+        "primitive_type": "polyline",
+        "stream_style": {
+          "stroke_width_min_pixels": 2
+        }
+      },
+
+      "/polyline/stream/stroke_width_max_pixels": {
+        "category": "primitive",
+        "primitive_type": "polyline",
+        "stream_style": {
+          "stroke_width_max_pixels": 0.5
+        }
+      },
+
+      "/polyline/inline": {
+        "category": "primitive",
+        "primitive_type": "polyline",
+        "coordinate": "VEHICLE_RELATIVE"
+      }
+
+    },
+    "log_info": {
+      "description": "XVIZ Client Test - Polyline Styling",
+      "license": "Apache 2.0",
+      "start_time": 1000,
+      "end_time": 1010
+    }
+  }
+}

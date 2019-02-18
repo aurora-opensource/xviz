@@ -13,10 +13,10 @@
     "center": {
       "$ref": "https://xviz.org/schema/math/vector3x1.json"
     },
-    "radius_m": {
+    "radius": {
       "type": "number"
     }
   },
-  "required": [ "center", "radius_m" ],
+  "required": [ "center", "radius" ],
   "additionalProperties": false
 }

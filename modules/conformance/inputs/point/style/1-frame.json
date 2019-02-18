@@ -7,24 +7,52 @@
         "category": "pose"
       },
 
-      "/point/inline/radius": {
+      "/point/stream/radius_pixels": {
         "category": "primitive",
         "primitive_type": "point",
-        "coordinate": "VEHICLE_RELATIVE"
+        "stream_style": {
+          "radius_pixels": 5
+        }
       },
 
-      "/point/inline/fill_color": {
+      "/point/stream/opacity": {
         "category": "primitive",
         "primitive_type": "point",
-        "coordinate": "VEHICLE_RELATIVE"
+        "stream_style": {
+          "opacity": 0.5
+        }
       },
 
       "/point/stream/fill_color": {
         "category": "primitive",
         "primitive_type": "point",
-        "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
           "fill_color": "#f00"
+        }
+      },
+
+      "/point/inline/color": {
+        "category": "primitive",
+        "primitive_type": "point",
+        "stream_style": {
+          "fill_color": "#f00"
+        }
+      },
+
+      "/point/stream/point_color_mode": {
+        "category": "primitive",
+        "primitive_type": "point",
+        "stream_style": {
+          "point_color_mode": "elevation"
+        }
+      },
+
+      "/point/stream/point_color_domain": {
+        "category": "primitive",
+        "primitive_type": "point",
+        "stream_style": {
+          "point_color_mode": "distance_to_vehicle",
+          "point_color_domain": [0, 5]
         }
       }
 

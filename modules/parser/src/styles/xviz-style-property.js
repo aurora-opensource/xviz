@@ -72,16 +72,17 @@ const PROPERTY_FORMATTERS = {
   stroked: getBool,
   filled: getBool,
   extruded: getBool,
-  wireframe: getBool,
   height: getNumber,
 
   stroke_color: getColor,
   fill_color: getColor,
 
-  size: getNumber,
-  angle: getNumber,
+  font_family: String,
+  font_weight: String,
+  text_size: getNumber,
+  text_rotation: getNumber,
   text_anchor: String,
-  alignment_baseline: String,
+  text_baseline: String,
 
   radius: getNumber,
   radius_min_pixels: getNumber,
@@ -98,16 +99,17 @@ const DEFAULT_STYLES = {
   stroked: true,
   filled: true,
   extruded: false,
-  wireframe: false,
   height: 0,
 
   stroke_color: [0, 0, 0],
   fill_color: [255, 255, 255],
 
-  size: 12,
-  angle: 0,
+  font_family: 'Arial',
+  font_weight: 'normal',
+  text_size: 12,
+  text_rotation: 0,
   text_anchor: 'middle',
-  alignment_baseline: 'center',
+  text_baseline: 'center',
 
   radius: 1,
   radius_pixels: 1,

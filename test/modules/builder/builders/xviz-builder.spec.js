@@ -307,7 +307,7 @@ test('XVIZBuilder#circle', t => {
             circles: [
               {
                 center: pos,
-                radius_m: 5
+                radius: 5
               }
             ]
           }
@@ -382,7 +382,7 @@ test('XVIZBuilder#stadium', t => {
               {
                 start: pos[0],
                 end: pos[1],
-                radius_m: 5
+                radius: 5
               }
             ]
           }

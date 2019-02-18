@@ -16,20 +16,24 @@
       "radius": {
         "type": "number"
       },
-      "size": {
+      "text_size": {
         "type": "number"
       },
-      "angle": {
+      "text_rotation": {
         "type": "number"
       },
       "text_anchor": {
         "enum": ["start", "middle", "end"]
       },
-      "alignment_baseline": {
+      "text_baseline": {
         "enum": ["top", "center", "bottom"]
       },
       "height": {
         "type": "number"
+      },
+      "radius_pixels": {
+        "type": "number",
+        "minimum": 0
       },
       "radius_min_pixels": {
         "type": "number",
@@ -61,8 +65,11 @@
       "extruded": {
         "type": "boolean"
       },
-      "wireframe": {
-        "type": "boolean"
+      "font_family": {
+        "type": "string"
+      },
+      "font_weight": {
+        "type": "number"
       }
   },
   "anyOf": [
@@ -70,10 +77,11 @@
       {"required": ["stroke_color"]},
       {"required": ["stroke_width"]},
       {"required": ["radius"]},
-      {"required": ["size"]},
-      {"required": ["angle"]},
+      {"required": ["radius_pixels"]},
+      {"required": ["text_size"]},
+      {"required": ["text_rotation"]},
       {"required": ["text_anchor"]},
-      {"required": ["alignment_baseline"]},
+      {"required": ["text_baseline"]},
       {"required": ["radius_min_pixels"]},
       {"required": ["radius_max_pixels"]},
       {"required": ["stroke_width_min_pixels"]},
@@ -82,7 +90,8 @@
       {"required": ["stroked"]},
       {"required": ["filled"]},
       {"required": ["extruded"]},
-      {"required": ["wireframe"]}
+      {"required": ["font_family"]},
+      {"required": ["font_weight"]}
   ],
   "additionalProperties": false
 }

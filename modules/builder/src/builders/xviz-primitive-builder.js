@@ -276,12 +276,12 @@ export default class XVIZPrimitiveBuilder extends XVIZBaseBuilder {
         break;
       case 'circle':
         obj.center = this._vertices[0];
-        obj.radius_m = this._radius;
+        obj.radius = this._radius;
         break;
       case 'stadium':
         obj.start = this._vertices[0];
         obj.end = this._vertices[1];
-        obj.radius_m = this._radius;
+        obj.radius = this._radius;
         break;
       case 'image':
         if (this._vertices) {

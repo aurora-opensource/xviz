@@ -28,7 +28,7 @@ message Circle
     
     repeated double center = 2;
     
-    double radius_m = 3;
+    double radius = 3;
 }
 
 message Image
@@ -92,7 +92,7 @@ message Stadium
 
     repeated double end = 3;
 
-    double radius_m = 4;
+    double radius = 4;
 }
 
 message Text

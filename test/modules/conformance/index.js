@@ -21,7 +21,16 @@ import renderXVIZ from './renderer';
 //  - 1-frame.json - metadata file
 //  - 2-frame.json - state_update file
 //  - output.png - golden image
-const TEST_CASES = [makeTestCase('circle/style')];
+const TEST_CASES = [
+  makeTestCase('circle/style'),
+  makeTestCase('point/style'),
+  makeTestCase('polyline/style'),
+  makeTestCase('polygon/style'),
+  makeTestCase('text/style'),
+  makeTestCase('stadium/style')
+];
+
+const DEBUG = false;
 
 // `require` is resolved by webpack
 // `goldenImage` is resolved in node, relative to root
@@ -62,13 +71,19 @@ function run(testCase) {
       .browserTestDriver_captureAndDiffScreen(
         Object.assign({
           tolerance: 0.1,
-          threshold: 0.99,
+          threshold: 0.999,
           goldenImage: testCase.goldenImage,
-          region: getBoundingBoxInPage(canvas)
+          region: getBoundingBoxInPage(canvas),
+          // set DEBUG above to true to overwrite golden image
+          saveOnFail: DEBUG,
+          saveAs: '[name].png'
         })
       )
       .then(result => {
         t.ok(result.success, result.error || `match ${result.matchPercentage}`);
+        if (!DEBUG) {
+          document.body.removeChild(canvas);
+        }
         t.end();
       });
   });

@@ -32,12 +32,14 @@ export default function renderCircle({context, feature, stylesheet, project}) {
 
   // Resolve styles
   const center = feature.center;
-  const radius = Math.min(
-    Math.max(streamStyles.radius_min_pixels, objectStyles.radius),
+  let radius = project(feature.radius || objectStyles.radius);
+  radius = Math.min(
+    Math.max(streamStyles.radius_min_pixels, radius),
     streamStyles.radius_max_pixels
   );
-  const strokeWidth = Math.min(
-    Math.max(streamStyles.stroke_width_min_pixels, objectStyles.stroke_width),
+  let strokeWidth = project(objectStyles.stroke_width);
+  strokeWidth = Math.min(
+    Math.max(streamStyles.stroke_width_min_pixels, strokeWidth),
     streamStyles.stroke_width_max_pixels
   );
   const strokeColor = getCSSColor(objectStyles.stroke_color, streamStyles.opacity);
@@ -45,7 +47,7 @@ export default function renderCircle({context, feature, stylesheet, project}) {
 
   // Render to canvas
   context.beginPath();
-  context.arc(project(center)[0], project(center)[1], project(radius), 0, Math.PI * 2);
+  context.arc(project(center)[0], project(center)[1], radius, 0, Math.PI * 2);
   context.closePath();
 
   if (streamStyles.filled) {
@@ -53,7 +55,7 @@ export default function renderCircle({context, feature, stylesheet, project}) {
     context.fill();
   }
   if (streamStyles.stroked) {
-    context.lineWidth = project(strokeWidth);
+    context.lineWidth = strokeWidth;
     context.strokeStyle = strokeColor;
     context.stroke();
   }

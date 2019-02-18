@@ -179,7 +179,6 @@ export default class ObjectsConverter {
 
         .streamStyle({
           extruded: true,
-          wireframe: true,
           fill_color: '#00000080'
         })
 

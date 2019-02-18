@@ -65,7 +65,7 @@
       "circles": [
         {
           "center": [1, 2, 3],
-          "radius_m": 1.2
+          "radius": 1.2
         }
       ]
     },
@@ -98,7 +98,7 @@
         {
           "start": [9, 15, 3],
           "end": [20, 13, 3],
-          "radius_m": 2.5
+          "radius": 2.5
         }
       ]
     },

@@ -1,0 +1,64 @@
+{
+  "type": "xviz/metadata",
+  "data": {
+    "version": "2.0.0",
+    "streams": {
+      "/vehicle_pose": {
+        "category": "pose"
+      },
+
+      "/stadium/stream/radius": {
+        "category": "primitive",
+        "primitive_type": "stadium",
+        "stream_style": {
+          "radius": 0.3
+        }
+      },
+
+      "/stadium/stream/fill_color": {
+        "category": "primitive",
+        "primitive_type": "stadium",
+        "stream_style": {
+          "fill_color": "#f00"
+        }
+      },
+
+      "/stadium/stream/opacity": {
+        "category": "primitive",
+        "primitive_type": "stadium",
+        "stream_style": {
+          "opacity": 0.5
+        }
+      },
+
+      "/stadium/stream/radius_min_pixels": {
+        "category": "primitive",
+        "primitive_type": "stadium",
+        "stream_style": {
+          "radius_min_pixels": 15
+        }
+      },
+
+      "/stadium/stream/radius_max_pixels": {
+        "category": "primitive",
+        "primitive_type": "stadium",
+        "stream_style": {
+          "radius_max_pixels": 5
+        }
+      },
+
+      "/stadium/inline": {
+        "category": "primitive",
+        "primitive_type": "stadium",
+        "coordinate": "VEHICLE_RELATIVE"
+      }
+
+    },
+    "log_info": {
+      "description": "XVIZ Client Test - Stadium Styling",
+      "license": "Apache 2.0",
+      "start_time": 1000,
+      "end_time": 1010
+    }
+  }
+}

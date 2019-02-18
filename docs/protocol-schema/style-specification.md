@@ -1,215 +1,237 @@
 # Styling XVIZ
 
-# Introduction
+The appearance of an XVIZ object can be customized using JSON styles. Each
+[primitive](/docs/protocol-schema/geometry-primitives.md) type allows for its own set of styling
+options, such as stroke width, fill color, etc.
 
-Styling in XVIZ happens at multiple levels. This allows definition of defaults and control to avoid
-excessive style redundancy while not compromising on expressiveness.
+## Styling Levels
 
-The styling levels are, in resolution priority:
+Styling in XVIZ may happen at multiple levels. This allows the definition of shared defaults as well
+as fine-grain control to avoid excessive style redundancy while not compromising on expressiveness.
 
-- Object inline styles
-- Stream style classes
-- Stream style defaults
+The styles of an object is resolved in the following priority:
 
-# Style Levels
+1. Object styles
+2. Class styles
+3. Stream styles
 
-## Object Styling
+### Stream Styles
 
-There are two ways to specify styles at the object level:
-
-- inline
-- classes
-
-Object styling happens thru the XVIZBuilder interface. Specifially the `style()` and `classes()`
-functions.
-
-## Style Classes
-
-Style classes work similar to HTML and CSS. Objects have class selectors defined, which resolve
-against a stylesheet. XVIZ defines this stylesheet in the metadata (see XVIZMetadataBuilder) and the
-classes are scoped by streamId.
-
-An important part of style class resolution is how style precedence is defined. In XVIZ the last
-class takes precedences over classes that are defined before it. This enables you to control your
-style ordering when defining classes using the XVIZMetadataBuilder.
-
-### Selectors
-
-Each style object contains a `class` field that specifies the selector of the style. A style only
-applies to an object if the selector is matched.
-
-- `<name>` matches an object if it contains the given field.
-- Space separate multiple selectors to match an objects that satisfies them all.
-- If an object matches multiple selectors in a stylesheet, the one that is defined last trumps.
-
-Here is an example of metadata with style classes defined for a stream '/object/shape'
+Stream styles are defined as part of the stream's metadata.
 
 ```js
+// metadata
 {
-    'version': '2.0.0',
-    'streams': {
-        '/object/shape': {                      // stream name
-            'style_classes': [
-                {
-                  'name': 'OBJECT_LABEL',            // selector
-                  'style': {
-                      'stroke_color': '#9D9DA3'
-                  }
-                },
-                {
-                  'name': 'OBJECT_LABEL selected',   // selector
-                  'style': {
-                      'stroke_color': '#FFC000',
-                      'fill_color': '#FFC00080'
-                  }
-                }
-            ]
-        }
+  'version': '2.0.0',
+  'streams': {
+    '/object/shape': {
+      "category": "primitive",
+      "primitive_type": "polygon",
+      "stream_style": {
+        "stroked": false,
+        "fill_color": "#9D9DA3"
+      }
     }
+  }
 }
 ```
 
-## Stream Styling
-
-Stream styling allows you to define all the properties that an Object may use, but also includes
-additional properties that effectively act as toggles for rendering. These properties allow for some
-performance advantage in the rendering pipeline when set to 'false'.
-
-Any style defined at the stream level will be the default style for any Objcts in that stream.
-
-# Styles
-
-## Per Object Properties
-
-These style properties that can be set on individual objects or in a stylesheet.
-
-##### `fill_color` (array | string)
-
-The fill color of a `point`, `circle`, `text` or `polygon` primitive.
-
-Default: `#FFFFFF`
-
-##### `stroke_color` (array | string)
-
-The stroke color of a `line`, `path` or `polygon` primitive.
-
-Default: `#FFFFFF`
-
-##### `stroke_width` (number)
-
-The stroke width of a `line`, `path` or `polygon` primitive in meters.
-
-Default: `1`
-
-##### `radius` (number)
-
-The radius of a `circle` primitive in meters.
-
-Default: `1`
-
-##### `radius_pixels` (number)
-
-The radius of a `point` primitive in pixels.
-
-Default: `1`
-
-##### `height` (number)
-
-The height of an extruded `polygon` primitive in meters.
-
-Default: `0`
-
-##### `size` (number)
-
-The size of a `text` primitive in pixels.
-
-Default: `12`
-
-##### `angle` (number)
-
-The rotation of a `text` primitive in degrees.
-
-Default: `0`
-
-##### `text_anchor` (string)
-
-The horizontal alignment of a `text` primitive relative to its position.
-
-One of `start`, `middle`, `end`.
-
-Default: `middle`
-
-##### `alignment_baseline` (string)
-
-The vertical alignment of a `text` primitive relative to its position.
-
-One of `top`, `center`, `bottom`.
-
-Default: `center`
-
-## Per Stream Properties
-
-Cannot be customized per object - only effective when specified inside in the stream style.
-
-##### `radius_min_pixels` (number)
-
-The minimum pixels to draw the radius of `point` or `circle` primitives. Prevent the circles from
-being too small to see at a far-away zoom level.
-
-Default: no constraint
-
-##### `radius_max_pixels` (number)
-
-The maximum pixels to draw the radius of `point` or `circle` primitives. Prevent the circles from
-getting too large at a closed-up zoom level.
-
-Default: no constraint
-
-##### `stroke_width_min_pixels` (number)
-
-The minimum pixels to draw the stroke with of `line`, `path` or `polygon` primitives. Prevent the
-lines from being too thin to see at a far-away zoom level.
-
-Default: no constraint
-
-##### `stroke_width_max_pixels` (number)
-
-The maximum pixels to draw the stroke with of `line`, `path` or `polygon` primitives. Prevent the
-lines from getting too thick at a closed-up zoom level.
-
-Default: no constraint
-
-##### `opacity` (number)
-
-Opacity of the object, between `0` and `1`.
-
-Default: `1`.
-
-##### `stroked` (bool)
-
-Whether to draw outline of `polygon` primitives.
-
-Default: `true`
-
-##### `filled` (bool)
-
-Whether to fill `polygon` primitives.
-
-Default: `true`
-
-##### `extruded` (bool)
-
-Whether to extrude `polygon` primitives into 3D objects.
-
-Default: `false`
-
-##### `wireframe` (bool)
-
-Whether to draw 3D outline for extruded `polygon` primitives.
-
-Default: `false`
-
-##### `point_color_mode` (string)
+Any style defined at the stream level will be the default style for any object in that stream.
+
+Some style properties can only be defined on the stream level. These properties allow for some
+performance advantage in the rendering pipeline. See the properties table of each primitive type for
+details.
+
+### Class Styles
+
+Class styles are also defined as part of the stream's metadata, but selectively applied to the
+objects in that stream based on their classes.
+
+```js
+// metadata
+{
+  "version": "2.0.0",
+  "streams": {
+    '/object/shape': {
+      "category": "primitive",
+      "primitive_type": "polygon",
+      "stream_style": {
+        "stroked": false,
+        "fill_color": "#9D9DA3"
+      },
+      "style_classes": [
+        {
+          "name": "Pedestrian",            // class selector
+          "style": {
+            "fill_color": "#00C8EF"
+          }
+        },
+        {
+          "name": "Pedestrian selected",   // class selector
+          "style": {
+            "fill_color": "#FFDC00"
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+In later frames, consider the following objects:
+
+```js
+// snapshot
+"primitives": {
+  "/object/shape": {
+    "polygons": [
+      {
+        "vertices": [[-6, -6, 0], [-6, -4, 0], [-4, -4, 0], [-4, -6, 0]],
+        "base": {
+          "classes": ["Car"]         // fill color resolves to #9D9DA3
+        }
+      },
+      {
+        "vertices": [[-3, 3, 0], [-3, 5, 0], [-1, 5, 0], [-1, 3, 0]],
+        "base": {
+          "classes": ["Pedestrian"]  // fill color resolves to #00C8EF
+        }
+      }
+    ]
+  }
+}
+```
+
+Style classes work similar to HTML and CSS. Each stream has multiple styling rules defined with
+selectors. Each rule contains the following fields:
+
+- `name`: the selector for this rule, as space-separated class names.
+- `styles`: the key-value map of style properties.
+
+Every object in that stream may contain a `classes` field. A styling rule applies to an object if:
+
+- The object contains all the classes in the selector.
+- If an object matches multiple rules, the rule that is defined last trumps.
+
+Rules and classes are scoped by streamId.
+
+Class styling can be generated through the `XVIZMeBuilder` interface. Specifially the `styleClass()`
+and `classes()` functions.
+
+### Object Styles
+
+An object can define its own style inline. Inline styles override any other styles.
+
+```js
+// snapshot
+"primitives": {
+  "/object/shape": {
+    "polygons": [
+      {
+        "vertices": [[-6, -6, 0], [-6, -4, 0], [-4, -4, 0], [-4, -6, 0]],
+        "base": {
+          "style": {
+            "fill_color": "#FF0000"
+          }
+        }
+      }
+    ]
+  }
+}
+```
+
+Note that some style properties cannot be defined per-object. See the properties table of each
+primitive type for details.
+
+## Style Properties
+
+Supported style properties by primitive types:
+
+### circle
+
+| Property                  | Description                                                                                                         | Type            | Default  | Per-stream | Per-object |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------- | --------------- | -------- | ---------- | ---------- |
+| `radius`                  | The circle radius in meters                                                                                         | Number          | `1`      | X          | X          |
+| `radius_min_pixels`       | The minimum pixels to draw the radius at. Prevents the circles from being too small to see at a far-away zoom level | Number          | (none)   | X          |            |
+| `radius_max_pixels`       | The maximum pixels to draw the radius at. Prevents the circles from being too large at a close-up zoom level        | Number          | (none)   | X          |            |
+| `filled`                  | Whether to fill the circle                                                                                          | Bool            | `true`   | X          |            |
+| `stroked`                 | Whether to draw outline around the circle                                                                           | Bool            | `true`   | X          |            |
+| `fill_color`              | Fill color of the circle                                                                                            | [Color](#color) | `'#fff'` | X          | X          |
+| `stroke_color`            | Stroke color of the outline                                                                                         | [Color](#color) | `'#000'` | X          | X          |
+| `stroke_width`            | Stroke width of the outline in meters                                                                               | Number          | `1`      | X          | X          |
+| `stroke_width_min_pixels` | The minimum pixels to draw the outline at. Prevents the lines from being too thin to see at a far-away zoom level.  | Number          | (none)   | X          |            |
+| `stroke_width_max_pixels` | The maximum pixels to draw the outline at. Prevents the lines from being too thick at a close-up zoom level.        | Number          | (none)   | X          |            |
+| `opacity`                 | Opacity of the object                                                                                               | Number          | `1`      | X          |            |
+
+### point
+
+| Property             | Description                                                                                                                            | Type                                | Default                                                               | Per-stream | Per-object |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- | --------------------------------------------------------------------- | ---------- | ---------- |
+| `radius_pixels`      | The point radius in pixels                                                                                                             | Number                              | `1`                                                                   | X          |            |
+| `fill_color`         | Fill color of the point                                                                                                                | [Color](#color)                     | `'#fff'`                                                              | X          |            |
+| `point_color_mode`   | How to color point primitives                                                                                                          | [PointColorMode](#point-color-mode) | `'default'`                                                           | X          |            |
+| `point_color_domain` | The lower and upper bounds of the point measurement that maps to blue and red respectively. Only used if `point_color_mode` is defined | Array                               | `[0, 3]` in `elevation` mode, `[0, 60]` in `distance_to_vehicle` mode | X          |            |
+| `opacity`            | Opacity of the object                                                                                                                  | Number                              | `1`                                                                   | X          |            |
+
+### polygon
+
+| Property                  | Description                                                                                                        | Type            | Default  | Per-stream | Per-object |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------ | --------------- | -------- | ---------- | ---------- |
+| `extruded`                | Whether to extrude the polygon                                                                                     | Bool            | `false`  | X          |            |
+| `height`                  | The extrusion of the polygon in meters. Only works if `extruded: true`                                             | Number          | `0`      | X          | X          |
+| `filled`                  | Whether to fill the polygon                                                                                        | Bool            | `true`   | X          |            |
+| `stroked`                 | Whether to draw outline around the polygon                                                                         | Bool            | `true`   | X          |            |
+| `fill_color`              | Fill color of the polygon                                                                                          | [Color](#color) | `'#fff'` | X          | X          |
+| `stroke_color`            | Stroke color of the outline                                                                                        | [Color](#color) | `'#000'` | X          | X          |
+| `stroke_width`            | Stroke width of the outline in meters. Only works if `extruded: false`                                             | Number          | `1`      | X          | X          |
+| `stroke_width_min_pixels` | The minimum pixels to draw the outline at. Prevents the lines from being too thin to see at a far-away zoom level. | Number          | (none)   | X          |            |
+| `stroke_width_max_pixels` | The maximum pixels to draw the outline at. Prevents the lines from being too thick at a close-up zoom level.       | Number          | (none)   | X          |            |
+| `opacity`                 | Opacity of the object                                                                                              | Number          | `1`      | X          |            |
+
+### polyline
+
+| Property                  | Description                                                                                                         | Type            | Default  | Per-stream | Per-object |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------- | --------------- | -------- | ---------- | ---------- |
+| `stroke_color`            | Stroke color of the polyline                                                                                        | [Color](#color) | `'#000'` | X          | X          |
+| `stroke_width`            | Stroke width of the polyline in meters                                                                              | Number          | `1`      | X          | X          |
+| `stroke_width_min_pixels` | The minimum pixels to draw the polyline at. Prevents the lines from being too thin to see at a far-away zoom level. | Number          | (none)   | X          |            |
+| `stroke_width_max_pixels` | The maximum pixels to draw the polyline at. Prevents the lines from being too thick at a close-up zoom level.       | Number          | (none)   | X          |            |
+| `opacity`                 | Opacity of the object                                                                                               | Number          | `1`      | X          |            |
+
+### stadium
+
+| Property            | Description                                                                                                          | Type            | Default  | Per-stream | Per-object |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------- | --------------- | -------- | ---------- | ---------- |
+| `fill_color`        | Fill color of the stadium                                                                                            | [Color](#color) | `'#fff'` | X          | X          |
+| `radius`            | Radius of the stadium in meters                                                                                      | Number          | `1`      | X          | X          |
+| `radius_min_pixels` | The minimum pixels to draw the radius at. Prevents the stadiums from being too small to see at a far-away zoom level | Number          | (none)   | X          |            |
+| `radius_max_pixels` | The maximum pixels to draw the radius at. Prevents the stadiums from being too large at a close-up zoom level        | Number          | (none)   | X          |            |
+| `opacity`           | Opacity of the object                                                                                                | Number          | `1`      | X          |            |
+
+### text
+
+| Property        | Description                                                                                              | Type            | Default   | Per-stream | Per-object |
+| --------------- | -------------------------------------------------------------------------------------------------------- | --------------- | --------- | ---------- | ---------- |
+| `font_family`   | Font name of the texts. A valid CSS font-family value                                                    | String          | `'Arial'` | X          |            |
+| `font_weight`   | Font weight of the texts. A valid CSS numeric font-weight value                                          | Number          | `400`     | X          |            |
+| `fill_color`    | Color of the texts                                                                                       | [Color](#color) | `'#fff'`  | X          | X          |
+| `text_size`     | Size of the text in pixels                                                                               | Number          | `12`      | X          | X          |
+| `text_rotation` | Counter-clockwise rotation of the text in degrees                                                        | Number          | `0`       | X          | X          |
+| `text_anchor`   | The horizontal alignment of a `text` primitive relative to its position. One of `start`, `middle`, `end` | String          | `middle`  | X          | X          |
+| `text_baseline` | The vertical alignment of a `text` primitive relative to its position. One of `top`, `center`, `bottom`  | String          | `center`  | X          | X          |
+| `opacity`       | Opacity of the object                                                                                    | Number          | `1`       | X          |            |
+
+## Property Types
+
+### Color
+
+Color values can be in one of the following formats:
+
+- Hex string in RGB or RGBA, e.g. `'#F00'`, `'#F00A'`, `'#FF0000'`, `'#FF000080'`.
+- Valid CSS color string, e.g. `'red'`, `'rgba(255, 0, 0, 0.5)'`.
+- RGB or RGBA array, each component in 0-255 range. e.g. `[255, 0, 0]`, `[255, 0, 0, 128]`.
+
+### Point Color Mode
 
 How to color `point` primitives. Can be one of 3 values:
 
@@ -217,19 +239,7 @@ How to color `point` primitives. Can be one of 3 values:
 - `elevation` - color by elevation from the ground.
 - `distance_to_vehicle` - color by distance to the vehicle.
 
-Default: `default`
-
-##### `point_color_domain` (array)
-
-The lower and upper bounds of elevation/distance if `point_color_mode` is `elevation` or
-`distance_to_vehicle`, in meters.
-
-Default:
-
-- If `point_color_mode` is `elevation`: `[0, 3]`
-- If `point_color_domain` is `distance_to_vehicle`: `[0, 60]`
-
-## Explanation of Object Property and Stream Property
+## Remarks
 
 Some styling features cause additional rendering overhead. For example, stroke and fill are done in
 separate passes.
@@ -249,57 +259,3 @@ of these passes, but you will be able to have styling difference all within a si
 An alternative approach would be to seperate out objects in a different stream that had stream level
 settings for stroke and fill. This approach may reduce the overhead required in per-object styling
 and render costs.
-
-# Style Property Tables
-
-## Object Style Property Table
-
-This table shows what style properties apply to each primitive type.
-
-| Type\Property | fill_color | radius | stroke_width | stroke_color | size | angle | text_anchor | alignment_baseline |
-| ------------- | ---------- | ------ | ------------ | ------------ | ---- | ----- | ----------- | ------------------ |
-| circle        | X          | X      |              |              |      |       |             |                    |
-| image         |            |        |              |              |      |       |             |                    |
-| point         | X          | X      |              |              |      |       |             |                    |
-| polygon       | X          |        | X            | X            |      |       |             |                    |
-| polyline      |            |        | X            | X            |      |       |             |                    |
-| stadium       | X          |        | X            | X            |      |       |             |                    |
-| text          | X          |        |              |              | X    | X     | X           | X                  |
-
-## Stream Property Table
-
-This table shows the _additional_ style properties that apply at the stream level for each primitive
-type.
-
-| Type\Property | opacity | stroked | filled | extruded | wireframe | radius_min_pixel | radius_max_pixels | stroke_width_min_pixels | stroke_width_min_pixels |
-| ------------- | ------- | ------- | ------ | -------- | --------- | ---------------- | ----------------- | ----------------------- | ----------------------- |
-| circle        | x       |         |        |          |           | x                | x                 |                         |                         |
-| image         |         |         |        |          |           |                  |                   |                         |                         |
-| point         | x       |         |        |          |           |                  |                   |                         |                         |
-| polygon       | x       | x       | x      | x        | x         |                  |                   | x                       | x                       |
-| polyline      | x       |         |        |          |           |                  |                   | x                       | x                       |
-| stadium       | x       | x       | x      | x        | x         |                  |                   | x                       | x                       |
-| text          | x       |         |        |          |           |                  |                   |                         |                         |
-
-## Stype Property Default Values
-
-| Property                | Default Value |
-| ----------------------- | ------------- |
-| fill_color              | '#FFFFFF'     |
-| stroke_color            | '#FFFFFF'     |
-| stroke_width            | 1             |
-| radius                  | 1             |
-| height                  | 0             |
-| size                    | 12            |
-| angle                   | 0             |
-| text_anchor             | 'middle'      |
-| alignment_baseline      | 'center'      |
-| opacity                 | 1             |
-| stroked                 | true          |
-| filled                  | true          |
-| extruded                | false         |
-| wireframe               | false         |
-| radius_min_pixels       | no constraint |
-| radius_max_pixels       | no constraint |
-| stroke_width_min_pixels | no constraint |
-| stroke_width_max_pixels | no constraint |

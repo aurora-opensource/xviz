@@ -33,7 +33,14 @@ export default {
   },
   circle: {
     category: PRIMITIVE_CAT.FEATURE,
-    validate: (primitive, streamName, time) => primitive.center,
+    validate: primitive => primitive.center,
+    normalize: primitive => {
+      aliasId(primitive);
+    }
+  },
+  stadium: {
+    category: PRIMITIVE_CAT.FEATURE,
+    validate: primitive => primitive.start && primitive.end,
     normalize: primitive => {
       aliasId(primitive);
     }

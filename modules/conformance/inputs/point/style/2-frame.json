@@ -19,28 +19,18 @@
         },
         "primitives": {
 
-          "/point/inline/radius": {
+          "/point/stream/radius_pixels": {
             "points": [
               {
-                "points": [[10, 10, 0]],
-                "base": {
-                  "inline_style": {
-                    "radius": 5
-                  }
-                }
+                "points": [[2, -4, 0], [2, -2, 0], [2, 0, 0]]
               }
             ]
           },
 
-          "/point/inline/fill_color": {
+          "/point/stream/opacity": {
             "points": [
               {
-                "points": [[10, -10, 0]],
-                "base": {
-                  "inline_style": {
-                    "fill_color": "#0f0"
-                  }
-                }
+                "points": [[2, 2, 0], [2, 4, 0]]
               }
             ]
           },
@@ -48,11 +38,35 @@
           "/point/stream/fill_color": {
             "points": [
               {
-                "points": [[-10, 10, 0]]
+                "points": [[-4, -4, 0], [-4, -2, 0]]
+              }
+            ]
+          },
+
+          "/point/inline/color": {
+            "points": [
+              {
+                "points": [[-4, 0, 0], [-4, 2, 0], [-4, 4, 0]],
+                "colors": [[0, 255, 0], [0, 0, 255], [255, 255, 0]]
+              }
+            ]
+          },
+
+          "/point/stream/point_color_mode": {
+            "points": [
+              {
+                "points": [[-2, -4, 0], [-2, -2, 1], [-2, 0, 1.5], [-2, 2, 2], [-2, 4, 3]]
+              }
+            ]
+          },
+
+          "/point/stream/point_color_domain": {
+            "points": [
+              {
+                "points": [[0, -4, 0], [0, -2, 0], [0, 0, 0], [0, 2, 2], [0, 4, 3]]
               }
             ]
           }
-
         }
       }
     ]

@@ -127,7 +127,6 @@ export default class TrackletsConverter {
       .coordinate('VEHICLE_RELATIVE')
       .streamStyle({
         extruded: true,
-        wireframe: true,
         fill_color: '#00000080'
       })
       .styleClass('Car', {
@@ -167,7 +166,7 @@ export default class TrackletsConverter {
       .category('primitive')
       .type('text')
       .streamStyle({
-        size: 18,
+        text_size: 18,
         fill_color: '#DCDCCD'
       })
       .coordinate('VEHICLE_RELATIVE')
