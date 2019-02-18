@@ -25,12 +25,12 @@
         }
       },
 
-      "/text/stream/font_size": {
+      "/text/stream/text_size": {
         "category": "primitive",
         "primitive_type": "text",
         "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
-          "font_size": 8
+          "text_size": 8
         }
       },
 

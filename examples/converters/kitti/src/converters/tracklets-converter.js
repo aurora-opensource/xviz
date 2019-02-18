@@ -167,7 +167,7 @@ export default class TrackletsConverter {
       .category('primitive')
       .type('text')
       .streamStyle({
-        size: 18,
+        text_size: 18,
         fill_color: '#DCDCCD'
       })
       .coordinate('VEHICLE_RELATIVE')

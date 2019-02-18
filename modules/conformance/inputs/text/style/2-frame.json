@@ -37,7 +37,7 @@
             ]
           },
 
-          "/text/stream/font_size": {
+          "/text/stream/text_size": {
             "texts": [
               {
                 "position": [-6, -2, 0],
@@ -116,7 +116,7 @@
                 "text": "AVS",
                 "base": {
                   "style": {
-                    "font_size": 8
+                    "text_size": 8
                   }
                 }
               },

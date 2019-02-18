@@ -79,6 +79,7 @@ const PROPERTY_FORMATTERS = {
   fill_color: getColor,
 
   font_family: String,
+  font_weight: String,
   text_size: getNumber,
   text_angle: getNumber,
   text_anchor: String,
@@ -99,7 +100,6 @@ const DEFAULT_STYLES = {
   stroked: true,
   filled: true,
   extruded: false,
-  wireframe: false,
   height: 0,
 
   stroke_color: [0, 0, 0],
@@ -107,10 +107,10 @@ const DEFAULT_STYLES = {
 
   font_family: 'Arial',
   font_weight: 'normal',
-  font_size: 12,
+  text_size: 12,
   text_angle: 0,
-  text_anchor: 'center',
-  text_baseline: 'middle',
+  text_anchor: 'middle',
+  text_baseline: 'center',
 
   radius: 1,
   radius_pixels: 1,

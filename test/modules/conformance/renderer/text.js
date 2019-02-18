@@ -16,7 +16,7 @@ import {getStyles, getCSSColor} from './utils';
 
 const STREAM_STYLES = ['opacity', 'font_family', 'font_weight'];
 
-const OBJECT_STYLES = ['fill_color', 'font_size', 'text_angle', 'text_anchor', 'text_baseline'];
+const OBJECT_STYLES = ['fill_color', 'text_size', 'text_angle', 'text_anchor', 'text_baseline'];
 
 export default function renderText({context, feature, stylesheet, project}) {
   const streamStyles = getStyles(stylesheet, STREAM_STYLES, {});
@@ -24,7 +24,7 @@ export default function renderText({context, feature, stylesheet, project}) {
 
   // Resolve styles
   const {position, text} = feature;
-  const fontSize = objectStyles.font_size;
+  const fontSize = objectStyles.text_size;
   const angle = objectStyles.text_angle;
   const fontFamily = streamStyles.font_family;
   const fontWeight = streamStyles.font_weight;
@@ -34,8 +34,8 @@ export default function renderText({context, feature, stylesheet, project}) {
 
   // Render to canvas
   context.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
-  context.textAlign = textAnchor;
-  context.textBaseline = textBaseline;
+  context.textAlign = textAnchor === 'middle' ? 'center' : textAnchor;
+  context.textBaseline = textBaseline === 'center' ? 'middle' : textBaseline;
   context.fillStyle = fillColor;
 
   context.save();
