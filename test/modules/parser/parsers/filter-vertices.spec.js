@@ -34,11 +34,7 @@ tape('filterVertices', t => {
 
   // Check that first and last vertex are preserved
   t.deepEqual(path.slice(0, 3), PROBLEMATIC_PATH[0], 'has the first vertex');
-  t.deepEqual(
-    path.slice(-3),
-    PROBLEMATIC_PATH[PROBLEMATIC_PATH.length - 1],
-    'has the last vertex'
-  );
+  t.deepEqual(path.slice(-3), PROBLEMATIC_PATH[PROBLEMATIC_PATH.length - 1], 'has the last vertex');
 
   t.deepEqual(path, path2, 'flat path is filtered correctly');
 
