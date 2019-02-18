@@ -8,7 +8,7 @@
       "name": "fancy",
       "style": {
         "stroke_width": 2,
-        "wireframe": true
+        "extruded": true
       }
     }
   ]

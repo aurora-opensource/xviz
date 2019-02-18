@@ -10,7 +10,6 @@
       "/polygon/stream/stroked": {
         "category": "primitive",
         "primitive_type": "polygon",
-        "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
           "stroked": false
         }
@@ -19,7 +18,6 @@
       "/polygon/stream/filled": {
         "category": "primitive",
         "primitive_type": "polygon",
-        "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
           "filled": false
         }
@@ -28,7 +26,6 @@
       "/polygon/stream/stroke_width": {
         "category": "primitive",
         "primitive_type": "polygon",
-        "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
           "stroke_width": 0.3
         }
@@ -37,7 +34,6 @@
       "/polygon/stream/stroke_color": {
         "category": "primitive",
         "primitive_type": "polygon",
-        "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
           "stroke_color": "#f00"
         }
@@ -46,7 +42,6 @@
       "/polygon/stream/fill_color": {
         "category": "primitive",
         "primitive_type": "polygon",
-        "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
           "fill_color": "#f00"
         }
@@ -55,7 +50,6 @@
       "/polygon/stream/opacity": {
         "category": "primitive",
         "primitive_type": "polygon",
-        "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
           "opacity": 0.5
         }
@@ -64,7 +58,6 @@
       "/polygon/stream/stroke_width_min_pixels": {
         "category": "primitive",
         "primitive_type": "polygon",
-        "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
           "stroke_width_min_pixels": 2
         }
@@ -73,7 +66,6 @@
       "/polygon/stream/stroke_width_max_pixels": {
         "category": "primitive",
         "primitive_type": "polygon",
-        "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
           "stroke_width_max_pixels": 0.5
         }
@@ -87,7 +79,7 @@
 
     },
     "log_info": {
-      "description": "XVIZ Client Test - Point Styling",
+      "description": "XVIZ Client Test - Polygon Styling",
       "license": "Apache 2.0",
       "start_time": 1000,
       "end_time": 1010

@@ -72,7 +72,6 @@ const PROPERTY_FORMATTERS = {
   stroked: getBool,
   filled: getBool,
   extruded: getBool,
-  wireframe: getBool,
   height: getNumber,
 
   stroke_color: getColor,
@@ -81,7 +80,7 @@ const PROPERTY_FORMATTERS = {
   font_family: String,
   font_weight: String,
   text_size: getNumber,
-  text_angle: getNumber,
+  text_rotation: getNumber,
   text_anchor: String,
   text_baseline: String,
 
@@ -108,7 +107,7 @@ const DEFAULT_STYLES = {
   font_family: 'Arial',
   font_weight: 'normal',
   text_size: 12,
-  text_angle: 0,
+  text_rotation: 0,
   text_anchor: 'middle',
   text_baseline: 'center',
 

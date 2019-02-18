@@ -82,7 +82,7 @@
             ]
           },
 
-          "/text/stream/text_angle": {
+          "/text/stream/text_rotation": {
             "texts": [
               {
                 "position": [-2, 0, 0],
@@ -161,7 +161,7 @@
                 "text": "AVS",
                 "base": {
                   "style": {
-                    "text_angle": -90
+                    "text_rotation": -90
                   }
                 }
               }

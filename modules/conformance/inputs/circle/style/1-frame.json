@@ -10,7 +10,6 @@
       "/circle/stream/stroked": {
         "category": "primitive",
         "primitive_type": "circle",
-        "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
           "stroked": false
         }
@@ -19,7 +18,6 @@
       "/circle/stream/filled": {
         "category": "primitive",
         "primitive_type": "circle",
-        "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
           "filled": false
         }
@@ -28,7 +26,6 @@
       "/circle/stream/opacity": {
         "category": "primitive",
         "primitive_type": "circle",
-        "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
           "opacity": 0.5
         }
@@ -37,7 +34,6 @@
       "/circle/stream/radius": {
         "category": "primitive",
         "primitive_type": "circle",
-        "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
           "radius": 0.5
         }
@@ -46,7 +42,6 @@
       "/circle/stream/radius_min_pixels": {
         "category": "primitive",
         "primitive_type": "circle",
-        "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
           "radius_min_pixels": 15
         }
@@ -55,7 +50,6 @@
       "/circle/stream/radius_max_pixels": {
         "category": "primitive",
         "primitive_type": "circle",
-        "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
           "radius_max_pixels": 5
         }
@@ -64,7 +58,6 @@
       "/circle/stream/stroke_width": {
         "category": "primitive",
         "primitive_type": "circle",
-        "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
           "stroke_width": 0.5
         }
@@ -73,7 +66,6 @@
       "/circle/stream/stroke_width_min_pixels": {
         "category": "primitive",
         "primitive_type": "circle",
-        "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
           "stroke_width_min_pixels": 2
         }
@@ -82,7 +74,6 @@
       "/circle/stream/stroke_width_max_pixels": {
         "category": "primitive",
         "primitive_type": "circle",
-        "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
           "stroke_width_max_pixels": 0.5
         }
@@ -91,7 +82,6 @@
       "/circle/stream/fill_color": {
         "category": "primitive",
         "primitive_type": "circle",
-        "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
           "fill_color": "#0f0"
         }
@@ -100,7 +90,6 @@
       "/circle/stream/stroke_color": {
         "category": "primitive",
         "primitive_type": "circle",
-        "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
           "stroke_color": "#0f0"
         }

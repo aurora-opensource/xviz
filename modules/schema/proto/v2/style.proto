@@ -29,10 +29,10 @@ message ObjectValue
 
     double radius = 4;
 
-    double size = 5;
+    double text_size = 5;
 
-    /// Angle in radians
-    double angle = 6;
+    /// Angle in degrees
+    double text_rotation = 6;
 
     enum TextAnchor {
         // yeah enums are message scoped, thanks C++98
@@ -46,13 +46,13 @@ message ObjectValue
 
     enum AlignmentBaseline
     {
-        alignment_baseline_not_set = 0;
+        text_baseline_not_set = 0;
         top = 1;
         center = 2;
         bottom = 3;
     }
     
-    AlignmentBaseline alignment_baseline = 8;
+    AlignmentBaseline text_baseline = 8;
 
     double height = 9;
 }
@@ -69,9 +69,9 @@ message StreamValue
 
     double radius = 4;
 
-    double size = 5;
+    double text_size = 5;
 
-    double angle = 6;
+    double text_rotation = 6;
 
     enum TextAnchor {
         // yeah enums are message scoped, thanks C++98
@@ -85,13 +85,13 @@ message StreamValue
 
     enum AlignmentBaseline
     {
-        alignment_baseline_not_set = 0;
+        text_baseline_not_set = 0;
         top = 1;
         center = 2;
         bottom = 3;
     }
     
-    AlignmentBaseline alignment_baseline = 8;
+    AlignmentBaseline text_baseline = 8;
 
     double height = 9;
 
@@ -111,7 +111,11 @@ message StreamValue
 
     bool extruded = 17;
 
-    bool wireframe = 18;
+    uint32 radius_pixels = 18;
+
+    uint32 font_weight = 19;
+
+    string font_family = 20;
 }
 
 message Color

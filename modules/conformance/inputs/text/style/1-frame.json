@@ -10,7 +10,6 @@
       "/text/stream/font_family": {
         "category": "primitive",
         "primitive_type": "text",
-        "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
           "font_family": "Times"
         }
@@ -19,7 +18,6 @@
       "/text/stream/font_weight": {
         "category": "primitive",
         "primitive_type": "text",
-        "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
           "font_weight": "bold"
         }
@@ -28,7 +26,6 @@
       "/text/stream/text_size": {
         "category": "primitive",
         "primitive_type": "text",
-        "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
           "text_size": 8
         }
@@ -37,7 +34,6 @@
       "/text/stream/opacity": {
         "category": "primitive",
         "primitive_type": "text",
-        "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
           "opacity": 0.5
         }
@@ -46,7 +42,6 @@
       "/text/stream/fill_color": {
         "category": "primitive",
         "primitive_type": "text",
-        "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
           "fill_color": "#f00"
         }
@@ -55,7 +50,6 @@
       "/text/stream/text_anchor": {
         "category": "primitive",
         "primitive_type": "text",
-        "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
           "text_anchor": "start"
         }
@@ -64,18 +58,16 @@
       "/text/stream/text_baseline": {
         "category": "primitive",
         "primitive_type": "text",
-        "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
           "text_baseline": "top"
         }
       },
 
-      "/text/stream/text_angle": {
+      "/text/stream/text_rotation": {
         "category": "primitive",
         "primitive_type": "text",
-        "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
-          "text_angle": 30
+          "text_rotation": 30
         }
       },
 
@@ -87,7 +79,7 @@
 
     },
     "log_info": {
-      "description": "XVIZ Client Test - Point Styling",
+      "description": "XVIZ Client Test - Text Styling",
       "license": "Apache 2.0",
       "start_time": 1000,
       "end_time": 1010

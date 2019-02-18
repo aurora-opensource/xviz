@@ -16,7 +16,7 @@ import {getStyles, getCSSColor} from './utils';
 
 const STREAM_STYLES = ['opacity', 'font_family', 'font_weight'];
 
-const OBJECT_STYLES = ['fill_color', 'text_size', 'text_angle', 'text_anchor', 'text_baseline'];
+const OBJECT_STYLES = ['fill_color', 'text_size', 'text_rotation', 'text_anchor', 'text_baseline'];
 
 export default function renderText({context, feature, stylesheet, project}) {
   const streamStyles = getStyles(stylesheet, STREAM_STYLES, {});
@@ -25,7 +25,7 @@ export default function renderText({context, feature, stylesheet, project}) {
   // Resolve styles
   const {position, text} = feature;
   const fontSize = objectStyles.text_size;
-  const angle = objectStyles.text_angle;
+  const rotation = objectStyles.text_rotation;
   const fontFamily = streamStyles.font_family;
   const fontWeight = streamStyles.font_weight;
   const textAnchor = objectStyles.text_anchor;
@@ -40,7 +40,7 @@ export default function renderText({context, feature, stylesheet, project}) {
 
   context.save();
   context.translate(project(position)[0], project(position)[1]);
-  context.rotate((-angle * Math.PI) / 180);
+  context.rotate((-rotation * Math.PI) / 180);
   context.fillText(text, 0, 0);
   context.restore();
 }

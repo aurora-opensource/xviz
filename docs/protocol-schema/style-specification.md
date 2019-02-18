@@ -27,7 +27,6 @@ Stream styles are defined as part of the stream's metadata.
     '/object/shape': {
       "category": "primitive",
       "primitive_type": "polygon",
-      "coordinate": "VEHICLE_RELATIVE",
       "stream_style": [
         {
           "style": {
@@ -60,7 +59,6 @@ objects in that stream based on their classes.
     '/object/shape': {
       "category": "primitive",
       "primitive_type": "polygon",
-      "coordinate": "VEHICLE_RELATIVE",
       "stream_style": [
         {
           "style": {
@@ -216,16 +214,16 @@ Supported style properties by primitive types:
 
 ### text
 
-| Property        | Description                                                                                              | Type            | Default    | Per-stream | Per-object |
-| --------------- | -------------------------------------------------------------------------------------------------------- | --------------- | ---------- | ---------- | ---------- |
-| `font_family`   | Font name of the texts. A valid CSS font-family value                                                    | String          | `'Arial'`  | X          |            |
-| `font_weight`   | Font name of the texts. A valid CSS font-weight value                                                    | String          | `'normal'` | X          |            |
-| `fill_color`    | Color of the texts                                                                                       | [Color](#color) | `'#fff'`   | X          | X          |
-| `text_size`     | Size of the text in pixels                                                                               | Number          | `12`       | X          | X          |
-| `text_angle`    | Rotation of the text in degrees                                                                          | Number          | `0`        | X          | X          |
-| `text_anchor`   | The horizontal alignment of a `text` primitive relative to its position. One of `start`, `middle`, `end` | String          | `middle`   | X          | X          |
-| `text_baseline` | The vertical alignment of a `text` primitive relative to its position. One of `top`, `center`, `bottom`  | String          | `center`   | X          | X          |
-| `opacity`       | Opacity of the object                                                                                    | Number          | `1`        | X          |            |
+| Property        | Description                                                                                              | Type            | Default   | Per-stream | Per-object |
+| --------------- | -------------------------------------------------------------------------------------------------------- | --------------- | --------- | ---------- | ---------- |
+| `font_family`   | Font name of the texts. A valid CSS font-family value                                                    | String          | `'Arial'` | X          |            |
+| `font_weight`   | Font weight of the texts. A valid CSS numeric font-weight value                                          | Number          | `400`     | X          |            |
+| `fill_color`    | Color of the texts                                                                                       | [Color](#color) | `'#fff'`  | X          | X          |
+| `text_size`     | Size of the text in pixels                                                                               | Number          | `12`      | X          | X          |
+| `text_rotation` | Counter-clockwise rotation of the text in degrees                                                        | Number          | `0`       | X          | X          |
+| `text_anchor`   | The horizontal alignment of a `text` primitive relative to its position. One of `start`, `middle`, `end` | String          | `middle`  | X          | X          |
+| `text_baseline` | The vertical alignment of a `text` primitive relative to its position. One of `top`, `center`, `bottom`  | String          | `center`  | X          | X          |
+| `opacity`       | Opacity of the object                                                                                    | Number          | `1`       | X          |            |
 
 ## Property Types
 

@@ -74,7 +74,7 @@ function run(testCase) {
           threshold: 0.999,
           goldenImage: testCase.goldenImage,
           region: getBoundingBoxInPage(canvas),
-          // uncomment to save golden image
+          // set DEBUG above to true to overwrite golden image
           saveOnFail: DEBUG,
           saveAs: '[name].png'
         })
