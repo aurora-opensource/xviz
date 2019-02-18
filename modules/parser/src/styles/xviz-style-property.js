@@ -78,10 +78,11 @@ const PROPERTY_FORMATTERS = {
   stroke_color: getColor,
   fill_color: getColor,
 
-  size: getNumber,
-  angle: getNumber,
+  font_family: String,
+  text_size: getNumber,
+  text_angle: getNumber,
   text_anchor: String,
-  alignment_baseline: String,
+  text_baseline: String,
 
   radius: getNumber,
   radius_min_pixels: getNumber,
@@ -104,10 +105,12 @@ const DEFAULT_STYLES = {
   stroke_color: [0, 0, 0],
   fill_color: [255, 255, 255],
 
-  size: 12,
-  angle: 0,
-  text_anchor: 'middle',
-  alignment_baseline: 'center',
+  font_family: 'Arial',
+  font_weight: 'normal',
+  font_size: 12,
+  text_angle: 0,
+  text_anchor: 'center',
+  text_baseline: 'middle',
 
   radius: 1,
   radius_pixels: 1,

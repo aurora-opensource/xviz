@@ -13,10 +13,10 @@
     "end": {
       "$ref": "https://xviz.org/schema/math/vector3x1.json"
     },
-    "radius_m": {
+    "radius": {
       "type": "number"
     }
   },
-  "required": [ "start", "end", "radius_m" ],
+  "required": [ "start", "end", "radius" ],
   "additionalProperties": false
 }

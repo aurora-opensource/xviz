@@ -1,0 +1,134 @@
+{
+  "type": "xviz/state_update",
+  "data": {
+    "update_type": "snapshot",
+    "updates": [
+      {
+        "timestamp": 1000.1,
+        "poses": {
+          "/vehicle_pose": {
+            "timestamp": 1000.1,
+            "orientation": [0, 0, 0],
+            "position": [0, 0, 0],
+            "mapOrigin": {
+              "longitude": -122.4,
+              "latitude": 37.8,
+              "altitude": 0
+            }
+          }
+        },
+        "primitives": {
+
+          "/stadium/stream/radius": {
+            "stadiums": [
+              {
+                "start": [-6, -6, 0],
+                "end": [-4, -6, 0]
+              },
+              {
+                "start": [-6, -4, 0],
+                "end": [-4, -4, 0],
+                "radius": 1
+              }
+            ]
+          },
+
+          "/stadium/stream/fill_color": {
+            "stadiums": [
+              {
+                "start": [-6, -2, 0],
+                "end": [-4, -2, 0],
+                "radius": 1
+              }
+            ]
+          },
+
+          "/stadium/stream/opacity": {
+            "stadiums": [
+              {
+                "start": [-6, 0, 0],
+                "end": [-4, 0, 0],
+                "radius": 1
+              }
+            ]
+          },
+
+          "/stadium/stream/radius_min_pixels": {
+            "stadiums": [
+              {
+                "start": [-6, 2, 0],
+                "end": [-4, 2, 0],
+                "radius": 1
+              }
+            ]
+          },
+
+          "/stadium/stream/radius_max_pixels": {
+            "stadiums": [
+              {
+                "start": [-6, 4, 0],
+                "end": [-4, 4, 0],
+                "radius": 1
+              }
+            ]
+          },
+
+          "/stadium/inline": {
+            "stadiums": [
+              {
+                "start": [-1, -6, 0],
+                "end": [1, -6, 0],
+                "radius": 1,
+                "base": {
+                  "style": {
+                    "radius": 0.5
+                  }
+                }
+              },
+              {
+                "start": [-1, -4, 0],
+                "end": [1, -4, 0],
+                "radius": 1,
+                "base": {
+                  "style": {
+                    "fill_color": "#08f"
+                  }
+                }
+              },
+              {
+                "start": [-1, -2, 0],
+                "end": [1, -2, 0],
+                "radius": 1,
+                "base": {
+                  "style": {
+                    "opacity": 0.5
+                  }
+                }
+              },
+              {
+                "start": [-1, 0, 0],
+                "end": [1, 0, 0],
+                "radius": 1,
+                "base": {
+                  "style": {
+                    "radius_min_pixels": 20
+                  }
+                }
+              },
+              {
+                "start": [-1, 2, 0],
+                "end": [1, 2, 0],
+                "radius": 1,
+                "base": {
+                  "style": {
+                    "radius_max_pixels": 5
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

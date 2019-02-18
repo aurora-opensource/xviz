@@ -12,31 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {getStyles, getCSSColor} from './utils';
+import {getStyles, getCSSColor, unflattenVertices} from './utils';
 
 const STREAM_STYLES = [
-  'opacity',
-  'radius_min_pixels',
-  'radius_max_pixels',
   'stroked',
   'filled',
+  'opacity',
+  'extruded',
+  'wireframe',
   'stroke_width_min_pixels',
   'stroke_width_max_pixels'
 ];
 
-const OBJECT_STYLES = ['radius', 'stroke_width', 'stroke_color', 'fill_color'];
+const OBJECT_STYLES = ['stroke_color', 'stroke_width', 'fill_color', 'height'];
 
-export default function renderCircle({context, feature, stylesheet, project}) {
+export default function renderPolygon({context, feature, stylesheet, project}) {
   const streamStyles = getStyles(stylesheet, STREAM_STYLES, {});
   const objectStyles = getStyles(stylesheet, OBJECT_STYLES, feature);
 
   // Resolve styles
-  const center = feature.center;
-  let radius = project(feature.radius || objectStyles.radius);
-  radius = Math.min(
-    Math.max(streamStyles.radius_min_pixels, radius),
-    streamStyles.radius_max_pixels
-  );
+  const vertices = unflattenVertices(feature.vertices);
   let strokeWidth = project(objectStyles.stroke_width);
   strokeWidth = Math.min(
     Math.max(streamStyles.stroke_width_min_pixels, strokeWidth),
@@ -47,16 +42,23 @@ export default function renderCircle({context, feature, stylesheet, project}) {
 
   // Render to canvas
   context.beginPath();
-  context.arc(project(center)[0], project(center)[1], radius, 0, Math.PI * 2);
+  for (let i = 0; i < vertices.length; i++) {
+    const p = project(vertices[i]);
+    if (i === 0) {
+      context.moveTo(p[0], p[1]);
+    } else {
+      context.lineTo(p[0], p[1]);
+    }
+  }
   context.closePath();
 
-  if (streamStyles.filled) {
-    context.fillStyle = fillColor;
-    context.fill();
-  }
   if (streamStyles.stroked) {
     context.lineWidth = strokeWidth;
     context.strokeStyle = strokeColor;
     context.stroke();
+  }
+  if (streamStyles.filled) {
+    context.fillStyle = fillColor;
+    context.fill();
   }
 }

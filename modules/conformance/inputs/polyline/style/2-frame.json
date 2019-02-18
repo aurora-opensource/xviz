@@ -1,0 +1,116 @@
+{
+  "type": "xviz/state_update",
+  "data": {
+    "update_type": "snapshot",
+    "updates": [
+      {
+        "timestamp": 1000.1,
+        "poses": {
+          "/vehicle_pose": {
+            "timestamp": 1000.1,
+            "orientation": [0, 0, 0],
+            "position": [0, 0, 0],
+            "mapOrigin": {
+              "longitude": -122.4,
+              "latitude": 37.8,
+              "altitude": 0
+            }
+          }
+        },
+        "primitives": {
+
+          "/polyline/stream/stroke_width": {
+            "polylines": [
+              {
+                "vertices": [[-6, -6, 0], [-6, -4, 0], [-4, -4, 0], [-6, -6, 0]]
+              },
+              {
+                "vertices": [[-6, -3, 0], [-6, -1, 0], [-4, -1, 0]]
+              }
+            ]
+          },
+
+          "/polyline/stream/stroke_color": {
+            "polylines": [
+              {
+                "vertices": [[0, -6, 0], [0, -4, 0], [2, -4, 0]]
+              }
+            ]
+          },
+
+          "/polyline/stream/opacity": {
+            "polylines": [
+              {
+                "vertices": [[-6, 0, 0], [-6, 2, 0], [-4, 2, 0]]
+              }
+            ]
+          },
+
+          "/polyline/stream/stroke_width_min_pixels": {
+            "polylines": [
+              {
+                "vertices": [[-6, 3, 0], [-6, 5, 0], [-4, 5, 0]]
+              }
+            ]
+          },
+
+          "/polyline/stream/stroke_width_max_pixels": {
+            "polylines": [
+              {
+                "vertices": [[-3, -6, 0], [-3, -4, 0], [-1, -4, 0]]
+              }
+            ]
+          },
+
+          "/polyline/inline": {
+            "polylines": [
+              {
+                "vertices": [[-3, -3, 0], [-3, -1, 0], [-1, -1, 0]]
+              },
+              {
+                "vertices": [[-3, 0, 0], [-3, 2, 0], [-1, 2, 0]],
+                "base": {
+                  "style": {
+                    "stroke_color": "#08f"
+                  }
+                }
+              },
+              {
+                "vertices": [[-3, 3, 0], [-3, 5, 0], [-1, 5, 0]],
+                "base": {
+                  "style": {
+                    "stroke_width": 0.5
+                  }
+                }
+              },
+              {
+                "vertices": [[0, -3, 0], [0, -1, 0], [2, -1, 0]],
+                "base": {
+                  "style": {
+                    "opacity": 0.5
+                  }
+                }
+              },
+              {
+                "vertices": [[0, 0, 0], [0, 2, 0], [2, 2, 0]],
+                "base": {
+                  "style": {
+                    "stroke_width_min_pixels": 2
+                  }
+                }
+              },
+              {
+                "vertices": [[0, 3, 0], [0, 5, 0], [2, 5, 0]],
+                "base": {
+                  "style": {
+                    "stroke_width_max_pixels": 0.5
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}

@@ -48,7 +48,7 @@
         "primitive_type": "circle",
         "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
-          "radius_min_pixels": 1.2
+          "radius_min_pixels": 15
         }
       },
 
@@ -57,7 +57,7 @@
         "primitive_type": "circle",
         "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
-          "radius_max_pixels": 0.8
+          "radius_max_pixels": 5
         }
       },
 
@@ -75,7 +75,7 @@
         "primitive_type": "circle",
         "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
-          "stroke_width_min_pixels": 0.2
+          "stroke_width_min_pixels": 2
         }
       },
 
@@ -84,7 +84,7 @@
         "primitive_type": "circle",
         "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
-          "stroke_width_max_pixels": 0.05
+          "stroke_width_max_pixels": 0.5
         }
       },
 

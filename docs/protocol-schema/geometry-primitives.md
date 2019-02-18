@@ -109,17 +109,17 @@ JSON example using style class for styling:
 
 The circle primitive is used to draw circles and rings, it’s center lines up with the object center.
 
-| Name     | Type    | Description                                           |
-| -------- | ------- | ----------------------------------------------------- |
-| center   | point3d | Continuous space position of the center of the circle |
-| radius_m | float32 | The radius of the circle in meters                    |
+| Name   | Type    | Description                                           |
+| ------ | ------- | ----------------------------------------------------- |
+| center | point3d | Continuous space position of the center of the circle |
+| radius | float32 | The radius of the circle in meters                    |
 
 Example:
 
 ```js
 {
     "center": [9, 15, 3],
-    "radius_m": 2.5
+    "radius": 2.5
 }
 ```
 
@@ -128,11 +128,11 @@ Example:
 The stadium primitive is used to draw 2D geometric stadiums. As of XVIZ v2.0.0, stadiums are the
 closest that XVIZ has to support for 3D capsule shapes.
 
-| Name     | Type    | Description                                                                                                       |
-| -------- | ------- | ----------------------------------------------------------------------------------------------------------------- |
-| start    | point3d | The midpoint of one end of the rectangle portion of a stadium that is adjacent to a semi-circle.                  |
-| end      | point3d | The midpoint of the other end of the rectangle portion of the stadium which is adjacent to the other semi-circle. |
-| radius_m | float32 | The radius of the circles in meters                                                                               |
+| Name   | Type    | Description                                                                                                       |
+| ------ | ------- | ----------------------------------------------------------------------------------------------------------------- |
+| start  | point3d | The midpoint of one end of the rectangle portion of a stadium that is adjacent to a semi-circle.                  |
+| end    | point3d | The midpoint of the other end of the rectangle portion of the stadium which is adjacent to the other semi-circle. |
+| radius | float32 | The radius of the circles in meters                                                                               |
 
 Example:
 
@@ -140,7 +140,7 @@ Example:
 {
     "start": [9, 15, 3],
     "end": [20, 13, 3],
-    "radius_m": 2.5
+    "radius": 2.5
 }
 ```
 

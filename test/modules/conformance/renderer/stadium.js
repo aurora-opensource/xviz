@@ -14,49 +14,30 @@
 
 import {getStyles, getCSSColor} from './utils';
 
-const STREAM_STYLES = [
-  'opacity',
-  'radius_min_pixels',
-  'radius_max_pixels',
-  'stroked',
-  'filled',
-  'stroke_width_min_pixels',
-  'stroke_width_max_pixels'
-];
+const STREAM_STYLES = ['opacity', 'radius_min_pixels', 'radius_max_pixels'];
 
-const OBJECT_STYLES = ['radius', 'stroke_width', 'stroke_color', 'fill_color'];
+const OBJECT_STYLES = ['fill_color', 'radius'];
 
-export default function renderCircle({context, feature, stylesheet, project}) {
+export default function renderPolyline({context, feature, stylesheet, project}) {
   const streamStyles = getStyles(stylesheet, STREAM_STYLES, {});
   const objectStyles = getStyles(stylesheet, OBJECT_STYLES, feature);
 
   // Resolve styles
-  const center = feature.center;
+  const {start, end} = feature;
   let radius = project(feature.radius || objectStyles.radius);
   radius = Math.min(
     Math.max(streamStyles.radius_min_pixels, radius),
     streamStyles.radius_max_pixels
   );
-  let strokeWidth = project(objectStyles.stroke_width);
-  strokeWidth = Math.min(
-    Math.max(streamStyles.stroke_width_min_pixels, strokeWidth),
-    streamStyles.stroke_width_max_pixels
-  );
-  const strokeColor = getCSSColor(objectStyles.stroke_color, streamStyles.opacity);
   const fillColor = getCSSColor(objectStyles.fill_color, streamStyles.opacity);
 
   // Render to canvas
   context.beginPath();
-  context.arc(project(center)[0], project(center)[1], radius, 0, Math.PI * 2);
-  context.closePath();
+  context.moveTo(project(start)[0], project(start)[1]);
+  context.lineTo(project(end)[0], project(end)[1]);
 
-  if (streamStyles.filled) {
-    context.fillStyle = fillColor;
-    context.fill();
-  }
-  if (streamStyles.stroked) {
-    context.lineWidth = strokeWidth;
-    context.strokeStyle = strokeColor;
-    context.stroke();
-  }
+  context.lineCap = 'round';
+  context.lineWidth = radius;
+  context.strokeStyle = fillColor;
+  context.stroke();
 }

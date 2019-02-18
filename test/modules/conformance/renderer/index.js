@@ -17,10 +17,20 @@ import {XVIZStyleParser} from '@xviz/parser';
 import {parseFrame, getTransform} from './utils';
 
 import renderCircle from './circle';
+import renderPoint from './point';
+import renderPolyline from './polyline';
+import renderPolygon from './polygon';
+import renderText from './text';
+import renderStadium from './stadium';
 
 // mapping from primitive_type to render function
 const renderers = {
-  circle: renderCircle
+  circle: renderCircle,
+  point: renderPoint,
+  polyline: renderPolyline,
+  polygon: renderPolygon,
+  text: renderText,
+  stadium: renderStadium
 };
 
 export default function renderXVIZ(context, frames) {
@@ -31,7 +41,10 @@ export default function renderXVIZ(context, frames) {
 
   for (const streamName in metadata.streams) {
     const streamMetadata = metadata.streams[streamName];
-    const {features} = timeslice.streams[streamName];
+    const stream = timeslice.streams[streamName];
+    if (!stream) {
+      continue; // eslint-disable-line
+    }
 
     const renderer = renderers[streamMetadata.primitive_type];
     const project = getTransform({
@@ -42,7 +55,12 @@ export default function renderXVIZ(context, frames) {
     const stylesheet = styleParser.getStylesheet(streamName);
 
     if (renderer) {
-      features.forEach(feature => renderer({context, feature, stylesheet, project}));
+      if (stream.features) {
+        stream.features.forEach(feature => renderer({context, feature, stylesheet, project}));
+      }
+      if (stream.pointCloud) {
+        renderer({context, pointCloud: stream.pointCloud, stylesheet, project});
+      }
     }
   }
 }

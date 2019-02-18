@@ -7,59 +7,55 @@
         "category": "pose"
       },
 
-      "/point/stream/radius_pixels": {
+      "/stadium/stream/radius": {
         "category": "primitive",
-        "primitive_type": "point",
+        "primitive_type": "stadium",
         "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
-          "radius_pixels": 5
+          "radius": 0.3
         }
       },
 
-      "/point/stream/opacity": {
+      "/stadium/stream/fill_color": {
         "category": "primitive",
-        "primitive_type": "point",
+        "primitive_type": "stadium",
+        "coordinate": "VEHICLE_RELATIVE",
+        "stream_style": {
+          "fill_color": "#f00"
+        }
+      },
+
+      "/stadium/stream/opacity": {
+        "category": "primitive",
+        "primitive_type": "stadium",
         "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
           "opacity": 0.5
         }
       },
 
-      "/point/stream/fill_color": {
+      "/stadium/stream/radius_min_pixels": {
         "category": "primitive",
-        "primitive_type": "point",
+        "primitive_type": "stadium",
         "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
-          "fill_color": "#f00"
+          "radius_min_pixels": 15
         }
       },
 
-      "/point/inline/color": {
+      "/stadium/stream/radius_max_pixels": {
         "category": "primitive",
-        "primitive_type": "point",
+        "primitive_type": "stadium",
         "coordinate": "VEHICLE_RELATIVE",
         "stream_style": {
-          "fill_color": "#f00"
+          "radius_max_pixels": 5
         }
       },
 
-      "/point/stream/point_color_mode": {
+      "/stadium/inline": {
         "category": "primitive",
-        "primitive_type": "point",
-        "coordinate": "VEHICLE_RELATIVE",
-        "stream_style": {
-          "point_color_mode": "elevation"
-        }
-      },
-
-      "/point/stream/point_color_domain": {
-        "category": "primitive",
-        "primitive_type": "point",
-        "coordinate": "VEHICLE_RELATIVE",
-        "stream_style": {
-          "point_color_mode": "distance_to_vehicle",
-          "point_color_domain": [0, 5]
-        }
+        "primitive_type": "stadium",
+        "coordinate": "VEHICLE_RELATIVE"
       }
 
     },

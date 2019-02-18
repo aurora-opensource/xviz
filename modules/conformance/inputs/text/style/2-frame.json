@@ -1,0 +1,174 @@
+{
+  "type": "xviz/state_update",
+  "data": {
+    "update_type": "snapshot",
+    "updates": [
+      {
+        "timestamp": 1000.1,
+        "poses": {
+          "/vehicle_pose": {
+            "timestamp": 1000.1,
+            "orientation": [0, 0, 0],
+            "position": [0, 0, 0],
+            "mapOrigin": {
+              "longitude": -122.4,
+              "latitude": 37.8,
+              "altitude": 0
+            }
+          }
+        },
+        "primitives": {
+
+          "/text/stream/font_family": {
+            "texts": [
+              {
+                "position": [-6, -6, 0],
+                "text": "AVS"
+              }
+            ]
+          },
+
+          "/text/stream/font_weight": {
+            "texts": [
+              {
+                "position": [-6, -4, 0],
+                "text": "AVS"
+              }
+            ]
+          },
+
+          "/text/stream/font_size": {
+            "texts": [
+              {
+                "position": [-6, -2, 0],
+                "text": "AVS"
+              }
+            ]
+          },
+
+          "/text/stream/opacity": {
+            "texts": [
+              {
+                "position": [-6, 0, 0],
+                "text": "AVS"
+              }
+            ]
+          },
+
+          "/text/stream/fill_color": {
+            "texts": [
+              {
+                "position": [-6, 2, 0],
+                "text": "AVS"
+              }
+            ]
+          },
+
+          "/text/stream/text_anchor": {
+            "texts": [
+              {
+                "position": [-6, 4, 0],
+                "text": "AVS"
+              }
+            ]
+          },
+
+          "/text/stream/text_baseline": {
+            "texts": [
+              {
+                "position": [-6, 6, 0],
+                "text": "AVS"
+              }
+            ]
+          },
+
+          "/text/stream/text_angle": {
+            "texts": [
+              {
+                "position": [-2, 0, 0],
+                "text": "AVS"
+              }
+            ]
+          },
+
+          "/text/inline": {
+            "texts": [
+              {
+                "position": [2, -6, 0],
+                "text": "AVS",
+                "base": {
+                  "style": {
+                    "font_family": "Times"
+                  }
+                }
+              },
+              {
+                "position": [2, -4, 0],
+                "text": "AVS",
+                "base": {
+                  "style": {
+                    "font_weight": "bold"
+                  }
+                }
+              },
+              {
+                "position": [2, -2, 0],
+                "text": "AVS",
+                "base": {
+                  "style": {
+                    "font_size": 8
+                  }
+                }
+              },
+              {
+                "position": [2, 0, 0],
+                "text": "AVS",
+                "base": {
+                  "style": {
+                    "opacity": 0.5
+                  }
+                }
+              },
+              {
+                "position": [2, 2, 0],
+                "text": "AVS",
+                "base": {
+                  "style": {
+                    "fill_color": "#08f"
+                  }
+                }
+              },
+              {
+                "position": [2, 4, 0],
+                "text": "AVS",
+                "base": {
+                  "style": {
+                    "text_anchor": "end"
+                  }
+                }
+              },
+              {
+                "position": [2, 6, 0],
+                "text": "AVS",
+                "base": {
+                  "style": {
+                    "text_baseline": "bottom"
+                  }
+                }
+              },
+              {
+                "position": [4, 0, 0],
+                "text": "AVS",
+                "base": {
+                  "style": {
+                    "text_angle": -90
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
+  }
+}
