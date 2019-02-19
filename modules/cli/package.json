@@ -1,6 +1,6 @@
 {
   "name": "@xviz/cli",
-  "version": "1.0.0-alpha.5",
+  "version": "1.0.0-beta.1",
   "description": "A CLI tool for the XVIZ protocol",
   "repository": {
     "type": "git",
@@ -17,9 +17,9 @@
     "src"
   ],
   "dependencies": {
-    "@xviz/builder": "^1.0.0-alpha.4",
-    "@xviz/parser": "^1.0.0-alpha.5",
-    "@xviz/schema": "^1.0.0-alpha.4",
+    "@xviz/builder": "^1.0.0-beta.1",
+    "@xviz/parser": "^1.0.0-beta.1",
+    "@xviz/schema": "^1.0.0-beta.1",
     "cli-table3": "^0.5.1",
     "indent-string": "^3.2.0",
     "websocket": "^1.0.28",
