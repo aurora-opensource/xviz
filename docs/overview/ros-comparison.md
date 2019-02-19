@@ -9,9 +9,9 @@ XVIZ goals are more focused than ROS. It's designed to create a standard protoco
 innovative clients to be built, offload expensive data transformations to a server, and minize data
 sent to the client. Doing for robotics what HTML and MP4 do for video and multi-media content.
 
-On our [roadmap](/docs/overview/roadmap.md) is a plan to bridge these worlds by updating our XVIZ
-server to support realtime conversion of ROS's [bag](http://wiki.ros.org/Bags) log format and common
-ROS data types.
+On our [roadmap](/docs/overview/roadmap.md) is a plan to bridge these worlds by updating our example
+XVIZ server to support realtime conversion of ROS's [bag](http://wiki.ros.org/Bags) log format and
+common ROS data types.
 
 ## Simularties
 
@@ -31,20 +31,23 @@ space and XVIZ being inspired by RViz. They both:
 XVIZ's advantages comes from it's focus on fully decoupling clients from data formats and server
 implementations. Along those lines it has a:
 
-- Config only UI system - Declarative UI
-- Comprehensive styling system
-- Metadata system for easies data introspective
-- Remote log viewing protocol, no need to copy logs
+- Config only UI system - [Declarative UI](/docs/declarative-ui/overview.md)
+- Comprehensive [styling system](/docs/protocol-schema/style-specification.md)
+- [Metadata system](/docs/protocol-schema/session-protocol.md#metadata) for easier data
+  introspection
+- Remote [log viewing protocol](/docs/protocol-schema/session-protocol.md#data-transfer---logs),
+  no need to copy logs
 - Web focus, ie. standard JSON
 - Protobuf support (in alpha)
 
 ### ROS
 
-ROS's advantages from it's long history of development and use, as well as basis in manipulator:
+ROS's advantages from it's long history of development and use, as well as basis in manipulator
+robotics:
 
-- ROS 1.0 more stable, 10 years of development
+- ROS 1.0 is stable with 10 years of development
 - More primitives - cubes, spheres, arrows
-- RViz Native client with existing plugins
+- RViz native client with existing plugins
 - Dynamic transform support
 
 ## Disadvantages
@@ -56,7 +59,7 @@ advantages.
 
 XVIZ's downsides stem from it's young age and the paucity of open source code, which is being fixed.
 
-- Binary protocol does not yet support optimized layout for all data
+- Binary protocol does not yet support optimized layout for all data types
 - No open source C++ or Python implementation
 - No mature open source server, example Node.js version
 
@@ -78,8 +81,8 @@ above to get a more nuanced view.
 
 |                      | XVIZ                 | ROS           |
 | -------------------- | -------------------- | ------------- |
-| Web Support          | First Class          | Community     |
-| Native Support       | None (Uber Internal) | First Class   |
+| Web App Support      | First Class          | Community     |
+| Native App Support   | None (Uber Internal) | First Class   |
 | C++ Support          | None (Uber Internal) | First Class   |
 | Python Support       | None                 | First Class   |
 | JavaScript Support   | First Class          | Community     |
