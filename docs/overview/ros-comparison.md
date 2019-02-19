@@ -1,12 +1,17 @@
 # ROS Comparson
 
-It comes up often how XVIZ and ROS relate. ROS is the more popular open source robotics development
-platform, and it has it's own visualization stack. While XVIZ is a protocol, and eventually an
-ecosystem, for visualizing robotics systems.
+It comes up often how XVIZ and [ROS](http://www.ros.org/) relate. ROS is the most popular open
+source robotics development platform, and it has it's own [RViz](http://wiki.ros.org/rviz) based
+visualization stack. While XVIZ is a protocol, and eventually an ecosystem, for visualizing robotics
+systems.
 
-XVIZ goal's are more focused than ROS. It's designed to create a standard protocol that allows
+XVIZ goals are more focused than ROS. It's designed to create a standard protocol that allows
 innovative clients to be built, offload expensive data transformations to a server, and minize data
 sent to the client. Doing for robotics what HTML and MP4 do for video and multi-media content.
+
+On our [roadmap](/docs/overview/roadmap.md) is a plan to bridge these worlds by updating our XVIZ
+server to support realtime conversion of ROS's [bag](http://wiki.ros.org/Bags) log format and common
+ROS data types.
 
 ## Simularties
 
@@ -74,7 +79,7 @@ above to get a more nuanced view.
 |                      | XVIZ                 | ROS           |
 | -------------------- | -------------------- | ------------- |
 | Web Support          | First Class          | Community     |
-| Native Support       | None (Uber Innernal) | First Class   |
+| Native Support       | None (Uber Internal) | First Class   |
 | C++ Support          | None (Uber Internal) | First Class   |
 | Python Support       | None                 | First Class   |
 | JavaScript Support   | First Class          | Community     |
