@@ -81,8 +81,8 @@ above to get a more nuanced view.
 
 |                      | XVIZ                 | ROS           |
 | -------------------- | -------------------- | ------------- |
-| Web Support          | First Class          | Community     |
-| Native Support       | None (Uber Internal) | First Class   |
+| Web App Support      | First Class          | Community     |
+| Native App Support   | None (Uber Internal) | First Class   |
 | C++ Support          | None (Uber Internal) | First Class   |
 | Python Support       | None                 | First Class   |
 | JavaScript Support   | First Class          | Community     |
