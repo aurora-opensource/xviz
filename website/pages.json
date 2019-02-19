@@ -23,6 +23,10 @@
         "markdown": "overview/conventions.md"
       },
       {
+        "name": "ROS Comparison",
+        "markdown": "overview/ros-comparison.md"
+      },
+      {
         "name": "Roadmap",
         "markdown": "overview/roadmap.md"
       },
@@ -228,7 +232,7 @@
           },
           {
             "name": "Trajectory Helpers",
-            "markdown": "api-reference/xviz-trajectory-helpers.md"
+            "markdown": "api-reference/trajectory-helpers.md"
           }
         ]
       },
