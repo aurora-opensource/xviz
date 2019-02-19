@@ -1,6 +1,6 @@
 # @xviz/schema
 
-This modulle contains the XVIZ protocol JSON schema files and examples along with utilities for
+This module contains the XVIZ protocol JSON schema files and examples along with utilities for
 validating them.
 
 ## Install
