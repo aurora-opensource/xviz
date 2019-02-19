@@ -19,7 +19,7 @@ const ALIASES = require('../aliases');
 
 const TEST_DIR = './test';
 
-const TEST_BROWSER_CONFIG = {
+const CONFIG = {
   mode: 'development',
 
   devServer: {
@@ -28,11 +28,6 @@ const TEST_BROWSER_CONFIG = {
     },
     contentBase: [resolve(TEST_DIR, '..')],
     progress: true
-  },
-
-  // Bundle the tests for running in the browser
-  entry: {
-    'test-browser': resolve(TEST_DIR, 'browser.js')
   },
 
   devtool: '#inline-source-maps',
@@ -70,4 +65,24 @@ const TEST_BROWSER_CONFIG = {
   plugins: [new HtmlWebpackPlugin()]
 };
 
-module.exports = TEST_BROWSER_CONFIG;
+module.exports = env => {
+  if (env.bench) {
+    return Object.assign({}, CONFIG, {
+      entry: {
+        main: resolve(TEST_DIR, 'bench/browser.js')
+      },
+      output: {
+        path: resolve(TEST_DIR, 'bench/dist'),
+        filename: 'bundle.js'
+      }
+    });
+  } else if (env.testBrowser) {
+    return Object.assign({}, CONFIG, {
+      entry: {
+        main: resolve(TEST_DIR, 'browser.js')
+      }
+    });
+  }
+
+  return CONFIG;
+};

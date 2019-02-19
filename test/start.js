@@ -55,6 +55,14 @@ switch (mode) {
     });
     break;
 
+  case 'bench-browser':
+    new BrowserTestDriver().run({
+      command: 'npx',
+      arguments: ['webpack-dev-server', '--config', 'test/webpack.config.js', '--env.bench'],
+      headless: false
+    });
+    break;
+
   default:
     require('./index');
     break;

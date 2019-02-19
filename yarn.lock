@@ -661,6 +661,14 @@
   dependencies:
     "@loaders.gl/core" "^0.6.2"
 
+"@probe.gl/bench@^3.0.0-alpha.1":
+  version "3.0.0-alpha.1"
+  resolved "https://registry.yarnpkg.com/@probe.gl/bench/-/bench-3.0.0-alpha.1.tgz#842bc0d53ab99e0896eae43803906f9ec8b12e74"
+  integrity sha512-RS0YrVYsz/Nwh+D1y/M7cmz7qYM5brvyrZCvW1s5iHSoBuR0WyYUnfT9Uu/iuY1uLhaMfk1j4DQrOHgcLVFsVw==
+  dependencies:
+    "@babel/runtime" "^7.0.0"
+    probe.gl "^3.0.0-alpha.1"
+
 "@probe.gl/test-utils@^3.0.0-alpha.4":
   version "3.0.0-alpha.4"
   resolved "https://registry.yarnpkg.com/@probe.gl/test-utils/-/test-utils-3.0.0-alpha.4.tgz#86d80115144f0d087f2816c1dd770722a7bc8406"
@@ -7172,7 +7180,7 @@ probe.gl@^2.0.1:
   dependencies:
     "@babel/runtime" "^7.0.0"
 
-probe.gl@^3.0.0-alpha.3:
+probe.gl@^3.0.0-alpha.1, probe.gl@^3.0.0-alpha.3:
   version "3.0.0-alpha.3"
   resolved "https://registry.yarnpkg.com/probe.gl/-/probe.gl-3.0.0-alpha.3.tgz#183bbf05634906fd12d25bf702fa042705dc5d0f"
   integrity sha512-+IDi1LQ8iC/7DeaxCK0b2Qdu1MF8Adsx/icZMFsioA8pdwJu3ut8h8CTAOyzM6ccuPj6mIum2Rfc2ZffAP0yDw==

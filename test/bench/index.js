@@ -12,13 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Bench} from 'probe.gl/bench';
-import {setXVIZConfig} from 'xviz';
+import {Bench} from '@probe.gl/bench';
 import xvizBench from './xviz.bench';
 
-setXVIZConfig({});
-const suite = new Bench();
+const suite = new Bench({
+  minIterations: 30
+});
 
 xvizBench(suite);
 
-suite.run();
+export default suite.run();

@@ -12,6 +12,7 @@
   "scripts": {
     "bootstrap": "scripts/bootstrap.sh",
     "bench": "node test/start bench",
+    "bench-browser": "node test/start bench-browser",
     "build": "lerna run build",
     "flow": "flow check",
     "cover": "NODE_ENV=cover nyc node test/start",
@@ -27,6 +28,7 @@
     "@babel/plugin-proposal-class-properties": "^7.0.0",
     "@babel/preset-env": "^7.0.0",
     "@babel/register": "^7.0.0",
+    "@probe.gl/bench": "^3.0.0-alpha.1",
     "@probe.gl/test-utils": "^3.0.0-alpha.4",
     "ajv": "^6.5.2",
     "ajv-cli": "^3.0.0",
