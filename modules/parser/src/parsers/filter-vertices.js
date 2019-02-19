@@ -53,8 +53,13 @@ export function filterVertices(vertices) {
 }
 
 function getPointAtIndex(vertices, i, isFlatArray = false) {
+  let point = null;
   if (isFlatArray) {
-    return vertices.slice(i * 3, i * 3 + 3);
+    point = vertices.slice(i * 3, i * 3 + 3);
+  } else {
+    point = vertices[i];
   }
-  return vertices[i];
+
+  point[2] = point[2] || 0;
+  return point;
 }
