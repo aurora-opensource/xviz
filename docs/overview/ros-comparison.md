@@ -6,8 +6,8 @@ visualization stack. While XVIZ is a protocol, and eventually an ecosystem, for 
 systems.
 
 XVIZ goals are more focused than ROS. It's designed to create a standard protocol that allows
-innovative clients to be built, offload expensive data transformations to a server, and minimize data
-sent to the client. Doing for robotics what HTML and MP4 do for video and multi-media content.
+innovative clients to be built, offload expensive data transformations to a server, and minimize
+data sent to the client. Doing for robotics what HTML and MP4 do for video and multi-media content.
 
 On our [roadmap](/docs/overview/roadmap.md) is a plan to bridge these worlds by updating our example
 XVIZ server to support realtime conversion of ROS's [bag](http://wiki.ros.org/Bags) log format and

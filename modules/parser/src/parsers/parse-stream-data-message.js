@@ -28,11 +28,21 @@ import parseTimesliceDataV1 from './parse-timeslice-data-v1';
 import parseTimesliceDataV2 from './parse-timeslice-data-v2';
 import {getXVIZConfig} from '../config/xviz-config';
 
+// if the first Char and lastChar represents json
+function isParsable(firstChar, lastChar) {
+  return (firstChar === '{' && lastChar === '}') || (firstChar === '[' && lastChar === ']');
+}
+
+// if the string can be sent to JSON.parse
+function isJSONString(str) {
+  return isParsable(str[0], str[str.length - 1]);
+}
+
+// encodedString is the Uint8Array, if it can be sent to string format.
 function isJSON(encodedString) {
   const firstChar = String.fromCharCode(encodedString[0]);
   const lastChar = String.fromCharCode(encodedString[encodedString.length - 1]);
-
-  return (firstChar === '{' && lastChar === '}') || (firstChar === '[' && lastChar === ']');
+  return isParsable(firstChar, lastChar);
 }
 
 // get JSON from binary
@@ -44,6 +54,8 @@ function decode(data, recursive) {
   } else if (data instanceof Uint8Array && isJSON(data)) {
     const jsonString = new TextDecoder('utf8').decode(data);
     return JSON.parse(jsonString);
+  } else if (typeof data === 'string' && isJSONString(data)) {
+    return data;
   } else if (recursive && typeof data === 'object') {
     for (const key in data) {
       // Only peek one-level deep
@@ -79,12 +91,7 @@ export function parseStreamDataMessage(message, onResult, onError, opts) {
   }
 
   try {
-    let data;
-    if (typeof message === 'string') {
-      data = JSON.parse(message);
-    } else {
-      data = decode(message, true);
-    }
+    let data = decode(message, true);
 
     let v2Type;
     let parseData = true;
