@@ -1,4 +1,4 @@
-# ROS Comparson
+# ROS Comparison
 
 It comes up often how XVIZ and [ROS](http://www.ros.org/) relate. ROS is the most popular open
 source robotics development platform, and it has it's own [RViz](http://wiki.ros.org/rviz) based
