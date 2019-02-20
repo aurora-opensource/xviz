@@ -55,7 +55,7 @@ function decode(data, recursive) {
     const jsonString = new TextDecoder('utf8').decode(data);
     return JSON.parse(jsonString);
   } else if (typeof data === 'string' && isJSONString(data)) {
-    return data;
+    return JSON.parse(data);
   } else if (recursive && typeof data === 'object') {
     for (const key in data) {
       // Only peek one-level deep
@@ -92,7 +92,6 @@ export function parseStreamDataMessage(message, onResult, onError, opts) {
 
   try {
     let data = decode(message, true);
-
     let v2Type;
     let parseData = true;
     if (isEnvelope(data)) {
