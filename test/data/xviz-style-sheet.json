@@ -1,50 +1,73 @@
 {
-  "lidar-points": {
-    "*": {
-      "fill_color": "#00a",
-      "radius_pixels": 2
+  "lidar-points": [
+    {
+      "style": {
+        "fill_color": "#00a",
+        "radius_pixels": 2
+      }
     }
-  },
-  "tracklets": {
-    "*": {
-      "extruded": true,
-      "wireframe": true,
-      "height": 1.5,
-      "fill_color": "#00000080"
+  ],
+  "tracklets": [
+    {
+      "style": {
+        "extruded": true,
+        "wireframe": true,
+        "height": 1.5,
+        "fill_color": "#00000080"
+      }
     },
-    "objectType=Car": {
-      "fill_color": "#7DDDD780",
-      "stroke_color": "#7DDDD7"
+    {
+      "name": "objectType=Car",
+      "style": {
+        "fill_color": "#7DDDD780",
+        "stroke_color": "#7DDDD7"
+      }
     },
-    "objectType=Cyclist": {
-      "fill_color": "#DA70BF80",
-      "stroke_color": "#DA70BF"
+    {
+      "name": "objectType=Cyclist",
+      "style": {
+        "fill_color": "#DA70BF80",
+        "stroke_color": "#DA70BF"
+      }
     },
-    "objectType=Pedestrian": {
-      "fill_color": "#FEC56480",
-      "stroke_color": "#FEC564"
+    {
+      "name": "objectType=Pedestrian",
+      "style": {
+        "fill_color": "#FEC56480",
+        "stroke_color": "#FEC564"
+      }
     },
-    "objectType=Van": {
-      "fill_color": "#267E6380",
-      "stroke_color": "#267E63"
+    {
+      "name": "objectType=Van",
+      "style": {
+        "fill_color": "#267E6380",
+        "stroke_color": "#267E63"
+      }
     },
-    "objectType=Unknown": {
-      "fill_color": "#D6A00080",
-      "stroke_color": "#D6A000"
+    {
+      "name": "objectType=Unknown",
+      "style": {
+        "fill_color": "#D6A00080",
+        "stroke_color": "#D6A000"
+      }
     }
-  },
-  "tracklets-trajectory": {
-    "*": {
-      "stroke_color": "#FEC557",
-      "stroke_width": 0.3,
-      "stroke_width_min_pixels": 1
+  ],
+  "tracklets-trajectory": [
+    {
+      "style": {
+        "stroke_color": "#FEC557",
+        "stroke_width": 0.3,
+        "stroke_width_min_pixels": 1
+      }
     }
-  },
-  "vehicle-pose-trajectory": {
-    "*": {
-      "stroke_color": "#57AD57AA",
-      "stroke_width": 1.4,
-      "stroke_width_min_pixels": 1
+  ],
+  "vehicle-pose-trajectory": [
+    {
+      "style": {
+        "stroke_color": "#57AD57AA",
+        "stroke_width": 1.4,
+        "stroke_width_min_pixels": 1
+      }
     }
-  }
+  ]
 }

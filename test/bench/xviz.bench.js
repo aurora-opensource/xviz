@@ -12,36 +12,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import xvizStreamMessages from 'test-data/xviz-stream';
-import xvizStylesheet from 'test-data/xviz-style-sheet.json';
-// Metadata is the first message
-const TestMetadataMessage = xvizStreamMessages[0];
-const TestMessage = xvizStreamMessages[1];
+import sampleXVIZMetadata from 'test-data/sample-metadata-message.json';
+import sampleXVIZSnapshot from 'test-data/sample-xviz.json';
+import sampleXVIZStylesheet from 'test-data/xviz-style-sheet.json';
 
-import {XVIZStyleParser, parseStreamLogData, XVIZObject} from 'xviz';
+import {setXVIZConfig, XVIZStyleParser, parseStreamMessage, LOG_STREAM_MESSAGE} from '@xviz/parser';
 
-const xvizObject = new XVIZObject({id: 1, index: 0});
+setXVIZConfig({currentMajorVersion: 2});
+
+function parse(message, opts) {
+  let result;
+  parseStreamMessage({
+    message,
+    onResult: msg => {
+      if (msg.type === LOG_STREAM_MESSAGE.INCOMPLETE) {
+        throw new Error('incomplete message');
+      }
+      result = msg;
+    },
+    onError: err => {
+      throw new Error(err);
+    },
+    ...opts
+  });
+
+  return result;
+}
 
 export default function xvizBench(bench) {
   return bench
     .group('PARSE XVIZ')
-    .add('xviz#parseMetadata', () => parseStreamLogData(TestMetadataMessage))
-
-    .add('xviz#parseFrame', () => parseStreamLogData(TestMessage))
-
-    .add('xviz#parse1second', () =>
-      xvizStreamMessages.forEach(message => parseStreamLogData(message))
-    )
-
-    .add('xviz#parseStylesheet', () => new XVIZStyleParser(xvizStylesheet))
-
-    .add(
-      'XVIZObject#_getSemanticColor',
-      // setLabel triggers a call to _getSemanticColor
-      () => {
-        xvizObject._setLabel('OBJECT_LABEL_VEHICLE');
-        xvizObject._setLabel('OBJECT_LABEL_BICYCLE');
-        xvizObject._setLabel('OBJECT_LABEL_PEDESTRIAN');
-      }
-    );
+    .add('xviz#parseMetadata', () => parse(sampleXVIZMetadata))
+    .add('xviz#parseFrame', () => parse(sampleXVIZSnapshot))
+    .add('xviz#parseStylesheet', () => new XVIZStyleParser(sampleXVIZStylesheet));
 }

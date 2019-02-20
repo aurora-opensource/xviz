@@ -35,8 +35,8 @@ implementations. Along those lines it has a:
 - Comprehensive [styling system](/docs/protocol-schema/style-specification.md)
 - [Metadata system](/docs/protocol-schema/session-protocol.md#metadata) for easier data
   introspection
-- Remote [log viewing protocol](/docs/protocol-schema/session-protocol.md#data-transfer---logs),
-  no need to copy logs
+- Remote [log viewing protocol](/docs/protocol-schema/session-protocol.md#data-transfer---logs), no
+  need to copy logs
 - Web focus, ie. standard JSON
 - Protobuf support (in alpha)
 
