@@ -39,7 +39,7 @@ case $MODE in
   "")
     run_full_test;
     echo "Ran 'full' test by default. Other options:"
-    echo "test [ 'full' | fast' | 'bench' | 'ci' | 'cover' | 'examples' | 'lint' | size-es6' ]"
+    echo "test [ 'full' | fast' | 'bench' | 'ci' | 'cover' | 'examples' | 'lint' | size-es6' | 'copyright' ]"
     break;;
 
   "full")
@@ -89,9 +89,19 @@ case $MODE in
     (cd $BASEDIR/../modules/core && npm run build-es6)
     break;;
 
+  "copyright")
+    break;;
 
   *)
     # default test
     node test/start.js $MODE
     break;;
   esac
+
+GIT_FILTER="$BASEDIR/git-copyright-files.sh"
+run_copyright_check() {
+  git diff-index --diff-filter=AM --cached --name-only HEAD | grep -e '\.sh$' -e '\.js$' | xargs "$BASEDIR/git-copyright-files.sh"
+}
+
+echo 'Running copyright header check'
+run_copyright_check
