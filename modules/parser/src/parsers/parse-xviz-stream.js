@@ -472,10 +472,18 @@ function joinObjectPointCloudsToTypedArrays(objects) {
       positions.set(vertexPositions, i * 3);
     }
 
+    if (Number.isFinite(object.id)) {
+      // v1 object ids
+      ids.fill(object.id, i, i + vertexCount);
+    }
+
+    if (isPositionFlattenedArray && (isColorFlattenedArray || !vertexColorStride)) {
+      // both positions and colors are populated
+      return;
+    }
+
     let color = object.color || DEFAULT_COLOR;
     for (let j = 0; j < vertexCount; j++, i++) {
-      ids[i] = object.id;
-
       if (!isPositionFlattenedArray) {
         const vertex = vertexPositions[j];
         positions[i * 3 + 0] = vertex[0];
