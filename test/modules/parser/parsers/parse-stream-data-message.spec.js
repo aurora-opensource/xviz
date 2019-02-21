@@ -435,11 +435,11 @@ tape('parseStreamLogData timeslice without parsing metadata (v1)', t => {
     TestTimesliceMessageV1.vehicle_pose.time,
     'Message timestamp set from timeslice'
   );
-  t.notEqual(
+  t.ok(
     metaMessage.streams['/test/stream'].pointCloud,
-    null,
     'v1 pointCloud is parsed even if metadata was not seen'
   );
+  t.deepEquals(metaMessage.streams['/test/stream'].pointCloud.ids, [1234], 'v1 ids are populated');
   t.end();
 });
 
@@ -630,8 +630,8 @@ tape('parseStreamLogData pointCloud timeslice', t => {
 
   const PointCloudTestTimesliceMessage = clone(TestTimesliceMessageV2);
   PointCloudTestTimesliceMessage.updates[0].primitives['/test/stream'].points.push({
-    object_id: '1235',
     base: {
+      object_id: '1235',
       style: {
         fill_color: [255, 255, 255]
       }
@@ -647,6 +647,7 @@ tape('parseStreamLogData pointCloud timeslice', t => {
   const pointCloud = slice.streams['/test/stream'].pointCloud;
   t.equals(pointCloud.numInstances, 2, 'Has 2 instance');
   t.equals(pointCloud.positions.length, 6, 'Has 6 values in positions');
+  t.equals(pointCloud.ids.length, 2, 'Has 2 values in ids');
 
   t.end();
 });
