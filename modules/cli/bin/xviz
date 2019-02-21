@@ -35,14 +35,9 @@ if (
 
   require('source-map-support').install();
 
-  // Registers aliases for virtual packages in this module
-  var moduleAlias = require('module-alias');
-  moduleAlias.addAliases({
-    '@xviz/builder': resolve(__dirname, '../../builder/src'),
-    '@xviz/parser': resolve(__dirname, '../../parser/src'),
-    '@xviz/schema': resolve(__dirname, '../../schema/src'),
-    '@xviz/cli': resolve(__dirname, '../../cli/src')
-  });
+  const ALIASES = require('../../../aliases');
+  const moduleAlias = require('module-alias');
+  moduleAlias.addAliases(ALIASES);
 
   requirePath = '../src';
 }
