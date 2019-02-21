@@ -260,6 +260,17 @@ Parameters:
 
 Returns: `this`
 
+##### colors(colorArray)
+
+Adds a parallel color array for coloring of the [point](/docs/protocol-schema/geometry-primitives#Point-Primitive) primitive.
+
+Parameters:
+
+- `colorArray` (Array:Number|String)
+//  string, array of string, array of number
+array of numbers0
+Returns: `this`
+
 ##### image(data, format)
 
 Add a [image](/docs/protocol-schema/geometry-primitives#Image-Primitive) primitive.

@@ -9,7 +9,7 @@ KITTI has 4 camera image sources. The conversion code converts each image into a
 ## XVIZ Mapping
 
 The following code comes from the KITTI converter file
-[image-converter.js](https://github.com/uber/xviz/tree/master/examples/converters/kitti/src/converters/tracklets-converter.js).
+[image-converter.js](https://github.com/uber/xviz/tree/master/examples/converters/kitti/src/converters/image-converter.js).
 
 ### Camera data
 
