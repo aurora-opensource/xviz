@@ -71,7 +71,7 @@ export default class LidarConverter {
 
       .streamStyle({
         fill_color: '#00a',
-        radiusPixels: 2
+        radiusPixels: 1
       });
   }
 
