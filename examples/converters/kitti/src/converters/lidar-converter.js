@@ -52,7 +52,7 @@ export default class LidarConverter extends BaseConverter {
       .type('point')
       .streamStyle({
         fill_color: '#00a',
-        radius_pixels: 2
+        radius_pixels: 1
       })
       // laser scanner relative to GPS position
       // http://www.cvlibs.net/datasets/kitti/setup.php
