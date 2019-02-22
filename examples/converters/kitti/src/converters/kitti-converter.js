@@ -106,7 +106,7 @@ export class KittiConverter {
     xb.startTime(this.timestamps[0]).endTime(this.timestamps[this.timestamps.length - 1]);
 
     this.converters.forEach(converter => converter.getMetadata(xb));
-    xb.ui(getDeclarativeUI());
+    xb.ui(getDeclarativeUI({fakeStreams: this.fakeStreams}));
 
     xb.logInfo({
       description: 'Conversion of KITTI data set into XVIZ',
