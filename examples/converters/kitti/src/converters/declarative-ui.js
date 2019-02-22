@@ -14,13 +14,16 @@
 
 import {XVIZUIBuilder} from '@xviz/builder';
 
-export function getDeclarativeUI() {
+export function getDeclarativeUI({fakeStreams}) {
   const builder = new XVIZUIBuilder({});
 
   builder.child(getMetricsPanel(builder));
-  builder.child(getPlotPanel(builder));
   builder.child(getVideoPanel(builder));
-  builder.child(getTablePanel(builder));
+
+  if (fakeStreams) {
+    builder.child(getPlotPanel(builder));
+    builder.child(getTablePanel(builder));
+  }
 
   return builder;
 }

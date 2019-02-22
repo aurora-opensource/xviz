@@ -150,7 +150,7 @@ export default class NuTonomyConverter {
 
     const timestamps = this.timestamps;
     xb.startTime(timestamps[0]).endTime(timestamps[timestamps.length - 1]);
-    xb.ui(getDeclarativeUI());
+    xb.ui(getDeclarativeUI({fakeStreams: this.fakeStreams}));
 
     xb.logInfo({
       description: 'Conversion of nuScenes dataset into XVIZ',
