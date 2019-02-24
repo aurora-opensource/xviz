@@ -65,8 +65,11 @@ export default class BaseSynchronizer {
       return null;
     }
 
-    const {PRIMARY_POSE_STREAM} = getXVIZConfig();
-    const vehiclePose = logSlice.getStream(PRIMARY_POSE_STREAM, null);
+    const {PRIMARY_POSE_STREAM, ALLOW_NO_PRIMARY_POSE} = getXVIZConfig();
+    // If a missing primary pose stream is allowed, then set the default pose
+    // value to origin.
+    const defaultPose = ALLOW_NO_PRIMARY_POSE ? {x: 0, y: 0, z: 0} : null;
+    const vehiclePose = logSlice.getStream(PRIMARY_POSE_STREAM, defaultPose);
 
     if (vehiclePose !== this._lastVehiclePose) {
       xvizStats.bump('vehiclePose');
