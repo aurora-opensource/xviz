@@ -700,6 +700,13 @@ function packFrame({json, isBinary}) {
 module.exports = function main(args) {
   const runScenario = args.scenario.length > 0;
 
+  // Until scenarios generate data in a way that is compatible with
+  // looping catch this directly for users.
+  if (args.loop && args.scenario) {
+    console.error('Error: --loop not compatible with --scenario');
+    process.exit(1);
+  }
+
   if (runScenario) {
     console.log(`Loading frames for scenario ${args.scenario}`);
   } else {
