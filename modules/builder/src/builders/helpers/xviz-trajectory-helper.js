@@ -39,48 +39,68 @@ export function getRelativeCoordinates(vertices, basePose) {
  * @returns {Array} trajectory, list of vertices
  */
 export function getPoseTrajectory({poses, startFrame, endFrame}) {
-  const vertices = [];
+  const positions = [];
   const iterationLimit = Math.min(endFrame, poses.length);
 
   for (let i = startFrame; i < iterationLimit; i++) {
-    vertices.push(poses[i].pose);
+    positions.push(poses[i].pose);
   }
 
-  return vertices.map((m, i) => getGeospatialVector(vertices[0], m, vertices[0].yaw));
+  const startPose = poses[startFrame].pose;
+  const worldToStartPoseTransformMatrix = new Pose(startPose).getTransformationMatrix().invert();
+
+  return positions.map(currPose => {
+    // offset vector in world coordinate system
+    const offset = getGeospatialVector(startPose, currPose);
+
+    // transform offset to startPose coordinate system
+    const relativeOffset = worldToStartPoseTransformMatrix.transformVector(offset);
+
+    return [relativeOffset.x, relativeOffset.y, relativeOffset.z];
+  });
 }
 
 /**
  * Return transform matrix that can be used to transform
- * data in futurePose into the currentPose reference frame
+ * data in `from` pose coordinate system into the `to` pose coordinate system
  *
  * @param from {Object} {longitude, latitude, pitch, roll, yaw}
  * @param to {Object} {longitude, latitude, pitch, roll, yaw}
- * @returns {Object} tranformation matrix that converts 'from' relative coordinates into 'to' relative coordinates
+ * @returns {Object} transformation matrix that converts 'from' relative coordinates into 'to' relative coordinates
  */
 export function getGeospatialToPoseTransform(from, to) {
-  const toPose = new Pose({
-    x: 0,
-    y: 0,
-    z: 0,
-    pitch: to.pitch,
-    roll: to.roll,
-    yaw: to.yaw
-  });
-
   // Since 'to' is the target, get the vector from 'to -> from'
   // and use that to set the position of 'from Pose'
-  const v = getGeospatialVector(to, from, to.yaw);
+
+  // offset in world coordinate system
+  let offset = getGeospatialVector(from, to);
 
   const fromPose = new Pose({
-    x: v[0],
-    y: v[1],
+    x: 0,
+    y: 0,
     z: 0,
     pitch: from.pitch,
     roll: from.roll,
     yaw: from.yaw
   });
 
-  return toPose.getTransformationMatrixToPose(fromPose);
+  // transform offset to `fromPose` coordinate
+  // TODO figure out why this step is needed
+  const worldToFromPoseTransformMatrix = fromPose.getTransformationMatrix().invert();
+  offset = worldToFromPoseTransformMatrix.transformVector(offset);
+
+  const toPose = new Pose({
+    x: offset[0],
+    y: offset[1],
+    z: offset[2],
+    pitch: to.pitch,
+    roll: to.roll,
+    yaw: to.yaw
+  });
+
+  // there is a bug in math.gl https://github.com/uber-web/math.gl/issues/33
+  // pose.getTransformationMatrixFromPose and pose.getTransformationMatrixFromPose are flipped
+  return fromPose.getTransformationMatrixFromPose(toPose);
 }
 
 /**
@@ -106,45 +126,79 @@ export function getObjectTrajectory({
 
   for (let i = 0; i < motions.length; i++) {
     const step = motions[i];
+
     const currVehiclePose = poseFrames[startFrame + i].pose;
 
-    const [x, y] = getGeospatialVector(startVehiclePose, currVehiclePose, startVehiclePose.yaw);
+    // matrix to convert data from currVehiclePose relative to startVehiclePose relative.
+    const transformMatrix = getGeospatialToPoseTransform(currVehiclePose, startVehiclePose);
 
-    const transformMatrix = new Pose(currVehiclePose).getTransformationMatrixFromPose(
-      new Pose(startVehiclePose)
-    );
-
-    // objects in curr frame are meters offset based on current vehicle pose
-    // need to convert to the coordinate system of the start vehicle pose
+    // objects in curr frame are meters offset based on currVehiclePose
+    // need to convert to the coordinate system of the startVehiclePose
     const p = transformMatrix.transformVector([step.x, step.y, step.z]);
-    vertices.push([p[0] + x, p[1] + y, p[2]]);
+    vertices.push(p);
   }
 
   return vertices;
 }
 
+/* eslint-disable complexity */
 /**
- * Get the meter vector from geospatial coordinates relative to the given heading
+ * Get the meter vector from Geospatial coordinates in world coordinate system
  *
- * @param from {Object} {longitude, latitude}
- * @param to {Object} {longitude, latitude}
- * @param heading {Number} Radian measurement, 0 = east, positive is counter clockwise
- * @returns {Array} Vector [x, y] in meters
+ * @param from {Object} {longitude, latitude, altitude, x, y, z}
+ * @param to {Object} {longitude, latitude, altitude, x, y, z}
+ * @returns {Array} Vector [x, y, z] in meters
  */
-export function getGeospatialVector(from, to, heading = 0) {
-  const fromCoord = turf.point([from.longitude, from.latitude]);
-  const toCoord = turf.point([to.longitude, to.latitude]);
-  const distInMeters = turf.distance(fromCoord, toCoord, {units: 'meters'});
+export function getGeospatialVector(from, to) {
+  from = {
+    longitude: from.longitude || 0,
+    latitude: from.latitude || 0,
+    altitude: from.altitude || 0,
+    x: from.x || 0,
+    y: from.y || 0,
+    z: from.z || 0,
+    yaw: from.yaw || 0
+  };
+
+  to = {
+    longitude: to.longitude || 0,
+    latitude: to.latitude || 0,
+    altitude: to.altitude || 0,
+    x: to.x || 0,
+    y: to.y || 0,
+    z: to.z || 0,
+    yaw: to.yaw || 0
+  };
+
+  const fromPoint = turf.destination(
+    [from.longitude, from.latitude, from.altitude],
+    Math.sqrt(from.x * from.x + from.y * from.y),
+    Math.PI / 2 - from.yaw,
+    {units: 'meters'}
+  );
+
+  const toPoint = turf.destination(
+    [to.longitude, to.latitude, to.altitude],
+    Math.sqrt(to.x * to.x + to.y * to.y),
+    Math.PI / 2 - to.yaw,
+    {units: 'meters'}
+  );
+
+  const distInMeters = turf.distance(fromPoint, toPoint, {units: 'meters'});
 
   // Bearing is degrees from north, positive is clockwise
-  const bearing = turf.bearing(fromCoord, toCoord);
+  const bearing = turf.bearing(fromPoint, toPoint);
+  const bearingInRadians = turf.degreesToRadians(bearing);
 
-  // Get the bearing relative to heading
-  const relativeBearing = turf.degreesToRadians(90 - bearing);
-  const radianDiff = relativeBearing - heading;
+  const diffZ = to.altitude + to.z - from.altitude - from.z;
 
-  return [distInMeters * Math.cos(radianDiff), distInMeters * Math.sin(radianDiff)];
+  return [
+    distInMeters * Math.sin(bearingInRadians),
+    distInMeters * Math.cos(bearingInRadians),
+    diffZ
+  ];
 }
+/* eslint-enable complexity */
 
 function getFrameObjects(frames, frameNumber) {
   if (frames instanceof Map) {
