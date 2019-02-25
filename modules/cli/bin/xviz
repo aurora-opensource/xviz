@@ -17,9 +17,12 @@
 /* eslint-env node */
 /* eslint no-var:0, no-process-env: 0 */
 
-// Dev mode setup
+// Production path
 var requirePath = '../dist/es5';
 
+// When building allow for running tool without build step, not expected to work
+// when published.  Use `babel-xviz` to run with this environment variable
+// automatically set.
 if (
   process.env.XVIZ_DEV !== undefined &&
   (process.env.XVIZ_DEV === '1' || process.env.XVIZ_DEV.toLowerCase() === 'true')
@@ -35,14 +38,9 @@ if (
 
   require('source-map-support').install();
 
-  // Registers aliases for virtual packages in this module
-  var moduleAlias = require('module-alias');
-  moduleAlias.addAliases({
-    '@xviz/builder': resolve(__dirname, '../../builder/src'),
-    '@xviz/parser': resolve(__dirname, '../../parser/src'),
-    '@xviz/schema': resolve(__dirname, '../../schema/src'),
-    '@xviz/cli': resolve(__dirname, '../../cli/src')
-  });
+  const ALIASES = require('../../../aliases');
+  const moduleAlias = require('module-alias');
+  moduleAlias.addAliases(ALIASES);
 
   requirePath = '../src';
 }
