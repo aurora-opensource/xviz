@@ -17,9 +17,12 @@
 /* eslint-env node */
 /* eslint no-var:0, no-process-env: 0 */
 
-// Dev mode setup
+// Production path
 var requirePath = '../dist/es5';
 
+// When building allow for running tool without build step, not expected to work
+// when published.  Use `babel-xviz` to run with this environment variable
+// automatically set.
 if (
   process.env.XVIZ_DEV !== undefined &&
   (process.env.XVIZ_DEV === '1' || process.env.XVIZ_DEV.toLowerCase() === 'true')
