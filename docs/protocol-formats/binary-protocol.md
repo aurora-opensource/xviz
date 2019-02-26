@@ -1,7 +1,6 @@
 # XVIZ Binary Container Protocol Format
 
-XVIZ comes with parsing support for a binary container format based on the (GLB
-container)[https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#glb-file-format-specification)
+XVIZ comes with parsing support for a binary container format based on the [GLB container](https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#glb-file-format-specification)
 for [glTF](https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md). In this
 format, each message is packaged in a binary container or "envelope", that contains two "chunks":
 
