@@ -6,39 +6,35 @@ provides convenient chaining methods to build up XVIZ data in an easy-to-read wa
 ## Example
 
 ```js
-import {XVIZBuilder} from '@xviz/builder';
+import { XVIZBuilder } from '@xviz/builder';
 
 const xvizBuilder = new XVIZBuilder({
   metadata: {} // See XVIZMetadataBuilder for generating metadata object
 });
 
 xvizBuilder
-  .pose({
-    time: 123,
-    latitude: 12.345,
-    longitude: 12.345,
-    altitude: 12.345,
-    roll: 0.123,
-    pitch: 0.123,
-    yaw: 0.123
-  })
-
-  .variable('/velocity')
+  .pose()
   .timestamp(123)
-  .value(1.23)
+  .mapOrigin(12.345, 12.345, 12.345)
+  .position(123, 123, 123)
+  .orientation(0.123, 0.123, 0.123)
 
+xvizBuilder
+  .variable('/velocity')
+  .values([1.23, 3.45])
+
+xvizBuilder
   .primitive('/point-cloud')
   .points(new Float32Array([1.23, 0.45, 0.06]))
-  .timestamp(123)
   .style({
     fill_color: [0, 0, 0, 255]
   })
 
+xvizBuilder
   .primitive('/pedestrian-1-trajectory')
   .polygon([[1.23, 0.45, 0.06], [2.45, 0.67, 0.08], [1.67, 0.53, 0.07], [1.23, 0.45, 0.06]])
-  .timestamp(123);
 
-const frame = xvizBuider.getFrame();
+const frame = xvizBuilder.getFrame();
 console.log(frame);
 ```
 
