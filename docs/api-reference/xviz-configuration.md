@@ -9,6 +9,9 @@ Constants:
   with a given timestamp. Increase this number to ensure that we cover a sufficient time window for
   any available data. Default `400`.
 - `PLAYBACK_FRAME_RATE` (Number) - The number of frames to generate per second. Default `10`.
+- `ALLOW_MISSING_PRIMARY_POSE` (Boolean) - Whether to render logs where there is no `/vehicle_pose`
+  stream. If `true`, `VEHICLE_RELATIVE` coordinates are treated as `IDENTITY`. Using this may break
+  certain functionalities in the `LogViewer` and `PlaybackControl`. Default `false`.
 
 Parser hooks:
 

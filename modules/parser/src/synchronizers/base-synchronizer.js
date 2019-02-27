@@ -31,6 +31,14 @@ const getCurrentFrameMemoized = memoize(
   }
 );
 
+const EMPTY_VEHICLE_POSE = {
+  longitude: 0,
+  latitude: 0,
+  x: 0,
+  y: 0,
+  z: 0
+};
+
 /**
  * Synchronizes log data across streams and provide the latest data
  * "closest" to a given timestamp within a time window.
@@ -65,10 +73,10 @@ export default class BaseSynchronizer {
       return null;
     }
 
-    const {PRIMARY_POSE_STREAM, ALLOW_NO_PRIMARY_POSE} = getXVIZConfig();
+    const {PRIMARY_POSE_STREAM, ALLOW_MISSING_PRIMARY_POSE} = getXVIZConfig();
     // If a missing primary pose stream is allowed, then set the default pose
     // value to origin.
-    const defaultPose = ALLOW_NO_PRIMARY_POSE ? {x: 0, y: 0, z: 0} : null;
+    const defaultPose = ALLOW_MISSING_PRIMARY_POSE ? EMPTY_VEHICLE_POSE : null;
     const vehiclePose = logSlice.getStream(PRIMARY_POSE_STREAM, defaultPose);
 
     if (vehiclePose !== this._lastVehiclePose) {
