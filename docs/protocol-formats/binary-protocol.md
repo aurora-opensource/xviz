@@ -151,7 +151,7 @@ TypeArray. Typed arrays do not support nesting so all numbers will be laid out f
 application needs to know how many values represent one element, for instance 3 values represent the
 `x, y, z` coordinates of a point.
 
-## References:
+## References
 
 - [glTF 2 Poster](https://raw.githubusercontent.com/KhronosGroup/glTF/master/specification/2.0/figures/gltfOverview-2.0.0a.png)
 - [glTF 2 Spec](https://github.com/KhronosGroup/glTF/tree/master/specification/2.0)
