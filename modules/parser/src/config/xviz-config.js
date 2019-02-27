@@ -33,6 +33,8 @@ const DEFAULT_XVIZ_CONFIG = {
   STREAM_BLACKLIST: new Set(),
   // Callback applied before normalize primitive
   preProcessPrimitive: primitive => primitive,
+  // Allow scenarios where there is no /vehicle_pose stream
+  ALLOW_MISSING_PRIMARY_POSE: false,
 
   /* Deprecated configs, do not use */
 
