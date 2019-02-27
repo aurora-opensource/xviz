@@ -1,29 +1,45 @@
 # XVIZ Binary Container Protocol Format
 
-XVIZ comes with parsing support for a binary container format based on the [GLB container](https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#glb-file-format-specification)
+XVIZ comes with encoding and parsing support for a binary container format based on the
+[GLB container](https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#glb-file-format-specification)
 for [glTF](https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md). In this
-format, each message is packaged in a binary container or "envelope", that contains two "chunks":
+format, each message is packaged in a binary container that contains at least two "chunks" as
+defined by the GLB specification.
 
-- a JSON chunk containing the JSON encoding of semantic parts of the data
-- a BIN chunk containing compact, back-to-back binary representations of large numeric arrays,
+- a _JSON_ chunk containing the JSON encoding of semantic parts of the data
+- a _BIN_ chunk containing compact, back-to-back binary representations of large numeric arrays,
   images etc.
 
 An intended benefit of the binary format is that large segments of data can be sent and processed
-natively.
+natively. Encoding XVIZ inside a glTF GLB format allows XVIZ to leverage the features available for
+assets.
 
-## Details on Binary Container Format
+## Current Status
+
+The current usage in the XVIZ context is to store point clouds and images in the BIN chunk of the
+GLB. The intention is to expand this to large vertex arrays and streams of data that can benefit
+from binary storage.
+
+XVIZ currently has limited support for glTF. We are using the
+[@loaders.gl/gltf](https://github.com/uber-web/loaders.gl) node module so our support will be tied
+to this library.
+
+# XVIZ encoding in GLB
 
 XVIZ in GLB is implemented with 2 changes over a standard GLB.
 
-### The `xviz` Property in the JSON chunk
+## The `xviz` Property in the JSON chunk
 
 The standard XVIZ JSON object is represented as a top-level property in the JSON chunk.
 
-### Use of JSON Pointers to reference GLB assets
+## Use of JSON Pointers to reference GLB assets
 
 Inside the `xviz` property any entry that is stored in the accompaning GLB BINARY structures are
-represented by a JSON Pointer, specifically URI Fragment format for JSON pointers. This format is
-"#<json pointer path>" where the root is the JSON CHUNK of the GLB container.
+represented by a JSON Pointer, specifically URI Fragment format for JSON pointers. This format has a
+'#' prefix, followed by a JSON Pointer path where the root is the JSON CHUNK of the GLB container.
+
+For example, the JSON Pointer `#/accessors/0` would point to the first entry of the _accessors_
+property on the root JSON object in the JSON Chunk "#/json/property/path/0"
 
 Using JSON Pointers allows the XVIZ data to reference the container and reuse the glTF specification
 for assets.
