@@ -46,6 +46,7 @@ export {parseStreamMessage, initializeWorkers} from './parsers/parse-stream-mess
 export {
   parseStreamDataMessage,
   parseStreamLogData,
+  isXVIZMessage,
   isEnvelope,
   unpackEnvelope
 } from './parsers/parse-stream-data-message';

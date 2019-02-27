@@ -17,23 +17,23 @@ xvizBuilder
   .timestamp(123)
   .mapOrigin(12.345, 12.345, 12.345)
   .position(123, 123, 123)
-  .orientation(0.123, 0.123, 0.123)
+  .orientation(0.123, 0.123, 0.123);
 
 xvizBuilder
   .timeSeries('/velocity')
   .timestamp(123)
-  .value(1.23)
+  .value(1.23);
 
 xvizBuilder
   .primitive('/point-cloud')
   .points(new Float32Array([1.23, 0.45, 0.06]))
   .style({
     fill_color: [0, 0, 0, 255]
-  })
+  });
 
 xvizBuilder
   .primitive('/pedestrian-1-trajectory')
-  .polygon([[1.23, 0.45, 0.06], [2.45, 0.67, 0.08], [1.67, 0.53, 0.07], [1.23, 0.45, 0.06]])
+  .polygon([[1.23, 0.45, 0.06], [2.45, 0.67, 0.08], [1.67, 0.53, 0.07], [1.23, 0.45, 0.06]]);
 
 const frame = xvizBuilder.getFrame();
 console.log(JSON.stringify(frame, null, 2));
