@@ -14,6 +14,7 @@
 
 import {StreamSynchronizer, XVIZStreamBuffer, setXVIZConfig} from '@xviz/parser';
 import tape from 'tape-catch';
+import {equals} from 'math.gl';
 
 import {resetXVIZConfigAndSettings} from '../config/config-utils';
 
@@ -125,6 +126,33 @@ tape('StreamSynchronizer#getData', t => {
       t.equals(data.streams.log2, undefined, 'Got undefined log2 value');
     }
   }
+
+  t.end();
+});
+
+tape('StreamSynchronizer#getCurrentFrame', t => {
+  resetXVIZConfigAndSettings();
+  setXVIZConfig({TIME_WINDOW: 3});
+  const streamSynchronizer = new StreamSynchronizer(TEST_BUFFER);
+
+  streamSynchronizer.setTime(100);
+  let frame = streamSynchronizer.getCurrentFrame();
+
+  t.notOk(frame, 'frame is null if no vehicle pose');
+
+  setXVIZConfig({ALLOW_MISSING_PRIMARY_POSE: true});
+  frame = streamSynchronizer.getCurrentFrame();
+
+  t.ok(frame, 'frame is generated without vehicle pose');
+  t.deepEquals(
+    frame.streams,
+    {log1: {value: 1}, log2: {value: 20}},
+    'frame contains correct streams'
+  );
+  t.ok(
+    equals(frame.vehicleRelativeTransform, [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]),
+    'vehicle relative transform is identity matrix'
+  );
 
   t.end();
 });
