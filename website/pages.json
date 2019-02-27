@@ -257,7 +257,7 @@
           },
           {
             "name": "XVIZStyleParser",
-            "markdown": "api-reference/xviz-stream-buffer.md"
+            "markdown": "api-reference/xviz-style-parser.md"
           },
           {
             "name": "XVIZObject",
