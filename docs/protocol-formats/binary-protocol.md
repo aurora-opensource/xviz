@@ -24,15 +24,15 @@ XVIZ currently has limited support for glTF. We are using the
 [@loaders.gl/gltf](https://github.com/uber-web/loaders.gl) node module so our support will be tied
 to this library.
 
-# XVIZ encoding in GLB
+## XVIZ encoding in GLB
 
 XVIZ in GLB is implemented with 2 changes over a standard GLB.
 
-## The `xviz` Property in the JSON chunk
+### The `xviz` Property in the JSON chunk
 
 The standard XVIZ JSON object is represented as a top-level property in the JSON chunk.
 
-## Use of JSON Pointers to reference GLB assets
+### Use of JSON Pointers to reference GLB assets
 
 Inside the `xviz` property any entry that is stored in the accompaning GLB BINARY structures are
 represented by a JSON Pointer, specifically URI Fragment format for JSON pointers. This format has a
@@ -130,13 +130,13 @@ for assets.
 
 ## XVIZ API References
 
-# Encoding Support
+### Encoding Support
 
 [XVIZWriter](/docs/api-reference/xviz-writer.md) by default will output the GLB binary encoding of
 the XVIZ data. This will be output for both Metadata and Frames, but not the FrameIndex, which is
 always output as JSON.
 
-# Parsing Support
+### Parsing Support
 
 [parseStreamMessage](/docs/api-reference/parse-xviz.md) will parse the data and handle GLB encoded
 XVIZ as well as other encodings of the data.
@@ -151,7 +151,7 @@ TypeArray. Typed arrays do not support nesting so all numbers will be laid out f
 application needs to know how many values represent one element, for instance 3 values represent the
 `x, y, z` coordinates of a point.
 
-# References:
+## References:
 
 - [glTF 2 Poster](https://raw.githubusercontent.com/KhronosGroup/glTF/master/specification/2.0/figures/gltfOverview-2.0.0a.png)
 - [glTF 2 Spec](https://github.com/KhronosGroup/glTF/tree/master/specification/2.0)
