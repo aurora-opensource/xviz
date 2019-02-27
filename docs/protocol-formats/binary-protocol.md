@@ -39,7 +39,7 @@ represented by a JSON Pointer, specifically URI Fragment format for JSON pointer
 '#' prefix, followed by a JSON Pointer path where the root is the JSON CHUNK of the GLB container.
 
 For example, the JSON Pointer `#/accessors/0` would point to the first entry of the _accessors_
-property on the root JSON object in the JSON Chunk "#/json/property/path/0"
+property on the root JSON object in the JSON Chunk.
 
 Using JSON Pointers allows the XVIZ data to reference the container and reuse the glTF specification
 for assets.
