@@ -55,4 +55,4 @@ export {default as lidarPointCloudWorker} from './workers/lidar-point-cloud-work
 export {default as streamDataWorker} from './workers/stream-data-worker';
 
 // Loaders
-export {parseBinaryXVIZ} from './loaders/xviz-loader/xviz-binary-loader';
+export {parseBinaryXVIZ, isBinaryXVIZ} from './loaders/xviz-loader/xviz-binary-loader';

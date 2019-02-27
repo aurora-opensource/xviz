@@ -14,7 +14,8 @@
   "esnext": "dist/es6/index.js",
   "files": [
     "dist",
-    "src"
+    "src",
+    "bin/xviz"
   ],
   "dependencies": {
     "@xviz/builder": "^1.0.0-beta.1",

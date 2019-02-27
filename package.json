@@ -39,6 +39,7 @@
     "babel-plugin-version-inline": "^1.0.0",
     "clone": "^2.1.2",
     "coveralls": "^2.13.0",
+    "cross-spawn": "^6.0.5",
     "eslint": "^4.13.1",
     "eslint-config-prettier": "^2.9.0",
     "eslint-config-uber-es2015": "^3.1.2",
