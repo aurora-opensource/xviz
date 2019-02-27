@@ -6,7 +6,7 @@ provides convenient chaining methods to build up XVIZ data in an easy-to-read wa
 ## Example
 
 ```js
-import { XVIZBuilder } from '@xviz/builder';
+import {XVIZBuilder} from '@xviz/builder';
 
 const xvizBuilder = new XVIZBuilder({
   metadata: {} // See XVIZMetadataBuilder for generating metadata object
@@ -20,8 +20,9 @@ xvizBuilder
   .orientation(0.123, 0.123, 0.123)
 
 xvizBuilder
-  .variable('/velocity')
-  .values([1.23, 3.45])
+  .timeSeries('/velocity')
+  .timestamp(123)
+  .value(1.23)
 
 xvizBuilder
   .primitive('/point-cloud')
@@ -35,7 +36,7 @@ xvizBuilder
   .polygon([[1.23, 0.45, 0.06], [2.45, 0.67, 0.08], [1.67, 0.53, 0.07], [1.23, 0.45, 0.06]])
 
 const frame = xvizBuilder.getFrame();
-console.log(frame);
+console.log(JSON.stringify(frame, null, 2));
 ```
 
 ## XVIZBuilder
