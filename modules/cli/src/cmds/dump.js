@@ -27,12 +27,6 @@ export function dumpArgs(inArgs) {
       addDataArgs(args);
       addMetadataArg(args, 'Just fetch metadata and exit');
       addCondensedArg(args, 'Display summary information');
-
-      args.options('oneline', {
-        alias: 'l',
-        boolean: true,
-        describe: 'One line of output per message'
-      });
     },
     args => {
       command(args);
