@@ -13,12 +13,14 @@
 // limitations under the License.
 
 import {Bench} from '@probe.gl/bench';
-import xvizBench from './xviz.bench';
+import xvizParserBench from './parse-stream-message.bench';
+import streamBufferBench from './xviz-stream-buffer.bench';
 
 const suite = new Bench({
-  minIterations: 30
+  time: 100
 });
 
-xvizBench(suite);
+xvizParserBench(suite);
+streamBufferBench(suite);
 
 export default suite.run();
