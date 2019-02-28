@@ -130,10 +130,7 @@ export default class BaseSynchronizer {
 
     // Find the right timeslices
     const {TIME_WINDOW} = getXVIZConfig();
-    this._streamsByReverseTime = this._getTimeRangeInReverse(
-      this.time - TIME_WINDOW,
-      this.time
-    );
+    this._streamsByReverseTime = this._getTimeRangeInReverse(this.time - TIME_WINDOW, this.time);
     xvizStats.bump('geometry-refresh');
 
     return getCurrentLogSliceMemoized(

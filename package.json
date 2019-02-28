@@ -9,6 +9,9 @@
   "workspaces": [
     "modules/*"
   ],
+  "browser": {
+    "jsonlint": false
+  },
   "scripts": {
     "bootstrap": "scripts/bootstrap.sh",
     "bench": "node test/start bench",
