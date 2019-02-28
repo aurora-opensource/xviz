@@ -206,6 +206,7 @@ export default class XVIZStreamBuffer {
 
     // backwards compatibility - normalize time slice
     timeslice.streams = timeslice.streams || {};
+    timeslice.videos = timeslice.videos || {};
 
     const {timeslices, streams, videos} = this;
 
@@ -287,8 +288,9 @@ export default class XVIZStreamBuffer {
     return true;
   }
 
+  /* eslint-disable complexity, no-unused-expressions */
   _pruneBuffer() {
-    const {timeslices, streams} = this;
+    const {timeslices, streams, videos} = this;
 
     if (timeslices.length) {
       const startIndex = this._indexOf(this.bufferStart, LEFT);
@@ -296,38 +298,38 @@ export default class XVIZStreamBuffer {
 
       XVIZObject.prune(this.bufferStart, this.bufferEnd);
 
-      if (startIndex > 0 || endIndex < timeslices.length) {
+      const trimStart = startIndex > 0;
+      const trimEnd = endIndex < timeslices.length;
+      if (trimStart || trimEnd) {
         // Drop frames that are outside of the buffer
-        timeslices.splice(endIndex);
-        timeslices.splice(0, startIndex);
+        trimEnd && timeslices.splice(endIndex);
+        trimStart && timeslices.splice(0, startIndex);
 
         for (const streamName in streams) {
           const stream = streams[streamName];
-          stream.splice(endIndex);
-          stream.splice(0, startIndex);
+          trimEnd && stream.splice(endIndex);
+          trimStart && stream.splice(0, startIndex);
+        }
+        for (const streamName in videos) {
+          const stream = videos[streamName];
+          trimEnd && stream.splice(endIndex);
+          trimStart && stream.splice(0, startIndex);
         }
 
         this.lastUpdate++;
       }
     }
   }
+  /* eslint-enable complexity, no-unused-expressions */
 
   _mergeTimesliceAt(index, timeslice) {
     const {timeslices, streams, videos} = this;
     const timesliceAtInsertPosition = timeslices[index];
 
-    timeslices[index] = {
-      ...timesliceAtInsertPosition,
-      ...timeslice,
-      streams: {
-        ...timesliceAtInsertPosition.streams,
-        ...timeslice.streams
-      },
-      videos: {
-        ...timesliceAtInsertPosition.videos,
-        ...timeslice.videos
-      }
-    };
+    Object.assign(timesliceAtInsertPosition, timeslice, {
+      streams: Object.assign(timesliceAtInsertPosition.streams, timeslice.streams),
+      videos: Object.assign(timesliceAtInsertPosition.videos, timeslice.videos)
+    });
 
     for (const streamName in timeslice.streams) {
       streams[streamName][index] = timeslice.streams[streamName];
