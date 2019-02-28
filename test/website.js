@@ -20,7 +20,7 @@ import test from 'tape-catch';
 
 const ROOT = path.resolve(__dirname, '..');
 
-test.only('website#all-pages-present', t => {
+test('website#all-pages-present', t => {
   const pages = loadJSONSync(path.join(ROOT, 'website', 'pages.json'));
 
   const validate = input => {
