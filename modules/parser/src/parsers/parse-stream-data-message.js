@@ -28,41 +28,108 @@ import parseTimesliceDataV1 from './parse-timeslice-data-v1';
 import parseTimesliceDataV2 from './parse-timeslice-data-v2';
 import {getXVIZConfig} from '../config/xviz-config';
 
-// if the first Char and lastChar represents json
-function isParsable(firstChar, lastChar) {
+// returns true if the input represents a JSON string.
+// Can be either string or Uint8Array
+function isJSONString(str) {
+  let firstChar = str[0];
+  let lastChar = str[str.length - 1];
+
+  if (Number.isFinite(firstChar)) {
+    firstChar = String.fromCharCode(firstChar);
+    lastChar = String.fromCharCode(lastChar);
+  }
+
   return (firstChar === '{' && lastChar === '}') || (firstChar === '[' && lastChar === ']');
 }
 
-// if the string can be sent to JSON.parse
-function isJSONString(str) {
-  return isParsable(str[0], str[str.length - 1]);
+const XVIZ_TYPE_PATTERN = /"type":\s*"xviz\//;
+
+// returns true if the input represents an enveloped XVIZ object as a JSON string.
+// Can be either string or Uint8Array
+function isXVIZJSONString(str) {
+  // {"type":"xviz/
+  let firstChunk = str.slice(0, 14);
+  // "type":"xviz/*"}
+  let lastChunk = str.slice(-36);
+
+  if (Number.isFinite(firstChunk[0])) {
+    firstChunk = String.fromCharCode.apply(null, firstChunk);
+    lastChunk = String.fromCharCode.apply(null, lastChunk);
+  }
+
+  return XVIZ_TYPE_PATTERN.test(firstChunk) || XVIZ_TYPE_PATTERN.test(lastChunk);
 }
 
-// encodedString is the Uint8Array, if it can be sent to string format.
-function isJSON(encodedString) {
-  const firstChar = String.fromCharCode(encodedString[0]);
-  const lastChar = String.fromCharCode(encodedString[encodedString.length - 1]);
-  return isParsable(firstChar, lastChar);
+function getDataType(data) {
+  if (data === null || data === undefined) {
+    return null;
+  }
+  if (data instanceof ArrayBuffer || ArrayBuffer.isView(data)) {
+    return 'binary';
+  }
+  return typeof data;
 }
 
 // get JSON from binary
 function decode(data, recursive) {
-  if (!data) {
-    // ignore
-  } else if (isBinaryXVIZ(data)) {
-    return parseBinaryXVIZ(data);
-  } else if (data instanceof Uint8Array && isJSON(data)) {
-    const jsonString = new TextDecoder('utf8').decode(data);
-    return JSON.parse(jsonString);
-  } else if (typeof data === 'string' && isJSONString(data)) {
-    return JSON.parse(data);
-  } else if (recursive && typeof data === 'object') {
-    for (const key in data) {
-      // Only peek one-level deep
-      data[key] = decode(data[key], false);
-    }
+  switch (getDataType(data)) {
+    case 'binary':
+      if (isBinaryXVIZ(data)) {
+        return parseBinaryXVIZ(data);
+      }
+      if (data instanceof ArrayBuffer) {
+        data = new Uint8Array(data);
+      }
+      if (isJSONString(data)) {
+        const jsonString = new TextDecoder('utf8').decode(data);
+        return JSON.parse(jsonString);
+      }
+      break;
+
+    case 'string':
+      if (isJSONString(data)) {
+        return JSON.parse(data);
+      }
+      break;
+
+    case 'object':
+      if (recursive) {
+        for (const key in data) {
+          // Only peek one-level deep
+          data[key] = decode(data[key], false);
+        }
+      }
+      break;
+
+    default:
   }
+
   return data;
+}
+
+// Efficiently check if an object is a supported XVIZ message, without decoding it.
+// Returns true for the following formats: XVIZ binary (GLB), eveloped JSON object,
+// eveloped JSON string, eveloped JSON string as arraybuffer
+export function isXVIZMessage(data) {
+  switch (getDataType(data)) {
+    case 'binary':
+      if (isBinaryXVIZ(data)) {
+        return true;
+      }
+      if (data instanceof ArrayBuffer) {
+        data = new Uint8Array(data);
+      }
+      return isXVIZJSONString(data);
+
+    case 'string':
+      return isXVIZJSONString(data);
+
+    case 'object':
+      return data.type ? data.type.startsWith('xviz/') : false;
+
+    default:
+  }
+  return false;
 }
 
 // Parse apart the namespace and type for the enveloped data

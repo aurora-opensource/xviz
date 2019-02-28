@@ -17,6 +17,7 @@ import {
   getXVIZConfig,
   parseStreamDataMessage,
   isEnvelope,
+  isXVIZMessage,
   unpackEnvelope,
   parseStreamLogData,
   LOG_STREAM_MESSAGE
@@ -31,6 +32,7 @@ import TestMetadataMessageV1 from 'test-data/sample-metadata-message-v1';
 import TestFuturesMessageV1 from 'test-data/sample-frame-futures-v1';
 
 import {resetXVIZConfigAndSettings} from '../config/config-utils';
+import {TextEncoder} from '@xviz/parser/utils/text-encoding';
 
 const schemaValidator = new XVIZValidator();
 
@@ -718,61 +720,70 @@ tape('parseStreamDataMessage', t => {
   resetXVIZConfigAndSettings();
   setXVIZConfig({currentMajorVersion: 2});
 
-  let result;
-  let error;
-  const opts = {};
-  parseStreamDataMessage(
-    {...TestTimesliceMessageV2},
-    newResult => {
-      result = newResult;
+  const samples = [
+    {
+      name: 'bare',
+      message: {...TestTimesliceMessageV2}
     },
-    newError => {
-      error = newError;
-    },
-    opts
-  );
+    {
+      name: 'enveloped',
+      message: {
+        type: 'xviz/state_update',
+        data: {...TestTimesliceMessageV2}
+      }
+    }
+  ];
 
-  t.equals(undefined, error, 'No errors received while parsing');
-  t.equals(result.type, LOG_STREAM_MESSAGE.TIMESLICE, 'Message type set for timeslice');
-  t.equals(
-    result.timestamp,
-    TestTimesliceMessageV2.updates[0].poses['/vehicle_pose'].timestamp,
-    'Message timestamp set from vehicle_pose'
-  );
+  const testCases = [];
 
-  t.end();
-});
+  for (const sample of samples) {
+    const jsonString = JSON.stringify(sample.message);
+    const binary = new TextEncoder().encode(jsonString);
 
-tape('parseStreamDataMessage enveloped', t => {
-  resetXVIZConfigAndSettings();
-  setXVIZConfig({currentMajorVersion: 2});
+    testCases.push(
+      {
+        title: `${sample.name} - plain JSON object`,
+        message: sample.message
+      },
+      {
+        title: `${sample.name} - JSON string`,
+        message: jsonString
+      },
+      {
+        title: `${sample.name} - Uint8Array`,
+        message: binary
+      },
+      {
+        title: `${sample.name} - ArrayBuffer`,
+        message: binary.buffer
+      }
+    );
+  }
 
-  const enveloped = {
-    type: 'xviz/state_update',
-    data: {...TestTimesliceMessageV2}
-  };
+  for (const testCase of testCases) {
+    t.comment(testCase.title);
+    let result;
+    let error;
+    const opts = {};
+    parseStreamDataMessage(
+      testCase.message,
+      newResult => {
+        result = newResult;
+      },
+      newError => {
+        error = newError;
+      },
+      opts
+    );
 
-  let result;
-  let error;
-  const opts = {};
-  parseStreamDataMessage(
-    enveloped,
-    newResult => {
-      result = newResult;
-    },
-    newError => {
-      error = newError;
-    },
-    opts
-  );
-
-  t.equals(undefined, error, 'No errors received while parsing');
-  t.equals(result.type, LOG_STREAM_MESSAGE.TIMESLICE, 'Message type set for timeslice');
-  t.equals(
-    result.timestamp,
-    TestTimesliceMessageV2.updates[0].poses['/vehicle_pose'].timestamp,
-    'Message timestamp set from vehicle_pose'
-  );
+    t.equals(undefined, error, 'No errors received while parsing');
+    t.equals(result.type, LOG_STREAM_MESSAGE.TIMESLICE, 'Message type set for timeslice');
+    t.equals(
+      result.timestamp,
+      TestTimesliceMessageV2.updates[0].poses['/vehicle_pose'].timestamp,
+      'Message timestamp set from vehicle_pose'
+    );
+  }
 
   t.end();
 });
@@ -864,6 +875,58 @@ tape('parseStreamDataMessage enveloped not xviz', t => {
 
   t.equals(undefined, error, 'No errors received while parsing');
   t.equals(undefined, result, 'No data parsed, unknown type');
+
+  t.end();
+});
+
+tape('isXVIZMessage', t => {
+  const testCases = [
+    {
+      title: 'type at start',
+      isValid: true,
+      message: {
+        type: 'xviz/state_update',
+        data: {...TestTimesliceMessageV2}
+      }
+    },
+    {
+      title: 'type at end',
+      isValid: true,
+      message: {
+        data: {...TestMetadataMessageV2},
+        type: 'xviz/metadata'
+      }
+    },
+    {
+      title: 'not enveloped',
+      isValid: false,
+      message: {...TestTimesliceMessageV2}
+    },
+    {
+      title: 'unknown namespace',
+      isValid: false,
+      message: {
+        type: 'foo/bar'
+      }
+    },
+    {
+      title: 'empty',
+      isValid: false,
+      message: null
+    }
+  ];
+
+  for (const testCase of testCases) {
+    t.comment(testCase.title);
+    t.is(isXVIZMessage(testCase.message), testCase.isValid, 'plain JSON object');
+
+    const jsonString = JSON.stringify(testCase.message);
+    t.is(isXVIZMessage(jsonString), testCase.isValid, 'JSON string');
+
+    const binary = new TextEncoder().encode(jsonString);
+    t.is(isXVIZMessage(binary), testCase.isValid, 'Uint8Array');
+    t.is(isXVIZMessage(binary.buffer), testCase.isValid, 'ArrayBuffer');
+  }
 
   t.end();
 });
