@@ -60,7 +60,6 @@ export default class BaseSynchronizer {
     this.opts = opts;
 
     this.time = 0;
-    this.loResTime = 0;
     this.lookAheadMs = 0;
   }
 
@@ -97,19 +96,12 @@ export default class BaseSynchronizer {
     return this.time;
   }
 
-  // The low resolution time is rounded to bigger intervals, throttling updates
-  getLoResTime() {
-    return this.loResTime;
-  }
-
   /**
    * @param {Number} time - time to synchronize the logs with
    * @return {StreamSynchronizer} - returns itself for chaining.
    */
   setTime(time) {
-    const {PLAYBACK_FRAME_RATE} = getXVIZConfig();
     this.time = time;
-    this.loResTime = Math.round(time * PLAYBACK_FRAME_RATE) / PLAYBACK_FRAME_RATE;
     assert(Number.isFinite(this.time), 'Invalid time');
     return this;
   }
@@ -138,10 +130,9 @@ export default class BaseSynchronizer {
 
     // Find the right timeslices
     const {TIME_WINDOW} = getXVIZConfig();
-    this._lastLoResTime = this.loResTime;
     this._streamsByReverseTime = this._getTimeRangeInReverse(
-      this.loResTime - TIME_WINDOW,
-      this.loResTime
+      this.time - TIME_WINDOW,
+      this.time
     );
     xvizStats.bump('geometry-refresh');
 
