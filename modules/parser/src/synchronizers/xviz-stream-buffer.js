@@ -53,7 +53,7 @@ export default class XVIZStreamBuffer {
     this.bufferEnd = null;
     /* Sorted timeslices */
     this.timeslices = [];
-    /* Sorted stream slices */
+    /* Sorted values by stream */
     this.streams = {};
     this.videos = {};
     /* Update counter */
@@ -162,17 +162,28 @@ export default class XVIZStreamBuffer {
   }
 
   /**
+   * Deprecated for perf reasons
    * Gets loaded stream slices within the current buffer
    */
   getStreams() {
-    return {...this.streams};
+    const {streams} = this;
+    const result = {};
+    for (const streamName in streams) {
+      result[streamName] = streams[streamName].filter(value => value !== undefined);
+    }
+    return result;
   }
 
   /**
    * Gets loaded video frames within the current buffer
    */
   getVideos() {
-    return {...this.videos};
+    const {videos} = this;
+    const result = {};
+    for (const streamName in videos) {
+      result[streamName] = videos[streamName].filter(value => value !== undefined);
+    }
+    return result;
   }
 
   /**
@@ -187,14 +198,27 @@ export default class XVIZStreamBuffer {
    * @params {object} timeslice - timeslice object from XVIZ stream
    */
   insert(timeslice) {
-    // backwards compatibility - normalize time slice
-    timeslice.streams = timeslice.streams || {};
-
-    const {timeslices} = this;
     const {timestamp} = timeslice;
 
     if (!this.isInBufferRange(timestamp)) {
       return false;
+    }
+
+    // backwards compatibility - normalize time slice
+    timeslice.streams = timeslice.streams || {};
+    timeslice.videos = timeslice.videos || {};
+
+    const {timeslices, streams, videos} = this;
+
+    for (const streamName in timeslice.streams) {
+      if (!streams[streamName]) {
+        streams[streamName] = new Array(timeslices.length);
+      }
+    }
+    for (const streamName in timeslice.videos) {
+      if (!videos[streamName]) {
+        videos[streamName] = new Array(timeslices.length);
+      }
     }
 
     const insertPosition = this._indexOf(timestamp, LEFT);
@@ -202,33 +226,9 @@ export default class XVIZStreamBuffer {
 
     if (timesliceAtInsertPosition && timesliceAtInsertPosition.timestamp === timestamp) {
       // Same timestamp, needs a merge
-      timeslices[insertPosition] = {
-        ...timesliceAtInsertPosition,
-        ...timeslice,
-        streams: {
-          ...timesliceAtInsertPosition.streams,
-          ...timeslice.streams
-        },
-        videos: {
-          ...timesliceAtInsertPosition.videos,
-          ...timeslice.videos
-        }
-      };
+      this._mergeTimesliceAt(insertPosition, timeslice);
     } else {
-      timeslices.splice(insertPosition, 0, timeslice);
-    }
-
-    for (const streamName in timeslice.streams) {
-      this.streams[streamName] = timeslices
-        .map(timeSlice => timeSlice.streams[streamName])
-        .filter(Boolean);
-    }
-
-    // TODO - remove when updating to v2
-    for (const streamName in timeslice.videos) {
-      this.videos[streamName] = timeslices
-        .map(timeSlice => timeSlice.videos && timeSlice.videos[streamName])
-        .filter(Boolean);
+      this._insertTimesliceAt(insertPosition, timeslice);
     }
 
     this.lastUpdate++;
@@ -288,8 +288,9 @@ export default class XVIZStreamBuffer {
     return true;
   }
 
+  /* eslint-disable complexity, no-unused-expressions */
   _pruneBuffer() {
-    const {timeslices} = this;
+    const {timeslices, streams, videos} = this;
 
     if (timeslices.length) {
       const startIndex = this._indexOf(this.bufferStart, LEFT);
@@ -297,13 +298,57 @@ export default class XVIZStreamBuffer {
 
       XVIZObject.prune(this.bufferStart, this.bufferEnd);
 
-      if (startIndex > 0 || endIndex < timeslices.length) {
+      const trimStart = startIndex > 0;
+      const trimEnd = endIndex < timeslices.length;
+      if (trimStart || trimEnd) {
         // Drop frames that are outside of the buffer
-        timeslices.splice(endIndex);
-        timeslices.splice(0, startIndex);
+        trimEnd && timeslices.splice(endIndex);
+        trimStart && timeslices.splice(0, startIndex);
+
+        for (const streamName in streams) {
+          const stream = streams[streamName];
+          trimEnd && stream.splice(endIndex);
+          trimStart && stream.splice(0, startIndex);
+        }
+        for (const streamName in videos) {
+          const stream = videos[streamName];
+          trimEnd && stream.splice(endIndex);
+          trimStart && stream.splice(0, startIndex);
+        }
 
         this.lastUpdate++;
       }
+    }
+  }
+  /* eslint-enable complexity, no-unused-expressions */
+
+  _mergeTimesliceAt(index, timeslice) {
+    const {timeslices, streams, videos} = this;
+    const timesliceAtInsertPosition = timeslices[index];
+
+    Object.assign(timesliceAtInsertPosition, timeslice, {
+      streams: Object.assign(timesliceAtInsertPosition.streams, timeslice.streams),
+      videos: Object.assign(timesliceAtInsertPosition.videos, timeslice.videos)
+    });
+
+    for (const streamName in timeslice.streams) {
+      streams[streamName][index] = timeslice.streams[streamName];
+    }
+    for (const streamName in timeslice.videos) {
+      videos[streamName][index] = timeslice.videos[streamName];
+    }
+  }
+
+  _insertTimesliceAt(index, timeslice) {
+    const {timeslices, streams, videos} = this;
+
+    timeslices.splice(index, 0, timeslice);
+
+    for (const streamName in streams) {
+      streams[streamName].splice(index, 0, timeslice.streams[streamName]);
+    }
+    for (const streamName in videos) {
+      videos[streamName].splice(index, 0, timeslice.videos[streamName]);
     }
   }
 

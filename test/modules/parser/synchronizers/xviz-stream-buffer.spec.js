@@ -139,7 +139,7 @@ test('XVIZStreamBuffer#insert, getStreams', t => {
   t.deepEquals(ts1001.streams, {A: 1.1, C: 1}, 'streams are deep merged');
   t.deepEquals(
     xvizStreamBuffer.getStreams(),
-    {A: [1.1, 2, 3, 4, 5], B: [-1], C: [1]},
+    {A: [1.1, 2, 3, 4, 5], B: [0, -1], C: [1]},
     'getStreams returns correct result'
   );
 
