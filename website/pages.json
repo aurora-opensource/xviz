@@ -137,6 +137,23 @@
     ]
   },
   {
+    "name": "XVIZ Tool",
+    "children": [
+      {
+        "name": "Overview",
+        "markdown": "xviz-tool/README.md"
+      },
+      {
+        "name": "Dump",
+        "markdown": "xviz-tool/dump.md"
+      },
+      {
+        "name": "Validate",
+        "markdown": "xviz-tool/validate.md"
+      }
+    ]
+  },
+  {
     "name": "Protocol",
     "children": [
       {
