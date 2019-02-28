@@ -15,8 +15,7 @@
 /* eslint no-console: ["error", { allow: ["log"] }] */
 /* eslint-env node, browser */
 
-import {isEnvelope, unpackEnvelope} from '@xviz/parser';
-import {parseBinaryXVIZ, isBinaryXVIZ} from '@xviz/parser/loaders/xviz-loader/xviz-binary-loader';
+import {isEnvelope, unpackEnvelope, parseBinaryXVIZ, isBinaryXVIZ} from '@xviz/parser';
 
 /**
  * Using the provided W3CWebSocket client, send the optional start
