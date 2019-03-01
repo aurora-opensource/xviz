@@ -61,7 +61,7 @@
     "walk": "^2.3.14",
     "webpack": "^4.20.2",
     "webpack-cli": "^3.1.1",
-    "webpack-dev-server": "^3.1.1",
+    "webpack-dev-server": "^3.1.14",
     "webworkify-webpack": "^2.0.0"
   },
   "engines": {
