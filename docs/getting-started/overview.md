@@ -1,6 +1,6 @@
 # Transforming KITTI data to XVIZ
 
-This section describes how to convert KITTI autonomy data into XVIZ. It is intended to provide and
+This section describes how to convert KITTI autonomy data into XVIZ. It is intended to provide an
 understanding of the concepts of XVIZ.
 
 Before we begin you must have read the [XVIZ Concepts](/docs/overview/concepts.md) as this guide
