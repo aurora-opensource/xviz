@@ -1,6 +1,6 @@
 # XVIZ Tool
 
-The `xviz` tool is the primary program in a XVIZ client or server developers toolkit. The goal if
+The `xviz` tool is the primary program in a XVIZ client or server developers toolkit. The goal for
 this tool is to be to a combination curl, wget, a simple HTTP server, and a specification validator
 all in one.
 
