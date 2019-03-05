@@ -606,6 +606,13 @@
   dependencies:
     regenerator-runtime "^0.12.0"
 
+"@babel/runtime@^7.3.1":
+  version "7.3.4"
+  resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.3.4.tgz#73d12ba819e365fcf7fd152aed56d6df97d21c83"
+  integrity sha512-IvfvnMdSaLBateu0jfsYIpZTxAc2cKEXEMiezGGN75QcBcecDUKd3PgLAncT0oOgxKy8dd8hrJKj9MfzgfZd6g==
+  dependencies:
+    regenerator-runtime "^0.12.0"
+
 "@babel/template@^7.0.0", "@babel/template@^7.1.0", "@babel/template@^7.1.2":
   version "7.1.2"
   resolved "https://registry.yarnpkg.com/@babel/template/-/template-7.1.2.tgz#090484a574fef5a2d2d7726a674eceda5c5b5644"
@@ -639,27 +646,29 @@
     lodash "^4.17.10"
     to-fast-properties "^2.0.0"
 
-"@loaders.gl/core@^0.6.2":
-  version "0.6.2"
-  resolved "https://registry.yarnpkg.com/@loaders.gl/core/-/core-0.6.2.tgz#d4260e27c367e4c41ea7ba69a2d9525ee608511b"
-  integrity sha512-dG8mTy+c+xqgkYKe/We6mgLfesCy3ITlEdfWccKjWupIa6iKPBnf/CgDQE8+C4IOzKR5njDCMMKKOM0kZIdDQw==
+"@loaders.gl/core@^0.7.1":
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/@loaders.gl/core/-/core-0.7.1.tgz#fd122d5518864d2ed2d851fd2a21a04d2613abe7"
+  integrity sha512-xdcevhaDcp8dEtvHXdD1JhxojAZVQj2mMvDgAAGS8rV7gD7/jOVVdp0nyilKbcXJxN/tIABBrYivTOkqoTMzPQ==
   dependencies:
+    "@babel/runtime" "^7.3.1"
     text-encoding "^0.6.4"
 
-"@loaders.gl/draco@^0.6.2":
-  version "0.6.2"
-  resolved "https://registry.yarnpkg.com/@loaders.gl/draco/-/draco-0.6.2.tgz#8e0268fcaa5770c421dcb7376b77405a6e13575d"
-  integrity sha512-J15/vwvroTwDwea0vJ4UhXvukqAmmCKnjmayHXcT8/UTEL4l9iDRFr3Lz9PumNzLsoQpb+0u9pcoU9hTH10Ecg==
+"@loaders.gl/draco@^0.7.1":
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/@loaders.gl/draco/-/draco-0.7.1.tgz#92ddb8d2d7371883e0099d6f45cbc6a3a7893c66"
+  integrity sha512-bISQD9+EaRwJdqgMDT1CrTT05OrwE7ZqKstotnpISWkQiiq0DbLi0lXwa1VQRHU4dXMtQoItkR4PyJTw7DDM+g==
   dependencies:
-    "@loaders.gl/core" "^0.6.2"
+    "@babel/runtime" "^7.3.1"
+    "@loaders.gl/core" "^0.7.1"
     draco3d "^1.3.4"
 
-"@loaders.gl/gltf@^0.6.2":
-  version "0.6.2"
-  resolved "https://registry.yarnpkg.com/@loaders.gl/gltf/-/gltf-0.6.2.tgz#03f4546840d0bf6c2e64cb0c08c3723af3106a6f"
-  integrity sha512-vZZV029K0ZOg/7lOJ/FF7mu5a1UZg0OTNrDMBpUFLlyX7gEheErGOpLD3WlDA+SxBdsdb4RLA7rCdpRLN5yyAQ==
+"@loaders.gl/gltf@^0.7.2":
+  version "0.7.2"
+  resolved "https://registry.yarnpkg.com/@loaders.gl/gltf/-/gltf-0.7.2.tgz#ace809c91efe1a47ff8f34c4305a8dff478e2053"
+  integrity sha512-Mzx3GqEQ4mTPIrn3vLkynFzTOLToE9aYPrKMcxmkqQ7UsvpGrUNSZK1ToOTQhOmQ72M33tN4mSxqlpePw/KkdQ==
   dependencies:
-    "@loaders.gl/core" "^0.6.2"
+    "@loaders.gl/core" "^0.7.1"
 
 "@probe.gl/bench@^3.0.0-alpha.5":
   version "3.0.0-alpha.5"
@@ -4766,11 +4775,6 @@ gl-mat4@^1.1.4:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/gl-mat4/-/gl-mat4-1.2.0.tgz#49d8a7636b70aa00819216635f4a3fd3f4669b26"
   integrity sha512-sT5C0pwB1/e9G9AvAoLsoaJtbMGjfd/jfxo8jMCKqYYEnjZuFvqV5rehqar0538EmssjdDeiEWnKyBSTw7quoA==
-
-gl-matrix@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/gl-matrix/-/gl-matrix-3.0.0.tgz#888301ac7650e148c3865370e13ec66d08a8381f"
-  integrity sha512-PD4mVH/C/Zs64kOozeFnKY8ybhgwxXXQYGWdB4h68krAHknWJgk9uKOn6z8YElh5//vs++90pb6csrTIDWnexA==
 
 gl-matrix@^3.0.0-0:
   version "3.0.0-0"
