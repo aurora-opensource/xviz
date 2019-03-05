@@ -53,10 +53,10 @@ xvizBuilder
 KITTI provides all the information necessary and you can see the details of the data types in the
 [XVIZBuilder](/docs/api-reference/xviz-builder.md#xvizposebuilder). The only interesting one is the
 `position(0, 0, 0)`. Different systems determine how to setup reference frames, and for the KITTI
-data every Pose is determined by the mapOrigin.
+data every Pose is determined by the longitude and latitude used in `mapOrigin()`.
 
-If the mapOrigin was fixed, we could use the `position()` as meter offsets from that known location.
-However that is not the case here. Please see the topic on
+If the geographic location was fixed, we could use the `position()` as meter offsets from that known
+location. However that is not the case here. Please see the topic on
 [XVIZ Reference Frames](/docs/protocol-schema/session-protocol.md) for more details.
 
 ### Acceleration and Velocity

@@ -4,7 +4,7 @@
   "poses": {
     "/vehicle_pose": {
       "timestamp": 1001.3,
-      "mapOrigin": {
+      "map_origin": {
         "longitude": 40.4641969,
         "latitude": -79.9733218,
         "altitude": 219
@@ -14,7 +14,7 @@
     },
     "/original/vehicle_pose": {
       "timestamp": 1001.3,
-      "mapOrigin": {
+      "map_origin": {
         "longitude": 40.46423,
         "latitude": -79.97384,
         "altitude": 220

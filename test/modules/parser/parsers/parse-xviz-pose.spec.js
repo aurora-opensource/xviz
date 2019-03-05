@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/* eslint-disable camelcase */
 import {parseXVIZPose} from '@xviz/parser/parsers/parse-xviz-pose';
 
 import tape from 'tape-catch';
 
 const testXVIZPose = {
-  mapOrigin: {
+  map_origin: {
     longitude: 8.422885,
     latitude: 49.0112128,
     altitude: 112.8349227
@@ -36,9 +37,9 @@ function parsedPoseCheck(t, parsedPose, xvizPose) {
   t.equal(parsedPose.pitch, xvizPose.orientation[1]);
   t.equal(parsedPose.yaw, xvizPose.orientation[2]);
 
-  t.equal(parsedPose.latitude, xvizPose.mapOrigin.latitude);
-  t.equal(parsedPose.longitude, xvizPose.mapOrigin.longitude);
-  t.equal(parsedPose.altitude, xvizPose.mapOrigin.altitude);
+  t.equal(parsedPose.latitude, xvizPose.map_origin.latitude);
+  t.equal(parsedPose.longitude, xvizPose.map_origin.longitude);
+  t.equal(parsedPose.altitude, xvizPose.map_origin.altitude);
 }
 
 tape('parseXVIZPose#simple', t => {

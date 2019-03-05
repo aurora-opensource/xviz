@@ -7,7 +7,7 @@
       "type": "number",
       "minimum": 0
     },
-    "mapOrigin": {
+    "map_origin": {
       "type": "object",
       "properties": {
         "longitude": {

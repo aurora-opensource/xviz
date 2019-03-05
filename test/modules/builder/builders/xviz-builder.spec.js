@@ -24,13 +24,13 @@ const PRIMARY_POSE_STREAM = '/vehicle_pose';
 
 const DEFAULT_POSE = {
   timestamp: 1.0,
-  mapOrigin: {longitude: 1.1, latitude: 2.2, altitude: 3.3},
+  map_origin: {longitude: 1.1, latitude: 2.2, altitude: 3.3},
   position: [11, 22, 33],
   orientation: [0.11, 0.22, 0.33]
 };
 
 function setupPose(builder) {
-  const {longitude, latitude, altitude} = DEFAULT_POSE.mapOrigin;
+  const {longitude, latitude, altitude} = DEFAULT_POSE.map_origin;
   builder
     .pose(PRIMARY_POSE_STREAM)
     .timestamp(DEFAULT_POSE.timestamp)
@@ -88,7 +88,7 @@ test('XVIZBuilder#multiple-poses', t => {
           [PRIMARY_POSE_STREAM]: DEFAULT_POSE,
           '/vehicle-pose-2': {
             timestamp: 2.0,
-            mapOrigin: {longitude: 4.4, latitude: 5.5, altitude: 6.6},
+            map_origin: {longitude: 4.4, latitude: 5.5, altitude: 6.6},
             position: [44, 55, 66],
             orientation: [0.44, 0.55, 0.66]
           }

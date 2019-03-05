@@ -10,7 +10,7 @@
             "timestamp": 1000.1,
             "orientation": [0, 0, 0],
             "position": [0, 0, 0],
-            "mapOrigin": {
+            "map_origin": {
               "longitude": -122.4,
               "latitude": 37.8,
               "altitude": 0

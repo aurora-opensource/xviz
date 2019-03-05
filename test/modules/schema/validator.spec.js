@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/* eslint-disable camelcase */
 import {XVIZValidator} from '@xviz/schema';
 
 import test from 'tape-catch';
@@ -74,7 +75,7 @@ test('validatePose', t => {
 
   validator.validatePose({
     timestamp: 1001.3,
-    mapOrigin: {
+    map_origin: {
       longitude: 40.4641969,
       latitude: -79.9733218,
       altitude: 219
@@ -87,7 +88,7 @@ test('validatePose', t => {
     () =>
       validator.validatePose({
         timestamp: 1001.3,
-        mapOrigin: [40.4641969, -79.9733218, 219],
+        map_origin: [40.4641969, -79.9733218, 219],
         position: [238.4, 1002.5, 5.0],
         orientation: [0.5, 10.0, 84.5]
       }),

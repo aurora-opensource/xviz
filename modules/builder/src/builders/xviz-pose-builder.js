@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/* eslint-disable camelcase */
 import XVIZBaseBuilder from './xviz-base-builder';
 import {CATEGORY} from './constant';
 
@@ -26,7 +27,7 @@ export default class XVIZPoseBuilder extends XVIZBaseBuilder {
   }
 
   mapOrigin(longitude, latitude, altitude) {
-    this._mapOrigin = {longitude, latitude, altitude};
+    this._map_origin = {longitude, latitude, altitude};
     return this;
   }
 
@@ -55,8 +56,8 @@ export default class XVIZPoseBuilder extends XVIZBaseBuilder {
       data.timestamp = this._timestamp;
     }
 
-    if (this._mapOrigin) {
-      data.mapOrigin = this._mapOrigin;
+    if (this._map_origin) {
+      data.map_origin = this._map_origin;
     }
 
     if (this._position) {
@@ -74,7 +75,7 @@ export default class XVIZPoseBuilder extends XVIZBaseBuilder {
     super.reset();
 
     this._timestamp = null;
-    this._mapOrigin = null;
+    this._map_origin = null;
     this._position = null;
     this._orientation = null;
   }

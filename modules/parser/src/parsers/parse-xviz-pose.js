@@ -12,15 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/* eslint-disable camelcase */
 export function parseXVIZPose(pose) {
-  const {mapOrigin, position, orientation, timestamp} = pose;
+  // TODO(twojtasz): remove deprecated mapOrigin
+  //                 https://github.com/uber/xviz/issues/394
+  const {mapOrigin, map_origin, position, orientation, timestamp} = pose;
+  const origin = map_origin || mapOrigin;
 
   const result = {
     timestamp
   };
 
-  if (mapOrigin) {
-    const {longitude, latitude, altitude} = mapOrigin;
+  if (origin) {
+    const {longitude, latitude, altitude} = origin;
     Object.assign(result, {
       longitude,
       latitude,

@@ -85,7 +85,7 @@ it's location in latitude, longitude, form.
 | Name          | Type              | Description                                                  |
 | ------------- | ----------------- | ------------------------------------------------------------ |
 | `timestamp`   | `float`           | The vehicle/log transmission_time associated with this data. |
-| `mapOrigin`   | `map_origin`      | Uniquely identifies an object for all time.                  |
+| `map_origin`  | `map_origin`      | Uniquely identifies an object for all time.                  |
 | `position`    | `array<float>(3)` | x, y, z position in meters                                   |
 | `orientation` | `array<float>(3)` | roll, pitch, yaw angle in radians                            |
 
