@@ -12,7 +12,7 @@ metadata = {
   version: '2.0.0'
 };
 
-validator.validatorMetadata(metadata);
+validator.validateMetadata(metadata);
 ```
 
 ## Validating XVIZ primitives
