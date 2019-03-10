@@ -49,7 +49,19 @@ example
 $ yarn start -d 2011_09_26/2011_09_26_drive_0005_sync --image-max-width=300 --disable-streams=image_01,image_02
 ```
 
-# Start Demo Application
+# Start Stream Server
+
+Run the [example XVIZ server](/docs/getting-started/xviz-server.md) to serve your converted data:
+
+```
+$ cd examples/server
+$ yarn  # install dependencies
+$ yarn start -d kitti/2011_09_26/2011_09_26_drive_0005_sync
+```
+
+To see a full list of options of the stream server, run `yarn start --help`.
+
+# Start Client Application
 
 See
 [streetscape.gl starter kit](https://github.com/uber/streetscape.gl/blob/master/docs/get-started/starter-kit.md).
