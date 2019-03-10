@@ -51,33 +51,5 @@ $ yarn start -d 2011_09_26/2011_09_26_drive_0005_sync --image-max-width=300 --di
 
 # Start Demo Application
 
-Start a XVIZ stream server:
-
-```
-$ cd examples/server
-$ yarn  # install dependencies
-$ yarn start -d kitti/2011_09_26/2011_09_26_drive_0005_sync
-```
-
-To see a full list of options of the stream server, run `yarn start --help`.
-
-Add an application config file
-
-```
-$ cd examples/clients/config
-```
-
-- An example is xviz-config-kitti.js, for complete xviz configs, check
-  [xviz-config](https://github.com/uber/xviz/blob/master/docs/api-reference/xviz-configuration.md)
-- Config file naming convention: xviz-config-\${appName}.js
-
-In another terminal, run the client app:
-
-```
-$ cd examples/clients/xviz-viewer
-$ yarn  # install dependencies
-$ appName=kitti yarn start-local
-```
-
-- `appName` is used for loading the correct configuration file for the client app (default is
-  `kitti`).
+See
+[streetscape.gl starter kit](https://github.com/uber/streetscape.gl/blob/master/docs/get-started/starter-kit.md).
