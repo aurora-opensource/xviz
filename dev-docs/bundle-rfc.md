@@ -1,3 +1,7 @@
+- Start Date: 2019-03-12
+- RFC PR: [#408](https://github.com/uber/xviz/pull/408)
+- XVIZ Issue: [#250](https://github.com/uber/xviz/issues/250)
+
 # Summary
 
 We make the PNG and GIF of XVIZ. By making a `xviz/bundle` type that combines a `metadata` field
