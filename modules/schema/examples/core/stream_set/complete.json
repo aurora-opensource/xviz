@@ -118,7 +118,7 @@
         "columns": [
           {
             "display_text": "Age",
-            "type": "integer",
+            "type": "int32",
             "unit": "Years"
           },
           {

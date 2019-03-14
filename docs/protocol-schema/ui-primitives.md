@@ -48,7 +48,7 @@ Here is an example tree table with two columns "Age" and "Name".
   "columns": [
     {
       "display_text": "Age",
-      "type": "integer",
+      "type": "int32",
       "unit": "Years"
     },
     {

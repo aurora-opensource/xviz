@@ -15,7 +15,7 @@
           "type": {
             "type": "string",
             "enum": [
-              "integer",
+              "int32",
               "double",
               "string",
               "boolean"

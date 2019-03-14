@@ -19,7 +19,7 @@ message TreeTableColumn
 
     enum ColumnType {
         column_type_not_set = 0;
-        integer = 1;
+        int32 = 1;
         double = 2;
         string = 3;
         boolean = 4;

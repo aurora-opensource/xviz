@@ -146,7 +146,7 @@ Example:
         "columns": [
             {
                 "display_text": "Age",
-                "type": "integer"
+                "type": "int32"
             }
         ],
         "nodes": [
