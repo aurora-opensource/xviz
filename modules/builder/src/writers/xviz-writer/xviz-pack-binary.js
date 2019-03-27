@@ -29,7 +29,8 @@ function packBinaryJsonTypedArray(gltfBuilder, object, objectKey) {
 // to encode where the binary data for a XVIZ element resides.
 // The unpacking is handled automatically by @loaders.gl
 export function packBinaryJson(json, gltfBuilder, objectKey = null, options = {}) {
-  const {flattenArrays = false} = options;
+  const {flattenArrays = true} = options;
+  console.log(flattenArrays);
   let object = json;
 
   // Check if string has same syntax as our "JSON pointers", if so "escape it".
@@ -39,6 +40,7 @@ export function packBinaryJson(json, gltfBuilder, objectKey = null, options = {}
 
   if (Array.isArray(object)) {
     // TODO - handle numeric arrays, flatten them etc.
+    console.log(flattenArrays);
     const typedArray = flattenArrays && flattenToTypedArray(object);
     if (typedArray) {
       object = typedArray;
