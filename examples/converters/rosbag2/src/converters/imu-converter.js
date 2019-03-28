@@ -43,7 +43,6 @@ export default class IMUConverter extends BaseConverter {
       const srcFilePath = path.join(this.dataDir, fileName);
       return this._convertPose(srcFilePath, this.timestamps[i]);
     });*/
-
   }
 
   getPose(frameNumber) {
@@ -64,36 +63,36 @@ export default class IMUConverter extends BaseConverter {
     // the core reference point for other data and usually drives the timing
     // of the system.
     xvizBuilder
-        .pose('/vehicle_pose')
-        .timestamp(pose.timestamp)
-        .mapOrigin(pose.longitude, pose.latitude, pose.altitude)
-        .orientation(pose.roll, pose.pitch, pose.yaw)
-        .position(0, 0, 0);
+      .pose('/vehicle_pose')
+      .timestamp(pose.timestamp)
+      .mapOrigin(pose.longitude, pose.latitude, pose.altitude)
+      .orientation(pose.roll, pose.pitch, pose.yaw)
+      .position(0, 0, 0);
 
     // This is an example of using the XVIZBuilder to convert your data
     // into XVIZ.
     //
     // The fluent-API makes this construction self-documenting.
     xvizBuilder
-        .timeSeries(this.VEHICLE_VELOCITY)
-        .timestamp(velocity.timestamp)
-        .value(velocity['velocity-forward']);
+      .timeSeries(this.VEHICLE_VELOCITY)
+      .timestamp(velocity.timestamp)
+      .value(velocity['velocity-forward']);
 
     xvizBuilder
-        .timeSeries(this.VEHICLE_ACCELERATION)
-        .timestamp(acceleration.timestamp)
-        .value(acceleration['acceleration-forward']);
+      .timeSeries(this.VEHICLE_ACCELERATION)
+      .timestamp(acceleration.timestamp)
+      .value(acceleration['acceleration-forward']);
 
     xvizBuilder
-        .timeSeries(this.VEHICLE_WHEEL)
-        .timestamp(velocity.timestamp)
-        .value(velocity['angular-rate-upward'] * RADIAN_TO_DEGREE);
+      .timeSeries(this.VEHICLE_WHEEL)
+      .timestamp(velocity.timestamp)
+      .value(velocity['angular-rate-upward'] * RADIAN_TO_DEGREE);
 
     // kitti dataset is always under autonomous mode
     xvizBuilder
-        .timeSeries(this.VEHICLE_AUTONOMOUS)
-        .timestamp(velocity.timestamp)
-        .value('autonomous');
+      .timeSeries(this.VEHICLE_AUTONOMOUS)
+      .timestamp(velocity.timestamp)
+      .value('autonomous');
 
     const poseTrajectory = _getPoseTrajectory({
       poses: this.poses,
@@ -110,39 +109,39 @@ export default class IMUConverter extends BaseConverter {
     // behavior tied to the viewer.
     const xb = xvizMetaBuilder;
     xb.stream('/vehicle_pose')
-        .category('pose')
+      .category('pose')
 
-        .stream(this.VEHICLE_ACCELERATION)
-        .category('time_series')
-        .type('float')
-        .unit('m/s^2')
+      .stream(this.VEHICLE_ACCELERATION)
+      .category('time_series')
+      .type('float')
+      .unit('m/s^2')
 
-        .stream(this.VEHICLE_VELOCITY)
-        .category('time_series')
-        .type('float')
-        .unit('m/s')
+      .stream(this.VEHICLE_VELOCITY)
+      .category('time_series')
+      .type('float')
+      .unit('m/s')
 
-        .stream(this.VEHICLE_WHEEL)
-        .category('time_series')
-        .type('float')
-        .unit('deg/s')
+      .stream(this.VEHICLE_WHEEL)
+      .category('time_series')
+      .type('float')
+      .unit('deg/s')
 
-        .stream(this.VEHICLE_AUTONOMOUS)
-        .category('time_series')
-        .type('string')
+      .stream(this.VEHICLE_AUTONOMOUS)
+      .category('time_series')
+      .type('string')
 
-        .stream(this.VEHICLE_TRAJECTORY)
-        .category('primitive')
-        .type('polyline')
-        .coordinate('VEHICLE_RELATIVE')
+      .stream(this.VEHICLE_TRAJECTORY)
+      .category('primitive')
+      .type('polyline')
+      .coordinate('VEHICLE_RELATIVE')
 
-        // This styling information is applied to *all* objects for this stream.
-        // It is possible to apply inline styling on individual objects.
-        .streamStyle({
-          stroke_color: '#47B27588',
-          stroke_width: 1.4,
-          stroke_width_min_pixels: 1
-        });
+      // This styling information is applied to *all* objects for this stream.
+      // It is possible to apply inline styling on individual objects.
+      .streamStyle({
+        stroke_color: '#47B27588',
+        stroke_width: 1.4,
+        stroke_width_min_pixels: 1
+      });
   }
 
   _convertPose(filePath, timestamp) {

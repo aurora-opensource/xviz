@@ -30,14 +30,13 @@ export async function getTimestamps(db) {
   return timestamps;
 }
 
-
-export function nanosecondsToXVIZDateTime(nanosecondsEpoch){
+export function nanosecondsToXVIZDateTime(nanosecondsEpoch) {
   return nanosecondsEpoch / 1e9;
 }
 
 async function getRosbagTimestamps(db) {
   return new Promise(function(resolve, reject) {
-    db.all("SELECT timestamp FROM messages", resolve)
+    db.all('SELECT timestamp FROM messages', resolve);
   });
 }
 

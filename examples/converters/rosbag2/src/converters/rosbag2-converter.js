@@ -46,24 +46,28 @@ export class Rosbag2Converter {
 
     const rosbagMetaData = this.loadRosbagMetaData(metaDataPath);
 
-
-    this.startTime = nanosecondsToXVIZDateTime(rosbagMetaData.starting_time.nanoseconds_since_epoch);
-    this.endTime = nanosecondsToXVIZDateTime(rosbagMetaData.starting_time.nanoseconds_since_epoch + rosbagMetaData.duration.nanoseconds);
+    this.startTime = nanosecondsToXVIZDateTime(
+      rosbagMetaData.starting_time.nanoseconds_since_epoch
+    );
+    this.endTime = nanosecondsToXVIZDateTime(
+      rosbagMetaData.starting_time.nanoseconds_since_epoch + rosbagMetaData.duration.nanoseconds
+    );
 
     //this.timestamps = getTimestamps(timestampsFilePath);
 
     createDir(this.outputDir);
 
-    this.numFrames = rosbagMetaData['message_count'] / rosbagMetaData['topics_with_message_count'].length;
+    this.numFrames =
+      rosbagMetaData['message_count'] / rosbagMetaData['topics_with_message_count'].length;
 
     // These are the converters for the various data sources.
     // Notice that some data sources are passed to others when a data dependency
     // requires coordination with another data source.
     const files = fs.readdirSync(this.inputDir);
-    let dbPath = "";
+    let dbPath = '';
     for (const f in files) {
-      if (files[f].endsWith(".db3")) {
-        dbPath = files[f]
+      if (files[f].endsWith('.db3')) {
+        dbPath = files[f];
       }
     }
 
@@ -77,10 +81,10 @@ export class Rosbag2Converter {
     this.converters = [
       //imuConverter,
       gpsConverter,
-      new CameraConverter(dbPath, {
+      /*new CameraConverter(dbPath, {
         disabledStreams: this.disabledStreams,
         options: this.imageOptions
-      })
+      })*/
     ];
 
     if (this.fakeStreams) {
@@ -114,18 +118,16 @@ export class Rosbag2Converter {
     return xvizBuilder.getFrame();
   }
 
-
   loadRosbagMetaData(metaDataPath) {
     // maybe extract and put in helper function
     try {
-      var doc = yaml.safeLoad(fs.readFileSync(metaDataPath, 'utf8'));
-      return doc['rosbag2_bagfile_information']
+      let doc = yaml.safeLoad(fs.readFileSync(metaDataPath, 'utf8'));
+      return doc['rosbag2_bagfile_information'];
     } catch (e) {
       console.log(e);
     }
     return none;
   }
-
 
   getMetadata() {
     // The XVIZMetadataBuilder provides a fluent API to collect
@@ -145,15 +147,14 @@ export class Rosbag2Converter {
       description: 'Conversion of Rosbag2 data set into XVIZ',
       license: 'CC BY-NC-SA 3.0',
       'license link':
-          '<a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">http://creativecommons.org/licenses/by-nc-sa/3.0/</a>',
+        '<a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">http://creativecommons.org/licenses/by-nc-sa/3.0/</a>',
       uri: '<a href="https://github.com/uber/xviz-data">https://github.com/uber/xviz-data</a>',
       source: {
         title: 'Rosbag2',
         author: 'Andreas Klintberg',
-        link:
-            '<a href=""></a>',
+        link: '<a href=""></a>',
         copyright:
-            'All datasets and benchmarks on <a href="">this page</a> are copyright by us and published under the MIT License. This means that you must attribute the work in the manner specified by the authors.'
+          'All datasets and benchmarks on <a href="">this page</a> are copyright by us and published under the MIT License. This means that you must attribute the work in the manner specified by the authors.'
       }
     });
 

@@ -17,15 +17,21 @@ import path from 'path';
 
 import sqlite3 from 'sqlite3';
 
-import rosbags2_nodejs from 'rosbags2_nodejs';
+//import rosbags2_nodejs from 'rosbags2_nodejs';
+//let RosbagDeserializer = require('../../node_modules/rosbags2_nodejs/build/Release/rosbags2_nodejs.node');
+
+let RosbagDeserializer = require('../../node_modules/rosbags2_nodejs/build/Release/rosbags2_nodejs.node');
 
 export default class BaseConverter {
   constructor(dbPath) {
     // Ros2 bags consists of a single SQLite3 db file, with blobs of serialized data
     this.dbPath = dbPath;
 
-    this.deserializer = new rosbags2_nodejs.Rosbag2Wrapper();
+    this.deserializer = new RosbagDeserializer.Rosbag2Wrapper();
+    this.messageMapping = {}
+
   }
+
 
   async load() {
     // Load all messages from SQLite3
@@ -34,35 +40,38 @@ export default class BaseConverter {
     try {
       this.messageMapping = await this.getMessageTypeMapping(this.db);
     } catch (err) {
-      console.log(err)
+      console.log("Message mapping failed error", err);
     }
-
   }
 
   async getMessageTypeMapping(db) {
     return new Promise((resolve, reject) => {
-      db.all("SELECT name, id, type FROM topics", function (error, results) {
+      db.all('SELECT name, id, type FROM topics', function (error, results) {
         if (error) reject(error);
-        resolve(results)
-      })
-
-    })
+        resolve(results);
+      });
+    });
   }
-
 
   async getMessage(frameNumber, topicType) {
     const this_ = this;
-    console.log("messageMapping", this_.messageMapping);
     // map the topic to the topic id using messageMappinp
     const topicId = 4;
-    this_.db.get("SELECT timestamp, data FROM messages WHERE topic_id = $topicId LIMIT 1 OFFSET $frameNumber", {
-      $frameNumber: frameNumber,
-      $topicId: topicId
-    })
+    return new Promise((resolve, reject) => {
+      this_.db.get(
+          'SELECT timestamp, data FROM messages WHERE topic_id = $topicId LIMIT 1 OFFSET $frameNumber',
+          {
+            $frameNumber: frameNumber,
+            $topicId: topicId
+          }, function (error, results) {
+            if (error) reject(error);
+            resolve(results);
+          });
+    });
   }
 
   deserializeRosMessage(message, messageType, topic) {
-    const uint8Message = new Uint8Array(message['data']);
+    const uint8Message = new Uint8Array(message);
     let base64_string = this.deserializer.deserializeMessage(uint8Message, messageType, topic);
     let buff = Buffer.from(base64_string, 'base64');
     return JSON.parse(buff.toString('ascii'));
@@ -71,10 +80,17 @@ export default class BaseConverter {
   async loadFrame(frameNumber) {
     // Load the data for this frame
     const this_ = this;
-    const data = await new Promise(function (resolve, reject) {
-      this_.db.get("SELECT topicid, data FROM messages WHERE id=$frameNumber", {
-        $frameNumber: frameNumber,
-      }, resolve)
+    const data = await new Promise((resolve, reject) => {
+      this_.db.get(
+          'SELECT topicid, data FROM messages WHERE id=$frameNumber',
+          {
+            $frameNumber: frameNumber
+          },
+          function (error, results) {
+            if (error) reject(error);
+            resolve(results);
+          }
+      );
     });
 
     // Remap topic id to topic

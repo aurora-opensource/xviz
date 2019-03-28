@@ -1,7 +1,7 @@
 {
-  "name": "jskitti",
-  "version": "1.1.0",
-  "description": "Provides a minimal set of tools for working with the KITTI dataset in Javascript",
+  "name": "rosbag2",
+  "version": "0.1.0",
+  "description": "Provides a minimal set of tools for working with a Rosbag2 dataset in Javascript",
   "scripts": {
     "start": "node ./src/index.js"
   },

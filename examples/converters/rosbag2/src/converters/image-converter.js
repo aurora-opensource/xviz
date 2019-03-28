@@ -33,11 +33,10 @@ export default class ImageConverter extends BaseConverter {
     const width = 320;
     const height = 240;
 
-    const {data, timestamp}  = super.loadFrame(frameNumber);
+    const {data, timestamp} = super.loadFrame(frameNumber);
 
     const {maxWidth, maxHeight} = this.options;
     //const {data, width, height} = await resizeImage(srcFilePath, maxWidth, maxHeight);
-
 
     return {data, timestamp, width, height};
   }

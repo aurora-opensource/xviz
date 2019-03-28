@@ -14,7 +14,6 @@
 
 import ImageConverter from './image-converter';
 
-
 // either get all possible cameras looking at all sensor_msg/compressed_image or
 // config file specifying all camera topics
 // this is also the name of the xviz stream
@@ -38,7 +37,7 @@ export default class CameraConverter {
 
   async convertFrame(frameNumber, xvizBuilder) {
     const promises = this.imageConverters.map(imageConverter =>
-        imageConverter.convertFrame(frameNumber, xvizBuilder)
+      imageConverter.convertFrame(frameNumber, xvizBuilder)
     );
 
     await Promise.all(promises);
