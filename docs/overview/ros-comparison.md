@@ -13,7 +13,7 @@ On our [roadmap](/docs/overview/roadmap.md) is a plan to bridge these worlds by 
 XVIZ server to support realtime conversion of ROS's [bag](http://wiki.ros.org/Bags) log format and
 common ROS data types.
 
-## Simularties
+## Similarities
 
 There is a decent amout of overlap between ROS and RViz and XVIZ, which is due to the nature of the
 space and XVIZ being inspired by RViz. They both:
