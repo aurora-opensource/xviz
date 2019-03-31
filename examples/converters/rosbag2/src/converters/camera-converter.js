@@ -17,11 +17,11 @@ import ImageConverter from './image-converter';
 // either get all possible cameras looking at all sensor_msg/compressed_image or
 // config file specifying all camera topics
 // this is also the name of the xviz stream
-const CAMERA_SOURCES = ['/image_raw/compressed'];
+const CAMERA_SOURCES = ['/iris/image_color/compressed'];
 
 export default class CameraConverter {
-  constructor(rootDir, {disabledStreams = [], options = {}}) {
-    this.rootDir = rootDir;
+  constructor(dbPath, {disabledStreams = [], options = {}}) {
+    this.dbPath = dbPath;
     this.cameraSources = CAMERA_SOURCES.filter(camera => !disabledStreams.includes(camera));
     this.imageConverters = [];
     this.options = options;
@@ -29,13 +29,14 @@ export default class CameraConverter {
 
   load() {
     this.cameraSources.forEach(cameraSource => {
-      this.imageConverters.push(new ImageConverter(this.rootDir, cameraSource, this.options));
+      this.imageConverters.push(new ImageConverter(this.dbPath, cameraSource, this.options));
     });
 
     this.imageConverters.forEach(imageConverter => imageConverter.load());
   }
 
   async convertFrame(frameNumber, xvizBuilder) {
+
     const promises = this.imageConverters.map(imageConverter =>
       imageConverter.convertFrame(frameNumber, xvizBuilder)
     );

@@ -25,14 +25,14 @@ import {MOTION_PLANNING_STEPS, PRIMARY_POSE_STREAM} from './constant';
 const RADIAN_TO_DEGREE = 180 / Math.PI;
 
 export default class GPSConverter extends BaseConverter {
-  constructor(dbPath) {
-    super(dbPath);
-
+  constructor(dbPath, topicName) {
+    super(dbPath, topicName);
   }
 
   async load() {
+    console.log("load gps");
     super.load();
-    this.numMessages = await this.getNumberOfFrames()
+    this.numMessages = await this.getNumberOfFrames();
   }
 
   getPose(frameNumber) {
@@ -43,39 +43,39 @@ export default class GPSConverter extends BaseConverter {
     //return this.poses;
   }
 
-
   async getNumberOfFrames() {
     const this_ = this;
     const topicId = 4;
-    return new Promise(function (resolve, reject) {
+    return new Promise(function(resolve, reject) {
       this_.db.get(
-          'SELECT count(*) FROM messages WHERE topic_id=$topicId',
-          {
-            $topicId: topicId
-          },
-          resolve
+        'SELECT count(*) FROM messages WHERE topic_id=$topicId',
+        {
+          $topicId: topicId
+        },
+        resolve
       );
     });
-
   }
 
   async convertFrame(frameNumber, xvizBuilder) {
-    console.log('frameNumber', frameNumber);
-    const topic = '/iris/fix';
-    const messageType = 'sensor_msgs/NavSatFix';
+    const messageType = await this.getMessageType(this.db, this.topicName);
+
     let serializedRosMessage;
 
     try {
-      serializedRosMessage = await this.getMessage(frameNumber, topic);
+      serializedRosMessage = await this.getMessage(frameNumber, this.topicId);
     } catch (e) {
-      console.log("error getting message ", e)
+      console.log('error getting message ', e);
     }
 
     const {timestamp, data} = serializedRosMessage;
     console.log(timestamp);
 
-    const rosMessage = this.deserializeRosMessage(data, messageType, topic);
-    console.log(rosMessage)
+    const base64Message = this.deserializeRosMessage(data, messageType, topic);
+
+    let buff = Buffer.from(base64Message, 'base64');
+    const rosMessage = JSON.parse(buff.toString('ascii'));
+    console.log(rosMessage);
     const [latitude, longitude, altitude] = rosMessage;
 
     //console.log(`processing gps data frame ${frameNumber}/${this.numMessages}`); // eslint-disable-line
@@ -84,11 +84,11 @@ export default class GPSConverter extends BaseConverter {
     // the core reference point for other data and usually drives the timing
     // of the system.
     xvizBuilder
-        .pose('/vehicle_pose')
-        .timestamp(nanosecondsToXVIZDateTime(timestamp))
-        .mapOrigin(Number(longitude), Number(latitude), Number(altitude))
-        .orientation(0.0, 0.0, 0.0)
-        .position(0, 0, 0);
+      .pose('/vehicle_pose')
+      .timestamp(nanosecondsToXVIZDateTime(timestamp))
+      .mapOrigin(Number(longitude), Number(latitude), Number(altitude))
+      .orientation(0.0, 0.0, 0.0)
+      .position(0, 0, 0);
   }
 
   getMetadata(xvizMetaBuilder) {
@@ -97,15 +97,14 @@ export default class GPSConverter extends BaseConverter {
     // behavior tied to the viewer.
     const xb = xvizMetaBuilder;
     xb.stream('/vehicle_pose')
-        .category('pose')
+      .category('pose')
 
-        // This styling information is applied to *all* objects for this stream.
-        // It is possible to apply inline styling on individual objects.
-        .streamStyle({
-          stroke_color: '#47B27588',
-          stroke_width: 1.4,
-          stroke_width_min_pixels: 1
-        });
+      // This styling information is applied to *all* objects for this stream.
+      // It is possible to apply inline styling on individual objects.
+      .streamStyle({
+        stroke_color: '#47B27588',
+        stroke_width: 1.4,
+        stroke_width_min_pixels: 1
+      });
   }
-
 }

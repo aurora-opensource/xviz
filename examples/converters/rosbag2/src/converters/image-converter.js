@@ -18,8 +18,8 @@ import {resizeImage} from '../parsers/process-image';
 import BaseConverter from './base-converter';
 
 export default class ImageConverter extends BaseConverter {
-  constructor(rootDir, camera = 'image_00', options) {
-    super(rootDir, camera);
+  constructor(dbPath, camera = "/image/compressed" , options) {
+    super(dbPath, camera);
 
     this.streamName = `/camera/${camera}`;
 
@@ -35,18 +35,35 @@ export default class ImageConverter extends BaseConverter {
 
     const {data, timestamp} = super.loadFrame(frameNumber);
 
-    const {maxWidth, maxHeight} = this.options;
+    //const {maxWidth, maxHeight} = this.options;
     //const {data, width, height} = await resizeImage(srcFilePath, maxWidth, maxHeight);
 
     return {data, timestamp, width, height};
   }
 
   async convertFrame(frameNumber, xvizBuilder) {
-    const {data, width, height} = await this.loadFrame(frameNumber);
+    const messageType = await this.getMessageType(this.db, this.topicName);
+    let serializedRosMessage;
 
+    try {
+      serializedRosMessage = await this.getMessage(frameNumber, this.topicId);
+    } catch (e) {
+      console.log('error getting message ', e);
+    }
+    console.log("serialized image message", serializedRosMessage);
+    const {timestamp, data} = serializedRosMessage;
+    console.log(timestamp);
+
+    const base64Message = this.deserializeRosMessage(data, messageType, this.topicName);
+    let imageData = Buffer.from(base64Message, 'base64');
+
+    const width = 320;
+    const height = 240;
+
+    console.log("this streamname", this.streamName);
     xvizBuilder
       .primitive(this.streamName)
-      .image(nodeBufferToTypedArray(data), 'png')
+      .image(nodeBufferToTypedArray(imageData), 'png')
       .dimensions(width, height);
   }
 
