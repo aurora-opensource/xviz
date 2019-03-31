@@ -18,10 +18,10 @@ import {resizeImage} from '../parsers/process-image';
 import BaseConverter from './base-converter';
 
 export default class ImageConverter extends BaseConverter {
-  constructor(dbPath, camera = "/image/compressed" , options) {
+  constructor(dbPath, camera = '/image/compressed', options) {
     super(dbPath, camera);
 
-    this.streamName = `/camera/${camera}`;
+    this.streamName = `/camera${camera}`;
 
     this.options = options;
   }
@@ -50,7 +50,8 @@ export default class ImageConverter extends BaseConverter {
     } catch (e) {
       console.log('error getting message ', e);
     }
-    console.log("serialized image message", serializedRosMessage);
+
+    console.log('serialized image message', serializedRosMessage);
     const {timestamp, data} = serializedRosMessage;
     console.log(timestamp);
 
@@ -60,7 +61,6 @@ export default class ImageConverter extends BaseConverter {
     const width = 320;
     const height = 240;
 
-    console.log("this streamname", this.streamName);
     xvizBuilder
       .primitive(this.streamName)
       .image(nodeBufferToTypedArray(imageData), 'png')

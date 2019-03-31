@@ -30,7 +30,6 @@ export default class GPSConverter extends BaseConverter {
   }
 
   async load() {
-    console.log("load gps");
     super.load();
     this.numMessages = await this.getNumberOfFrames();
   }
@@ -71,7 +70,7 @@ export default class GPSConverter extends BaseConverter {
     const {timestamp, data} = serializedRosMessage;
     console.log(timestamp);
 
-    const base64Message = this.deserializeRosMessage(data, messageType, topic);
+    const base64Message = this.deserializeRosMessage(data, messageType, this.topicName);
 
     let buff = Buffer.from(base64Message, 'base64');
     const rosMessage = JSON.parse(buff.toString('ascii'));

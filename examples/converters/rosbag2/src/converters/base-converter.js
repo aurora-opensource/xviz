@@ -36,7 +36,6 @@ export default class BaseConverter {
 
   async load() {
     // Load all messages from SQLite3
-    console.log("get topic id");
     try {
       this.topicId = await this.getTopicId(this.db, this.topicName);
     } catch (err) {
@@ -46,43 +45,43 @@ export default class BaseConverter {
 
   async getTopicId(db, topicName) {
     return new Promise((resolve, reject) => {
-      db.get('SELECT id FROM topics WHERE name=$topicName',
-          {$topicName: topicName},
-          (error, results) => {
-            if (error) reject(error);
-            resolve(results.id);
-          }
+      db.get(
+        'SELECT id FROM topics WHERE name=$topicName',
+        {$topicName: topicName},
+        (error, results) => {
+          if (error) reject(error);
+          resolve(results.id);
+        }
       );
     });
   }
 
-
   async getMessageType(db, topicName) {
     return new Promise((resolve, reject) => {
-      db.get('SELECT type FROM topics WHERE name=$topicName',
-          {$topicName: topicName},
-          function (error, results) {
-            if (error) reject(error);
-            resolve(results.type);
-          });
+      db.get('SELECT type FROM topics WHERE name=$topicName', {$topicName: topicName}, function(
+        error,
+        results
+      ) {
+        if (error) reject(error);
+        resolve(results.type);
+      });
     });
   }
 
   async getMessage(frameNumber, topicId) {
     const this_ = this;
-    console.log(topicId.id);
     // map the topic to the topic id using messageMapping
     return new Promise((resolve, reject) => {
       this_.db.get(
-          'SELECT timestamp, data FROM messages WHERE topic_id = $topicId LIMIT 1 OFFSET $frameNumber',
-          {
-            $frameNumber: frameNumber,
-            $topicId: this.topicId || 4
-          },
-          function (error, results) {
-            if (error) reject(error);
-            resolve(results);
-          }
+        'SELECT timestamp, data FROM messages WHERE topic_id = $topicId LIMIT 1 OFFSET $frameNumber',
+        {
+          $frameNumber: frameNumber,
+          $topicId: this.topicId || 4
+        },
+        function(error, results) {
+          if (error) reject(error);
+          resolve(results);
+        }
       );
     });
   }
@@ -91,7 +90,6 @@ export default class BaseConverter {
     const uint8Message = new Uint8Array(message);
     let base64_string = this.deserializer.deserializeMessage(uint8Message, messageType, topic);
     return base64_string;
-
   }
 
   async loadFrame(frameNumber) {
@@ -99,14 +97,14 @@ export default class BaseConverter {
     const this_ = this;
     const data = await new Promise((resolve, reject) => {
       this_.db.get(
-          'SELECT topicid, data FROM messages WHERE id=$frameNumber',
-          {
-            $frameNumber: frameNumber
-          },
-          function (error, results) {
-            if (error) reject(error);
-            resolve(results);
-          }
+        'SELECT topicid, data FROM messages WHERE id=$frameNumber',
+        {
+          $frameNumber: frameNumber
+        },
+        function(error, results) {
+          if (error) reject(error);
+          resolve(results);
+        }
       );
     });
 

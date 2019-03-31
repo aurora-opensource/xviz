@@ -74,7 +74,7 @@ export class Rosbag2Converter {
     dbPath = path.join(this.inputDir, dbPath);
 
     //const imuConverter = new IMUConverter(dbPath);
-    const gps_topic = "/iris/fix";
+    const gps_topic = '/iris/fix';
     // Note: order is important due to data deps on the pose
     this.converters = [
       //imuConverter,
@@ -89,7 +89,6 @@ export class Rosbag2Converter {
       this.converters.push(new RandomDataGenerator());
     }
 
-    console.log("Load call for each converter");
     this.converters.forEach(converter => converter.load());
 
     this.metadata = this.getMetadata();

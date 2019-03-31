@@ -36,7 +36,6 @@ export default class CameraConverter {
   }
 
   async convertFrame(frameNumber, xvizBuilder) {
-
     const promises = this.imageConverters.map(imageConverter =>
       imageConverter.convertFrame(frameNumber, xvizBuilder)
     );
