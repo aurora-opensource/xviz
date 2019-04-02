@@ -81,11 +81,19 @@ export class WorkerFarm {
    * @param workerURL {function | string} - worker function
    * @param maxConcurrency {number} - max count of workers
    */
-  constructor({workerURL, maxConcurrency = 1, debug = () => {}, initialMessage = null}) {
+  constructor({
+    workerURL,
+    maxConcurrency = 1,
+    debug = () => {},
+    initialMessage = null,
+    capacity = null
+  }) {
     this.workerURL = workerURL;
     this.workers = [];
     this.queue = [];
     this.debug = debug;
+    this.capacity = capacity;
+    this.dropped = 0;
 
     for (let i = 0; i < maxConcurrency; i++) {
       this.workers[i] = new WorkerThread({
@@ -118,6 +126,13 @@ export class WorkerFarm {
   next() {
     const {queue} = this;
 
+    // Drop the oldest data if we are beyond our capacity
+    while (this.capacity && queue.length > this.capacity) {
+      queue.shift();
+      this.dropped++;
+    }
+
+    // Queue data
     while (queue.length) {
       const worker = this.getAvailableWorker();
       if (!worker) {
@@ -128,7 +143,8 @@ export class WorkerFarm {
       this.debug({
         message: 'processing',
         worker: worker.metadata.name,
-        backlog: queue.length
+        backlog: queue.length,
+        dropped: this.dropped
       });
 
       worker

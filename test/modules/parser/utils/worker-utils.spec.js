@@ -28,38 +28,92 @@ if (typeof Worker !== 'undefined') {
   testWorker = URL.createObjectURL(blob);
 }
 
-test('WorkerFarm', t => {
+function shouldRunTest(t) {
   if (!testWorker) {
     t.comment('Worker test is browser only');
     t.end();
+    return false;
+  }
+
+  return true;
+}
+
+function runWorkerTest(t, total, workerFarmConfig, onFinished) {
+  let processed = 0;
+
+  const workerFarm = new WorkerFarm(workerFarmConfig);
+
+  const onResult = (expected, result) => {
+    processed++;
+    t.deepEquals(result, expected, 'worker returns expected result');
+
+    if (processed + workerFarm.dropped === total) {
+      if (onFinished) {
+        onFinished(workerFarm);
+      }
+      workerFarm.destroy();
+      t.end();
+    }
+  };
+
+  for (let i = 0; i < total; i++) {
+    const testData = {chunk: i};
+    workerFarm.process(testData, onResult.bind(null, testData), err => t.fail(err));
+  }
+}
+
+test('WorkerFarm#Normal', t => {
+  if (!shouldRunTest(t)) {
     return;
   }
 
   const CHUNKS_TOTAL = 6;
   const MAX_CONCURRENCY = 3;
 
-  let processed = 0;
-
-  const callback = message =>
+  const callback = message => {
     t.comment(`Processing with worker ${message.worker}, backlog ${message.backlog}`);
-
-  const workerFarm = new WorkerFarm({
-    workerURL: testWorker,
-    maxConcurrency: MAX_CONCURRENCY,
-    debug: callback
-  });
-
-  const onResult = (expected, result) => {
-    processed++;
-    t.deepEquals(result, expected, 'worker returns expected result');
-    if (processed === CHUNKS_TOTAL) {
-      workerFarm.destroy();
-      t.end();
-    }
   };
 
-  for (let i = 0; i < CHUNKS_TOTAL; i++) {
-    const testData = {chunk: i};
-    workerFarm.process(testData, onResult.bind(null, testData), err => t.fail(err));
+  const workerFarmConfig = {
+    workerURL: testWorker,
+    maxConcurrency: MAX_CONCURRENCY,
+    debug: callback,
+    capacity: 1000
+  };
+
+  const onFinished = workerFarm => {
+    t.equals(0, workerFarm.dropped, 'No data dropped');
+  };
+
+  runWorkerTest(t, CHUNKS_TOTAL, workerFarmConfig, onFinished);
+});
+
+test('WorkerFarm#Capped', t => {
+  if (!shouldRunTest(t)) {
+    return;
   }
+
+  const CHUNKS_TOTAL = 20;
+  const MAX_CONCURRENCY = 2;
+  const CAPACITY = 1;
+
+  let dropped = 0;
+
+  const callback = message => {
+    t.comment(`Processing with worker ${message.worker}, backlog ${message.backlog}`);
+    dropped = message.dropped;
+  };
+
+  const workerFarmConfig = {
+    workerURL: testWorker,
+    maxConcurrency: MAX_CONCURRENCY,
+    debug: callback,
+    capacity: CAPACITY
+  };
+
+  const onFinished = () => {
+    t.ok(dropped > 0, `we expected dropps, and we dropped: ${(dropped / CHUNKS_TOTAL) * 100}%`);
+  };
+
+  runWorkerTest(t, CHUNKS_TOTAL, workerFarmConfig, onFinished);
 });
