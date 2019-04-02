@@ -21,7 +21,7 @@ import assert from '../utils/assert';
 
 // MEMOIZATION OF LOGSLICE CONSTRUCTOR AND GET METHOD
 const getCurrentLogSliceMemoized = memoize((streamFilter, lookAheadMs, ...streamsByReverseTime) => {
-  xvizStats.bump('getCurrentLogSliceMemoized');
+  xvizStats.get('getCurrentLogSliceMemoized').incrementCount();
   return new LogSlice(streamFilter, lookAheadMs, streamsByReverseTime);
 });
 
@@ -65,7 +65,7 @@ export default class BaseSynchronizer {
 
   // The "frame" contains the processed and combined data from the current log slice
   getCurrentFrame(streamFilter, trackedObjectId) {
-    xvizStats.bump('getCurrentFrame');
+    xvizStats.get('getCurrentFrame').incrementCount();
 
     const logSlice = this.getLogSlice(streamFilter);
     if (!logSlice) {
@@ -79,7 +79,7 @@ export default class BaseSynchronizer {
     const vehiclePose = logSlice.getStream(PRIMARY_POSE_STREAM, defaultPose);
 
     if (vehiclePose !== this._lastVehiclePose) {
-      xvizStats.bump('vehiclePose');
+      xvizStats.get('vehiclePose').incrementCount();
       this._lastVehiclePose = vehiclePose;
     }
 
@@ -131,7 +131,7 @@ export default class BaseSynchronizer {
     // Find the right timeslices
     const {TIME_WINDOW} = getXVIZConfig();
     this._streamsByReverseTime = this._getTimeRangeInReverse(this.time - TIME_WINDOW, this.time);
-    xvizStats.bump('geometry-refresh');
+    xvizStats.get('geometry-refresh').incrementCount();
 
     return getCurrentLogSliceMemoized(
       streamFilter,
