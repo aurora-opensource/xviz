@@ -46,24 +46,24 @@ export default class BaseConverter {
   async getTopicId(db, topicName) {
     return new Promise((resolve, reject) => {
       db.get(
-          'SELECT id FROM topics WHERE name=$topicName',
-          {$topicName: topicName},
-          (error, results) => {
-            if (error || typeof results === 'undefined') {
-              reject(error);
-            } else {
-              resolve(results.id);
-            }
+        'SELECT id FROM topics WHERE name=$topicName',
+        {$topicName: topicName},
+        (error, results) => {
+          if (error || typeof results === 'undefined') {
+            reject(error);
+          } else {
+            resolve(results.id);
           }
+        }
       );
     });
   }
 
   async getMessageType(db, topicName) {
     return new Promise((resolve, reject) => {
-      db.get('SELECT type FROM topics WHERE name=$topicName', {$topicName: topicName}, function (
-          error,
-          results
+      db.get('SELECT type FROM topics WHERE name=$topicName', {$topicName: topicName}, function(
+        error,
+        results
       ) {
         if (error) {
           reject(error);
@@ -79,18 +79,18 @@ export default class BaseConverter {
     // map the topic to the topic id using messageMapping
     return new Promise((resolve, reject) => {
       this_.db.get(
-          'SELECT timestamp, data FROM messages WHERE topic_id = $topicId LIMIT 1 OFFSET $frameNumber',
-          {
-            $frameNumber: frameNumber,
-            $topicId: topicId
-          },
-          function (error, results) {
-            if (error) {
-              reject(error);
-            } else {
-              resolve(results);
-            }
+        'SELECT timestamp, data FROM messages WHERE topic_id = $topicId LIMIT 1 OFFSET $frameNumber',
+        {
+          $frameNumber: frameNumber,
+          $topicId: topicId
+        },
+        function(error, results) {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(results);
           }
+        }
       );
     });
   }
@@ -106,17 +106,16 @@ export default class BaseConverter {
     const this_ = this;
     const data = await new Promise((resolve, reject) => {
       this_.db.get(
-          'SELECT topicid, data FROM messages WHERE id=$frameNumber',
-          {
-            $frameNumber: frameNumber
-          },
-          function (error, results) {
-            if (error) reject(error);
-            resolve(results);
-          }
+        'SELECT topicid, data FROM messages WHERE id=$frameNumber',
+        {
+          $frameNumber: frameNumber
+        },
+        function(error, results) {
+          if (error) reject(error);
+          resolve(results);
+        }
       );
     });
-
 
     // Get the timestamp
     // Note: original Rosbag2 timestamps give nanoseconds

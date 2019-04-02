@@ -14,7 +14,7 @@
 
 /* eslint-disable camelcase */
 import {nanosecondsToXVIZDateTime} from '../parsers/common';
-let qte= require('quaternion-to-euler');
+let qte = require('quaternion-to-euler');
 
 import BaseConverter from './base-converter';
 
@@ -55,9 +55,9 @@ export default class GPSConverter extends BaseConverter {
     // the core reference point for other data and usually drives the timing
     // of the system.
     xvizBuilder
-        .pose('/vehicle_pose')
-        .orientation(roll, pitch, yaw)
-        .position(0, 0, 0);
+      .pose('/vehicle_pose')
+      .orientation(roll, pitch, yaw)
+      .position(0, 0, 0);
   }
 
   getMetadata(xvizMetaBuilder) {
@@ -66,14 +66,14 @@ export default class GPSConverter extends BaseConverter {
     // behavior tied to the viewer.
     const xb = xvizMetaBuilder;
     xb.stream('/vehicle_pose')
-        .category('pose')
+      .category('pose')
 
-        // This styling information is applied to *all* objects for this stream.
-        // It is possible to apply inline styling on individual objects.
-        .streamStyle({
-          stroke_color: '#47B27588',
-          stroke_width: 1.4,
-          stroke_width_min_pixels: 1
-        });
+      // This styling information is applied to *all* objects for this stream.
+      // It is possible to apply inline styling on individual objects.
+      .streamStyle({
+        stroke_color: '#47B27588',
+        stroke_width: 1.4,
+        stroke_width_min_pixels: 1
+      });
   }
 }

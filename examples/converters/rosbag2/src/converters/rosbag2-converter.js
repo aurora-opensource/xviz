@@ -79,7 +79,7 @@ export class Rosbag2Converter {
     // Note: order is important due to data deps on the pose
     this.converters = [
       new IMUConverter(dbPath, imu_topic),
-      new GPSConverter(dbPath, gps_topic),
+      new GPSConverter(dbPath, gps_topic)
       //new CameraConverter(dbPath, {
       //  disabledStreams: this.disabledStreams,
       //  options: this.imageOptions
