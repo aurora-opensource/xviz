@@ -1,7 +1,7 @@
 # Docker Image for BuildKite CI
 # -----------------------------
 
-FROM node:8.11.4
+FROM node:10.15.3
 
 RUN yarn global add yarn@1.10.0
 
