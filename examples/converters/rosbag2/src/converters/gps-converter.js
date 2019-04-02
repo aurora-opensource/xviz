@@ -31,15 +31,6 @@ export default class GPSConverter extends BaseConverter {
 
   async load() {
     super.load();
-    this.numMessages = await this.getNumberOfFrames();
-  }
-
-  getPose(frameNumber) {
-    //return this.poses[frameNumber].pose;
-  }
-
-  getPoses() {
-    //return this.poses;
   }
 
   async getNumberOfFrames() {
@@ -68,13 +59,11 @@ export default class GPSConverter extends BaseConverter {
     }
 
     const {timestamp, data} = serializedRosMessage;
-    console.log(timestamp);
 
     const base64Message = this.deserializeRosMessage(data, messageType, this.topicName);
 
     let buff = Buffer.from(base64Message, 'base64');
     const rosMessage = JSON.parse(buff.toString('ascii'));
-    console.log(rosMessage);
     const [latitude, longitude, altitude] = rosMessage;
 
     //console.log(`processing gps data frame ${frameNumber}/${this.numMessages}`); // eslint-disable-line
@@ -86,8 +75,6 @@ export default class GPSConverter extends BaseConverter {
       .pose('/vehicle_pose')
       .timestamp(nanosecondsToXVIZDateTime(timestamp))
       .mapOrigin(Number(longitude), Number(latitude), Number(altitude))
-      .orientation(0.0, 0.0, 0.0)
-      .position(0, 0, 0);
   }
 
   getMetadata(xvizMetaBuilder) {

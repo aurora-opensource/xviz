@@ -73,16 +73,17 @@ export class Rosbag2Converter {
 
     dbPath = path.join(this.inputDir, dbPath);
 
-    //const imuConverter = new IMUConverter(dbPath);
     const gps_topic = '/iris/fix';
+    const imu_topic = '/iris/imu';
+
     // Note: order is important due to data deps on the pose
     this.converters = [
-      //imuConverter,
+      new IMUConverter(dbPath, imu_topic),
       new GPSConverter(dbPath, gps_topic),
-      new CameraConverter(dbPath, {
-        disabledStreams: this.disabledStreams,
-        options: this.imageOptions
-      })
+      //new CameraConverter(dbPath, {
+      //  disabledStreams: this.disabledStreams,
+      //  options: this.imageOptions
+      //})
     ];
 
     if (this.fakeStreams) {

@@ -14,7 +14,6 @@
 
 import path from 'path';
 
-import {resizeImage} from '../parsers/process-image';
 import BaseConverter from './base-converter';
 
 export default class ImageConverter extends BaseConverter {
@@ -51,9 +50,7 @@ export default class ImageConverter extends BaseConverter {
       console.log('error getting message ', e);
     }
 
-    console.log('serialized image message', serializedRosMessage);
     const {timestamp, data} = serializedRosMessage;
-    console.log(timestamp);
 
     const base64Message = this.deserializeRosMessage(data, messageType, this.topicName);
     let imageData = Buffer.from(base64Message, 'base64');

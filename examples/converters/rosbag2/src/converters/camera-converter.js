@@ -17,7 +17,7 @@ import ImageConverter from './image-converter';
 // either get all possible cameras looking at all sensor_msg/compressed_image or
 // config file specifying all camera topics
 // this is also the name of the xviz stream
-const CAMERA_SOURCES = ['/iris/image_color/compressed'];
+const CAMERA_SOURCES = ['/image_raw'];
 
 export default class CameraConverter {
   constructor(dbPath, {disabledStreams = [], options = {}}) {
