@@ -13,7 +13,7 @@
 // limitations under the License.
 import {XVIZJSONDataSource} from './xviz-json-data-source';
 import {XVIZBinaryDataSource} from './xviz-binary-data-source';
-// import {ROSBAGDataSource} from './rosbag-data-source';
+import {ROSBAGDataSource} from './rosbag-data-source';
 
 async function createDataSource(SourceClass, args) {
   let source = null;
@@ -32,7 +32,7 @@ export class XVIZSourceFactory {
   // dataSource
   // options
   static async open(args) {
-    const sourceClasses = [XVIZJSONDataSource, XVIZBinaryDataSource /* , ROSBAGDataSource */];
+    const sourceClasses = [XVIZJSONDataSource, XVIZBinaryDataSource, ROSBAGDataSource];
 
     for (const sourceClass of sourceClasses) {
       const loader = await createDataSource(sourceClass, args);

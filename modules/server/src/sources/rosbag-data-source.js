@@ -11,7 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-/*
+/* global console */
+/* eslint-disable no-console */
 import {XVIZData} from '@xviz/io';
 import {Bag} from '@xviz/ros';
 
@@ -50,7 +51,7 @@ class FrameIterator {
     };
   }
 
-  [Symbol.iterator] = () => this;
+  // [Symbol.iterator] = () => this;
 }
 
 // People will need to create their own ROSBAGDataSource
@@ -62,7 +63,7 @@ class FrameIterator {
 //
 export class ROSBAGDataSource {
   constructor({root, options}) {
-    this.bagPath = root + '.bag';
+    this.bagPath = `${root}.bag`;
     this.options = options;
     this.metadata = null;
 
@@ -89,7 +90,7 @@ export class ROSBAGDataSource {
 
   getFrameIterator(startTime, endTime) {
     // metadata
-    const {start_time: start, end_time: end} = this.metadata.data;
+    let {start_time: start, end_time: end} = this.metadata.data;
 
     // bounds check params
     if (startTime) {
@@ -120,8 +121,7 @@ export class ROSBAGDataSource {
     }
 
     // Read Frame by keyTopic/stream
-    let frame = await this.bag.readFrameByTime(start, end);
+    const frame = await this.bag.readFrameByTime(start, end);
     return new XVIZData(frame);
   }
 }
-*/
