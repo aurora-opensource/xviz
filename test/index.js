@@ -16,6 +16,7 @@ require('./modules/update-test-cases');
 
 require('./modules/builder');
 require('./modules/parser');
+require('./modules/io');
 require('./modules/schema');
 require('./modules/cli');
 require('./website');

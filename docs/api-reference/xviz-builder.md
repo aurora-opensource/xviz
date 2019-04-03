@@ -52,14 +52,14 @@ const xvizBuilder = new XVIZBuilder(options);
 
 Parameters:
 
-- **options.metadata** (Object) - a JSON object that is the metadata of the session. See
+- `options.metadata`(Object) - a JSON object that is the metadata of the session. See
   [XVIZMetadataBuilder](/docs/api-reference/xviz-metadata-builder.md) for generating metadata
   objects.
-- **options.disableStreams** (Array) - a list of stream names to disable. Disabled streams are not
+- `options.disableStreams` (Array) - a list of stream names to disable. Disabled streams are not
   flushed to frame.
-- **options.validateWarn** (Function) - called when there is a validation warning. Default is
+- `options.validateWarn` (Function) - called when there is a validation warning. Default is
   `console.warn`.
-- **options.validateError** (Function) - called when there is a validation error. Default is
+- `options.validateError` (Function) - called when there is a validation error. Default is
   `console.error`.
 
 ### Methods
