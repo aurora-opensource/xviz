@@ -16,5 +16,6 @@ import './modules/builder';
 import './modules/parser';
 import './modules/io';
 import './modules/schema';
+import './modules/server';
 import './modules/cli';
 import './website';
