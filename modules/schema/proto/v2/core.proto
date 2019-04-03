@@ -40,7 +40,7 @@ message Pose
 
     double timestamp = 1;
 
-    MapOrigin mapOrigin = 2;
+    MapOrigin map_origin = 2;
 
     /// 3 element x, y, z
     repeated double position = 3;

@@ -50,7 +50,7 @@ export function getTransformsFromPose(vehiclePose) {
 
   const vehicleRelativeTransform = pose.getTransformationMatrix();
 
-  // If mapOrigin is not specified, use a faux position of [0, 0, 0]
+  // If map_origin is not specified, use a faux position of [0, 0, 0]
   // deck.gl needs a lon/lat position to target the camera
   const trackPosition = addMetersToLngLat(
     origin || [0, 0, 0],

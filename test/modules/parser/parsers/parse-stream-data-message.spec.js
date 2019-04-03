@@ -93,7 +93,7 @@ const TestTimesliceMessageV2 = {
       poses: {
         '/vehicle_pose': {
           timestamp: 1001.0,
-          mapOrigin: {longitude: 11.2, latitude: 33.4, altitude: 55.6},
+          map_origin: {longitude: 11.2, latitude: 33.4, altitude: 55.6},
           position: [1.1, 2.2, 3.3],
           orientation: [0.1, 0.2, 0.3]
         }
@@ -380,7 +380,7 @@ tape('parseStreamLogData timeslice INCOMPLETE', t => {
         {
           poses: {
             '/vehicle_pose': {
-              mapOrigin: {longitude: 11.2, latitude: 33.4, altitude: 55.6}
+              map_origin: {longitude: 11.2, latitude: 33.4, altitude: 55.6}
             }
           }
         }
@@ -665,7 +665,7 @@ tape('parseStreamLogData variable timeslice', t => {
         poses: {
           '/vehicle_pose': {
             timestamp: 1001.0,
-            mapOrigin: [11.2, 33.4, 55.6],
+            map_origin: [11.2, 33.4, 55.6],
             position: [1.1, 2.2, 3.3],
             orientation: [0.1, 0.2, 0.3]
           }

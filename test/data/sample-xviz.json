@@ -6,7 +6,7 @@
       "poses": {
         "/vehicle_pose": {
           "timestamp": 1317042272459,
-          "mapOrigin": {
+          "map_origin": {
             "longitude": 8.42288,
             "latitude": 49.01197384,
             "altitude": 112.8469
