@@ -31,7 +31,7 @@ export function destroyWorkerFarm() {
   }
 }
 
-export function initializeWorkerFarm({worker, maxConcurrency = 4}) {
+export function initializeWorkerFarm({worker, maxConcurrency = 4, capacity = null}) {
   if (!workerFarm) {
     const xvizConfig = {...getXVIZConfig()};
     delete xvizConfig.preProcessPrimitive;
@@ -49,6 +49,7 @@ export function initializeWorkerFarm({worker, maxConcurrency = 4}) {
     workerFarm = new WorkerFarm({
       workerURL,
       maxConcurrency,
+      capacity,
       initialMessage: {xvizConfig}
     });
   }

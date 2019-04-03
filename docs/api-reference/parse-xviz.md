@@ -34,6 +34,8 @@ Parameters:
     - string: a custom worker URL to use.
   - `maxConcurrency` (Number) - the max number of workers to use. Has no effect if `worker` is set
     to `false`. Default `4`.
+  - `capacity` (Number) - the limit on the number of messages to queue for the workers to process,
+    has no effect if set ot `null`. Default `null`.
 
 ##### LOG_STREAM_MESSAGE
 
