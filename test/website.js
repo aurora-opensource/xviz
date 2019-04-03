@@ -27,7 +27,7 @@ test('website#all-pages-present', t => {
     input.forEach(item => {
       if (item.markdown) {
         const fullpath = path.join(ROOT, 'docs', item.markdown);
-        t.ok(fs.existsSync(fullpath), `Doc exists: item.markdown`);
+        t.ok(fs.existsSync(fullpath), `Doc exists: item.markdown ${fullpath}`);
       } else {
         validate(item.children);
       }

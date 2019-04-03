@@ -244,12 +244,104 @@
             "markdown": "api-reference/xviz-ui-builder.md"
           },
           {
-            "name": "XVIZWriter",
-            "markdown": "api-reference/xviz-writer.md"
-          },
-          {
             "name": "Trajectory Helpers",
             "markdown": "api-reference/trajectory-helpers.md"
+          }
+        ]
+      },
+      {
+        "name": "@xviz/io",
+        "children": [
+          {
+            "name": "Overview",
+            "markdown": "api-reference/io/overview.md"
+          },
+          {
+            "name": "XVIZData",
+            "markdown": "api-reference/io/xviz-data.md"
+          },
+          { "name": "XVIZFormat",
+            "markdown": "api-reference/io/xviz-format.md"
+          },
+          {
+            "name": "XVIZMessage",
+            "markdown": "api-reference/io/xviz-message.md"
+          },
+          {
+            "name": "Sources and Sinks",
+            "children": [
+              {
+                "name": "Overview",
+                "markdown": "api-reference/io/overview-source-sink.md"
+              },
+              {
+                "name": "XVIZFileSink",
+                "markdown": "api-reference/io/xviz-file-sink.md"
+              },
+              {
+                "name": "XVIZFileSource",
+                "markdown": "api-reference/io/xviz-file-source.md"
+              },
+              {
+                "name": "XVIZMemorySourceSink",
+                "markdown": "api-reference/io/xviz-memory-source-sink.md"
+              }
+            ]
+          },
+          {
+            "name": "Readers",
+            "children": [
+              {
+                "name": "Overview",
+                "markdown": "api-reference/io/overview-reader.md"
+              },
+              {
+                "name": "XVIZJSONReader",
+                "markdown": "api-reference/io/xviz-json-reader.md"
+              },
+              {
+                "name": "XVIZBinaryReader",
+                "markdown": "api-reference/io/xviz-binary-reader.md"
+              }
+            ]
+          },
+          {
+            "name": "Writers",
+            "children": [
+              {
+                "name": "Overview",
+                "markdown": "api-reference/io/overview-writer.md"
+              },
+              {
+                "name": "XVIZJSONWriter",
+                "markdown": "api-reference/io/xviz-json-writer.md"
+              },
+              {
+                "name": "XVIZBinaryWriter",
+                "markdown": "api-reference/io/xviz-binary-writer.md"
+              },
+              {
+                "name": "XVIZFormatWriter",
+                "markdown": "api-reference/io/xviz-format-writer.md"
+              }
+            ]
+          },
+          {
+            "name": "Providers",
+            "children": [
+              {
+                "name": "Overview",
+                "markdown": "api-reference/io/overview-provider.md"
+              },
+              {
+                "name": "XVIZProviderFactory",
+                "markdown": "api-reference/io/xviz-provider-factory.md"
+              },
+              {
+                "name": "XVIZ Provider Iterator",
+                "markdown": "api-reference/io/xviz-provider-iterator.md"
+              }
+            ]
           }
         ]
       },

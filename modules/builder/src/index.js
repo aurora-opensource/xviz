@@ -14,6 +14,7 @@
 
 // UTILS
 export {loadUri} from './utils/load-uri.js';
+export {flattenToTypedArray} from './utils/flatten.js';
 
 // WRITERS
 export {default as XVIZWriter} from './writers/xviz-writer/xviz-writer';

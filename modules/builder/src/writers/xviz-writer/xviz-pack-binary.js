@@ -26,7 +26,7 @@ function packBinaryJsonTypedArray(gltfBuilder, object, objectKey, info) {
 }
 
 // Follows a convention used by @loaders.gl to use JSONPointers
-// to encode where the binary data for a XVIZ element resides.
+// to encode where the binary data for an XVIZ element resides.
 // The unpacking is handled automatically by @loaders.gl
 export function packBinaryJson(json, gltfBuilder, objectKey = null, options = {}) {
   const {flattenArrays = true} = options;

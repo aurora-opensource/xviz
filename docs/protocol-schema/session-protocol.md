@@ -254,7 +254,7 @@ limiting data usage and potentially speeding up backend processing.
 
 ### reconfigure (WARNING: unstable feature)
 
-Reconfigure messages allow for a client to change the configuration of a XVIZ server, affecting all
+Reconfigure messages allow for a client to change the configuration of an XVIZ server, affecting all
 future requests for data from the server. This in turn enables a client to enable or disable
 expensive to compute or transmit features.
 

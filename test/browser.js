@@ -37,3 +37,4 @@ require('./modules/conformance');
 require('./modules/builder');
 require('./modules/parser');
 require('./modules/schema');
+require('./modules/io');
