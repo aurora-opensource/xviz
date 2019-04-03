@@ -46,7 +46,18 @@
     semver "^5.4.1"
     source-map "^0.5.0"
 
-"@babel/generator@^7.4.0", "@babel/generator@^7.4.4":
+"@babel/generator@^7.4.0":
+  version "7.4.0"
+  resolved "https://registry.yarnpkg.com/@babel/generator/-/generator-7.4.0.tgz#c230e79589ae7a729fd4631b9ded4dc220418196"
+  integrity sha512-/v5I+a1jhGSKLgZDcmAUZ4K/VePi43eRkUs3yePW1HB1iANOD5tqJXwGSG4BZhSksP8J9ejSlwGeTiiOFZOrXQ==
+  dependencies:
+    "@babel/types" "^7.4.0"
+    jsesc "^2.5.1"
+    lodash "^4.17.11"
+    source-map "^0.5.0"
+    trim-right "^1.0.1"
+
+"@babel/generator@^7.4.4":
   version "7.4.4"
   resolved "https://registry.yarnpkg.com/@babel/generator/-/generator-7.4.4.tgz#174a215eb843fc392c7edcaabeaa873de6e8f041"
   integrity sha512-53UOLK6TVNqKxf7RUh8NE851EHRxOOeVXKbK2bivdb+iziMyk03Sr4eaE9OELCbyZAAafAKPDwF2TPUES5QbxQ==
@@ -679,6 +690,23 @@
   dependencies:
     "@babel/runtime" "^7.3.1"
 
+"@loaders.gl/core@^0.7.1":
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/@loaders.gl/core/-/core-0.7.1.tgz#fd122d5518864d2ed2d851fd2a21a04d2613abe7"
+  integrity sha512-xdcevhaDcp8dEtvHXdD1JhxojAZVQj2mMvDgAAGS8rV7gD7/jOVVdp0nyilKbcXJxN/tIABBrYivTOkqoTMzPQ==
+  dependencies:
+    "@babel/runtime" "^7.3.1"
+    text-encoding "^0.6.4"
+
+"@loaders.gl/draco@^0.7.1":
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/@loaders.gl/draco/-/draco-0.7.1.tgz#92ddb8d2d7371883e0099d6f45cbc6a3a7893c66"
+  integrity sha512-bISQD9+EaRwJdqgMDT1CrTT05OrwE7ZqKstotnpISWkQiiq0DbLi0lXwa1VQRHU4dXMtQoItkR4PyJTw7DDM+g==
+  dependencies:
+    "@babel/runtime" "^7.3.1"
+    "@loaders.gl/core" "^0.7.1"
+    draco3d "^1.3.4"
+
 "@loaders.gl/draco@^1.0.3":
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/@loaders.gl/draco/-/draco-1.0.3.tgz#f2be4f4aa61fc68d3422f90df7eab7ead107c248"
@@ -687,6 +715,13 @@
     "@babel/runtime" "^7.3.1"
     "@loaders.gl/core" "1.0.3"
     draco3d "^1.3.4"
+
+"@loaders.gl/gltf@^0.7.2":
+  version "0.7.2"
+  resolved "https://registry.yarnpkg.com/@loaders.gl/gltf/-/gltf-0.7.2.tgz#ace809c91efe1a47ff8f34c4305a8dff478e2053"
+  integrity sha512-Mzx3GqEQ4mTPIrn3vLkynFzTOLToE9aYPrKMcxmkqQ7UsvpGrUNSZK1ToOTQhOmQ72M33tN4mSxqlpePw/KkdQ==
+  dependencies:
+    "@loaders.gl/core" "^0.7.1"
 
 "@loaders.gl/gltf@^1.0.3":
   version "1.0.3"
@@ -6179,7 +6214,7 @@ map-visit@^1.0.0:
   dependencies:
     object-visit "^1.0.0"
 
-math.gl@^2.3.1:
+math.gl@^2.0.0, math.gl@^2.3.1:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/math.gl/-/math.gl-2.3.1.tgz#4099e0e34f03dbc458e57945583badb3a517ce8f"
   integrity sha512-364xFXawzGCp46BmaEcKMAYgDLsaSqXO3ki4XAh+8aJAFNcdJFeORpoZFRLdZMZzwdOepwfcc+rk3LhDNJZF1Q==

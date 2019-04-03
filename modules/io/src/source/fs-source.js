@@ -11,12 +11,22 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-require('reify');
-require('./modules/update-test-cases');
+/**
+ * Class to abstract away file IO
+ */
+export class FileSource {
+  constructor(rootDirectory) {
+    this.fs = module.require('fs');
+    this.path = module.require('path');
+    this.root = rootDirectory;
+  }
 
-require('./modules/builder');
-require('./modules/parser');
-require('./modules/io');
-require('./modules/schema');
-require('./modules/cli');
-require('./website');
+  readSync(name) {
+    const path = this.path.join(this.root, name);
+    if (this.fs.existsSync(path)) {
+      return this.fs.readFileSync(path);
+    }
+
+    return undefined;
+  }
+}

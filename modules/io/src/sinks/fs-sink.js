@@ -11,12 +11,18 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-require('reify');
-require('./modules/update-test-cases');
+/**
+ * Class to abstract away file IO
+ */
+export class FileSink {
+  constructor(rootDirectory) {
+    this.fs = module.require('fs');
+    this.path = module.require('path');
+    this.root = rootDirectory;
+  }
 
-require('./modules/builder');
-require('./modules/parser');
-require('./modules/io');
-require('./modules/schema');
-require('./modules/cli');
-require('./website');
+  writeSync(name, data) {
+    const path = this.path.join(this.root, name);
+    this.fs.writeFileSync(path, data);
+  }
+}

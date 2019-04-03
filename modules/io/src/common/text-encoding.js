@@ -11,12 +11,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-require('reify');
-require('./modules/update-test-cases');
 
-require('./modules/builder');
-require('./modules/parser');
-require('./modules/io');
-require('./modules/schema');
-require('./modules/cli');
-require('./website');
+/* global TextEncoder,TextDecoder */
+
+if (typeof TextDecoder === 'undefined') {
+  module.exports = require('text-encoding');
+} else {
+  module.exports = {TextEncoder, TextDecoder};
+}
