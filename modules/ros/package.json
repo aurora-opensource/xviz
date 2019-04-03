@@ -1,0 +1,43 @@
+{
+  "name": "@xviz/ros",
+  "description": "ROS module for converting ROS data into XVIZ",
+  "license": "Apache-2.0",
+  "version": "1.0.0-beta.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/uber/xviz.git"
+  },
+  "main": "dist/es5/index.js",
+  "module": "dist/esm/index.js",
+  "esnext": "dist/es6/index.js",
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "bluebird": "^3.5.3",
+    "lodash": "^4.17.11",
+    "rosbag": "^2.0.0",
+    "sharp": "^0.20.7"
+  },
+  "scripts": {
+    "clean": "rm -fr dist && mkdir -p dist",
+    "build-es6": "BABEL_ENV=es6 babel src --config-file ../../babel.config.js --out-dir dist/es6 --source-maps --ignore 'node_modules/'",
+    "build-esm": "BABEL_ENV=esm babel src --config-file ../../babel.config.js --out-dir dist/esm --source-maps --ignore 'node_modules/'",
+    "build-es5": "BABEL_ENV=es5 babel src --config-file ../../babel.config.js --out-dir dist/es5 --source-maps --ignore 'node_modules/'",
+    "build": "npm run clean && npm run build-es6 && npm run build-esm && npm run build-es5",
+    "cover": "NODE_ENV=test BABEL_ENV=cover npx nyc node ../../test/start.js cover"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.0.0-beta",
+    "@babel/core": "^7.0.0-beta",
+    "@babel/plugin-proposal-class-properties": "^7.0.0-beta",
+    "@babel/preset-env": "^7.0.0-beta",
+    "@babel/register": "^7.0.0-beta",
+    "babel-polyfill": "^6.26.0"
+  },
+  "engines": {
+    "node": ">= 8",
+    "npm": ">= 5",
+    "yarn": ">= 1.10.0"
+  }
+}
