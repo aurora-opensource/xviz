@@ -11,10 +11,5 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-import './modules/builder';
-import './modules/parser';
-import './modules/io';
-import './modules/schema';
-import './modules/cli';
-import './website';
+import './xviz-data.spec';
+import './xviz-formatter.spec';

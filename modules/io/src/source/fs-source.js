@@ -11,10 +11,22 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+/**
+ * Class to abstract away file IO
+ */
+export class FileSource {
+  constructor(rootDirectory) {
+    this.fs = module.require('fs');
+    this.path = module.require('path');
+    this.root = rootDirectory;
+  }
 
-import './modules/builder';
-import './modules/parser';
-import './modules/io';
-import './modules/schema';
-import './modules/cli';
-import './website';
+  readSync(name) {
+    const path = this.path.join(this.root, name);
+    if (this.fs.existsSync(path)) {
+      return this.fs.readFileSync(path);
+    }
+
+    return undefined;
+  }
+}

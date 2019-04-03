@@ -11,10 +11,23 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+/**
+ * Memory storage for XVIZ data
+ */
+export class MemorySink {
+  constructor() {
+    this.data = new Map();
+  }
 
-import './modules/builder';
-import './modules/parser';
-import './modules/io';
-import './modules/schema';
-import './modules/cli';
-import './website';
+  writeSync(name, data) {
+    this.data.set(name, data);
+  }
+
+  has(name) {
+    return this.data.has(name);
+  }
+
+  get(name) {
+    return this.data.get(name);
+  }
+}

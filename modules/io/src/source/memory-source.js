@@ -11,10 +11,23 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+/**
+ * Memory storage for XVIZ data
+ */
+export class MemorySource {
+  constructor() {
+    this.data = new Map();
+  }
 
-import './modules/builder';
-import './modules/parser';
-import './modules/io';
-import './modules/schema';
-import './modules/cli';
-import './website';
+  readSync(name) {
+    this.data.get(name);
+  }
+
+  has(name) {
+    return this.data.has(name);
+  }
+
+  set(name, data) {
+    return this.data.set(name, data);
+  }
+}

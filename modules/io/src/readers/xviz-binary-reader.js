@@ -11,10 +11,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+import {XVIZBaseReader} from './xviz-base-reader';
 
-import './modules/builder';
-import './modules/parser';
-import './modules/io';
-import './modules/schema';
-import './modules/cli';
-import './website';
+export class XVIZBinaryReader extends XVIZBaseReader {
+  constructor(source, options = {}) {
+    super(source, {...options, suffix: '-frame.glb'});
+  }
+}

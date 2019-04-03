@@ -11,10 +11,18 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+/**
+ * Class to abstract away file IO
+ */
+export class FileSink {
+  constructor(rootDirectory) {
+    this.fs = module.require('fs');
+    this.path = module.require('path');
+    this.root = rootDirectory;
+  }
 
-import './modules/builder';
-import './modules/parser';
-import './modules/io';
-import './modules/schema';
-import './modules/cli';
-import './website';
+  writeSync(name, data) {
+    const path = this.path.join(this.root, name);
+    this.fs.writeFileSync(path, data);
+  }
+}

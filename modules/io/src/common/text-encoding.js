@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import './modules/builder';
-import './modules/parser';
-import './modules/io';
-import './modules/schema';
-import './modules/cli';
-import './website';
+/* global TextEncoder,TextDecoder */
+
+if (typeof TextDecoder === 'undefined') {
+  module.exports = require('text-encoding');
+} else {
+  module.exports = {TextEncoder, TextDecoder};
+}
