@@ -15,7 +15,9 @@
 /* eslint no-console: ["error", { allow: ["log"] }] */
 /* eslint-env node, browser */
 
-import {isEnvelope, unpackEnvelope, parseBinaryXVIZ, isBinaryXVIZ} from '@xviz/parser';
+// TODO remove these
+import {isEnvelope, unpackEnvelope} from '@xviz/parser';
+import {XVIZData} from '@xviz/io';
 
 /**
  * Using the provided W3CWebSocket client, send the optional start
@@ -70,19 +72,14 @@ export class WebSocketInterface {
   }
 
   onMessage(message) {
-    if (typeof message.data !== 'string') {
-      if (isBinaryXVIZ(message.data)) {
-        // Convert from binary to JSON object
-        const parsed = parseBinaryXVIZ(message.data);
-        this.processMessage(parsed);
-      }
-    } else {
-      const parsed = JSON.parse(message.data);
-      this.processMessage(parsed);
-    }
+    const xvizData = new XVIZData(message.data);
+    const parsed = xvizData.message();
+    this.processMessage(parsed);
   }
 
   processMessage(parsed) {
+    // TODO: every message should be enveloped
+    // ... this means no support for v1?
     if (isEnvelope(parsed)) {
       const unpacked = unpackEnvelope(parsed);
 
