@@ -5,6 +5,8 @@ xviz protocol.
 
 ## Example
 
+Try it [live](https://avs.auto/playground/?tab=metadata)
+
 ```js
 import {XVIZMetadataBuilder, XVIZBuilder} from '@xviz/builder';
 

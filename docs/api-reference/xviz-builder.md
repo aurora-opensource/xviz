@@ -5,6 +5,8 @@ provides convenient chaining methods to build up XVIZ data in an easy-to-read wa
 
 ## Example
 
+Try it [live](https://avs.auto/playground/)
+
 ```js
 import {XVIZBuilder} from '@xviz/builder';
 
@@ -229,7 +231,8 @@ Returns: `this`
 
 ##### polygon(vertices)
 
-Add a [polygon](/docs/protocol-schema/geometry-primitives#Polygon-Primitive) primitive.
+Add a [polygon](/docs/protocol-schema/geometry-primitives#Polygon-Primitive) primitive. Try it
+[live](https://avs.auto/playground/?sample_streams=polygon)
 
 Parameters:
 
@@ -239,7 +242,8 @@ Returns: `this`
 
 ##### polyline(vertices)
 
-Add a [polyline](/docs/protocol-schema/geometry-primitives#Polyline-Primitive) primitive.
+Add a [polyline](/docs/protocol-schema/geometry-primitives#Polyline-Primitive) primitive. Try it
+[live](https://avs.auto/playground/?sample_streams=polyline)
 
 Parameters:
 
@@ -249,7 +253,8 @@ Returns: `this`
 
 ##### points(vertices)
 
-Add a [point](/docs/protocol-schema/geometry-primitives#Point-Primitive) primitive.
+Add a [point](/docs/protocol-schema/geometry-primitives#Point-Primitive) primitive. Try it
+[live](https://avs.auto/playground/?sample_streams=points)
 
 Parameters:
 
@@ -281,7 +286,8 @@ Returns: `this`
 
 ##### circle(position: Array, radius : Number)
 
-Add a [circle](/docs/protocol-schema/geometry-primitives#Circle-Primitive) primitive.
+Add a [circle](/docs/protocol-schema/geometry-primitives#Circle-Primitive) primitive. Try it
+[live](https://avs.auto/playground/?sample_streams=circle)
 
 Parameters:
 
@@ -292,7 +298,8 @@ Returns: `this`
 
 ##### stadium(start, end, radius)
 
-Add a [stadium](/docs/protocol-schema/geometry-primitives#Stadium-Primitive) primitive.
+Add a [stadium](/docs/protocol-schema/geometry-primitives#Stadium-Primitive) primitive. Try it
+[live](https://avs.auto/playground/?sample_streams=stadium)
 
 Parameters:
 
@@ -304,7 +311,8 @@ Returns: `this`
 
 ##### text(message)
 
-Add a [text](/docs/protocol-schema/geometry-primitives#Text-Primitive) primitive.
+Add a [text](/docs/protocol-schema/geometry-primitives#Text-Primitive) primitive. Try it
+[live](https://avs.auto/playground/?sample_streams=text)
 
 Parameters:
 
