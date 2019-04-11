@@ -11,7 +11,22 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import {XVIZFormatter} from '@xviz/io';
+import {XVIZFormat, XVIZFormatter} from '@xviz/io';
+
+export class WebsocketSink {
+  constructor(socket) {
+    this.socket = socket;
+  }
+
+  writeSync(name, data) {
+    const opts = {compress: false};
+    if (typeof data === 'string') {
+      opts.compress = true;
+    }
+
+    this.socket.send(data, opts);
+  }
+}
 
 // Send message through the websocket taking into account
 // that only string and arraybuffer data can be sent.
@@ -20,19 +35,18 @@ import {XVIZFormatter} from '@xviz/io';
 // is assumed to just be JSON strings (generally short ones).
 //
 export class XVIZWebsocketSender {
-  constructor(context, socket, options) {
+  constructor(context, socket, options = {}) {
     this.context = context;
     this.socket = socket;
+    this.sink = new WebsocketSink(socket, options.format);
 
     // TODO: options register:
     // - compress
     // - formatter
 
     this.options = options;
-    // Websocket needs string or buffer
-    // TODO: should this throw instead
-    if (this.options.format === 'object') {
-      this.options.format = 'json_string';
+    if (this.options.format === XVIZFormat.object) {
+      this.options.format = XVIZFormat.jsonString;
     }
   }
 
@@ -44,48 +58,42 @@ export class XVIZWebsocketSender {
 
       // Test to determine if msg is either string or arraybuffer
       if (
-        msg.data.dataFormat() === 'object' ||
+        msg.data.dataFormat() === XVIZFormat.object ||
         (!msg.data.hasMessage() &&
           typeof msg.data.buffer !== 'string' &&
           !msg.data.buffer.byteLength)
       ) {
-        return {...this.options, format: 'json_string'};
+        return {...this.options, format: XVIZFormat.jsonString};
       }
+
+      // return the format set to the current data format
+      return {...this.options, format: msg.data.dataFormat()};
     }
 
     return this.options;
-  }
-
-  _getOpts(resp) {
-    const opts = {compress: false};
-    if (typeof resp === 'string') {
-      opts.compress = true;
-    }
-
-    return opts;
   }
 
   onError(req, msg) {
     // TODO: This message is almost always just a plain object
     // but the special handling for here feels awkard
     const resp = JSON.stringify(msg.data.buffer);
-    this.socket.send(resp, this._getOpts(resp));
+    this.sink.writeSync('error', resp);
   }
 
   onMetadata(req, msg) {
-    const resp = XVIZFormatter(msg.data, this._getFormatOptions(msg));
-    this.socket.send(resp, this._getOpts(resp));
+    const {format} = this._getFormatOptions(msg);
+    XVIZFormatter(msg.data, format, this.sink);
   }
 
   onStateUpdate(req, msg) {
-    const resp = XVIZFormatter(msg.data, this._getFormatOptions(msg));
-    this.socket.send(resp, this._getOpts(resp));
+    const {format} = this._getFormatOptions(msg);
+    XVIZFormatter(msg.data, format, this.sink);
   }
 
   onTransformLogDone(req, msg) {
     // TODO: This message is almost always just a plain object
     // but the special handling for here feels awkard
     const resp = JSON.stringify(msg.data.buffer);
-    this.socket.send(resp, this._getOpts(resp));
+    this.sink.writeSync('done', resp);
   }
 }
