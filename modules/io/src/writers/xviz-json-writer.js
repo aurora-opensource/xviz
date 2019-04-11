@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import {xvizConvertJson} from './xviz-json-encoder.js';
+import {TextEncoder} from '../common/text-encoding';
 
 // 0-frame is an index file for timestamp metadata
 // 1-frame is the metadata file for the log
@@ -21,13 +22,13 @@ const frameName = index => `${index + 2}-frame`;
 
 export class XVIZJSONWriter {
   constructor(sink, options = {}) {
-    const {envelope = true, precision = 10} = options;
+    const {envelope = true, precision = 10, asArrayBuffer = false} = options;
     this.sink = sink;
     this.frameTimings = {
       frames: new Map()
     };
     this.wroteFrameIndex = null;
-    this.options = {envelope, precision};
+    this.options = {envelope, precision, asArrayBuffer};
   }
 
   // xvizMetadata is the object returned
@@ -39,7 +40,8 @@ export class XVIZJSONWriter {
       xvizMetadata = {type: 'xviz/metadata', data: xvizMetadata};
     }
 
-    this.sink.writeSync('1-frame.json', JSON.stringify(xvizMetadata));
+    const msg = JSON.stringify(xvizMetadata);
+    this.writeToSink('1-frame.json', msg);
   }
 
   writeFrame(frameIndex, xvizFrame) {
@@ -67,10 +69,8 @@ export class XVIZJSONWriter {
     };
 
     const jsonXVIZFrame = xvizConvertJson(xvizFrame);
-    this.sink.writeSync(
-      `${frameName(frameIndex)}.json`,
-      JSON.stringify(jsonXVIZFrame, numberRounder)
-    );
+    const msg = JSON.stringify(jsonXVIZFrame, numberRounder);
+    this.writeToSink(`${frameName(frameIndex)}.json`, msg);
   }
 
   writeFrameIndex() {
@@ -103,7 +103,8 @@ export class XVIZJSONWriter {
     });
     frameTimings.timing = timing;
 
-    this.sink.writeSync('0-frame.json', JSON.stringify(frameTimings));
+    const msg = JSON.stringify(frameTimings);
+    this.writeToSink('0-frame.json', msg);
     this.wroteFrameIndex = timing.length;
   }
 
@@ -138,4 +139,14 @@ export class XVIZJSONWriter {
     }
   }
   /* eslint-enable camelcase */
+
+  writeToSink(name, msg) {
+    if (this.options.asArrayBuffer) {
+      const encoder = new TextEncoder();
+      // TODO: measure this as it is likely expensive
+      msg = encoder.encode(msg);
+    }
+
+    this.sink.writeSync(name, msg);
+  }
 }
