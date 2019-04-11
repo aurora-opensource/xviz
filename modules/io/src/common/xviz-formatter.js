@@ -33,7 +33,8 @@ export function XVIZFormatter(xvizData, targetFormat, sink, {frame = 0} = {}) {
   if (!targetFormat || sourceFormat === targetFormat) {
     // need to check if object() has been called (ie it might be dirty) and repack
     if (!xvizData.hasMessage()) {
-      return xvizData.buffer;
+      sink.writeSync(`${frame}-frame`, xvizData.buffer);
+      return;
     }
   }
 
