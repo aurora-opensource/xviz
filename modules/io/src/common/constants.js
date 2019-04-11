@@ -11,27 +11,13 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-/**
- * Memory storage for XVIZ data
- */
-export class MemorySink {
-  constructor() {
-    this.data = new Map();
-  }
-
-  writeSync(name, data) {
-    this.data.set(name, data);
-  }
-
-  has(name) {
-    return this.data.has(name);
-  }
-
-  get(name) {
-    return this.data.get(name);
-  }
-
-  entries() {
-    return this.data.entries();
-  }
-}
+export const XVIZFormat = Object.freeze({
+  // Binary GLB enocded in Buffer/ArrayBuffer
+  binary: 'binary',
+  // JSON encoded in a Buffer/ArrayBuffer
+  jsonBuffer: 'jsonBuffer',
+  // JSON encoded in a String
+  jsonString: 'jsonString',
+  // XVIZ Object
+  object: 'object'
+});

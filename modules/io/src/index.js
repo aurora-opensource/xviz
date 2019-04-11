@@ -26,3 +26,4 @@ export {TextEncoder, TextDecoder} from './common/text-encoding';
 export {XVIZData} from './common/xviz-data';
 export {XVIZMessage} from './common/xviz-message';
 export {XVIZFormatter} from './common/xviz-formatter';
+export {XVIZFormat} from './common/constants';

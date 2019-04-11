@@ -11,56 +11,54 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import {TextEncoder} from './text-encoding';
-import {MemorySink} from '../sinks/memory-sink';
 import {XVIZBinaryWriter} from '../writers/xviz-binary-writer';
 import {XVIZJSONWriter} from '../writers/xviz-json-writer';
+import {XVIZFormat} from './constants';
 
-// TODO: how to register and manage options
-// TODO: add draco option
-export function XVIZFormatter(xvizData, {format}) {
-  const formatIn = xvizData.dataFormat();
+// Convenience class for Formatting JSON String vs ArrayBuffer
+class XVIZJSONBufferWriter extends XVIZJSONWriter {
+  constructor(sink, options) {
+    super(sink, {...options, asArrayBuffer: true});
+  }
+}
 
-  if (!format || formatIn === format) {
+// Convert an XVIZData to a different XVIZFormat.
+export function XVIZFormatter(xvizData, targetFormat, sink, {frame = 0} = {}) {
+  if (targetFormat === XVIZFormat.object) {
+    throw new Error('XVIZFormat.object is not supported by XVIZFormatter.');
+  }
+
+  const sourceFormat = xvizData.dataFormat();
+
+  if (!targetFormat || sourceFormat === targetFormat) {
     // need to check if object() has been called (ie it might be dirty) and repack
     if (!xvizData.hasMessage()) {
       return xvizData.buffer;
     }
   }
 
-  // * => JS object => output with XVIZWriter
-  const msg = xvizData.message();
-  const sink = new MemorySink();
   let writer = null;
-  let suffix = null;
-  let id = null;
-  switch (format) {
-    case 'binary':
+  switch (targetFormat) {
+    case XVIZFormat.binary:
       writer = new XVIZBinaryWriter(sink);
-      suffix = 'glb';
       break;
-    case 'json_buffer':
-    case 'json_string':
+    case XVIZFormat.jsonBuffer:
+      writer = new XVIZJSONBufferWriter(sink);
+      break;
+    case XVIZFormat.jsonString:
       writer = new XVIZJSONWriter(sink);
-      suffix = 'json';
       break;
     default:
-      throw new Error(`Cannot convert XVIZData to format ${format}`);
+      throw new Error(`Cannot convert XVIZData to format ${targetFormat}`);
   }
+
+  const msg = xvizData.message();
 
   if (msg.type === 'metadata') {
-    id = 1;
     writer.writeMetadata(msg.data);
+  } else if (msg.type === 'state_update') {
+    writer.writeFrame(frame, msg.data);
   } else {
-    id = 3;
-    writer.writeFrame(1, msg.data);
+    throw new Error(`Message type ${msg.type} is not handled by XVIZFormatter`);
   }
-
-  let result = sink.get(`${id}-frame.${suffix}`);
-  if (format === 'json_buffer') {
-    const encoder = new TextEncoder();
-    result = encoder.encode(result);
-  }
-
-  return result;
 }

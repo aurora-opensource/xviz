@@ -11,9 +11,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+/* global Buffer */
 import tape from 'tape-catch';
 
-import {XVIZData, XVIZBinaryWriter, TextEncoder} from '@xviz/io';
+import {XVIZData, XVIZBinaryWriter, XVIZFormat, TextEncoder} from '@xviz/io';
 
 // Source test data
 import TestXVIZSnapshot from 'test-data/sample-xviz';
@@ -35,31 +36,61 @@ writer.writeFrame(0, TestXVIZSnapshot);
 const TestCases = [
   {
     data: TestXVIZSnapshot,
-    dataFormat: 'object'
+    description: 'XVIZ Object',
+    dataFormat: XVIZFormat.object
   },
   {
     data: TestXVIZSnapshotString,
-    dataFormat: 'json_string'
+    description: 'XVIZ String',
+    dataFormat: XVIZFormat.jsonString
+  },
+  {
+    data: `   ${TestXVIZSnapshotString}   `,
+    description: 'XVIZ String with whitespace head and tail',
+    dataFormat: XVIZFormat.jsonString
   },
   {
     data: TestXVIZSnapshotBuffer,
-    dataFormat: 'json_buffer'
+    description: 'XVIZ String Buffer',
+    dataFormat: XVIZFormat.jsonBuffer
   },
   {
     data: TestXVIZSnapshotGLB,
-    dataFormat: 'binary'
+    description: 'XVIZ Binary Buffer',
+    dataFormat: XVIZFormat.binary
+  },
+  {
+    data: Buffer.from(TestXVIZSnapshotBuffer),
+    description: 'XVIZ String NodeBuffer',
+    dataFormat: XVIZFormat.jsonBuffer,
+    nodeOnly: true
+  },
+  {
+    data: Buffer.from(TestXVIZSnapshotGLB),
+    description: 'XVIZ Binary NodeBuffer',
+    dataFormat: 'binary',
+    nodeOnly: true
   }
 ];
 
 tape('XVIZData#constructor', t => {
+  const isBrowser = typeof window !== 'undefined';
+
   for (const test of TestCases) {
-    t.comment(`-- TestCase ${test.dataFormat}`);
+    if (test.nodeOnly === true && isBrowser) {
+      continue; // eslint-disable-line no-continue
+    }
+
     const xvizObj = new XVIZData(test.data);
-    t.equal(xvizObj.dataFormat(), test.dataFormat, `data as ${test.name} has expected dataFormat`);
+    t.equal(
+      xvizObj.dataFormat(),
+      test.dataFormat,
+      `${test.description} matches expected format ${test.dataFormat}`
+    );
 
     const msg = xvizObj.message();
-    t.equal(msg.type, 'state_update', `data as ${test.name} has expected XVIZ type`);
-    t.ok(msg.data.updates[0].timestamp, `data as ${test.name} has expected timestamp present`);
+    t.equal(msg.type, 'state_update', `${test.description} has expected XVIZ type`);
+    t.ok(msg.data.updates[0].timestamp, `${test.description} has expected timestamp present`);
   }
 
   t.end();

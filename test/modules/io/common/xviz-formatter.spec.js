@@ -13,7 +13,14 @@
 // limitations under the License.
 import tape from 'tape-catch';
 
-import {TextEncoder, XVIZBinaryWriter, XVIZData, XVIZFormatter} from '@xviz/io';
+import {
+  TextEncoder,
+  MemorySink,
+  XVIZBinaryWriter,
+  XVIZData,
+  XVIZFormatter,
+  XVIZFormat
+} from '@xviz/io';
 
 // Source test data
 import TestXVIZSnapshot from 'test-data/sample-xviz';
@@ -41,18 +48,44 @@ tape('XVIZFormatter#full matrix', t => {
   for (const source of dataSources) {
     const xvizObj = new XVIZData(source);
 
-    for (const format of ['binary', 'json_buffer', 'json_string']) {
+    for (const format of [XVIZFormat.binary, XVIZFormat.jsonBuffer, XVIZFormat.jsonString]) {
+      const sink = new MemorySink();
+
       t.comment(`-- TestCase ${xvizObj.dataFormat()} to ${format}`);
 
       // Convert the data to the requested format
-      const rawData = XVIZFormatter(xvizObj, {format});
-      t.ok(rawData.length, 'has formatted data');
+      // data is state_update and this will default to a frame sequence of 0
+      XVIZFormatter(xvizObj, format, sink);
 
-      // Verify the data is parsed as the expected format
-      const newObj = new XVIZData(rawData);
-      t.equal(newObj.dataFormat(), format, `data format matches`);
+      // We don't really care about the key as each writer will have
+      // different identifier, (eg: 1-frame.json vs 1.frame.glb)
+      for (const [key, val] of sink.entries()) {
+        t.ok(val.length, `${key} has formatted data`);
+
+        // Verify the data is parsed as the expected format
+        const newObj = new XVIZData(val);
+        t.equal(newObj.dataFormat(), format, `data format matches`);
+      }
     }
   }
+
+  t.end();
+});
+
+tape('XVIZFormatter#frame options', t => {
+  const xvizObj = new XVIZData(TestXVIZSnapshot);
+  const sink = new MemorySink();
+
+  XVIZFormatter(xvizObj, XVIZFormat.binary, sink, {frame: 0});
+  XVIZFormatter(xvizObj, XVIZFormat.binary, sink, {frame: 1});
+  XVIZFormatter(xvizObj, XVIZFormat.binary, sink, {frame: 2});
+
+  const expectedKeys = ['2-frame.glb', '3-frame.glb', '4-frame.glb'];
+  for (const key of expectedKeys) {
+    t.ok(sink.has(key), `entry ${key} was present`);
+  }
+
+  t.not(sink.has('1-frame.glb'), 'entry 1-frame.glb was not present');
 
   t.end();
 });

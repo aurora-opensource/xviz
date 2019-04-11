@@ -98,7 +98,7 @@ function testWriter(t, testCase, Writer, suffix) {
     t.fail('Unknown testCase type');
   }
 
-  t.ok(sink.has(`${lookup}.${suffix}`), 'wrote json data');
+  t.ok(sink.has(`${lookup}.${suffix}`), `wrote json data ${lookup}.${suffix}`);
   const jsMessage = new XVIZData(sink.get(`${lookup}.${suffix}`)).message();
   t.deepEquals(jsMessage.data, testCase.data, 'data matches');
   t.deepEquals(jsMessage.type, resultType, 'type matches');

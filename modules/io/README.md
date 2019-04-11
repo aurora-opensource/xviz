@@ -33,11 +33,6 @@ the XVIZ dataFormat().
 
 ### buffer()
 ### dataFormat()
- - binary
- - json_buffer
- - json_string
- - object
-
 ### hasMessage()
 ### message()
 
