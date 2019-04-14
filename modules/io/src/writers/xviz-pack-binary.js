@@ -41,12 +41,22 @@ export function packBinaryJson(json, gltfBuilder, objectKey = null, options = {}
   }
 
   if (Array.isArray(object)) {
-    // TODO - handle numeric arrays, flatten them etc.
-    const typedArray = flattenArrays && flattenToTypedArray(object);
-    if (typedArray) {
-      object = typedArray;
+    // TODO: how do we generalize this?
+    // - certain type, with some predicate (such as size of data)
+    if (objectKey === 'colors') {
+      const data = flattenToTypedArray(object, Uint8Array);
+      object = data;
+    } else if (objectKey === 'points' && Number.isFinite(object[0])) {
+      const data = flattenToTypedArray(object);
+      object = data;
     } else {
-      return object.map(element => packBinaryJson(element, gltfBuilder, options));
+      // TODO - handle numeric arrays, flatten them etc.
+      const typedArray = flattenArrays && flattenToTypedArray(object);
+      if (typedArray) {
+        object = typedArray;
+      } else {
+        return object.map(element => packBinaryJson(element, gltfBuilder, objectKey, options));
+      }
     }
   }
 

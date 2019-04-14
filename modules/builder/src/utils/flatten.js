@@ -12,26 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright (c) 2015 - 2017 Uber Technologies, Inc.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-
 /**
  * Flattens a nested array into a single level array,
  * or a single value into an array with one value
@@ -105,7 +85,16 @@ export function flattenVertices(nestedArray, {result = [], dimensions = 3} = {})
   return result;
 }
 
-export function flattenToTypedArray(nestedArray, ArrayType = Float32Array) {
+// Returns the dimension of the nested array
+function isNestedDimension(array) {
+  const isNested = array.length && Array.isArray(array) && Array.isArray(array[0]);
+  if (isNested) {
+    return array[0].length;
+  }
+  return 0;
+}
+
+export function flattenToTypedArray(nestedArray, ArrayType = Float32Array, dimensions) {
   if (nestedArray.length === 0) {
     return new Float32Array(0);
   }
@@ -114,10 +103,16 @@ export function flattenToTypedArray(nestedArray, ArrayType = Float32Array) {
     return null;
   }
 
+  // Handle case where it's not nested
+  const dim = isNestedDimension(nestedArray);
+  if (dim === 0) {
+    return ArrayType.from(nestedArray);
+  }
+
   const count = countVertices(nestedArray);
 
   const typedArray = new ArrayType(count);
-  flattenVerticesInPlace(nestedArray, typedArray);
+  flattenVerticesInPlace(nestedArray, typedArray, dimensions || dim);
   return typedArray;
 }
 
