@@ -21,9 +21,14 @@ export {FileSink} from './sinks/fs-sink';
 export {MemorySink} from './sinks/memory-sink';
 
 export {FileSource} from './source/fs-source';
+export {MemorySource} from './source/memory-source';
 
 export {TextEncoder, TextDecoder} from './common/text-encoding';
 export {XVIZData} from './common/xviz-data';
 export {XVIZMessage} from './common/xviz-message';
 export {XVIZFormatter} from './common/xviz-formatter';
 export {XVIZFormat} from './common/constants';
+
+export {XVIZProviderFactory} from './providers/index';
+export {XVIZJSONDataProvider} from './providers/xviz-json-data-provider';
+export {XVIZBinaryDataProvider} from './providers/xviz-binary-data-provider';

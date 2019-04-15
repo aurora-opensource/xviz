@@ -11,20 +11,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-const getBabelConfig = require('ocular-dev-tools/config/babel.config');
+import {XVIZJSONReader} from '@xviz/io';
+import {XVIZBaseDataProvider} from './xviz-base-data-provider';
 
-module.exports = api => {
-  const config = getBabelConfig(api);
-  config.plugins = config.plugins || [];
-
-  config.plugins.push('version-inline',
-    '@babel/plugin-transform-runtime',
-    '@babel/proposal-class-properties', [
-    'babel-plugin-inline-import',
-    {
-      extensions: ['.worker.js']
-    }
-  ]);
-
-  return config;
-};
+export class XVIZJSONDataProvider extends XVIZBaseDataProvider {
+  constructor(params) {
+    super({...params, reader: new XVIZJSONReader(params.source, params.options)});
+  }
+}

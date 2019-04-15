@@ -13,3 +13,5 @@
 // limitations under the License.
 import './writers';
 import './common';
+import './readers';
+import './providers';

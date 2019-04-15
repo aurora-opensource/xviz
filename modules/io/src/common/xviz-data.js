@@ -38,8 +38,16 @@ function getDataContainer(data) {
 // being a JSON buffer
 function isJSONStringTypeArray(arr) {
   let firstChar = arr.slice(0, 5).find(entry => entry >= 0x20);
-  let lastChar = arr
-    .slice(-5)
+  let lastChars = arr
+    .slice(-5);
+
+  // Buffer.slice() does not make a copy, but we need one since
+  // we call reverse()
+  if (lastChars instanceof Buffer) {
+    lastChars = Buffer.from(lastChars);
+  }
+
+  let lastChar = lastChars
     .reverse()
     .find(entry => entry >= 0x20);
 
@@ -54,7 +62,7 @@ function isJSONStringTypeArray(arr) {
 //
 // Search the first and last 5 entries for evidence of
 // being a JSON buffer
-function isJSONString(str) {
+export function isJSONString(str) {
   if (str instanceof Uint8Array) {
     return isJSONStringTypeArray(str);
   }
