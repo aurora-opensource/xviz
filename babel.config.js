@@ -33,6 +33,7 @@ const CONFIG = {
     ],
     plugins: [
       'version-inline',
+      '@babel/plugin-transform-runtime',
       '@babel/proposal-class-properties',
       [
         'babel-plugin-inline-import',

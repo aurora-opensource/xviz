@@ -29,6 +29,7 @@
     "@babel/cli": "^7.0.0",
     "@babel/core": "^7.0.0",
     "@babel/plugin-proposal-class-properties": "^7.0.0",
+    "@babel/plugin-transform-runtime": "^7.4.3",
     "@babel/preset-env": "^7.0.0",
     "@babel/register": "^7.0.0",
     "@probe.gl/bench": "^3.0.0-alpha.5",
@@ -74,6 +75,7 @@
   ],
   "private": true,
   "dependencies": {
+    "@babel/runtime": "^7.4.3",
     "protobufjs": "^6.8.8"
   }
 }

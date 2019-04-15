@@ -20,7 +20,7 @@ export class MemorySource {
   }
 
   readSync(name) {
-    this.data.get(name);
+    return this.data.get(name);
   }
 
   has(name) {
