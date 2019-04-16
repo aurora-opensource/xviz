@@ -128,13 +128,13 @@ export class XVIZBaseDataProvider {
   // they will be clamped to the actual range.
   // Otherwise return undefined.
   getFrameIterator(startTime, endTime) {
+    let start = this.indexFile.startTime;
+    let end = this.indexFile.endTime;
+
     // Completely invalid
     if (endTime < startTime) {
       return undefined;
     }
-
-    let start = this.indexFile.startTime;
-    let end = this.indexFile.endTime;
 
     // Validate desired range is in bounds
     if (startTime > end) {
@@ -166,7 +166,6 @@ export class XVIZBaseDataProvider {
       .reverse()
       .findIndex(timeEntry => timeEntry[1] <= end);
     const endIndex = this.indexFile.timing.length - endReverseIndex - 1;
-
     return new FrameIterator(startIndex, endIndex);
   }
 
