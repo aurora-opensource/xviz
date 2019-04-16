@@ -18,7 +18,7 @@ import {
   MemorySink,
   XVIZBinaryWriter,
   XVIZData,
-  XVIZFormatter,
+  XVIZFormatWriter,
   XVIZFormat
 } from '@xviz/io';
 
@@ -38,7 +38,7 @@ const writer = new XVIZBinaryWriter({
 });
 writer.writeFrame(0, TestXVIZSnapshot);
 
-tape('XVIZFormatter#full matrix', t => {
+tape('XVIZFormatWriter#full matrix', t => {
   const dataSources = [
     TestXVIZSnapshot,
     TestXVIZSnapshotString,
@@ -55,7 +55,8 @@ tape('XVIZFormatter#full matrix', t => {
 
       // Convert the data to the requested format
       // data is state_update and this will default to a frame sequence of 0
-      XVIZFormatter(xvizObj, format, sink);
+      const formatWriter = new XVIZFormatWriter(sink, {format});
+      formatWriter.writeFrame(0, xvizObj);
 
       // We don't really care about the key as each writer will have
       // different identifier, (eg: 1-frame.json vs 1.frame.glb)
@@ -72,13 +73,15 @@ tape('XVIZFormatter#full matrix', t => {
   t.end();
 });
 
-tape('XVIZFormatter#frame options', t => {
+tape('XVIZFormatWriter#frame writing', t => {
   const xvizObj = new XVIZData(TestXVIZSnapshot);
   const sink = new MemorySink();
 
-  XVIZFormatter(xvizObj, XVIZFormat.binary, sink, {frame: 0});
-  XVIZFormatter(xvizObj, XVIZFormat.binary, sink, {frame: 1});
-  XVIZFormatter(xvizObj, XVIZFormat.binary, sink, {frame: 2});
+  const formatWriter = new XVIZFormatWriter(sink, {format: XVIZFormat.binary});
+
+  formatWriter.writeFrame(0, xvizObj);
+  formatWriter.writeFrame(1, xvizObj);
+  formatWriter.writeFrame(2, xvizObj);
 
   const expectedKeys = ['2-frame.glb', '3-frame.glb', '4-frame.glb'];
   for (const key of expectedKeys) {
