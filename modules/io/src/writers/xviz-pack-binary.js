@@ -12,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {flattenToTypedArray} from '@loaders.gl/core';
+// TODO(twojtasz): This appears broken in loaders, fix then update here
+// import {flattenToTypedArray} from '@loaders.gl/core';
+import {flattenToTypedArray} from '@xviz/builder';
 
 function packBinaryJsonTypedArray(gltfBuilder, object, objectKey) {
   if (gltfBuilder.isImage(object)) {
@@ -28,6 +30,7 @@ function packBinaryJsonTypedArray(gltfBuilder, object, objectKey) {
 // Follows a convention used by @loaders.gl to use JSONPointers
 // to encode where the binary data for a XVIZ element resides.
 // The unpacking is handled automatically by @loaders.gl
+/* eslint-disable complexity */
 export function packBinaryJson(json, gltfBuilder, objectKey = null, options = {}) {
   const {flattenArrays = false} = options;
   let object = json;
@@ -62,3 +65,4 @@ export function packBinaryJson(json, gltfBuilder, objectKey = null, options = {}
 
   return object;
 }
+/* eslint-enable complexity */

@@ -38,8 +38,7 @@ function getDataContainer(data) {
 // being a JSON buffer
 function isJSONStringTypeArray(arr) {
   let firstChar = arr.slice(0, 5).find(entry => entry >= 0x20);
-  let lastChars = arr
-    .slice(-5);
+  let lastChars = arr.slice(-5);
 
   // Buffer.slice() does not make a copy, but we need one since
   // we call reverse()
@@ -47,9 +46,7 @@ function isJSONStringTypeArray(arr) {
     lastChars = Buffer.from(lastChars);
   }
 
-  let lastChar = lastChars
-    .reverse()
-    .find(entry => entry >= 0x20);
+  let lastChar = lastChars.reverse().find(entry => entry >= 0x20);
 
   firstChar = String.fromCharCode(firstChar);
   lastChar = String.fromCharCode(lastChar);
@@ -65,6 +62,10 @@ function isJSONStringTypeArray(arr) {
 export function isJSONString(str) {
   if (str instanceof Uint8Array) {
     return isJSONStringTypeArray(str);
+  }
+
+  if (typeof str === 'object') {
+    return false;
   }
 
   const beginning = str.slice(0, 5).trim();
