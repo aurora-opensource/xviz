@@ -68,7 +68,13 @@ export class XVIZSessionHandler {
     this.middleware = new XVIZServerMiddlewareStack();
 
     const stack = [
-      new XVIZRequestHandler(this.context, this.socket, this.provider, this.middleware, this.options),
+      new XVIZRequestHandler(
+        this.context,
+        this.socket,
+        this.provider,
+        this.middleware,
+        this.options
+      ),
       new XVIZWebsocketSender(this.context, this.socket, this.options)
     ];
     this.middleware.set(stack);
