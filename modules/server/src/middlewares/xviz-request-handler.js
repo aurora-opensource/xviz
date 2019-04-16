@@ -57,13 +57,13 @@ const startMsgDefault = {
 };
 
 // Server middleware that handles the logic of responding
-// to a request with data from a source, processing
+// to a request with data from a provider, processing
 // the data through the supplied middleware
 export class XVIZRequestHandler {
-  constructor(context, socket, source, middleware, options = {}) {
+  constructor(context, socket, provider, middleware, options = {}) {
     this.context = context;
     this.socket = socket;
-    this.source = source;
+    this.provider = provider;
     this.middleware = middleware;
 
     this.options = Object.assign({}, DEFAULT_OPTIONS, options);
@@ -83,7 +83,7 @@ export class XVIZRequestHandler {
       this.context.start = backfillWithDefault(req, startMsgDefault);
 
       // Errors
-      // ? some of these are dependent on the source/session
+      // ? some of these are dependent on the provider/session
       //   can only be reported once transform log is specified
       //
       // version unsupported
@@ -93,7 +93,7 @@ export class XVIZRequestHandler {
       // log not found
 
       // send metadata
-      const data = this.source.xvizMetadata();
+      const data = this.provider.xvizMetadata();
       this.middleware.onMetadata(req, {data});
     }
   }
@@ -113,12 +113,12 @@ export class XVIZRequestHandler {
       // time range not valid
 
       if (this.interval === null) {
-        const frameIterator = this.source.getFrameIterator(
+        const frameIterator = this.provider.getFrameIterator(
           req.start_timestamps,
           req.end_timestamps
         );
         // TODO: what if out of range, or default
-        // I say default is defined by source
+        // I say default is defined by provider
         // but we should have guidance
         this.context.frameRequest = {
           request: req,
@@ -149,7 +149,7 @@ export class XVIZRequestHandler {
 
     if (iterator.valid()) {
       const loadtime = process.hrtime();
-      const data = await this.source.xvizFrame(iterator);
+      const data = await this.provider.xvizFrame(iterator);
       const dataload = deltaTimeMs(loadtime);
       console.log(`--- loadtime ${dataload}`);
 
@@ -179,7 +179,7 @@ export class XVIZRequestHandler {
     while (iterator.valid()) {
       const frame_sent_start_time = process.hrtime();
 
-      const data = await this.source.xvizFrame(iterator);
+      const data = await this.provider.xvizFrame(iterator);
       this.middleware.onStateUpdate({}, {data});
 
       const frame_sent_end_time = process.hrtime();

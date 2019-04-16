@@ -31,10 +31,10 @@ import {XVIZServerMiddlewareStack} from '../middlewares/middleware';
 //   add data (custom) for messages, they could try to handle first,
 //   else send to XVIZ
 export class XVIZSessionHandler {
-  constructor(socket, request, source, options) {
+  constructor(socket, request, provider, options) {
     this.socket = socket;
     this.request = request;
-    this.source = source;
+    this.provider = provider;
     this.options = options;
 
     // A place to store state for the middlewares for this session
@@ -68,7 +68,7 @@ export class XVIZSessionHandler {
     this.middleware = new XVIZServerMiddlewareStack();
 
     const stack = [
-      new XVIZRequestHandler(this.context, this.socket, this.source, this.middleware, this.options),
+      new XVIZRequestHandler(this.context, this.socket, this.provider, this.middleware, this.options),
       new XVIZWebsocketSender(this.context, this.socket, this.options)
     ];
     this.middleware.set(stack);
