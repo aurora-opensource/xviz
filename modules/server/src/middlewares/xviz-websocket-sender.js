@@ -11,20 +11,21 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import {XVIZFormat, XVIZFormatter} from '@xviz/io';
+import {XVIZFormat, XVIZFormatWriter} from '@xviz/io';
 
 export class WebsocketSink {
-  constructor(socket) {
+  constructor(socket, options) {
     this.socket = socket;
+    this.options = options;
   }
 
   writeSync(name, data) {
-    const opts = {compress: false};
+    let { compress = false } = this.options;
     if (typeof data === 'string') {
-      opts.compress = true;
+      compress = true;
     }
 
-    this.socket.send(data, opts);
+    this.socket.send(data, {compress});
   }
 }
 
@@ -38,16 +39,54 @@ export class XVIZWebsocketSender {
   constructor(context, socket, options = {}) {
     this.context = context;
     this.socket = socket;
-    this.sink = new WebsocketSink(socket, options.format);
+    this.sink = new WebsocketSink(socket, options);
 
     // TODO: options register:
     // - compress
     // - formatter
 
     this.options = options;
-    if (this.options.format === XVIZFormat.object) {
-      this.options.format = XVIZFormat.jsonString;
+
+    // This is the actual format we use to send data and can change
+    // based on the message.
+    this.format = options.format;
+
+    if (this.format === XVIZFormat.object) {
+      this.format = XVIZFormat.jsonString;
     }
+
+    this.writer = null;
+    this._syncFormatWithWriter(this.format);
+  }
+
+  // Sets this.writer based on 'format'
+  // If format is not defined, but the xvizData.hasMessage(), meaning it may
+  // have been mutated, we must format to the fallbackFormat.
+  _syncFormatWithWriter(format, fallbackFormat) {
+    // Cover the case where we have a format and no writer or when the
+    // format does not match.
+    if (format && (!this.writer || this.format !== format)) {
+      this.writer = new XVIZFormatWriter(this.sink, {format});
+      this.format = format;
+    } else if (fallbackFormat && this.format !== fallbackFormat) {
+      this.writer = new XVIZFormatWriter(this.sink, {format: fallbackFormat});
+      this.format = fallbackFormat;
+    }
+  }
+
+  // Data is in the desired format and can be written to sink directly
+  _sendDataDirect(msg) {
+    const {format} = this.options;
+    const sourceFormat = msg.data.dataFormat();
+
+    if (!format || sourceFormat === format) {
+      // need to check if object() has been called (ie it might be dirty) and repack
+      if (!msg.data.hasMessage()) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   _getFormatOptions(msg) {
@@ -82,12 +121,24 @@ export class XVIZWebsocketSender {
 
   onMetadata(req, msg) {
     const {format} = this._getFormatOptions(msg);
-    XVIZFormatter(msg.data, format, this.sink);
+
+    if (this._sendDataDirect(msg)) {
+      this.sink.writeSync(`1-frame`, msg.data.buffer);
+    } else {
+      this._syncFormatWithWriter(format, msg.data.dataFormat());
+      this.writer.writeMetadata(msg.data);
+    }
   }
 
   onStateUpdate(req, msg) {
     const {format} = this._getFormatOptions(msg);
-    XVIZFormatter(msg.data, format, this.sink);
+
+    if (this._sendDataDirect(msg)) {
+      this.sink.writeSync('2-frame', msg.data.buffer);
+    } else {
+      this._syncFormatWithWriter(format, msg.data.dataFormat());
+      this.writer.writeFrame(0, msg.data);
+    }
   }
 
   onTransformLogDone(req, msg) {
