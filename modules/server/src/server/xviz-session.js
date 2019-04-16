@@ -29,16 +29,16 @@ export class XVIZSession {
     const root = path.join(this.options.d, req.path);
 
     // FileSource is used for a JSON/GLB sources
-    const dataSource = new FileSource(root);
+    const source = new FileSource(root);
 
-    const source = await this.factory.open({
-      dataSource,
+    const provider = await this.factory.open({
+      source,
       options: req.params,
       root
     });
 
-    if (source) {
-      return new XVIZSessionHandler(socket, req, source, this.options);
+    if (provider) {
+      return new XVIZSessionHandler(socket, req, provider, this.options);
     }
 
     return null;
