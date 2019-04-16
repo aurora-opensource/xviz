@@ -13,6 +13,7 @@
 // limitations under the License.
 export {XVIZJSONWriter} from './writers/xviz-json-writer';
 export {XVIZBinaryWriter, encodeBinaryXVIZ} from './writers/xviz-binary-writer';
+export {XVIZFormatWriter} from './writers/xviz-format-writer';
 
 export {XVIZJSONReader} from './readers/xviz-json-reader';
 export {XVIZBinaryReader} from './readers/xviz-binary-reader';
@@ -26,7 +27,6 @@ export {MemorySource} from './source/memory-source';
 export {TextEncoder, TextDecoder} from './common/text-encoding';
 export {XVIZData} from './common/xviz-data';
 export {XVIZMessage} from './common/xviz-message';
-export {XVIZFormatter} from './common/xviz-formatter';
 export {XVIZFormat} from './common/constants';
 
 export {XVIZProviderFactory} from './providers/index';
