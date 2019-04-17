@@ -22,6 +22,7 @@ import {WebSocketInterface} from './websocket';
 // Pull in sub commands
 import {validateArgs} from './cmds/validate';
 import {dumpArgs} from './cmds/dump';
+import {convertArgs} from './cmds/convert';
 
 /**
  * Main function for entire tool
@@ -31,6 +32,7 @@ function main() {
 
   args = dumpArgs(args);
   args = validateArgs(args);
+  args = convertArgs(args);
 
   return args.argv;
 }
