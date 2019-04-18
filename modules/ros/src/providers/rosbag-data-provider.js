@@ -63,7 +63,7 @@ class FrameIterator {
 //
 export class ROSBAGDataProvider {
   constructor({root, options}) {
-    this.bagPath = `${root}.bag`;
+    this.bagPath = root.endsWith('.bag') ? root : `${root}.bag`;
     this.options = options;
     this.metadata = null;
 

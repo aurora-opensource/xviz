@@ -17,7 +17,8 @@
     "bluebird": "^3.5.3",
     "lodash": "^4.17.11",
     "rosbag": "^2.0.0",
-    "sharp": "^0.20.7"
+    "sharp": "^0.20.7",
+    "yargs": "^13.2.2"
   },
   "scripts": {
     "clean": "rm -fr dist && mkdir -p dist",
