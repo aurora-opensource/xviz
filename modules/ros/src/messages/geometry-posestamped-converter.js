@@ -38,7 +38,6 @@ export class GeometryPoseStamped {
     // Every frame *MUST* have a pose. The pose can be considered
     // the core reference point for other data and usually drives the timing
     // of the system.
-    console.log('~time', TimeUtil.toDate(timestamp).getTime() / 1e3);
     // Position, decimal degrees
     const rotation = quaternionToEuler(message.pose.orientation);
     const {position} = message.pose;

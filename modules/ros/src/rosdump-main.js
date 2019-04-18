@@ -13,7 +13,7 @@
 // limitations under the License.
 /* global process, console  */
 /* eslint-disable no-console */
-import {open} from 'rosbag';
+import {open, TimeUtil} from 'rosbag';
 
 export async function main() {
   const bagPath = process.argv[2];
@@ -21,6 +21,8 @@ export async function main() {
 
   const bag = await open(bagPath);
 
+  console.log(`start_time: ${TimeUtil.toDate(bag.startTime).getTime() / 1e3}`);
+  console.log(`end_time: ${TimeUtil.toDate(bag.endTime).getTime() / 1e3}`);
   for (const conn in bag.connections) {
     const {topic, type} = bag.connections[conn];
     console.log(topic, type);

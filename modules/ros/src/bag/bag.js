@@ -15,7 +15,6 @@
 /* eslint-disable no-console, camelcase */
 import {open, TimeUtil} from 'rosbag';
 import {quaternionToEuler} from '../common/quaternion';
-// import {FrameBuilder} from './frame-builder';
 import {topicMapper} from '../messages';
 
 import {XVIZMetadataBuilder, XVIZBuilder} from '@xviz/builder';
@@ -142,7 +141,7 @@ export class Bag {
     this.topicType = topicType;
 
     const {origin, frameIdToPoseMap} = this.metadata.data;
-    console.log('~!~ frameIdToPoseMap', JSON.stringify(frameIdToPoseMap, null, 2));
+    // console.log('~!~ frameIdToPoseMap', JSON.stringify(frameIdToPoseMap, null, 2));
     topicMapper(this.topicType, {keyTopic: this.keyTopic}, origin);
 
     const xvizMetadataBuilder = new XVIZMetadataBuilder();
@@ -152,7 +151,7 @@ export class Bag {
       }
     }
     this.metadata2 = xvizMetadataBuilder.getMetadata();
-    console.log(JSON.stringify(this.metadata2, null, 2));
+    // console.log(JSON.stringify(this.metadata2, null, 2));
 
     const {start_time, end_time} = this.metadata.data;
     this.metadata2.start_time = start_time;
@@ -175,7 +174,6 @@ export class Bag {
       }
     };
 
-    // this.frameBuilder = new FrameBuilder(this.metadata.data)
     return {
       type: 'xviz/metadata',
       data: this.metadata2
@@ -226,7 +224,7 @@ export class Bag {
       }
     });
 
-    console.log('Calc metadata', (Date.now() - start) / 1000);
+    // console.log('Calc metadata', (Date.now() - start) / 1000);
 
     return {
       type: 'xviz/metadata',
@@ -249,10 +247,15 @@ export class Bag {
     const bag = await open(this.bagPath);
     const frame = {};
 
-    const options = {
-      startTime: TimeUtil.fromDate(new Date(start * 1e3)),
-      endTime: TimeUtil.fromDate(new Date(end * 1e3))
-    };
+    const options = {};
+
+    if (start) {
+      options.startTime = TimeUtil.fromDate(new Date(start * 1e3));
+    }
+
+    if (end) {
+      options.endTime = TimeUtil.fromDate(new Date(end * 1e3));
+    }
 
     if (this.topics) {
       options.topics = this.topics;
@@ -272,7 +275,6 @@ export class Bag {
       frame[result.topic].push(result);
     });
 
-    // return await this.frameBuilder.buildFrame(frame);
     return await this.buildFrame(frame);
   }
 

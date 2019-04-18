@@ -13,17 +13,59 @@
 // limitations under the License.
 /* global console */
 /* eslint-disable no-console */
-import {FileSink, XVIZBinaryWriter} from '@xviz/io';
-import * as Topics from './topics';
+import {FileSink, XVIZFormat, XVIZFormatWriter} from '@xviz/io';
 import {Bag} from './bag';
 import {TimeUtil} from 'rosbag';
 
-import {createDir, deleteDirRecursive} from './lib/util';
-import FrameBuilder from './frame-builder';
+import {ROSBAGDataProvider} from './providers/rosbag-data-provider';
+
+import {FrameBuilder} from './bag/frame-builder';
 
 const process = require('process');
 const loggingStartTime = process.hrtime();
 const NS_PER_SEC = 1e9;
+
+import fs from 'fs';
+import path from 'path';
+
+export function createDir(dirPath) {
+  if (!fs.existsSync(dirPath)) {
+    // make sure parent exists
+    const parent = path.dirname(dirPath);
+    createDir(parent);
+
+    fs.mkdirSync(dirPath);
+  }
+}
+
+export function deleteDirRecursive(parentDir) {
+  const files = fs.readdirSync(parentDir);
+  files.forEach(file => {
+    const currPath = path.join(parentDir, file);
+    if (fs.lstatSync(currPath).isDirectory()) {
+      // recurse
+      deleteDirRecursive(currPath);
+    } else {
+      // delete file
+      fs.unlinkSync(currPath);
+    }
+  });
+
+  fs.rmdirSync(parentDir);
+}
+
+async function createProvider(args) {
+  let provider = null;
+  // root, dataProvider, options
+  provider = new ROSBAGDataProvider(args);
+  await provider.init();
+
+  if (provider.valid()) {
+    return provider;
+  }
+
+  return null;
+}
 
 function deltaTimeMs(startT) {
   const diff = process.hrtime(startT || loggingStartTime);
@@ -33,7 +75,7 @@ function deltaTimeMs(startT) {
 export default async function transform(args) {
   const profileStart = Date.now();
 
-  const {bag: bagPath, outputDir, disableStreams, frameLimit = Number.MAX_VALUE} = args;
+  const {bag: bagPath, dir: outputDir, start, end} = args;
 
   console.log(`Converting data at ${bagPath}`); // eslint-disable-line
   console.log(`Saving to ${outputDir}`); // eslint-disable-line
@@ -44,58 +86,49 @@ export default async function transform(args) {
     // ignore
   }
   createDir(outputDir);
-  const bag = new Bag({
-    bagPath,
-    keyTopic: Topics.CURRENT_POSE,
-    topics: Topics.ALL
-  });
 
-  const {origin, frameIdToPoseMap} = await bag.calculateMetadata();
-  const frameBuilder = new FrameBuilder({
-    origin,
-    frameIdToPoseMap,
-    disableStreams
-  });
+  // TODO: fix that key topic is fixed
+  // TODO: fix that topics is baked into the 'bag'
+  const options = {};
+  const provider = await createProvider({root: bagPath, options});
+  if (!provider) {
+    process.exit(1);
+  }
 
   // This abstracts the details of the filenames expected by our server
   const sink = new FileSink(outputDir);
-  const xvizWriter = new XVIZBinaryWriter(sink);
 
-  let frameNum = 0;
-  let startTime = null;
-  let endTime = null;
-  await bag.readFrames(async frame => {
-    try {
-      if (frameNum < frameLimit) {
-        endTime = TimeUtil.toDate(frame.keyTopic.timestamp);
+  const iterator = provider.getFrameIterator(start, end);
 
-        if (!startTime) {
-          startTime = endTime;
-        }
-
-        const loadtime = process.hrtime();
-        const xvizFrame = await frameBuilder.buildFrame(frame);
-        const dataload = deltaTimeMs(loadtime);
-        console.log(`--- frame: ${frameNum} ${dataload}ms ${endTime.valueOf() / 1000.0}`);
-        xvizWriter.writeFrame(frameNum, xvizFrame);
-        frameNum++;
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  });
-
-  if (!startTime) {
-    throw new Error('No key frames found');
+  if (!iterator.valid()) {
+    console.log('Error creating and iterator, exiting');
+    process.exit(2);
   }
 
-  // Write metadata file
-  const xb = frameBuilder.getXVIZMetadataBuilder();
-  xb.startTime(startTime.getTime() / 1e3).endTime(endTime.getTime() / 1e3);
-  xvizWriter.writeMetadata(xb.getMetadata());
+  const writer = new XVIZFormatWriter(sink, {format: XVIZFormat.binary});
+  writer.writeMetadata(provider.xvizMetadata());
 
-  xvizWriter.writeFrameIndex();
+  signalWriteIndexOnInterrupt(writer);
 
-  const profileEnd = Date.now();
-  console.log(`Generate ${frameNum} frames in ${(profileEnd - profileStart) / 1000}s`); // eslint-disable-line
+  let frameSequence = 0;
+  while (iterator.valid()) {
+    const data = await provider.xvizFrame(iterator);
+    if (!data) {
+      throw new Error(`No data for frame ${frameSequence}`);
+    }
+
+    process.stdout.write(`Writing frame ${frameSequence}\r`);
+    writer.writeFrame(frameSequence, data);
+    frameSequence += 1;
+  }
+
+  writer.writeFrameIndex();
+}
+
+function signalWriteIndexOnInterrupt(writer) {
+  process.on('SIGINT', () => {
+    console.log('Aborting, writing index file.');
+    writer.writeFrameIndex();
+    process.exit(0); // eslint-disable-line no-process-exit
+  });
 }
