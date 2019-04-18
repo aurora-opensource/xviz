@@ -15,28 +15,29 @@
 /* eslint-disable no-console */
 import {open, TimeUtil} from 'rosbag';
 
-export async function main() {
-  const bagPath = process.argv[2];
-  const mainTopic = process.argv[3];
+export async function BagDump(args) {
+  const {bag: bagPath, topic: mainTopic} = args;
 
   const bag = await open(bagPath);
 
-  console.log(`start_time: ${TimeUtil.toDate(bag.startTime).getTime() / 1e3}`);
-  console.log(`end_time: ${TimeUtil.toDate(bag.endTime).getTime() / 1e3}`);
-  for (const conn in bag.connections) {
-    const {topic, type} = bag.connections[conn];
-    console.log(topic, type);
+  console.log(args);
+  if (args.dumpTime) {
+    console.log(`start_time: ${TimeUtil.toDate(bag.startTime).getTime() / 1e3}`);
+    console.log(`end_time: ${TimeUtil.toDate(bag.endTime).getTime() / 1e3}`);
   }
 
-  if (mainTopic) {
-    console.log(mainTopic);
-  }
-  /*
-  await bag.readMessages({}, ({topic, message}) => {
-    if (!mainTopic || topic === mainTopic) {
-      console.log(topic);
-      // console.log(JSON.stringify(message, null, 2));
+  if (args.dumpAllTopics) {
+    for (const conn in bag.connections) {
+      const {topic, type} = bag.connections[conn];
+      console.log(topic, type);
     }
-  });
-  */
+  }
+
+  if (args.dumpMessages) {
+    await bag.readMessages({}, ({topic, message}) => {
+      if (!mainTopic || topic === mainTopic) {
+        console.log(JSON.stringify(message, null, 2));
+      }
+    });
+  }
 }

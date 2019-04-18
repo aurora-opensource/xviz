@@ -11,9 +11,5 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-require('@babel/register');
-require('babel-polyfill');
-
-const main = require('./rosdump-main').main;
-
-main();
+export {BagDump} from './bagdump';
+export {Convert} from './convert';

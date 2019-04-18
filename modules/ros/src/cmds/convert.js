@@ -14,12 +14,12 @@
 /* global console */
 /* eslint-disable no-console */
 import {FileSink, XVIZFormat, XVIZFormatWriter} from '@xviz/io';
-import {Bag} from './bag';
+import {Bag} from '../bag/bag';
 import {TimeUtil} from 'rosbag';
 
-import {ROSBAGDataProvider} from './providers/rosbag-data-provider';
+import {ROSBAGDataProvider} from '../providers/rosbag-data-provider';
 
-import {FrameBuilder} from './bag/frame-builder';
+import {FrameBuilder} from '../bag/frame-builder';
 
 const process = require('process');
 const loggingStartTime = process.hrtime();
@@ -28,7 +28,7 @@ const NS_PER_SEC = 1e9;
 import fs from 'fs';
 import path from 'path';
 
-export function createDir(dirPath) {
+function createDir(dirPath) {
   if (!fs.existsSync(dirPath)) {
     // make sure parent exists
     const parent = path.dirname(dirPath);
@@ -38,7 +38,7 @@ export function createDir(dirPath) {
   }
 }
 
-export function deleteDirRecursive(parentDir) {
+function deleteDirRecursive(parentDir) {
   const files = fs.readdirSync(parentDir);
   files.forEach(file => {
     const currPath = path.join(parentDir, file);
@@ -72,7 +72,7 @@ function deltaTimeMs(startT) {
   return ((diff[0] * NS_PER_SEC + diff[1]) / 1e6).toFixed(3);
 }
 
-export default async function transform(args) {
+export async function Convert(args) {
   const profileStart = Date.now();
 
   const {bag: bagPath, dir: outputDir, start, end} = args;
@@ -98,8 +98,9 @@ export default async function transform(args) {
   // This abstracts the details of the filenames expected by our server
   const sink = new FileSink(outputDir);
 
+  console.log(start, end);
   const iterator = provider.getFrameIterator(start, end);
-
+  console.log(JSON.stringify(iterator));
   if (!iterator.valid()) {
     console.log('Error creating and iterator, exiting');
     process.exit(2);
