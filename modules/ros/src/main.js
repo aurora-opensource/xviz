@@ -16,7 +16,10 @@
 require('@babel/register');
 require('babel-polyfill');
 
-const convert = require('./transform').default;
+import {
+  BagDump,
+  Convert,
+} from './cmds';
 
 const yargs = require('yargs')
   .alias('h', 'help')
@@ -38,6 +41,38 @@ const yargs = require('yargs')
         demandOption: true
       }
     },
-    convert);
+    Convert)
+  .command(
+    'bagdump <bag>',
+    'Display information about a ROS bag',
+    { 
+      topic: {
+        alias: 't',
+        description: 'The topic to inspect'
+      },
+      start: {
+        alias: 's',
+        describe: 'Starting timestamp to begin dump'
+      },
+      end: {
+        alias: 'e',
+        describe: 'Ending timestamp to stop dump',
+      },
+      dumpTime: {
+        type: 'boolean',
+        description: 'Show start and end time of the bag'
+      },
+      dumpAllTopics: {
+        type: 'boolean',
+        description: 'Show start and end time of the bag'
+      },
+      dumpMessages: {
+        type: 'boolean',
+        description: 'Will dump messages, if a topic is provided only those will be dumped'
+      }
+    },
+    BagDump);
 
-yargs.parse();
+export function main() {
+  yargs.parse();
+}
