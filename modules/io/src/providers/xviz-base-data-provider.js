@@ -194,10 +194,12 @@ export class XVIZBaseDataProvider {
   _readIndex() {
     const data = this.reader.readFrameIndex();
 
-    if (isJSONString(data)) {
-      return JSON.parse(data);
-    } else if (typeof data === 'object') {
-      return data;
+    if (data) {
+      if (isJSONString(data)) {
+        return JSON.parse(data);
+      } else if (typeof data === 'object') {
+        return data;
+      }
     }
 
     return undefined;
