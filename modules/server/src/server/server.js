@@ -40,8 +40,8 @@ export class XVIZServer {
     }
 
     this.handlers = handlers;
-    this.options = Object.assign({}, DEFAULT_OPTIONS, options);
-    this._server = new WebSocket.Server(options, callback);
+    this.options = Object.assign(DEFAULT_OPTIONS, options);
+    this._server = new WebSocket.Server(this.options, callback);
 
     this.server.on('connection', (socket, request) => this.handleSession(socket, request));
   }
