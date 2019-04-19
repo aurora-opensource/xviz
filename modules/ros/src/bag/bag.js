@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-/* global Buffer, console */
+/* global Buffer */
 /* eslint-disable no-console, camelcase */
 import {open, TimeUtil} from 'rosbag';
 import {quaternionToEuler} from '../common/quaternion';
@@ -120,7 +120,7 @@ export class Bag {
   async init() {
     await this.open();
 
-    this.metadata = await this.calculateMetadata();
+    this.metadata = await this.collectMetadata();
 
     const topicType = {};
     for (const conn in this.bag.connections) {
@@ -140,7 +140,7 @@ export class Bag {
 
     this.topicType = topicType;
 
-    const {origin, frameIdToPoseMap} = this.metadata.data;
+    const {origin, frameIdToPoseMap} = this.metadata;
     // console.log('~!~ frameIdToPoseMap', JSON.stringify(frameIdToPoseMap, null, 2));
     topicMapper(this.topicType, {keyTopic: this.keyTopic}, origin);
 
@@ -153,7 +153,7 @@ export class Bag {
     this.metadata2 = xvizMetadataBuilder.getMetadata();
     // console.log(JSON.stringify(this.metadata2, null, 2));
 
-    const {start_time, end_time} = this.metadata.data;
+    const {start_time, end_time} = this.metadata;
     this.metadata2.start_time = start_time;
     this.metadata2.end_time = end_time;
     this.metadata2.log_info = {
@@ -174,10 +174,12 @@ export class Bag {
       }
     };
 
-    return {
+    this.xvizMetadata = {
       type: 'xviz/metadata',
       data: this.metadata2
     };
+
+    return this.xvizMetadata;
   }
 
   /**
@@ -188,13 +190,12 @@ export class Bag {
    *   origin: map origin
    *   frameIdToPoseMap: ROS /tf transform tree
    */
-  async calculateMetadata() {
+  async collectMetadata() {
     const TF = '/tf';
 
     let origin = {latitude: 0, longitude: 0, altitude: 0};
     const frameIdToPoseMap = {};
 
-    const start = Date.now();
     await this.open();
 
     const start_time = TimeUtil.toDate(this.bag.startTime).getTime() / 1e3;
@@ -224,21 +225,11 @@ export class Bag {
       }
     });
 
-    // console.log('Calc metadata', (Date.now() - start) / 1000);
-
     return {
-      type: 'xviz/metadata',
-      data: {
-        version: '2.0',
-        start_time,
-        end_time,
-        log_info: {
-          start_time,
-          end_time
-        },
-        origin,
-        frameIdToPoseMap
-      }
+      start_time,
+      end_time,
+      origin,
+      frameIdToPoseMap
     };
   }
 
@@ -279,7 +270,7 @@ export class Bag {
   }
 
   async buildFrame(frame) {
-    const xvizBuilder = new XVIZBuilder(this.metadata.data, this.disableStreams, {});
+    const xvizBuilder = new XVIZBuilder(this.xvizMetadata.data, this.disableStreams, {});
 
     for (const topicName in this.topicType) {
       if (this.topicType[topicName].converter) {
