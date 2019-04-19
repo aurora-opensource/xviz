@@ -11,52 +11,45 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-/* global process, console  */
-/* eslint-disable no-console */
 require('@babel/register');
 require('babel-polyfill');
 
-import {
-  BagDump,
-  Convert,
-} from './cmds';
+import {BagDump, Convert} from './cmds';
+
+const StartEndOptions = {
+  start: {
+    alias: 's',
+    describe: 'Starting timestamp to begin conversion'
+  },
+  end: {
+    alias: 'e',
+    describe: 'Ending timestamp to stop conversion'
+  }
+};
 
 const yargs = require('yargs')
   .alias('h', 'help')
   .command(
     'convert [-d output] <bag>',
     'Convert a rosbag to xviz',
-    { 
-      start: {
-        alias: 's',
-        describe: 'Starting timestamp to begin conversion'
-      },
-      end: {
-        alias: 'e',
-        describe: 'Ending timestamp to stop conversion',
-      },
+    {
+      ...StartEndOptions,
       dir: {
         alias: 'd',
         describe: 'Directory to save XVIZ data',
         demandOption: true
       }
     },
-    Convert)
+    Convert
+  )
   .command(
     'bagdump <bag>',
     'Display information about a ROS bag',
-    { 
+    {
+      ...StartEndOptions,
       topic: {
         alias: 't',
         description: 'The topic to inspect'
-      },
-      start: {
-        alias: 's',
-        describe: 'Starting timestamp to begin dump'
-      },
-      end: {
-        alias: 'e',
-        describe: 'Ending timestamp to stop dump',
       },
       dumpTime: {
         type: 'boolean',
@@ -71,7 +64,8 @@ const yargs = require('yargs')
         description: 'Will dump messages, if a topic is provided only those will be dumped'
       }
     },
-    BagDump);
+    BagDump
+  );
 
 export function main() {
   yargs.parse();

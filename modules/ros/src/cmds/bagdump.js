@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-/* global process, console  */
+/* global console  */
 /* eslint-disable no-console */
 import {open, TimeUtil} from 'rosbag';
 
@@ -20,7 +20,6 @@ export async function BagDump(args) {
 
   const bag = await open(bagPath);
 
-  console.log(args);
   if (args.dumpTime) {
     console.log(`start_time: ${TimeUtil.toDate(bag.startTime).getTime() / 1e3}`);
     console.log(`end_time: ${TimeUtil.toDate(bag.endTime).getTime() / 1e3}`);

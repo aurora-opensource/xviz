@@ -12,19 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 /* global console */
-/* eslint-disable no-console */
+/* eslint-disable no-console, complexity, max-statements */
 import {FileSink, XVIZFormat, XVIZFormatWriter} from '@xviz/io';
-import {Bag} from '../bag/bag';
-import {TimeUtil} from 'rosbag';
-
 import {ROSBAGDataProvider} from '../providers/rosbag-data-provider';
 
-import {FrameBuilder} from '../bag/frame-builder';
-
-const process = require('process');
-const loggingStartTime = process.hrtime();
-const NS_PER_SEC = 1e9;
-
+import process from 'process';
 import fs from 'fs';
 import path from 'path';
 
@@ -67,14 +59,7 @@ async function createProvider(args) {
   return null;
 }
 
-function deltaTimeMs(startT) {
-  const diff = process.hrtime(startT || loggingStartTime);
-  return ((diff[0] * NS_PER_SEC + diff[1]) / 1e6).toFixed(3);
-}
-
 export async function Convert(args) {
-  const profileStart = Date.now();
-
   const {bag: bagPath, dir: outputDir, start, end} = args;
 
   console.log(`Converting data at ${bagPath}`); // eslint-disable-line
@@ -92,23 +77,24 @@ export async function Convert(args) {
   const options = {};
   const provider = await createProvider({root: bagPath, options});
   if (!provider) {
-    process.exit(1);
+    throw new Error('Failed to create ROSBAGDataProvider');
   }
 
   // This abstracts the details of the filenames expected by our server
   const sink = new FileSink(outputDir);
 
-  console.log(start, end);
   const iterator = provider.getFrameIterator(start, end);
-  console.log(JSON.stringify(iterator));
   if (!iterator.valid()) {
-    console.log('Error creating and iterator, exiting');
-    process.exit(2);
+    throw new Error('Error creating and iterator');
   }
 
   const writer = new XVIZFormatWriter(sink, {format: XVIZFormat.binary});
-  writer.writeMetadata(provider.xvizMetadata());
 
+  const md = provider.xvizMetadata();
+  setMetadataTimes(md.message().data, start, end);
+  writer.writeMetadata(md);
+
+  // If we get interrupted make sure the index is written out
   signalWriteIndexOnInterrupt(writer);
 
   let frameSequence = 0;
@@ -125,6 +111,22 @@ export async function Convert(args) {
 
   writer.writeFrameIndex();
 }
+
+/* eslint-disable camelcase */
+function setMetadataTimes(metadata, start, end) {
+  if (start || end) {
+    if (start) {
+      const logInfo = metadata.log_info || {};
+      logInfo.start_time = start;
+    }
+
+    if (end) {
+      const logInfo = metadata.log_info || {};
+      logInfo.end_time = end;
+    }
+  }
+}
+/* eslint-enable camelcase */
 
 function signalWriteIndexOnInterrupt(writer) {
   process.on('SIGINT', () => {
