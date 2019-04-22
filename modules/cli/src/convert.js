@@ -82,8 +82,9 @@ export class ConvertXVIZ {
 
     const sinkFormat =
       this.options.format === ConvertFormat.JSON ? XVIZFormat.jsonString : XVIZFormat.binary;
+    const optimize = Boolean(this.options.optimize);
 
-    const writer = new XVIZFormatWriter(this.sink, {format: sinkFormat});
+    const writer = new XVIZFormatWriter(this.sink, {format: sinkFormat, flattenArrays: optimize});
     writer.writeMetadata(metadata);
 
     const iterator = this.getIterator();
@@ -94,7 +95,7 @@ export class ConvertXVIZ {
         throw new Error(`No data for frame ${frameSequence}`);
       }
 
-      this.log('Writing frame ', frameSequence);
+      process.stdout.write(`Writing frame ${frameSequence}\r`);
       writer.writeFrame(frameSequence, data);
       frameSequence += 1;
     }

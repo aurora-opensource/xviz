@@ -20,7 +20,7 @@ export class WebsocketSink {
   }
 
   writeSync(name, data) {
-    let { compress = false } = this.options;
+    let {compress = false} = this.options;
     if (typeof data === 'string') {
       compress = true;
     }

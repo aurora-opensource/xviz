@@ -96,7 +96,7 @@ function isNestedDimension(array) {
 
 export function flattenToTypedArray(nestedArray, ArrayType = Float32Array, dimensions) {
   if (nestedArray.length === 0) {
-    return new Float32Array(0);
+    return null;
   }
 
   if (!checkVertices(nestedArray)) {

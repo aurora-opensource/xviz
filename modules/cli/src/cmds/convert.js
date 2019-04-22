@@ -27,8 +27,13 @@ export function convertArgs(inArgs) {
       args.options('format', {
         alias: 'f',
         default: ConvertFormat.BINARY,
-        chloices: [ConvertFormat.BINARY, ConvertFormat.JSON],
+        choices: [ConvertFormat.BINARY, ConvertFormat.JSON],
         describe: 'Target format "json" or "binary"'
+      });
+      args.options('optimize', {
+        type: 'boolean',
+        default: true,
+        describe: 'When format is "binary" this will optimize certain data types'
       });
     },
     args => {

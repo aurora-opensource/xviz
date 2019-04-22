@@ -54,3 +54,17 @@ test('flattenToTypedArray#color', t => {
   t.deepEqual(newArray, expected, 'flattenToTypedArray matches expected output');
   t.end();
 });
+
+test('flattenToTypedArray#zero array returns null', t => {
+  const newArray = flattenToTypedArray([]);
+
+  t.equal(newArray, null, 'flattenToTypedArray with 0 length input returns null');
+  t.end();
+});
+
+test('flattenToTypedArray#array with objects', t => {
+  const newArray = flattenToTypedArray([{a: 1}]);
+
+  t.equal(newArray, null, 'flattenToTypedArray with array of objects returns null');
+  t.end();
+});

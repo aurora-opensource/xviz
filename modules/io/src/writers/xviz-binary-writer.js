@@ -37,13 +37,13 @@ export function encodeBinaryXVIZ(xvizJson, options) {
 
 export class XVIZBinaryWriter {
   constructor(sink, options = {}) {
-    const {envelope = true, draco = false} = options;
+    const {envelope = true, flattenArrays = false, draco = false} = options;
     this.sink = sink;
     this.frameTimings = {
       frames: new Map()
     };
     this.wroteFrameIndex = null;
-    this.options = {envelope, draco};
+    this.options = {envelope, flattenArrays, draco};
   }
 
   // xvizMetadata is the object returned
@@ -56,7 +56,7 @@ export class XVIZBinaryWriter {
     }
 
     const options = {
-      flattenArrays: false
+      flattenArrays: this.options.flattenArrays
     };
 
     const glbFileBuffer = encodeBinaryXVIZ(xvizMetadata, options);
@@ -79,7 +79,7 @@ export class XVIZBinaryWriter {
     }
 
     const options = {
-      flattenArrays: false
+      flattenArrays: this.options.flattenArrays
     };
 
     if (this.options.draco) {
