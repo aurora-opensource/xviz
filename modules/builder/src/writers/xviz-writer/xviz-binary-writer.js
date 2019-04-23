@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import {GLTFBuilder} from '@loaders.gl/gltf';
-import {toBuffer} from '@loaders.gl/core';
 import {packBinaryJson} from './xviz-pack-binary';
 
 export function encodeBinaryXVIZ(xvizJson, options) {
@@ -30,6 +29,7 @@ export function encodeBinaryXVIZ(xvizJson, options) {
 
 export function writeBinaryXVIZtoFile(sink, directory, name, json, options) {
   const glbFileBuffer = encodeBinaryXVIZ(json, options);
-  sink.writeSync(directory, `${name}.glb`, toBuffer(glbFileBuffer), {flag: 'w'});
+  /* global Buffer */
+  sink.writeSync(directory, `${name}.glb`, Buffer.from(glbFileBuffer), {flag: 'w'});
   return glbFileBuffer;
 }
