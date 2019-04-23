@@ -14,3 +14,4 @@
 
 import './sort.spec';
 import './validate.spec';
+import './flatten.spec';

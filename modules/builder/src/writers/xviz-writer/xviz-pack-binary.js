@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {flattenToTypedArray} from '@loaders.gl/core';
+import {flattenToTypedArray} from '../../utils';
 
 function packBinaryJsonTypedArray(gltfBuilder, object, objectKey) {
   if (gltfBuilder.isImage(object)) {
