@@ -28,9 +28,9 @@ function packBinaryJsonTypedArray(gltfBuilder, object, objectKey) {
 // Follows a convention used by @loaders.gl to use JSONPointers
 // to encode where the binary data for a XVIZ element resides.
 // The unpacking is handled automatically by @loaders.gl
+// eslint-disable-next-line complexity
 export function packBinaryJson(json, gltfBuilder, objectKey = null, options = {}) {
   const {flattenArrays = true} = options;
-  console.log(flattenArrays);
   let object = json;
 
   // Check if string has same syntax as our "JSON pointers", if so "escape it".
@@ -39,11 +39,12 @@ export function packBinaryJson(json, gltfBuilder, objectKey = null, options = {}
   }
 
   if (Array.isArray(object)) {
-    // TODO - handle numeric arrays, flatten them etc.
-    console.log(flattenArrays);
-    const typedArray = flattenArrays && flattenToTypedArray(object);
-    if (typedArray) {
-      object = typedArray;
+    if (Number.isFinite(object[0])) {
+      return object;
+    }
+    if (flattenArrays && Array.isArray(object[0])) {
+      // Flatten nested vertices
+      object = flattenToTypedArray(object);
     } else {
       return object.map(element => packBinaryJson(element, gltfBuilder, options));
     }

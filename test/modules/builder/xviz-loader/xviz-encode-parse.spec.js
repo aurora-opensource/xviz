@@ -132,8 +132,7 @@ test('pack-unpack-pack-json', t => {
   const frameBinary = encodeBinaryXVIZ(frame, options);
   // TODO/ib - might be interesting to check why this has increased.
   // Should make effort to keep overhead small in loaders.gl
-  // t.equal(frameBinary.byteLength, 664);
-  t.equal(frameBinary.byteLength, 708);
+  t.equal(frameBinary.byteLength, 584);
 
   const xvizBinaryDecoded2 = parseBinaryXVIZ(frameBinary);
   const lidar = xvizBinaryDecoded2.state_updates[0].primitives.lidarPoints;
