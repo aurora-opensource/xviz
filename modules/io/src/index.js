@@ -19,10 +19,8 @@ export {XVIZJSONReader} from './readers/xviz-json-reader';
 export {XVIZBinaryReader} from './readers/xviz-binary-reader';
 
 export {FileSink} from './io/fs-sink';
-export {MemorySink} from './io/memory-sink';
-
 export {FileSource} from './io/fs-source';
-export {MemorySource} from './io/memory-source';
+export {MemorySourceSink} from './io/memory-source-sink';
 
 export {TextEncoder, TextDecoder} from './common/text-encoding';
 export {XVIZData} from './common/xviz-data';

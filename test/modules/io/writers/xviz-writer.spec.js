@@ -14,12 +14,12 @@
 
 /* eslint-disable camelcase */
 import test from 'tape-catch';
-import {XVIZJSONWriter, XVIZBinaryWriter, XVIZData, MemorySink} from '@xviz/io';
+import {XVIZJSONWriter, XVIZBinaryWriter, XVIZData, MemorySourceSink} from '@xviz/io';
 
 test('XVIZWriter#default-ctor', t => {
   /* eslint-disable no-unused-vars */
   // Ensure no parameter ctor
-  const sink = new MemorySink();
+  const sink = new MemorySourceSink();
   const jsBuilder = new XVIZJSONWriter(sink);
   const binBuilder = new XVIZBinaryWriter(sink);
   t.end();
@@ -65,7 +65,7 @@ const TestCases = [
       writer.writeFrameIndex();
       t.ok(sink.has('0-frame.json'), 'wrote index for frames');
       t.deepEquals(
-        JSON.parse(sink.get('0-frame.json')),
+        JSON.parse(sink.readSync('0-frame.json')),
         {
           timing: [[100, 100, 0, '2-frame']]
         },
@@ -77,7 +77,7 @@ const TestCases = [
 
 // Setup then test writing meta or frame and validate output
 function testWriter(t, testCase, Writer, suffix) {
-  const sink = new MemorySink();
+  const sink = new MemorySourceSink();
   const writer = new Writer(sink, testCase.options);
 
   if (testCase.preTest) {
@@ -99,7 +99,7 @@ function testWriter(t, testCase, Writer, suffix) {
   }
 
   t.ok(sink.has(`${lookup}.${suffix}`), `wrote json data ${lookup}.${suffix}`);
-  const jsMessage = new XVIZData(sink.get(`${lookup}.${suffix}`)).message();
+  const jsMessage = new XVIZData(sink.readSync(`${lookup}.${suffix}`)).message();
   t.deepEquals(jsMessage.data, testCase.data, 'data matches');
   t.deepEquals(jsMessage.type, resultType, 'type matches');
 
@@ -148,7 +148,7 @@ const ThrowingTestCases = [
 ];
 
 function testWriterThrows(t, testCase, Writer) {
-  const sink = new MemorySink();
+  const sink = new MemorySourceSink();
   const writer = new Writer(sink, testCase.options);
 
   if (testCase.preTest) {
@@ -177,7 +177,7 @@ test('XVIZWriter#ThrowingTestCases', t => {
 });
 
 test('XVIZWriter#default-ctor frames writeFrameIndex', t => {
-  const sink = new MemorySink();
+  const sink = new MemorySourceSink();
   const jsBuilder = new XVIZJSONWriter(sink);
   const binBuilder = new XVIZBinaryWriter(sink);
 
@@ -193,7 +193,11 @@ test('XVIZWriter#default-ctor frames writeFrameIndex', t => {
       timing: [[100, 100, 0, '2-frame']]
     };
 
-    t.deepEquals(JSON.parse(sink.get('0-frame.json')), expected, 'json index matches expected');
+    t.deepEquals(
+      JSON.parse(sink.readSync('0-frame.json')),
+      expected,
+      'json index matches expected'
+    );
   }
 
   t.end();

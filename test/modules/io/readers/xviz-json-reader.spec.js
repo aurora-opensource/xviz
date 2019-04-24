@@ -14,19 +14,19 @@
 
 /* eslint-disable camelcase */
 import test from 'tape-catch';
-import {XVIZJSONReader, MemorySource} from '@xviz/io';
+import {XVIZJSONReader, MemorySourceSink} from '@xviz/io';
 
 test('XVIZJSONReader#default-ctor', t => {
   /* eslint-disable no-unused-vars */
   // Ensure no parameter ctor
-  const source = new MemorySource();
+  const source = new MemorySourceSink();
   const binBuilder = new XVIZJSONReader(source);
   t.end();
   /* eslint-enable no-unused-vars */
 });
 
 test('XVIZJSONReader#readFrameIndex', t => {
-  const source = new MemorySource();
+  const source = new MemorySourceSink();
   const binBuilder = new XVIZJSONReader(source);
 
   const testData = {
@@ -35,7 +35,7 @@ test('XVIZJSONReader#readFrameIndex', t => {
     timing: [[1000.5, 1000.5, 0, '2-frame'], [1010.5, 1010.5, 1, '3-frame']]
   };
 
-  source.set('0-frame.json', testData);
+  source.writeSync('0-frame.json', testData);
   const result = binBuilder.readFrameIndex();
 
   t.deepEquals(result, testData, 'readFrameIndex works with object');
@@ -43,14 +43,14 @@ test('XVIZJSONReader#readFrameIndex', t => {
 });
 
 test('XVIZJSONReader#readMetadata', t => {
-  const source = new MemorySource();
+  const source = new MemorySourceSink();
   const binBuilder = new XVIZJSONReader(source);
 
   const testData = {
     version: '2.0.0'
   };
 
-  source.set('1-frame.json', testData);
+  source.writeSync('1-frame.json', testData);
   const result = binBuilder.readMetadata();
 
   t.deepEquals(result, testData, 'readMetadata works with object');
@@ -58,7 +58,7 @@ test('XVIZJSONReader#readMetadata', t => {
 });
 
 test('XVIZJSONReader#readFrame', t => {
-  const source = new MemorySource();
+  const source = new MemorySourceSink();
   const binBuilder = new XVIZJSONReader(source);
 
   const testData = {
@@ -68,7 +68,7 @@ test('XVIZJSONReader#readFrame', t => {
     }
   };
 
-  source.set('2-frame.json', testData);
+  source.writeSync('2-frame.json', testData);
   const result = binBuilder.readFrame(0);
 
   t.deepEquals(result, testData, 'readFrame(0) works with object');

@@ -14,24 +14,24 @@
 /**
  * Memory storage for XVIZ data
  */
-export class MemorySink {
+export class MemorySourceSink {
   constructor() {
     this.data = new Map();
+  }
+
+  readSync(name) {
+    return this.data.get(name);
   }
 
   writeSync(name, data) {
     this.data.set(name, data);
   }
 
-  has(name) {
-    return this.data.has(name);
-  }
-
-  get(name) {
-    return this.data.get(name);
-  }
-
   entries() {
     return this.data.entries();
+  }
+
+  has(name) {
+    return this.data.has(name);
   }
 }

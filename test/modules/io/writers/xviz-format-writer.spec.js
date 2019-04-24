@@ -15,7 +15,7 @@ import tape from 'tape-catch';
 
 import {
   TextEncoder,
-  MemorySink,
+  MemorySourceSink,
   XVIZBinaryWriter,
   XVIZData,
   XVIZFormatWriter,
@@ -49,7 +49,7 @@ tape('XVIZFormatWriter#full matrix', t => {
     const xvizObj = new XVIZData(source);
 
     for (const format of [XVIZFormat.binary, XVIZFormat.jsonBuffer, XVIZFormat.jsonString]) {
-      const sink = new MemorySink();
+      const sink = new MemorySourceSink();
 
       t.comment(`-- TestCase ${xvizObj.dataFormat()} to ${format}`);
 
@@ -75,7 +75,7 @@ tape('XVIZFormatWriter#full matrix', t => {
 
 tape('XVIZFormatWriter#frame writing', t => {
   const xvizObj = new XVIZData(TestXVIZSnapshot);
-  const sink = new MemorySink();
+  const sink = new MemorySourceSink();
 
   const formatWriter = new XVIZFormatWriter(sink, {format: XVIZFormat.binary});
 

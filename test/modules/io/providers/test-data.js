@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 /* eslint-disable camelcase */
-import {MemorySource} from '@xviz/io';
+import {MemorySourceSink} from '@xviz/io';
 
 const index = {
   startTime: 1000.5,
@@ -46,21 +46,21 @@ const frame2 = {
 };
 
 export function getJSONTestDataSource() {
-  const source = new MemorySource();
-  source.set('0-frame.json', index);
-  source.set('1-frame.json', metadata);
-  source.set('2-frame.json', frame1);
-  source.set('3-frame.json', frame2);
+  const source = new MemorySourceSink();
+  source.writeSync('0-frame.json', index);
+  source.writeSync('1-frame.json', metadata);
+  source.writeSync('2-frame.json', frame1);
+  source.writeSync('3-frame.json', frame2);
 
   return source;
 }
 
 export function getBinaryTestDataSource() {
-  const source = new MemorySource();
-  source.set('0-frame.json', index);
-  source.set('1-frame.glb', metadata);
-  source.set('2-frame.glb', frame1);
-  source.set('3-frame.glb', frame2);
+  const source = new MemorySourceSink();
+  source.writeSync('0-frame.json', index);
+  source.writeSync('1-frame.glb', metadata);
+  source.writeSync('2-frame.glb', frame1);
+  source.writeSync('3-frame.glb', frame2);
 
   return source;
 }
