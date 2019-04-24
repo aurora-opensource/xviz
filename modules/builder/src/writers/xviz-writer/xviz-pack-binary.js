@@ -69,7 +69,8 @@ function flattenObject(key, object) {
     return flattenToTypedArray(object, 3, Float32Array);
   }
   if (key === 'colors') {
-    return flattenToTypedArray(object, 4, Uint8Array);
+    const size = object[0].length === 4 ? 4 : 3;
+    return flattenToTypedArray(object, size, Uint8Array);
   }
   return null;
 }
