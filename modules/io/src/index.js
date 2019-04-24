@@ -18,11 +18,11 @@ export {XVIZFormatWriter} from './writers/xviz-format-writer';
 export {XVIZJSONReader} from './readers/xviz-json-reader';
 export {XVIZBinaryReader} from './readers/xviz-binary-reader';
 
-export {FileSink} from './sinks/fs-sink';
-export {MemorySink} from './sinks/memory-sink';
+export {FileSink} from './io/fs-sink';
+export {MemorySink} from './io/memory-sink';
 
-export {FileSource} from './source/fs-source';
-export {MemorySource} from './source/memory-source';
+export {FileSource} from './io/fs-source';
+export {MemorySource} from './io/memory-source';
 
 export {TextEncoder, TextDecoder} from './common/text-encoding';
 export {XVIZData} from './common/xviz-data';
