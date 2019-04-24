@@ -1,54 +1,44 @@
-# XVIZWriter
+# XVIZWriters
 
-The `XVIZWriter` class encodes the output of
+The classes `XVIZJSONWriter` and `XVIZBinaryWriter` format the output of
 [XVIZMetadataBuilder](/docs/api-reference/xviz-metadata-builder.md) and
 [XVIZBuilder](/docs/api-reference/xviz-builder.md) to files.
 
 ## Example
 
 ```js
-import {XVIZWriter, XVIZMetadataBuilder, XVIZBuilder} from '@xviz/builder';
+import {XVIZMetadataBuilder, XVIZBuilder} from '@xviz/builder';
+import {XVIZBinaryWriter, FileSink} from '@xviz/io';
 
-const xvizWriter = new XVIZWriter();
+const sink = new FileSink('output-dir');
+const xvizWriter = new XVIZBinaryWriter(sink);
 
 const metadataBuilder = new XVIZMetadataBuilder();
 // build metadata
-xvizWriter.writeMetadata('output_dir', metadataBuilder.getMetadata());
+xvizWriter.writeMetadata(metadataBuilder.getMetadata());
 
 const builder = new XVIZBuilder();
 for (let i = 0; i < 10; i++) {
   // build frames
-  xvizWriter.writeFrame('output_dir', i, builder.getFrame());
+  xvizWriter.writeFrame(i, builder.getFrame());
 }
 
-xvizWriter.writeFrameIndex('output_dir');
+xvizWriter.writeFrameIndex();
 ```
 
 ### Constructor
 
 ```js
-import {XVIZWriter} from '@xviz/builder';
-const xvizWriter = new XVIZWriter();
+import {FileSink, XVIZBinaryWriter} from '@xviz/io';
+const sink = new FileSink();
+const xvizWriter = new XVIZBinaryWriter(sink);
 ```
 
 Parameters:
 
+- **sink** (Object) Object that manages writing data
 - **options** (Object)
-  - **options.envelope** (Boolean) - whether to wrap the data object with a typed container. Default
-    `true`.
-  - **options.binary** (Boolean) - output binary (GLB) format. Default `true`.
-  - **options.json** (Boolean) - output JSON format. Default `false`.
-  - **options.dataSink** (Object) - by default, XVIZWriter writes the output to files on a disk.
-    Provide this option to override the behavior. `dataSink` must contain the following fields:
-    - **writeSync(directory, filename, data)** (Function) - write data to the specified destination.
-    ```js
-    new XVIZWriter({
-      dataSink: {
-        writeSync: (directory, filename, data) =>
-          fs.writeFileSync(path.resolve(directory, filename), data)
-      }
-    });
-    ```
+  - **options.flatten**
 
 ### Methods
 

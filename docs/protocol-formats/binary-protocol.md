@@ -1,6 +1,6 @@
 # XVIZ Binary Container Protocol Format
 
-XVIZ comes with encoding and parsing support for a binary container format based on the
+XVIZ comes with formatting and parsing support for a binary container format based on the
 [GLB container](https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md#glb-file-format-specification)
 for [glTF](https://github.com/KhronosGroup/glTF/blob/master/specification/2.0/README.md). In this
 format, each message is packaged in a binary container that contains at least two "chunks" as
@@ -130,16 +130,20 @@ for assets.
 
 ## XVIZ API References
 
-### Encoding Support
+### Format Support
 
-[XVIZWriter](/docs/api-reference/xviz-writer.md) by default will output the GLB binary encoding of
+[XVIZBinaryWriter](/docs/api-reference/xviz-binary-writer.md) will output the GLB binary format of
 the XVIZ data. This will be output for both Metadata and Frames, but not the FrameIndex, which is
 always output as JSON.
+
+[XVIZJSONWriter](/docs/api-reference/xviz-json-writer.md) will output the JSON format of the XVIZ
+data. This will be output for both Metadata and Frames, but not the FrameIndex, which is always
+output as JSON.
 
 ### Parsing Support
 
 [parseStreamMessage](/docs/api-reference/parse-xviz.md) will parse the data and handle GLB encoded
-XVIZ as well as other encodings of the data.
+XVIZ as well as other formats of the data.
 
 XVIZ parsing functions will decode the binary container, parse the JSON and resolve binary
 references. The application will get a "patched" JSON structure, with the difference from the basic
