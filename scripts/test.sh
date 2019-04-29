@@ -55,11 +55,8 @@ case $MODE in
     break;;
 
   "cover")
-    echo "HERE"
     # Seems to need to be run from each package.json root...
-    (cd $BASEDIR/../modules/parser && NODE_ENV=test BABEL_ENV=cover npx nyc node ../../test/start.js cover)
-    echo "HERE"
-    npx nyc report
+    NODE_ENV=test BABEL_ENV=cover npx nyc node ./test/start.js cover
     break;;
 
   "dist")
