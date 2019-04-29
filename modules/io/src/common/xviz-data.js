@@ -122,13 +122,13 @@ export class XVIZData {
 
     let data = this._data;
     switch (this._dataFormat) {
-      case XVIZFormat.binary:
+      case XVIZFormat.BINARY:
         if (data instanceof Buffer) {
           data = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength); // eslint-disable-line no-fallthrough
         }
         msg = parseBinaryXVIZ(data);
         break;
-      case XVIZFormat.jsonBuffer:
+      case XVIZFormat.JSON_BUFFER:
         let jsonString = null;
         if (data instanceof Buffer) {
           // Default to utf8 encoding
@@ -142,10 +142,10 @@ export class XVIZData {
 
         msg = JSON.parse(jsonString);
         break;
-      case XVIZFormat.jsonString:
+      case XVIZFormat.JSON_STRING:
         msg = JSON.parse(data);
         break;
-      case XVIZFormat.object:
+      case XVIZFormat.OBJECT:
         // TODO: what is the recursive case?
         // see parse-stream-data-message.js
         msg = data;
@@ -167,7 +167,7 @@ export class XVIZData {
         }
 
         if (isBinaryXVIZ(data)) {
-          this._dataFormat = XVIZFormat.binary;
+          this._dataFormat = XVIZFormat.BINARY;
         }
 
         if (data instanceof ArrayBuffer) {
@@ -175,16 +175,16 @@ export class XVIZData {
         }
 
         if (isJSONString(data)) {
-          this._dataFormat = XVIZFormat.jsonBuffer;
+          this._dataFormat = XVIZFormat.JSON_BUFFER;
         }
         break;
       case 'string':
         if (isJSONString(data)) {
-          this._dataFormat = XVIZFormat.jsonString;
+          this._dataFormat = XVIZFormat.JSON_STRING;
         }
         break;
       case 'object':
-        this._dataFormat = XVIZFormat.object;
+        this._dataFormat = XVIZFormat.OBJECT;
         break;
 
       default:

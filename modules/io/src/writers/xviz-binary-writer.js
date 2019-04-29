@@ -125,6 +125,14 @@ export class XVIZBinaryWriter {
     this.wroteFrameIndex = timing.length;
   }
 
+  close() {
+    if (!this.wroteFrameIndex) {
+      this.writeFrameIndex();
+    }
+
+    this.sink.close();
+  }
+
   /* eslint-disable camelcase */
   _saveTimestamp(xviz_data, index) {
     const {log_info, updates} = xviz_data;

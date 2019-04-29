@@ -29,4 +29,6 @@ export class FileSource {
 
     return undefined;
   }
+
+  close() {}
 }

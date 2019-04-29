@@ -318,7 +318,7 @@
               },
               {
                 "name": "XVIZFormatWriter",
-                "markdown": "api-reference/io/xviz-format-writerr.md"
+                "markdown": "api-reference/io/xviz-format-writer.md"
               }
             ]
           },
@@ -334,12 +334,12 @@
                 "markdown": "api-reference/io/xviz-provider-factory.md"
               },
               {
-                "name": "XVIZJSONDataProvider",
-                "markdown": "api-reference/io/xviz-json-data-provider.md"
+                "name": "XVIZJSONProvider",
+                "markdown": "api-reference/io/xviz-json-provider.md"
               },
               {
-                "name": "XVIZBinaryDataProvider",
-                "markdown": "api-reference/io/xviz-binary-data-provider.md"
+                "name": "XVIZBinaryProvider",
+                "markdown": "api-reference/io/xviz-binary-provider.md"
               }
             ]
           }

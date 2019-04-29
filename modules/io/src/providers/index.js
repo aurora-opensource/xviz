@@ -11,8 +11,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import {XVIZJSONDataProvider} from './xviz-json-data-provider';
-import {XVIZBinaryDataProvider} from './xviz-binary-data-provider';
+import {XVIZJSONProvider} from './xviz-json-provider';
+import {XVIZBinaryProvider} from './xviz-binary-provider';
 
 async function createXVIZProvider(ProviderClass, args) {
   let provider = null;
@@ -31,7 +31,7 @@ export class XVIZProviderFactory {
   // source
   // options
   static async open(args) {
-    const providerClasses = [XVIZJSONDataProvider, XVIZBinaryDataProvider];
+    const providerClasses = [XVIZJSONProvider, XVIZBinaryProvider];
 
     for (const providerClass of providerClasses) {
       const loader = await createXVIZProvider(providerClass, args);

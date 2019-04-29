@@ -37,38 +37,38 @@ const TestCases = [
   {
     data: TestXVIZSnapshot,
     description: 'XVIZ Object',
-    dataFormat: XVIZFormat.object
+    dataFormat: XVIZFormat.OBJECT
   },
   {
     data: TestXVIZSnapshotString,
     description: 'XVIZ String',
-    dataFormat: XVIZFormat.jsonString
+    dataFormat: XVIZFormat.JSON_STRING
   },
   {
     data: `   ${TestXVIZSnapshotString}   `,
     description: 'XVIZ String with whitespace head and tail',
-    dataFormat: XVIZFormat.jsonString
+    dataFormat: XVIZFormat.JSON_STRING
   },
   {
     data: TestXVIZSnapshotBuffer,
     description: 'XVIZ String Buffer',
-    dataFormat: XVIZFormat.jsonBuffer
+    dataFormat: XVIZFormat.JSON_BUFFER
   },
   {
     data: TestXVIZSnapshotGLB,
     description: 'XVIZ Binary Buffer',
-    dataFormat: XVIZFormat.binary
+    dataFormat: XVIZFormat.BINARY
   },
   {
     data: Buffer.from(TestXVIZSnapshotBuffer),
     description: 'XVIZ String NodeBuffer',
-    dataFormat: XVIZFormat.jsonBuffer,
+    dataFormat: XVIZFormat.JSON_BUFFER,
     nodeOnly: true
   },
   {
     data: Buffer.from(TestXVIZSnapshotGLB),
     description: 'XVIZ Binary NodeBuffer',
-    dataFormat: 'binary',
+    dataFormat: 'BINARY',
     nodeOnly: true
   }
 ];

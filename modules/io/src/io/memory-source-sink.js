@@ -27,6 +27,8 @@ export class MemorySourceSink {
     this.data.set(name, data);
   }
 
+  close() {}
+
   entries() {
     return this.data.entries();
   }

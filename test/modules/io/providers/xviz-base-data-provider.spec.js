@@ -14,15 +14,15 @@
 
 /* eslint-disable camelcase */
 import test from 'tape-catch';
-import {XVIZJSONDataProvider} from '@xviz/io';
+import {XVIZJSONProvider} from '@xviz/io';
 import {getJSONTestDataSource} from './test-data';
 
 const source = getJSONTestDataSource();
 
-test('XVIZJSONDataProvider#getFrameIterator()', async t => {
-  const provider = new XVIZJSONDataProvider({source});
+test('XVIZJSONProvider#getFrameIterator()', async t => {
+  const provider = new XVIZJSONProvider({source});
   await provider.init();
-  t.ok(provider.valid(), 'DataProvider is valid');
+  t.ok(provider.valid(), 'Provider is valid');
 
   // Default to start/end of index file
   let iterator = provider.getFrameIterator();

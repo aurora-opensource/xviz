@@ -25,8 +25,9 @@ export {MemorySourceSink} from './io/memory-source-sink';
 export {TextEncoder, TextDecoder} from './common/text-encoding';
 export {XVIZData} from './common/xviz-data';
 export {XVIZMessage} from './common/xviz-message';
+export {XVIZMessageType} from './common/xviz-message-type';
 export {XVIZFormat} from './common/constants';
 
 export {XVIZProviderFactory} from './providers/index';
-export {XVIZJSONDataProvider} from './providers/xviz-json-data-provider';
-export {XVIZBinaryDataProvider} from './providers/xviz-binary-data-provider';
+export {XVIZJSONProvider} from './providers/xviz-json-provider';
+export {XVIZBinaryProvider} from './providers/xviz-binary-provider';

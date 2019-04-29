@@ -43,4 +43,8 @@ export class XVIZBaseReader {
 
     return `${index}${this.suffix}`;
   }
+
+  close() {
+    this.source.close();
+  }
 }

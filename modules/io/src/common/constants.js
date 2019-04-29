@@ -13,11 +13,11 @@
 // limitations under the License.
 export const XVIZFormat = Object.freeze({
   // Binary GLB enocded in Buffer/ArrayBuffer
-  binary: 'binary',
+  BINARY: 'BINARY',
   // JSON encoded in a Buffer/ArrayBuffer
-  jsonBuffer: 'jsonBuffer',
+  JSON_BUFFER: 'JSON_BUFFER',
   // JSON encoded in a String
-  jsonString: 'jsonString',
+  JSON_STRING: 'JSON_STRING',
   // XVIZ Object
-  object: 'object'
+  OBJECT: 'OBJECT'
 });

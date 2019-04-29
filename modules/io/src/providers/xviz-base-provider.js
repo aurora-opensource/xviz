@@ -53,7 +53,7 @@ class FrameIterator {
 // - configuration(config) {}
 // - reconfigure(config) {}
 
-export class XVIZBaseDataProvider {
+export class XVIZBaseProvider {
   constructor({reader, options}) {
     this.reader = reader;
     this.options = options;
@@ -118,7 +118,7 @@ export class XVIZBaseDataProvider {
     return frame;
   }
 
-  // The DataProvider provides an iterator since
+  // The Provider provides an iterator since
   // different sources may "index" their data independently
   // however all iterators are based on a startTime/endTime
   //
@@ -190,7 +190,8 @@ export class XVIZBaseDataProvider {
   }
 
   // Return XVIZ Index object read from the reader
-  // TODO(twojtasz): Odd that this is not and XVIZData
+  // This is an object since the index an implementation detail
+  // not a specified XVIZ message.
   _readIndex() {
     const data = this.reader.readFrameIndex();
 

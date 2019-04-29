@@ -11,11 +11,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import {XVIZJSONReader} from '@xviz/io';
-import {XVIZBaseDataProvider} from './xviz-base-data-provider';
+import {XVIZBinaryReader} from '@xviz/io';
+import {XVIZBaseProvider} from './xviz-base-provider';
 
-export class XVIZJSONDataProvider extends XVIZBaseDataProvider {
+export class XVIZBinaryProvider extends XVIZBaseProvider {
   constructor(params) {
-    super({...params, reader: new XVIZJSONReader(params.source, params.options)});
+    super({...params, reader: new XVIZBinaryReader(params.source, params.options)});
   }
 }
