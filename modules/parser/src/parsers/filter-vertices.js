@@ -35,7 +35,7 @@ export function filterVertices(vertices) {
       newVertices[index++] = v[0];
       newVertices[index++] = v[1];
       newVertices[index++] = v[2];
-      lastEmittedVertex = new Vector3(v);
+      lastEmittedVertex = new Vector3(v[0], v[1], v[2]);
       lastEmittedIndex = i;
     }
   }

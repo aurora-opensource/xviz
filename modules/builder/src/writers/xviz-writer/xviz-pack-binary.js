@@ -14,13 +14,13 @@
 
 import {flattenToTypedArray} from '../../utils';
 
-function packBinaryJsonTypedArray(gltfBuilder, object, objectKey) {
+function packBinaryJsonTypedArray(gltfBuilder, object, objectKey, info) {
   if (gltfBuilder.isImage(object)) {
     const imageIndex = gltfBuilder.addImage(object);
     return `#/images/${imageIndex}`;
   }
   // if not an image, pack as accessor
-  const opts = objectKey === 'colors' ? {size: 4} : {size: 3};
+  const opts = info && info.size ? {size: info.size} : {size: 3};
   const bufferIndex = gltfBuilder.addBuffer(object, opts);
   return `#/accessors/${bufferIndex}`;
 }
@@ -29,8 +29,9 @@ function packBinaryJsonTypedArray(gltfBuilder, object, objectKey) {
 // to encode where the binary data for a XVIZ element resides.
 // The unpacking is handled automatically by @loaders.gl
 export function packBinaryJson(json, gltfBuilder, objectKey = null, options = {}) {
-  const {flattenArrays = false} = options;
+  const {flattenArrays = true} = options;
   let object = json;
+  let objectInfo = null;
 
   // Check if string has same syntax as our "JSON pointers", if so "escape it".
   if (typeof object === 'string' && object.indexOf('#/') === 0) {
@@ -39,9 +40,10 @@ export function packBinaryJson(json, gltfBuilder, objectKey = null, options = {}
 
   if (Array.isArray(object)) {
     // TODO - handle numeric arrays, flatten them etc.
-    const typedArray = flattenArrays && flattenToTypedArray(object);
-    if (typedArray) {
-      object = typedArray;
+    const flatObject = flattenArrays && flattenObject(objectKey, object);
+    if (flatObject) {
+      object = flatObject.typedArray;
+      objectInfo = flatObject;
     } else {
       return object.map(element => packBinaryJson(element, gltfBuilder, options));
     }
@@ -49,7 +51,7 @@ export function packBinaryJson(json, gltfBuilder, objectKey = null, options = {}
 
   // Typed arrays, pack them as binary
   if (ArrayBuffer.isView(object) && gltfBuilder) {
-    return packBinaryJsonTypedArray(gltfBuilder, object, objectKey);
+    return packBinaryJsonTypedArray(gltfBuilder, object, objectKey, objectInfo);
   }
 
   if (object !== null && typeof object === 'object') {
@@ -61,4 +63,22 @@ export function packBinaryJson(json, gltfBuilder, objectKey = null, options = {}
   }
 
   return object;
+}
+
+function flattenObject(key, object) {
+  if (key === 'vertices' || key === 'points') {
+    // Flatten nested vertices
+    return {
+      typedArray: flattenToTypedArray(object, 3, Float32Array),
+      size: 3
+    };
+  }
+  if (key === 'colors') {
+    const size = object[0].length === 4 ? 4 : 3;
+    return {
+      typedArray: flattenToTypedArray(object, size, Uint8Array),
+      size
+    };
+  }
+  return null;
 }

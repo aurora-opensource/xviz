@@ -306,10 +306,11 @@ tape('parseXVIZStream#primitive no-data entries', t => {
       features: [
         {
           type: 'polygon2d',
-          vertices: [[-10, 10, 0], [10, 10, 0], [10, -10, 0], [-10, -10, 0], [-10, 10, 0]]
+          vertices: new Float32Array([-10, 10, 0, 10, 10, 0, 10, -10, 0, -10, -10, 0, -10, 10, 0])
         }
       ],
       labels: [],
+      vertices: new Float32Array([-10, 10, 0, 10, 10, 0, 10, -10, 0, -10, -10, 0, -10, 10, 0]),
       pointCloud: null,
       images: [],
       components: [],
@@ -319,6 +320,7 @@ tape('parseXVIZStream#primitive no-data entries', t => {
       lookAheads: [],
       features: [],
       labels: [],
+      vertices: null,
       pointCloud: null,
       images: [],
       components: [],

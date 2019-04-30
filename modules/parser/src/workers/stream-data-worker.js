@@ -29,6 +29,7 @@ export default config => self => {
         for (const streamName in message.streams) {
           const stream = message.streams[streamName];
           getTransferList(stream.pointCloud, true, transfers);
+          getTransferList(stream.vertices, false, transfers);
           if (stream.images && stream.images.length) {
             stream.images.forEach(image => getTransferList(image, true, transfers));
           }
@@ -46,8 +47,12 @@ export default config => self => {
     message = preSerialize(message);
 
     /* uncomment for debug */
+    // let size = 0;
+    // for (const item of transfers) {
+    //   size += item.byteLength;
+    // }
     // message._size = {
-    //   arraybuffer: transfers.size
+    //   arraybuffer: size
     // };
     // message._sentAt = Date.now();
 

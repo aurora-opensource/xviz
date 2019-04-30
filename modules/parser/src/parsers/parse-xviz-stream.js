@@ -158,6 +158,7 @@ export function parseStreamPrimitive(primitives, streamName, time, convertPrimit
     }
   }
 
+  primitiveMap.vertices = joinFeatureVerticesToTypedArrays(primitiveMap.features);
   primitiveMap.pointCloud = joinObjectPointCloudsToTypedArrays(primitiveMap.pointCloud);
   primitiveMap.time = time;
 
@@ -418,6 +419,41 @@ function getColorStride(colors, vertexCount) {
     log.error('Unknown point color format');
   }
   return 0;
+}
+
+// Create typed arrays from vertices to save storage & transfer time
+function joinFeatureVerticesToTypedArrays(features) {
+  let vertexCount = 0;
+  for (const feature of features) {
+    if (feature.vertices) {
+      vertexCount += getVertexCount(feature.vertices);
+    }
+  }
+
+  if (vertexCount === 0) {
+    return null;
+  }
+
+  const vertices = new Float32Array(vertexCount * 3);
+  let i = 0;
+
+  for (const feature of features) {
+    if (feature.vertices) {
+      const count = getVertexCount(feature.vertices);
+      if (Number.isFinite(feature.vertices[0])) {
+        vertices.set(feature.vertices, i);
+        i += count * 3;
+      } else {
+        for (const p of feature.vertices) {
+          vertices.set(p, i);
+          i += 3;
+        }
+      }
+      feature.vertices = vertices.subarray(i - count * 3, i);
+    }
+  }
+
+  return vertices;
 }
 
 const DEFAULT_COLOR = [0, 0, 0, 255];

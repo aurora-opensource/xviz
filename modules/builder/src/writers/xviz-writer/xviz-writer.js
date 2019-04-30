@@ -67,7 +67,7 @@ export default class XVIZWriter {
 
     if (this.options.binary) {
       const options = {
-        flattenArrays: false
+        flattenArrays: true
       };
 
       writeBinaryXVIZtoFile(this.sink, xvizDirectory, '1-frame', xvizMetadata, options);
@@ -95,7 +95,7 @@ export default class XVIZWriter {
 
     if (this.options.binary) {
       const options = {
-        flattenArrays: false
+        flattenArrays: true
       };
 
       if (this.options.draco) {

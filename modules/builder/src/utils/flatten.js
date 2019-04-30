@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-export function flattenToTypedArray(nestedArray, ArrayType = Float32Array) {
+export function flattenToTypedArray(nestedArray, dimensions = 3, ArrayType = Float32Array) {
   if (nestedArray.length === 0) {
     return new Float32Array(0);
   }
@@ -21,10 +21,10 @@ export function flattenToTypedArray(nestedArray, ArrayType = Float32Array) {
     return null;
   }
 
-  const count = countVertices(nestedArray);
+  const count = countVertices(nestedArray, dimensions);
 
   const typedArray = new ArrayType(count);
-  flattenVerticesInPlace(nestedArray, typedArray);
+  flattenVerticesInPlace(nestedArray, typedArray, dimensions);
   return typedArray;
 }
 
