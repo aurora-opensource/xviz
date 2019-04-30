@@ -334,12 +334,8 @@
                 "markdown": "api-reference/io/xviz-provider-factory.md"
               },
               {
-                "name": "XVIZJSONProvider",
-                "markdown": "api-reference/io/xviz-json-provider.md"
-              },
-              {
-                "name": "XVIZBinaryProvider",
-                "markdown": "api-reference/io/xviz-binary-provider.md"
+                "name": "XVIZ Provider Iterator",
+                "markdown": "api-reference/io/xviz-provider-iterator.md"
               }
             ]
           }

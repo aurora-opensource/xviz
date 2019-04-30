@@ -16,16 +16,12 @@ _Parameters:_
 
 ## Properties
 
-- **buffer** - Returns the internal buffer storing the XVIZ data.
-
-- **format** -
+- **buffer** - the original data passed into this object.
+- **format** - The [XVIZFormat](./constants.md) of the data.
 
 ## Methods
-
-- **dataFormat()** - Returns the [XVIZFormat] of the original data. TODO: should just be format
-  TODO: should be a property
 
 - **message()** - Parses the data and returns an
   [XVIZMessage](/docs/api-reference/io/xviz-message.md).
 
-- **hasMessage()** - Returns true if the original data has been parsed into a message.
+- **hasMessage()** - Returns \*true if the original data has been parsed into a message.

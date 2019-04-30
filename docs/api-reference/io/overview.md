@@ -5,29 +5,22 @@ XVIZ.
 
 The module also provides classes to inspect and manipulate XVIZ data.
 
-## XVIZ data objects
+[@xviz/io diagram](./images/xviz-io-block-diagram.png)
 
-XVIZ defines messages which are wrapped around an envelope marking each message with an explicity
-type. There is additional information useful for hosting XVIZ data but not necessary for a client
-which is an index.
+_Diagram of the @xviz/io classes relationships and data flow_
 
-This index allows a quick lookup for a specific timestamp so time range queries can be quickly
-served.
+# XVIZ Data classes
 
-[Session link]()
+Passing any data to the [XVIZData](/docs/api-reference/io/xviz-data.md) constructor will determine
+if the data represents XVIZ and will perform **minimal** parsing of the data to facilitate
+performant workflows where you only care about the XVIZ data and type without changing the data.
 
-### Index
+If you want to obtain an object to inspect or change from an XVIZData instance you do so by calling
+`XVIZData.message()` and a [XVIZMessage](/docs/api-reference/io/xviz-message.md) will be return
+which provides access to the object.
 
-The index provides the ability to quickly find the timestamp range associated with a particular
-frame.
-
-### Metadata
-
-The metadata provides supporting information about the XVIZ data context, streams, and UI bindings.
-
-### Frames
-
-A frame of data consists of a set of XVIZ state updates and covers a span of time.
+The data is still owned and managed by the XVIZData class and XVIZData is the class that should be
+passed around in an API.
 
 ## Sources and Sinks
 
@@ -61,27 +54,15 @@ providing access to the XVIZ data through the
 
 ## Readers and Writers
 
-This layer builds upon the Source and Sink to deal with the XVIZ data types of Index, Metadata, and
-Frames.
+This layer builds upon the Source and Sink to deal with the XVIZ data types of Metadata, and Frames.
 
-[Readers](/docs/api-reference/io/overview-writer.md) provide an interface to access the three data
+[Readers](/docs/api-reference/io/overview-reader.md) provide an interface to access the three data
 objects.
 
 [Writers](/docs/api-reference/io/overview-writer.md) provide an interface to write the three data
 objects.
 
-This layer builds upon the XVIZ Sink, and deals with the XVIZ data types of Index, Metadata, and
-Frames.
-
-## Provider
-
-An offers a high-level way to access the data and iterate over a range of the data.
+## Providers
 
 An [XVIZ Provider](/docs/api-reference/io/overview-provider.md) abstracts the specific details of
-how XVIZ data is stored and simply offers up an interface to get the data.
-
-A concrete example would be the standard storage of JSON or Binary XVIZ follows a convention of
-sequentially numbered files with a corresponding extension. The specifics of the filename and the
-extension are not critical to accessing the data, they are simply an artifact of the implementation.
-This is the details a Provider would encapsulate and instead provide access to the specific data
-types an application would care about.
+the concrete XVIZ data format details and provides a way to access metadata and frames.

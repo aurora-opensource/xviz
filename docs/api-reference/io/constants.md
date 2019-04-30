@@ -1,19 +1,15 @@
 # @xviz/io Constants
 
-Below are constants used across the @xviz/io module
+Constants used across the @xviz/io interface.
 
 # XVIZFormat
 
 ## Enumeration values
 
-- **binary** - A GLB-based binary binary format
+- `BINARY` - GLB-based binary formatted data
 
-- **jsonBuffer** - A Javascript JSON stored in a TypeArray
+- `JSON_BUFFER` - Javascript JSON stored in a TypeArray
 
-- **jsonString** - A Javascript JSON stored as a string
+- `JSON_STRING` - Javascript JSON stored as a string
 
-- **object** - A Javascript Object
-
-# XVIZMessageType
-
-- **xviz/metadata** etc
+- `OBJECT` - A Javascript Object

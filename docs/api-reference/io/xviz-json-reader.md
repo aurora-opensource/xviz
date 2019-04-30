@@ -1,22 +1,22 @@
 # XVIZJSONReader
 
-XVIZBinaryReader supports the JSON format for XVIZ data.
+XVIZJSONReader supports the JSON format for XVIZ data.
 
 ## Example
 
 ```js
-import {FileSink, XVIZBinaryWriter} from '@xviz/io';
-const sink = new FileSink();
-const xvizWriter = new XVIZBinaryWriter(sink);
+import {XVIZJSONReader, MemorySource} from '@xviz/io';
+
+const source = new MemorySource();
+// XVIZ data added to source
+const reader = new XVIZJSONReader(source);
 ```
 
 ## Constructor
 
-Parameters:
+_Parameters:_
 
-- **source** (Object) Object that manages reading data
-- **options** (Object)
-  - **options.flatten**
+- **source** (Object) XVIZ data source
 
 ## Methods
 
@@ -28,11 +28,21 @@ Reads a log metadata from the source.
 
 Reads an XVIZ frame from the source.
 
-Parameters:
+_Parameters:_
 
 - **frameIndex** (Number) - the index of this frame.
   [XVIZBuilder.getFrame](/docs/api-reference/xviz-builder.md).
 
-### readFrameIndex() {
+### timeRange()
 
-Reads the frame index for all the frames in a log.
+Returns the `{startTime, endTime}` available in the data.
+
+### frameCount()
+
+Returns then number of frames available in the data.
+
+### findFrame(timestamp)
+
+Returns an 2 element array with [minFrame, maxFrame] for the given timestamp. If the timestamp is
+before the start of the data, the start index is returned for both values. If the timestamp is
+greater than the end of the data, the end is returned for both values.

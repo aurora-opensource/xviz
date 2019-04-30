@@ -32,43 +32,43 @@ const writer = new XVIZBinaryWriter({
 });
 writer.writeFrame(0, TestXVIZSnapshot);
 
-// Load the data in XVIZData and verify the dataFormat
+// Load the data in XVIZData and verify the format
 const TestCases = [
   {
     data: TestXVIZSnapshot,
     description: 'XVIZ Object',
-    dataFormat: XVIZFormat.OBJECT
+    format: XVIZFormat.OBJECT
   },
   {
     data: TestXVIZSnapshotString,
     description: 'XVIZ String',
-    dataFormat: XVIZFormat.JSON_STRING
+    format: XVIZFormat.JSON_STRING
   },
   {
     data: `   ${TestXVIZSnapshotString}   `,
     description: 'XVIZ String with whitespace head and tail',
-    dataFormat: XVIZFormat.JSON_STRING
+    format: XVIZFormat.JSON_STRING
   },
   {
     data: TestXVIZSnapshotBuffer,
     description: 'XVIZ String Buffer',
-    dataFormat: XVIZFormat.JSON_BUFFER
+    format: XVIZFormat.JSON_BUFFER
   },
   {
     data: TestXVIZSnapshotGLB,
     description: 'XVIZ Binary Buffer',
-    dataFormat: XVIZFormat.BINARY
+    format: XVIZFormat.BINARY
   },
   {
     data: Buffer.from(TestXVIZSnapshotBuffer),
     description: 'XVIZ String NodeBuffer',
-    dataFormat: XVIZFormat.JSON_BUFFER,
+    format: XVIZFormat.JSON_BUFFER,
     nodeOnly: true
   },
   {
     data: Buffer.from(TestXVIZSnapshotGLB),
     description: 'XVIZ Binary NodeBuffer',
-    dataFormat: 'BINARY',
+    format: 'BINARY',
     nodeOnly: true
   }
 ];
@@ -83,9 +83,9 @@ tape('XVIZData#constructor', t => {
 
     const xvizObj = new XVIZData(test.data);
     t.equal(
-      xvizObj.dataFormat(),
-      test.dataFormat,
-      `${test.description} matches expected format ${test.dataFormat}`
+      xvizObj.format,
+      test.format,
+      `${test.description} matches expected format ${test.format}`
     );
 
     const msg = xvizObj.message();

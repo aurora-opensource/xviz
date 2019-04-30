@@ -67,5 +67,5 @@ With our classes defined, the main convertion code flow will be as follows
 4. Collect and write out [XVIZ Metadata](/docs/protocol-schema/session-protocol.md#metadata)
 5. Process frames and write out with
    [XVIZBinaryWriter.writeFrame](/docs/api-reference/xviz-binary-writer.md#writeframe)
-6. Write out an [XVIZBinaryWriter.writeFrameIndex](/docs/api-reference/xviz-binary-writer.md#writeframeindex) to
-   support fast loading and random seek in the XVIZ Server
+6. Call [XVIZBinaryWriter.close](/docs/api-reference/xviz-binary-writer.md#close) to
+   allow cleanup and writing of an index file to support fast loading and random seek in the XVIZ Server

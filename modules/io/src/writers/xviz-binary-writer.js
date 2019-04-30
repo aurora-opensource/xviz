@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {XVIZBaseWriter} from './xviz-base-writer';
 import {GLTFBuilder} from '@loaders.gl/gltf';
 import {toBuffer} from '@loaders.gl/core';
 import {DracoEncoder, DracoDecoder} from '@loaders.gl/draco';
@@ -22,7 +23,6 @@ import {packBinaryJson} from './xviz-pack-binary';
 // 2-frame is where the actual XVIZ updates begin
 const frameName = index => `${index + 2}-frame`;
 
-// TODO: is this exported for testing
 export function encodeBinaryXVIZ(xvizJson, options) {
   const gltfBuilder = new GLTFBuilder(options);
 
@@ -35,10 +35,11 @@ export function encodeBinaryXVIZ(xvizJson, options) {
   return gltfBuilder.encodeAsGLB(options);
 }
 
-export class XVIZBinaryWriter {
+export class XVIZBinaryWriter extends XVIZBaseWriter {
   constructor(sink, options = {}) {
+    super(sink);
+
     const {envelope = true, draco = false} = options;
-    this.sink = sink;
     this.frameTimings = {
       frames: new Map()
     };
@@ -49,6 +50,7 @@ export class XVIZBinaryWriter {
   // xvizMetadata is the object returned
   // from a Builder.
   writeMetadata(xvizMetadata) {
+    this._checkValid();
     this._saveTimestamp(xvizMetadata);
 
     if (this.options.envelope) {
@@ -64,14 +66,7 @@ export class XVIZBinaryWriter {
   }
 
   writeFrame(frameIndex, xvizFrame) {
-    if (this.wroteFrameIndex !== null) {
-      throw new Error(
-        `writeFrame() was called after writeFrameIndex().  The index was written with last frame of ${frameName(
-          this.wroteFrameIndex - 1
-        )}`
-      );
-    }
-
+    this._checkValid();
     this._saveTimestamp(xvizFrame, frameIndex);
 
     if (this.options.envelope) {
@@ -91,7 +86,8 @@ export class XVIZBinaryWriter {
     this.sink.writeSync(`${frameName(frameIndex)}.glb`, toBuffer(glbFileBuffer), {flag: 'w'});
   }
 
-  writeFrameIndex() {
+  _writeFrameIndex() {
+    this._checkValid();
     const {startTime, endTime, frames} = this.frameTimings;
     const frameTimings = {};
 
@@ -126,11 +122,13 @@ export class XVIZBinaryWriter {
   }
 
   close() {
-    if (!this.wroteFrameIndex) {
-      this.writeFrameIndex();
-    }
+    if (this.sink) {
+      if (!this.wroteFrameIndex) {
+        this._writeFrameIndex();
+      }
 
-    this.sink.close();
+      super.close();
+    }
   }
 
   /* eslint-disable camelcase */

@@ -25,10 +25,8 @@ test('XVIZBinaryReader#default-ctor', t => {
   /* eslint-enable no-unused-vars */
 });
 
-test('XVIZBinaryReader#readFrameIndex', t => {
+test('XVIZBinaryReader#log timing', t => {
   const source = new MemorySourceSink();
-  const binBuilder = new XVIZBinaryReader(source);
-
   const testData = {
     startTime: 1000.5,
     endTime: 1010.5,
@@ -36,9 +34,12 @@ test('XVIZBinaryReader#readFrameIndex', t => {
   };
 
   source.writeSync('0-frame.json', testData);
-  const result = binBuilder.readFrameIndex();
 
-  t.deepEquals(result, testData, 'readFrameIndex works with object');
+  const binBuilder = new XVIZBinaryReader(source);
+  const range = binBuilder.timeRange();
+
+  t.ok(Math.abs(range.startTime - 1000.5) < Number.EPSILON, 'timeRange start correct ');
+  t.ok(Math.abs(range.endTime - 1010.5) < Number.EPSILON, 'timeRange end correct');
   t.end();
 });
 

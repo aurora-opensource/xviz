@@ -13,7 +13,7 @@
 // limitations under the License.
 /* global console */
 /* eslint-disable no-console */
-import {isJSONString, XVIZData} from '../common/xviz-data';
+import {XVIZData} from '../common/xviz-data';
 
 // Generic iterator that stores context for context for an iterator
 class FrameIterator {
@@ -48,26 +48,12 @@ class FrameIterator {
   }
 }
 
-// TODO
-// - limits() for min/max time/frame
-// - configuration(config) {}
-// - reconfigure(config) {}
-
 export class XVIZBaseProvider {
   constructor({reader, options}) {
     this.reader = reader;
     this.options = options;
 
     this.metadata = null;
-    this.indexFile = null;
-    // {
-    //  startTime
-    //  endTime
-    //  timing [
-    //    [first, end, index, "2-frame'],
-    //  ]
-    // }
-
     this._valid = false;
   }
 
@@ -77,26 +63,16 @@ export class XVIZBaseProvider {
       return;
     }
 
-    this.indexFile = this._readIndex();
+    const {startTime, endTime} = this.reader.timeRange();
     this.metadata = this._readMetadata();
 
-    if (
-      this.metadata &&
-      this.indexFile &&
-      Number.isFinite(this.indexFile.startTime) &&
-      Number.isFinite(this.indexFile.endTime)
-    ) {
+    if (this.metadata && Number.isFinite(startTime) && Number.isFinite(endTime)) {
       this._valid = true;
     }
 
-    if (
-      this.metadata &&
-      (!this.indexFile ||
-        !Number.isFinite(this.indexFile.startTime) ||
-        !Number.isFinite(this.indexFile.endTime))
-    ) {
-      // TODO: should provide a command for hte cli to regenerate the index files
-      console.log('index file needs recreated');
+    if (this.metadata && (!Number.isFinite(startTime) || !Number.isFinite(endTime))) {
+      // TODO: should provide a command for the cli to regenerate the index files
+      console.log('The data source is missing the data index');
     }
   }
 
@@ -122,51 +98,32 @@ export class XVIZBaseProvider {
   // different sources may "index" their data independently
   // however all iterators are based on a startTime/endTime
   //
-  // TODO: live mode?
-  //
   // If startTime and endTime cover the actual range, then
   // they will be clamped to the actual range.
   // Otherwise return undefined.
-  getFrameIterator(startTime, endTime) {
-    let start = this.indexFile.startTime;
-    let end = this.indexFile.endTime;
+  getFrameIterator({startTime, endTime} = {}, options = {}) {
+    const {startTime: start, endTime: end} = this.reader.timeRange();
 
-    // Completely invalid
-    if (endTime < startTime) {
-      return undefined;
+    if (!Number.isFinite(startTime)) {
+      startTime = start;
     }
 
-    // Validate desired range is in bounds
-    if (startTime > end) {
-      return undefined;
+    if (!Number.isFinite(endTime)) {
+      endTime = end;
     }
 
-    if (endTime < start) {
-      return undefined;
+    if (startTime > endTime) {
+      return null;
     }
 
-    // bounds check params
-    if (startTime) {
-      if (startTime >= start) {
-        start = startTime;
-      }
+    const startFrames = this.reader.findFrame(startTime);
+    const endFrames = this.reader.findFrame(endTime);
+
+    if (startFrames !== undefined && endFrames !== undefined) {
+      return new FrameIterator(startFrames[0], endFrames[1]);
     }
 
-    if (endTime) {
-      if (endTime <= end) {
-        end = endTime;
-      }
-    }
-    // todo: server limit on duration
-
-    // Find indices based on time
-    const startIndex = this.indexFile.timing.findIndex(timeEntry => timeEntry[0] >= start);
-    const endReverseIndex = this.indexFile.timing
-      .slice()
-      .reverse()
-      .findIndex(timeEntry => timeEntry[1] <= end);
-    const endIndex = this.indexFile.timing.length - endReverseIndex - 1;
-    return new FrameIterator(startIndex, endIndex);
+    return null;
   }
 
   // return XVIZData for frame or undefined
@@ -184,23 +141,6 @@ export class XVIZBaseProvider {
     const data = this.reader.readMetadata();
     if (data) {
       return new XVIZData(data);
-    }
-
-    return undefined;
-  }
-
-  // Return XVIZ Index object read from the reader
-  // This is an object since the index an implementation detail
-  // not a specified XVIZ message.
-  _readIndex() {
-    const data = this.reader.readFrameIndex();
-
-    if (data) {
-      if (isJSONString(data)) {
-        return JSON.parse(data);
-      } else if (typeof data === 'object') {
-        return data;
-      }
     }
 
     return undefined;

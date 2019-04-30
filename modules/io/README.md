@@ -1,52 +1,28 @@
-# Writers
+# @xviz/io Overview
 
-## writeMetadata
-## writeFrame
-## writeFrameIndex
+This module aims at being the central IO library for reading, writing, and manipulating
+XVIZ data.
 
-# XVIZJSONWriter
-# XVIZBinaryWriter
+This module is separated in the following layers.
 
-# Readers
+# XVIZ Data classes
 
-## readMetadata
-## readFrame
-## readFrameIndex
+[XVIZ data classes](/docs/api-reference/io/overview.md) strive to remove the need to
+understand and handle the various formats that XVIZ data can be stored.
 
-# XVIZJSONReader
-# XVIZBinaryReader
+# Sources and Sinks
 
-# TODO: structure source & sink together
-# IO Sink
+[Sources and Sinks](/docs/api-reference/io/overview-source-sink.md) are a simple abstraction to write and read data. We provide
+synchronous File and Memory implementations.
 
-## FileSink
-## MemorySink
+# Readers and Writers
 
-# IO Source
-## FileSource
+[Readers](/docs/api-reference/io/overview-writer.md) and [Writers](/docs/api-reference/io/overview-writer.md) are the objects that deal with writing out the actual XVIZ
+data. At this level the objects **know** about any implementation details that
+are not covered by the XVIZ specification, such as the use of an index file or
+the specific identifiers used to store XVIZ in a particular format.
 
-# XVIZ Data objects
+# Providers
 
-## XVIZData
-Raw data which can be efficiently parsed to determine
-the XVIZ dataFormat().
-
-### buffer()
-### dataFormat()
-### hasMessage()
-### message()
-
-## XVIZMessage
-
-### type
-### data
-
-# XVIZ Utility
-
-## encodeBinaryXVIZ
-## XVIZFormatter
-
-# Utilities
-
-## TextEncoder
-## TextDecoder
+[XVIZ Providers](/docs/api-reference/io/overview-provider.md) are a level above Readers and Writers where a Provider interface only
+deals with metadata and frames and providing access to that data.

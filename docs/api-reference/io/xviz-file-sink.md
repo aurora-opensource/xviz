@@ -4,7 +4,7 @@ A file-based implementation for the SinkInterface
 
 ## Constructor
 
-Parameters:
+_Parameters:_
 
 - **rootDirectory** - The root directory path used to read data.
 
@@ -12,7 +12,7 @@ Parameters:
 
 ### writeSync(name, data)
 
-Parameters:
+_Parameters:_
 
 - **name** - The identifier of the data to write.
 - **data** - The data to write.

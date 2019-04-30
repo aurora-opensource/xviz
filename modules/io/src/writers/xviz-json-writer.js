@@ -12,7 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {xvizConvertJson} from './xviz-json-encoder.js';
+import {XVIZBaseWriter} from './xviz-base-writer';
+import {xvizConvertJson} from './xviz-json-encoder';
 import {TextEncoder} from '../common/text-encoding';
 
 // 0-frame is an index file for timestamp metadata
@@ -20,10 +21,11 @@ import {TextEncoder} from '../common/text-encoding';
 // 2-frame is where the actual XVIZ updates begin
 const frameName = index => `${index + 2}-frame`;
 
-export class XVIZJSONWriter {
+export class XVIZJSONWriter extends XVIZBaseWriter {
   constructor(sink, options = {}) {
+    super(sink);
+
     const {envelope = true, precision = 10, asArrayBuffer = false} = options;
-    this.sink = sink;
     this.frameTimings = {
       frames: new Map()
     };
@@ -34,6 +36,7 @@ export class XVIZJSONWriter {
   // xvizMetadata is the object returned
   // from a Builder.
   writeMetadata(xvizMetadata) {
+    this._checkValid();
     this._saveTimestamp(xvizMetadata);
 
     if (this.options.envelope) {
@@ -45,14 +48,7 @@ export class XVIZJSONWriter {
   }
 
   writeFrame(frameIndex, xvizFrame) {
-    if (this.wroteFrameIndex !== null) {
-      throw new Error(
-        `writeFrame() was called after writeFrameIndex().  The index was written with last frame of ${frameName(
-          this.wroteFrameIndex - 1
-        )}`
-      );
-    }
-
+    this._checkValid();
     this._saveTimestamp(xvizFrame, frameIndex);
 
     if (this.options.envelope) {
@@ -73,7 +69,8 @@ export class XVIZJSONWriter {
     this.writeToSink(`${frameName(frameIndex)}.json`, msg);
   }
 
-  writeFrameIndex() {
+  _writeFrameIndex() {
+    this._checkValid();
     const {startTime, endTime, frames} = this.frameTimings;
     const frameTimings = {};
 
@@ -109,11 +106,13 @@ export class XVIZJSONWriter {
   }
 
   close() {
-    if (!this.wroteFrameIndex) {
-      this.writeFrameIndex();
-    }
+    if (this.sink) {
+      if (!this.wroteFrameIndex) {
+        this._writeFrameIndex();
+      }
 
-    this.sink.close();
+      super.close();
+    }
   }
 
   /* eslint-disable camelcase */

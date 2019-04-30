@@ -51,7 +51,7 @@ tape('XVIZFormatWriter#full matrix', t => {
     for (const format of [XVIZFormat.BINARY, XVIZFormat.JSON_BUFFER, XVIZFormat.JSON_STRING]) {
       const sink = new MemorySourceSink();
 
-      t.comment(`-- TestCase ${xvizObj.dataFormat()} to ${format}`);
+      t.comment(`-- TestCase ${xvizObj.format} to ${format}`);
 
       // Convert the data to the requested format
       // data is state_update and this will default to a frame sequence of 0
@@ -65,7 +65,7 @@ tape('XVIZFormatWriter#full matrix', t => {
 
         // Verify the data is parsed as the expected format
         const newObj = new XVIZData(val);
-        t.equal(newObj.dataFormat(), format, `data format matches`);
+        t.equal(newObj.format, format, `data format matches`);
       }
     }
   }

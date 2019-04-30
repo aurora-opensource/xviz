@@ -11,6 +11,26 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import './xviz-base-provider.spec';
-import './xviz-json-provider.spec';
-import './xviz-binary-provider.spec';
+
+export class XVIZBaseWriter {
+  constructor(sink) {
+    if (!sink) {
+      throw new Error('Writer must be provided a sink');
+    }
+
+    this.sink = sink;
+  }
+
+  _checkValid() {
+    if (!this.sink) {
+      throw new Error('Cannot use this Writer after "close()" has been called.');
+    }
+  }
+
+  close() {
+    if (this.sink) {
+      this.sink.close();
+      this.sink = null;
+    }
+  }
+}

@@ -105,7 +105,7 @@ export class XVIZData {
     return this._data;
   }
 
-  dataFormat() {
+  get format() {
     return this._dataFormat;
   }
 

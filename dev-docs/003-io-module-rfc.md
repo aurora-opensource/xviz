@@ -1,6 +1,6 @@
-- Start Date: 2019-04-25
-- RFC PR: [#?](https://github.com/uber/xviz/pull/?)
-- XVIZ Issue: [#?](https://github.com/uber/xviz/issues/?)
+- Start Date: 2019-04-29
+- RFC PR: [#435](https://github.com/uber/xviz/pull/435)
+- XVIZ Issue: [#434](https://github.com/uber/xviz/issues/434)
 
 # Summary
 
@@ -8,7 +8,7 @@ The current modules, **@xviz/builder** and **@xviz/parser**, do not provide gene
 functionality and data types one would expect for working with XVIZ data nor are they a logical home
 for such functionality.
 
-This is the goal for the **@xviz/io** module. To provide the basic input/output functionality and
+The goal for the **@xviz/io** module is to provide the basic input/output functionality and
 encapsulate the data and format variations across various interfaces to support the current and
 future use-cases.
 
@@ -18,17 +18,17 @@ XVIZ currently defines two formats, JSON and Binary, with plans to support addit
 the near future. Examples would be the support for a single-file based bundle as well as a protobuf
 format.
 
-The initial XVIZ libraries where focused on a specific workflow. This new module will provide better
-support for dealing with XVIZ without the need to deal with the internal details across the various
-formats.
+The initial XVIZ libraries where focused on a specific workflow, mainly creating data for
+streetscape.gl. This new module will provide better support for dealing with existing XVIZ data
+without the need to deal with the internal details across the various formats.
 
 Today any consumer of XVIZ data must take into account the variety of formats as well as the
 language specific constructs around the data encoding and types. This layer of consuming XVIZ will
 only increase and having a central interface to handle this will make adding additional formats
 significantly easier for both producers and consumers of XVIZ data.
 
-A specific example in Javascript is the we can have 2 formats **JSON** and **Binary**. Each of these
-can manifest in Javascript in the following ways:
+A specific example in Javascript is that we can have 2 formats **JSON** and **Binary**. Each of
+these can manifest in Javascript in the following ways:
 
 - JSON
   - string
@@ -44,45 +44,11 @@ formats or variations are added.
 In addition, there are some asymetries in the interfaces and functionality as well as exposure to
 implementation details that should be removed.
 
-- Addition of XVIZReader along with XVIZWriter
-- Removal of `writeFrameIndex()` method from XVIZWriter. This is an implementation detail and the
-  functionality will be moved to `close()`.
-
-# Future Intentions
-
-- Async is a cross cutting concern, this will be supported in JS with a parallel class structure,
-  for example
-
-  - will bubble up to sink/source => reader/writer => provider
-
-- Readers/writers must know the specifics for any implementation details
-- Providers should be the abstraction layer on top that operates with just metadata, and iterators
-
-- bundle
-
-  - src/sink will not change
-  - add bundle specific reader/writer
-    - json
-    - binary
-  - functionality for bundle will be subsumed into the current format providers
-
-- protobuf
-
-  - add reader/writer
-  - add provider
-
-- @xviz/parser
-  - ideally XVIZMessage will evolve to provider data navigation, at that point parser should use the
-    interface rather than access the data directly
-
 # Detailed Design
 
-**@xviz/builder** is use to build XVIZ data, but not to consume and maniuplate it. **@xviz/parser**
+**@xviz/builder** is use to build XVIZ data, but not to consume and manipulate it. **@xviz/parser**
 consumes XVIZ data, but transforms it into a different data schema that no longer conforms to the
 specifcation and is intend solely for the streetscape.gl components.
-
-There is a need, driven by our expanding XVIZ tooilng work, for a library that enables working with
-standard compliant XVIZ data which does not exist today.
 
 Currently the limited functionality need is contained within the modules on an as needed basis. This
 is a problem in that each module has a specific purpose and the general XVIZ data handling types and
@@ -90,71 +56,90 @@ functions are spread out across these without a logical ordering.
 
 The new module will provide the following abstractions:
 
+- Data Objects
 - Source and Sinks
 - Readers and Writers
 - Providers
 
+## XVIZ Data Classes
+
+XVIZ data can come in many encodings and formats. In order consolidate parsing the encoding and
+formats two new class [XVIZData](/docs/api-reference/io/xviz-data.md) and
+[XVIZMessage](/docs/api-reference/io/xviz-message.md) are being introduced.
+
+**XVIZData** handles the basic formating and encoding determination, but strives to be performant
+for workflows where you just need to know the type of the data but do not needed to access any
+internal information.
+
+**XVIZMessage** is accessible from an XVIZData class and provides the parsed XVIZ data for accessing
+the internal state.
+
 ## Sources and Sinks
 
-These deal with the lowest level of data and serialization. Files, Memory, and Websockets are
-implemented behind these interfaces providing a simple interface for the layers above.
+[Source and sinks](/docs/api-reference/io/overview-source-sink.md) deal with the lowest level of
+data access. Files, Memory, and Websockets can be implemented behind these interfaces providing a
+simple interface for the layers above.
 
 ## Readers and Writers
 
-Where Sources and Sinks deals with system level concepts, Reader and Writers are concerned with XVIZ
-level constructs. Specifically the Metadata and Frames.
+[Reader](/docs/api-reference/io/overview-writer.md) and
+[Writers](/docs/api-reference/io/overview-reader.md) are concerned with XVIZ level constructs.
+Readers and Writers take Sources and Sinks, respectively, and provide an interface for dealing with
+Metadata and Frames.
 
-Readers and Writers take Sources and Sinks respectively and provide an XVIZ specific abstraction on
-the basic data define within the XVIZ specification.
+# Providers
 
-# Future considerations
+[Providers](/docs/api-reference/io/overview-provider.md) are a level above Readers and Writers where
+a Provider provides an generic interface for accessing core XVIZ data encapsulating any
+implementation details.
 
-- async
+# Future Plans
 
-  - builder needs to be async
-  - node/js has an Async assumption, and annotates with "Sync" when not. We are kinda backward :(
-    The best I can come up with is to provide something similar with readAsync() an writeAsync(),
-    but this propogates up the chain ReaderAsync, WriterSync( and then XVIZJSONAsyncProvider, etc
+To make the intention behind these types clearer lets imagine some likely future developments and
+how they would take shape in the **@xviz/io** module.
 
-    ... i don't see how to (aside from making everything async) to break this stack.
+## Async support
 
-    ... need to understand where synchronicity matters.. mainlyl out of order iteration as a
-    possibility, but we should be resilient to that type of data flow and not expect it.
+Async support would be a very useful addition to the XVIZ eco-system for Javascript. The Node
+convention for this support has a precedent of using suffix to denote the behavior, such as adding
+"-Sync" to the method or class name.
 
-    dont' have any good answer here :'(
+We can see already that the Reader and Writer define `readSync` and `writeSync`.
 
-- how do bundle and protobuf fit within these layers XVIZJSONBundleWriter, XVIZJSONBundleReader
-  - writer just needs a "close()" method. Reader interface needs nothing
-  - well, we could remove the Index as an artifact of Close(), then that becomes an implementation
-    detail that does not need to leak ... lives only in the Provider .. .. But there is a connection
-    between Reader/Writer and Provide. ... right
-- websocket
+Focusing on the read flow, one approach would be to add the method `readAsync` which returns a
+Promise. A Source supporting this asynchronous method, lets imagine a class **FileSourceAsync**,
+would be passed to an appropriate asynchronous reader **XVIZJSONReaderAsync**.
 
-  - server defines it's own webSocketWriter, that could move here?
+The class **XVIZJSONReaderAsync** has to know it is dealing with an asynchronous source, and would
+expose read methods in kind. However, since the majority of the code would be a duplicate of
+**XVIZJSONReader**, we would refactor these two classes to a base class that handles everything
+except the calls on the source.
 
-- xviz controller?
+Next would come the **Provider** to abstract away whether you are dealing with JSON data or Binary
+data, and instead just deal with XVIZ data. The interface for a **Provider** **already** defines the
+main iteration function as asynchronous. However the implementation of the Provider needs to
+interact with the reader which does carry the distinction, therefore we would have to create an
+**XVIZJSONProviderAsync**. Again, we would likely refactor to a base class factoring out the
+synchronous calls sites as necessary.
 
-  - this should probably conform to the XVIZ middleware
-  - not sure how this "evolves" with new message types/actions
-  - kinda want to separate out messages and actions, but now it likely not a good time
-    - also not sure what the value of this is.. need to think and define that
+This highlights a case that cuts across all the layers of the module.
 
-- middleware pattern and definition
-  - cli (client) has a slightly different middleware than a producer (server)
-  - define this and why
+## Bundle format
 
-! phase out of direct data schema and move to interface based data access
+A **bundle** is the packing of metadata and frames inside a single file. This may include both JSON
+and Binary formatting of the data.
 
-- provides a layer for adaptation that raw data types do not
+Since this deals with how the data is managed at the implemenation level we would need a
+**XVIZJSONBundleReader** and **XVIZJSONBundleWriter**. A **XVIZJSONBundleProvider** would also be
+needed to provide an the XVIZ specific interface on top of the data, removing that fact that happens
+to be packaged as a **bundle** from the calling code.
 
-## impact
+There is no need for any change at the Source or Sink level since they operate at a data block
+level. The entire bundle would simply be passed as necessary.
 
-- update docs
-- update test case
-- update examples
+## Protobuf format
 
-phase 2 - refactor others
-
-- refactor io & parser where necessary
-  - this can be "delayed" as long as their interfaces don't change
-  - what is Object today could be Object|XVIZData tomorrow, maybe
+A **protobuf** format is similar to the bundle, in that it exposes a particular format of the
+underlying data. So the solution is the same, we need a **XVIZProtobufReader** and an
+**XVIZProtobufProvider**. However any code relying on the XVIZProvider interface would not need to
+be changed regardless of the XVIZ data format.

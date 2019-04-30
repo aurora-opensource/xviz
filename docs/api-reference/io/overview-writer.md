@@ -1,10 +1,6 @@
 # Writers
 
-Writers provide an interface to write XVIZ Metadata, Frames, and an Index.
-
-The classes `XVIZJSONWriter` and `XVIZBinaryWriter` format the output of
-[XVIZMetadataBuilder](/docs/api-reference/xviz-metadata-builder.md) and
-[XVIZBuilder](/docs/api-reference/xviz-builder.md) to files.
+Writers provide an interface to write XVIZ Metadata and Frames.
 
 ## Example
 
@@ -25,7 +21,7 @@ for (let i = 0; i < 10; i++) {
   xvizWriter.writeFrame(i, builder.getFrame());
 }
 
-xvizWriter.writeFrameIndex();
+xvizWriter.close();
 ```
 
 ### Constructor
@@ -36,7 +32,7 @@ const sink = new FileSink();
 const xvizWriter = new XVIZBinaryWriter(sink);
 ```
 
-Parameters:
+_Parameters:_
 
 - **sink** (Object) Object that manages writing data
 - **options** (Object)
@@ -48,7 +44,7 @@ Parameters:
 
 Writes a log metadata to the sink.
 
-Parameters:
+_Parameters:_
 
 - **xvizMetadata** (Object) - a XVIZ metadata object. See
   [XVIZMetadataBuilder.getMetadata](/docs/api-reference/xviz-metadata-builder.md).
@@ -57,13 +53,12 @@ Parameters:
 
 Writes an XVIZ frame to the sink.
 
-Parameters:
+_Parameters:_
 
 - **frameIndex** (Number) - the index of this frame.
 - **xvizFrame** (Object) - a XVIZ frame object. See
   [XVIZBuilder.getFrame](/docs/api-reference/xviz-builder.md).
 
-##### writeFrameIndex() {
+#### close()
 
-Writes an index file of all the frames in a log. This method must be called after all `writeFrame`
-calls.
+Allow the sink to finalize state resulting in any subsequent methods throwing an error.

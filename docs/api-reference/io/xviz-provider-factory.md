@@ -1,30 +1,34 @@
-## XVIZProviderFactory
+# XVIZProviderFactory
 
 The XVIZProviderFactory provides the ability to create an XVIZProvider without knowing the specific
 implementation that handles the underlying data source.
 
-### Example
+## Example
 
 ```js
-TODO;
+import {FileSource, XVIZProviderFactory} from '@xviz/io';
+
+const root = '.';
+const source = new FileSource(root);
+const provider = await XVIZProviderFactory.open({
+  source,
+  root
+});
+
+if (provider) {
+  // ...
+}
 ```
 
-### Constructor
+## Methods
 
-```js
-TODO;
-```
-
-### Methods
-
-##### open({root, source, options})
+### async open({root, source, options})
 
 Attempts to open an XVIZ Provider from the given location and source. If a provider is successful it
 will be returned otherwise null is returned.
 
-Parameters:
+_Parameters:_
 
 - **root** (String) - the output directory.
-- **source** (XVIZSource) - a XVIZ Source object. See
-  [XVIZ Source](/docs/api-reference/io/xviz-source-sink.md).
-- **options** (Object) - the output directory.
+- **source** (XVIZSource) - a [XVIZ Source](/docs/api-reference/io/xviz-source-sink.md) object.
+- **options** (Object) - implementation defined options.

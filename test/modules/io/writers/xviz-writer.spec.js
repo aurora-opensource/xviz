@@ -62,7 +62,7 @@ const TestCases = [
     type: 'f',
     data: SAMPLE_STATE_UPDATE,
     postTest: (t, tc, writer, sink) => {
-      writer.writeFrameIndex();
+      writer.close();
       t.ok(sink.has('0-frame.json'), 'wrote index for frames');
       t.deepEquals(
         JSON.parse(sink.readSync('0-frame.json')),
@@ -136,14 +136,14 @@ const ThrowingTestCases = [
     testMessage: 'Throws if updates missing timestamp'
   },
   {
-    name: 'writeFrame after writeFrameIndex',
+    name: 'writeFrame after close',
     data: SAMPLE_STATE_UPDATE,
     preTest: (t, tc, writer, sink) => {
       writer.writeFrame(0, tc.data);
-      writer.writeFrameIndex();
+      writer.close();
     },
-    exceptionRegex: /was called after.*last frame of 2-frame/,
-    testMessage: 'throws if writeFrame() called after writeFrameIndex()'
+    exceptionRegex: /Cannot use this Writer after .close()/,
+    testMessage: 'throws if writeFrame() called after close()'
   }
 ];
 
@@ -176,7 +176,7 @@ test('XVIZWriter#ThrowingTestCases', t => {
   t.end();
 });
 
-test('XVIZWriter#default-ctor frames writeFrameIndex', t => {
+test('XVIZWriter#default-ctor frames close()', t => {
   const sink = new MemorySourceSink();
   const jsBuilder = new XVIZJSONWriter(sink);
   const binBuilder = new XVIZBinaryWriter(sink);
@@ -185,7 +185,7 @@ test('XVIZWriter#default-ctor frames writeFrameIndex', t => {
 
   for (const builder of [jsBuilder, binBuilder]) {
     builder.writeFrame(0, data);
-    builder.writeFrameIndex();
+    builder.close();
 
     t.ok(sink.has('0-frame.json'), 'wrote index for frames');
 

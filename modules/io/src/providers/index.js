@@ -27,9 +27,14 @@ async function createXVIZProvider(ProviderClass, args) {
 }
 
 export class XVIZProviderFactory {
-  // root
-  // source
-  // options
+  /*
+   * Attempt to find a valid provider for the given source
+   * returning null if none can be found.
+   *
+   * @param args.root
+   * @param args.source
+   * @param args.options
+   */
   static async open(args) {
     const providerClasses = [XVIZJSONProvider, XVIZBinaryProvider];
 
