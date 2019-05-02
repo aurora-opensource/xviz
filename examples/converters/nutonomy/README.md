@@ -1,4 +1,5 @@
 ### nuTonomy XVIZ Conversion Example
+
 This nuTonomy data set is used to demonstrate how to convert data into the XVIZ format.
 
 The structure of this examples places the core conversion objects in `src/converters`.
@@ -12,11 +13,13 @@ at different rates.
 Follow the comments to get an understanding of the how's converting data to XVIZ.
 
 ### nuTonomy Data Set
+
 - [nuTonomy dataset](https://www.nuscenes.org/download)
 - [python lib](https://github.com/nutonomy/nuscenes-devkit/tree/master/python-sdk)
 - [Jupyter notebook](https://github.com/nutonomy/nuscenes-devkit/blob/master/python-sdk/tutorial.ipynb)
 
 ### Download nuTonomy Data
+
 1. Go to **[nuTonomy dataset](https://www.nuscenes.org/download)**
 2. Download `Meta data and annotations`, `LIDAR and RADAR pointclouds used as keyframes`,
    `Camera images used as keyframes`
@@ -41,14 +44,14 @@ Other options may be useful:
 
    --image-max-width
    --image-max-height # reduce image size
-   
+
    --disable-streams=CAM_FRONT_LEFT,CAM_FRONT_RIGHT # disable streams
 ```
 
 To get a full list of acceptable parameters, run `yarn start --help`
 
-
 ### Structure of nuTonomy data
+
 Detailed [schema](https://github.com/nutonomy/nuscenes-devkit/blob/master/schema.md)
 
 ```

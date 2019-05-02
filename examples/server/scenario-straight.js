@@ -19,7 +19,7 @@
  * - no streams in metadata
  *   - this means primitives have the coordinate IDENTITY
  */
-
+/* eslint-disable camelcase */
 const DEG_1_AS_RAD = Math.PI / 180;
 
 const straight_metadata = {
@@ -81,7 +81,7 @@ class StraightScenario {
       range.push(i * this.lineGap);
     }
 
-    console.log(start, end);
+    console.log(start, end); // eslint-disable-line
     return range;
   }
 

@@ -17,7 +17,7 @@
  * - no start end time in metadata
  * - stream metadata for coordinate & styling
  */
-
+/* eslint-disable camelcase */
 const DEG_1_AS_RAD = Math.PI / 180;
 const DEG_6_AS_RAD = 6 * DEG_1_AS_RAD;
 const DEG_90_AS_RAD = 90 * DEG_1_AS_RAD;

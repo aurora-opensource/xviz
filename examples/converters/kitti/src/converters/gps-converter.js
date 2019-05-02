@@ -19,7 +19,7 @@ import {_getPoseTrajectory} from '@xviz/builder';
 
 import BaseConverter from './base-converter';
 import {loadOxtsPackets} from '../parsers/parse-gps-data';
-import {MOTION_PLANNING_STEPS, PRIMARY_POSE_STREAM} from './constant';
+import {MOTION_PLANNING_STEPS} from './constant';
 
 const RADIAN_TO_DEGREE = 180 / Math.PI;
 
