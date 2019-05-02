@@ -17,16 +17,12 @@ module.exports = api => {
   const config = getBabelConfig(api);
   config.plugins = config.plugins || [];
 
-  config.plugins.push(
-    'version-inline',
-    '@babel/proposal-class-properties',
-    [
-      'babel-plugin-inline-import',
-      {
-        extensions: ['.worker.js']
-      }
-    ]
-  );
+  config.plugins.push('version-inline', '@babel/proposal-class-properties', [
+    'babel-plugin-inline-import',
+    {
+      extensions: ['.worker.js']
+    }
+  ]);
 
   return config;
 };

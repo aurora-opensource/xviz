@@ -17,6 +17,7 @@
     "bench": "ocular-test bench",
     "bench-browser": "ocular-test bench-browser",
     "build": "ocular-clean && lerna run pre-build && ocular-build",
+    "check-copyright-header": "./scripts/check-copyright-header.sh",
     "flow": "flow check",
     "lint": "ocular-lint",
     "publish": "ocular-publish",
@@ -48,6 +49,7 @@
     "yarn": ">= 1.10.0"
   },
   "pre-commit": [
+    "check-copyright-header",
     "test"
   ],
   "private": true,

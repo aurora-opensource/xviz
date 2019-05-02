@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # Copyright (c) 2019 Uber Technologies, Inc.
 #
@@ -14,23 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Script to publish the module
+# Automated tests
 
 set -e
 
-# beta or prod
-MODE=$1
+BASEDIR=$(dirname "$0")
 
-case $MODE in
-  "beta")
-    # npm-tag argument: npm publish --tag <beta>
-    # cd-version argument: increase <prerelease> version
-    lerna publish --npm-tag beta --cd-version prerelease
-    break;;
+GIT_FILTER="$BASEDIR/git-copyright-files.sh"
 
-  "prod")
-    lerna publish --cd-version minor
-    break;;
-
-  *) ;;
-esac
+echo 'Running copyright header check'
+git diff-index --diff-filter=AM --cached --name-only HEAD | grep -e '\.sh$' -e '\.js$' | xargs "$BASEDIR/git-copyright-files.sh"
