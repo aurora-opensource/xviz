@@ -18,3 +18,4 @@ package-lock.json
 *.DS_Store
 .npmrc
 .dir-locals.el
+test/modules/parser/*.worker.js

@@ -1,8 +1,11 @@
+const fs = require('fs');
 const path = require('path');
 const {walkDir, dump} = require('../../scripts/file-utils');
 
+const ROOT_DIR = path.resolve(__dirname, '../..');
+
 function getSchemaExamples() {
-  const moduleDir = path.resolve(__dirname, '../../modules/schema');
+  const moduleDir = path.resolve(ROOT_DIR, 'modules/schema');
   const examplesMap = walkDir(path.resolve(moduleDir, 'examples/'), '.json');
   const invalidExamplesMap = walkDir(path.resolve(moduleDir, 'invalid/'), '.json');
   dump(
@@ -15,4 +18,16 @@ function getSchemaExamples() {
   );
 }
 
+// We do not transpile source when running test
+// This breaks the inline worker source import
+// We redirect the import to this placeholder file with `aliases` in ocular-dev-tools.config.js
+function getWorker() {
+  const workerSource = fs.readFileSync(path.resolve(ROOT_DIR, 'modules/parser/dist/workers/stream-data.worker.js'), 'utf-8');
+  fs.writeFileSync(
+    path.resolve(__dirname, './parser/stream-data.worker.js'),
+    `export default ${JSON.stringify(workerSource)}`
+  );
+}
+
 getSchemaExamples();
+getWorker();

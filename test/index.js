@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import './modules/builder';
-import './modules/parser';
-import './modules/schema';
-import './modules/cli';
-import './website';
+require('./modules/update-test-cases');
+
+require('./modules/builder');
+require('./modules/parser');
+require('./modules/schema');
+require('./modules/cli');
+require('./website');
