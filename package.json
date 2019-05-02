@@ -15,14 +15,12 @@
   "scripts": {
     "bootstrap": "yarn && ocular-bootstrap",
     "bench": "ocular-test bench",
-    "bench-browser": "ocular-test bench-browser",
     "build": "ocular-clean && lerna run pre-build && ocular-build",
     "check-copyright-header": "./scripts/check-copyright-header.sh",
     "flow": "flow check",
     "lint": "ocular-lint",
     "publish": "ocular-publish",
-    "test": "ocular-test",
-    "test-browser": "ocular-test browser"
+    "test": "ocular-test"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.0.0",
