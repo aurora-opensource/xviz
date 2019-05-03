@@ -29,9 +29,9 @@ RUN  apt-get update \
   && chmod +x /usr/sbin/wait-for-it.sh
 
 # fonts
-sudo apt-get install ttf-mscorefonts-installer
-sudo fc-cache
-fc-match Arial
+RUN apt-get install ttf-mscorefonts-installer
+RUN fc-cache \
+  && fc-match Arial
 
 COPY . /xviz/
 
