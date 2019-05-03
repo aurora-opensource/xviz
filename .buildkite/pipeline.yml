@@ -18,7 +18,7 @@ steps:
       queue: workers
 
   - name: ':node:'
-    command: 'yarn test node'
+    command: 'yarn test cover && cat coverage/lcov.info | coveralls'
     plugins:
       docker-compose#v1.5.2:
         run: xviz
