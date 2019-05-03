@@ -71,7 +71,7 @@ function run(testCase) {
       .browserTestDriver_captureAndDiffScreen(
         Object.assign({
           tolerance: 0.1,
-          threshold: 0.999,
+          threshold: 0.995,
           goldenImage: testCase.goldenImage,
           region: getBoundingBoxInPage(canvas),
           // set DEBUG above to true to overwrite golden image

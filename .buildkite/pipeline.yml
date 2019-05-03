@@ -18,7 +18,7 @@ steps:
       queue: workers
 
   - name: ':node:'
-    command: 'yarn test node'
+    command: 'yarn test-ci'
     plugins:
       docker-compose#v1.5.2:
         run: xviz
@@ -26,7 +26,7 @@ steps:
       queue: workers
 
   - name: ':chrome:'
-    command: 'sh /etc/init.d/xvfb && yarn test browser'
+    command: 'yarn test browser-headless'
     plugins:
       docker-compose#v1.5.2:
         run: xviz
