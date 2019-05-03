@@ -1,34 +1,34 @@
 steps:
-  - name: ":docker:"
+  - name: ':docker:'
     plugins:
       docker-compose#v1.5.2:
         build: xviz
         image-repository: 027047743804.dkr.ecr.us-east-2.amazonaws.com/uber
     agents:
-      queue: private-builders
+      queue: builders
 
   - wait
 
-  - name: ":eslint:"
-    command: "yarn lint"
+  - name: ':eslint:'
+    command: 'yarn lint'
     plugins:
       docker-compose#v1.5.2:
         run: xviz
     agents:
-      queue: private-default
+      queue: workers
 
-  - name: ":node:"
-    command: "node test/start.js test src"
+  - name: ':node:'
+    command: 'node test/start.js test src'
     plugins:
       docker-compose#v1.5.2:
         run: xviz
     agents:
-      queue: private-default
+      queue: workers
 
-  - name: ":chrome:"
-    command: "sh /etc/init.d/xvfb && yarn test-browser"
+  - name: ':chrome:'
+    command: 'sh /etc/init.d/xvfb && yarn test-browser'
     plugins:
       docker-compose#v1.5.2:
         run: xviz
     agents:
-      queue: private-default
+      queue: workers
