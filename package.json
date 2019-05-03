@@ -24,7 +24,6 @@
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.0.0",
-    "@babel/register": "^7.0.0",
     "@probe.gl/bench": "^3.0.1",
     "@probe.gl/test-utils": "^3.0.1",
     "ajv": "^6.5.2",
