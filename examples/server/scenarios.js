@@ -22,11 +22,11 @@ const Scenario = {
 
 function loadScenario(name, isLive, duration) {
   // Construct proper scenario for live vs log
-  const scenarioName = isLive ? name : name + '_log';
+  const scenarioName = isLive ? name : `${name}_log`;
 
   const scenario = Scenario[scenarioName];
   if (!scenario) {
-    throw new Error('No scenario named ' + scenario + 'found.');
+    throw new Error(`No scenario named ${scenario} found.`);
   }
 
   const data = {

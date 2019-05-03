@@ -96,15 +96,13 @@ export default class NuTonomyConverter {
       frames: this.frames
     });
 
-    this.converters
-      .filter(converter => converter !== gpsConverter)
-      .forEach(converter =>
-        converter.load({
-          staticData: this.staticData,
-          frames: this.frames,
-          posesByFrame: gpsConverter.getPoses()
-        })
-      );
+    this.converters.filter(converter => converter !== gpsConverter).forEach(converter =>
+      converter.load({
+        staticData: this.staticData,
+        frames: this.frames,
+        posesByFrame: gpsConverter.getPoses()
+      })
+    );
 
     this.metadata = this.getMetadata();
   }
@@ -209,7 +207,7 @@ export default class NuTonomyConverter {
   // lidar frame is synchronized with ego pose
   // use lidar frame's timestamp as the frame reference timestamp
   _getFrameSensors(frameIndex, sensorsMetadata) {
-    const lidar = sensorsMetadata['LIDAR_TOP'][frameIndex];
+    const lidar = sensorsMetadata.LIDAR_TOP[frameIndex];
     const timestamp = lidar.timestamp;
     const sensors = {
       LIDAR_TOP: lidar

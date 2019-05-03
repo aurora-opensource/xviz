@@ -552,28 +552,30 @@ class ConnectionContext {
   // Take a frame at time t, and make it appears as it occured
   // frame_time_advance in the future.
   adjustFrameTime(frame, frame_index) {
-    if (this.frame_time_advance) {
-      // Determine if binary and unpack
-      const jsonFrame = this.json_frames[frame_index];
+    if (!this.frame_time_advance) {
+      return frame;
+    }
 
-      // Update the snapshot times
-      for (let i = 0; i < jsonFrame.data.updates.length; ++i) {
-        const update = jsonFrame.data.updates[i];
-        update.timestamp += this.frame_time_advance;
+    // Determine if binary and unpack
+    const jsonFrame = this.json_frames[frame_index];
 
-        if (update.time_series) {
-          for (let y = 0; y < update.time_series.length; ++y) {
-            update.time_series[y].timestamp += this.frame_time_advance;
-          }
+    // Update the snapshot times
+    for (let i = 0; i < jsonFrame.data.updates.length; ++i) {
+      const update = jsonFrame.data.updates[i];
+      update.timestamp += this.frame_time_advance;
+
+      if (update.time_series) {
+        for (let y = 0; y < update.time_series.length; ++y) {
+          update.time_series[y].timestamp += this.frame_time_advance;
         }
       }
+    }
 
-      // Repack based on binary-ness
-      if (this.is_frame_binary[frame_index]) {
-        frame = encodeBinaryXVIZ(jsonFrame, {});
-      } else {
-        frame = JSON.stringify(jsonFrame);
-      }
+    // Repack based on binary-ness
+    if (this.is_frame_binary[frame_index]) {
+      frame = encodeBinaryXVIZ(jsonFrame, {});
+    } else {
+      frame = JSON.stringify(jsonFrame);
     }
 
     return frame;
@@ -696,7 +698,7 @@ function packFrame({json, isBinary}) {
 }
 
 // Main
-
+/* eslint-disable complexity */
 module.exports = function main(args) {
   const runScenario = args.scenario.length > 0;
 

@@ -31,19 +31,17 @@ const BABEL_CONFIG = {
 module.exports = env => {
   const config = getWebpackConfig(env);
 
-  config.module.rules.push(
-    {
-      // This is required to handle inline worker!
-      test: /\.js$/,
-      exclude: /node_modules/,
-      use: [
-        {
-          loader: 'babel-loader',
-          options: BABEL_CONFIG
-        }
-      ]
-    }
-  );
+  config.module.rules.push({
+    // This is required to handle inline worker!
+    test: /\.js$/,
+    exclude: /node_modules/,
+    use: [
+      {
+        loader: 'babel-loader',
+        options: BABEL_CONFIG
+      }
+    ]
+  });
 
   return config;
 };

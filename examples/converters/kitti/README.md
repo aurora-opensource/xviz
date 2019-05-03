@@ -2,23 +2,27 @@
 
 This public KITTI data set is used to demonstrate how to convert data into the XVIZ format.
 
-The structure of this examples places the core conversion objects in `src/converters` with
-an object per data source. Data source will also have parsing utilities in `src/parsers`.
+The structure of this examples places the core conversion objects in `src/converters` with an object
+per data source. Data source will also have parsing utilities in `src/parsers`.
 
-The *converter* objects are responsible for calling the parsers and knowing the structure of the data
-such that it can be processed by a *frame*, which is all the data required for a point in time.
+The _converter_ objects are responsible for calling the parsers and knowing the structure of the
+data such that it can be processed by a _frame_, which is all the data required for a point in time.
 
-In this example, the data has been synchronized for us, but XVIZ does support data sources operating at
-different rates.
+In this example, the data has been synchronized for us, but XVIZ does support data sources operating
+at different rates.
 
-Please see the [Getting Started](https://github.com/uber/xviz/blob/master/docs/getting-started/README.md) guide for details this XVIZ conversion.
+Please see the
+[Getting Started](https://github.com/uber/xviz/blob/master/docs/getting-started/README.md) guide for
+details this XVIZ conversion.
 
 # Structure of the XVIZ conversion code
 
-The [Getting Started](https://github.com/uber/xviz/blob/master/docs/getting-started/README.md) covers the
-details of the XVIZ conversion. Here we briefly describe the structure of the conversion code itself.
+The [Getting Started](https://github.com/uber/xviz/blob/master/docs/getting-started/README.md)
+covers the details of the XVIZ conversion. Here we briefly describe the structure of the conversion
+code itself.
 
-We have defined a conversion class for each data source in the original KITTI data. Specifically we want this class to handle the following:
+We have defined a conversion class for each data source in the original KITTI data. Specifically we
+want this class to handle the following:
 
 1. Handle data dependencies
 2. Load KITTI data source
@@ -27,8 +31,8 @@ We have defined a conversion class for each data source in the original KITTI da
 
 ## Defining the XVIZ converter class structure
 
-We will map each of these requirements to a function of our class. Each conversion class will
-share the following structure.
+We will map each of these requirements to a function of our class. Each conversion class will share
+the following structure.
 
 ```js
   // #1 Accept dependencies during construction
