@@ -31,19 +31,4 @@ function getSchemaExamples() {
   );
 }
 
-// We do not transpile source when running test
-// This breaks the inline worker source import
-// We redirect the import to this placeholder file with `aliases` in ocular-dev-tools.config.js
-function getWorker() {
-  const workerSource = fs.readFileSync(
-    path.resolve(ROOT_DIR, 'modules/parser/dist/workers/stream-data.worker.js'),
-    'utf-8'
-  );
-  fs.writeFileSync(
-    path.resolve(__dirname, './parser/stream-data.worker.js'),
-    `export default ${JSON.stringify(workerSource)}`
-  );
-}
-
 getSchemaExamples();
-getWorker();
