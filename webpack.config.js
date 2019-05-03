@@ -42,13 +42,6 @@ module.exports = env => {
           options: BABEL_CONFIG
         }
       ]
-    },
-    {
-      // Load worker tests
-      test: /\.worker\.js$/,
-      use: {
-        loader: 'worker-loader'
-      }
     }
   );
 

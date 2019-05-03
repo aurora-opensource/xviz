@@ -38,8 +38,7 @@
     "ocular-dev-tools": "0.0.20",
     "pre-commit": "^1.2.2",
     "reify": "^0.18.1",
-    "walk": "^2.3.14",
-    "webworkify-webpack": "^2.0.0"
+    "walk": "^2.3.14"
   },
   "engines": {
     "node": ">= 8",
