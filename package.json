@@ -21,7 +21,7 @@
     "lint": "ocular-lint",
     "publish": "ocular-publish",
     "test": "ocular-test",
-    "test-ci": "ocular-test cover && (cat coverage/lcov.info | coveralls --verbose)"
+    "test-ci": "ocular-test cover && (cat coverage/lcov.info | coveralls)"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.0.0",
