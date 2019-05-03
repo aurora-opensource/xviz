@@ -28,13 +28,6 @@ RUN  apt-get update \
   && wget --quiet https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh -O /usr/sbin/wait-for-it.sh \
   && chmod +x /usr/sbin/wait-for-it.sh
 
-# fonts
-# http://askubuntu.com/a/25614
-RUN echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | debconf-set-selections
-RUN apt-get install -y fontconfig msttcorefonts-installer \
-  && update-ms-fonts \
-  && fc-cache -f
-
 COPY . /xviz/
 
 RUN yarn bootstrap
