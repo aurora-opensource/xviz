@@ -17,7 +17,10 @@ deb-src http://archive.ubuntu.com/ubuntu/ trusty-updates multiverse \
 deb http://archive.ubuntu.com/ubuntu/ trusty-security multiverse \
 deb-src http://archive.ubuntu.com/ubuntu/ trusty-security multiverse" >> /etc/apt/sources.list
 
-RUN apt-get update --allow-unauthenticated
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 40976EAF437D05B5
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3B4FE6ACC0B21F32
+
+RUN apt-get update
 
 # required by lint script
 RUN apt-get -y install jq
