@@ -33,11 +33,12 @@ const sink = new FileSink('output-dir');
 const xvizWriter = new XVIZJSONWriter(sink);
 ```
 
-_Parameters:_
+Parameters:
 
-- **sink** (Object) Object that manages writing data
-- **options** (Object)
-  - **options.flatten**
+- `sink` (Object) - Object that manages writing data
+- `options.precision` (Number) - transform Numbers in the data to the specified precision
+  (default 10)
+- `options.asArrayBuffer` (Boolean) - write to sink using ArrayBuffer rather than string
 
 ### Methods
 
@@ -45,20 +46,20 @@ _Parameters:_
 
 Encodes a log metadata to file.
 
-_Parameters:_
+Parameters:
 
-- **xvizMetadata** (Object) - a XVIZ metadata object. See
-  [XVIZMetadataBuilder.getMetadata](/docs/api-reference/xviz-metadata-builder.md).
+- `xvizMetadata` (Object) - an XVIZ metadata object. See
+  [XVIZMetadataBuilder.getMetadata()](/docs/api-reference/xviz-metadata-builder.md#getMetadata).
 
 ##### writeFrame(frameIndex, xvizFrame)
 
 Encodes an XVIZ frame to file.
 
-_Parameters:_
+Parameters:
 
-- **frameIndex** (Number) - the index of this frame.
-- **xvizFrame** (Object) - a XVIZ frame object. See
-  [XVIZBuilder.getFrame](/docs/api-reference/xviz-builder.md).
+- `frameIndex` (Number) - the index of this frame.
+- `xvizFrame` (Object) - an XVIZ frame object. See
+  [XVIZBuilder.getFrame()](/docs/api-reference/xviz-builder.md#getFrame).
 
 ##### close()
 

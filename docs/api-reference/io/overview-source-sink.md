@@ -5,27 +5,21 @@ data.
 
 Sinks provide an interface to write data as an XVIZ message.
 
-## SourceInterface
-
-Interface to read an XVIZ message
-
-## Methods
+## Source Interface Methods
 
 ### readSync(name)
 
-_Parameters:_
+Parameters:
 
-- **name** - The name used to identify the data source
+- `name` (string) - The name used to identify the data
 
-# SinkInterface
+Returns: (Object|Buffer) - XVIZ data
 
-Interface to write XVIZ data.
+## Sink Interface Methods
 
-## Methods
+### writeSync(name, data)
 
-## writeSync(name, data)
+Parameters:
 
-_Parameters:_
-
-- **name** - The name used to identify the data source
-- **data** - The data to write
+- `name` (string) - The name used to identify the data
+- `data` (Object|string|ArrayBuffer|Buffer) - The data to write

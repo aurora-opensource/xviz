@@ -5,22 +5,11 @@ XVIZ.
 
 The module also provides classes to inspect and manipulate XVIZ data.
 
-[@xviz/io diagram](./images/xviz-io-block-diagram.png)
+![@xviz/io diagram](./images/xviz-io-block-diagram.svg)
 
-_Diagram of the @xviz/io classes relationships and data flow_
+_Diagram of the @xviz/io class relationships and data flow_
 
-# XVIZ Data classes
-
-Passing any data to the [XVIZData](/docs/api-reference/io/xviz-data.md) constructor will determine
-if the data represents XVIZ and will perform **minimal** parsing of the data to facilitate
-performant workflows where you only care about the XVIZ data and type without changing the data.
-
-If you want to obtain an object to inspect or change from an XVIZData instance you do so by calling
-`XVIZData.message()` and a [XVIZMessage](/docs/api-reference/io/xviz-message.md) will be return
-which provides access to the object.
-
-The data is still owned and managed by the XVIZData class and XVIZData is the class that should be
-passed around in an API.
+# Module Classes
 
 ## Sources and Sinks
 
@@ -48,21 +37,22 @@ On top of this, in the future we expect additional formats, such as with protobu
 want to isolate a client from the concrete form the data takes by providing an interface to take
 care of the format details.
 
-The object [XVIZData](/docs/api-references/io/xviz-data.md) handles consuming any format and
-providing access to the XVIZ data through the
-[XVIZMessage](/docs/api-references/io/xviz-message.md).
+The object [XVIZData](/docs/api-reference/io/xviz-data.md) handles consuming any format and
+providing access to the XVIZ data through the [XVIZMessage](/docs/api-reference/io/xviz-message.md).
+
+The data is still owned and managed by the XVIZData class and XVIZData is the class that should be
+passed around in an API.
 
 ## Readers and Writers
 
-This layer builds upon the Source and Sink to deal with the XVIZ data types of Metadata, and Frames.
+This layer builds upon the Source and Sink to deal with the XVIZ data types of Metadata and Frames.
 
-[Readers](/docs/api-reference/io/overview-reader.md) provide an interface to access the three data
+[Readers](/docs/api-reference/io/overview-reader.md) provide an interface to access the data
 objects.
 
-[Writers](/docs/api-reference/io/overview-writer.md) provide an interface to write the three data
-objects.
+[Writers](/docs/api-reference/io/overview-writer.md) provide an interface to write the data objects.
 
 ## Providers
 
-An [XVIZ Provider](/docs/api-reference/io/overview-provider.md) abstracts the specific details of
-the concrete XVIZ data format details and provides a way to access metadata and frames.
+An [XVIZ Provider](/docs/api-reference/io/overview-provider.md) encapsulates the specific details of
+the concrete XVIZ data format and provides a generic interface to access metadata and frames.

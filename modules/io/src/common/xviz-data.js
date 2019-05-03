@@ -124,7 +124,7 @@ export class XVIZData {
     switch (this._dataFormat) {
       case XVIZFormat.BINARY:
         if (data instanceof Buffer) {
-          data = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength); // eslint-disable-line no-fallthrough
+          data = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
         }
         msg = parseBinaryXVIZ(data);
         break;
@@ -163,7 +163,7 @@ export class XVIZData {
     switch (getDataContainer(data)) {
       case 'binary':
         if (data instanceof Buffer) {
-          data = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength); // eslint-disable-line no-fallthrough
+          data = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
         }
 
         if (isBinaryXVIZ(data)) {

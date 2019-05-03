@@ -1,6 +1,6 @@
-# Writers
+# XVIZ Writer
 
-Writers provide an interface to write XVIZ Metadata and Frames.
+XVIZ Writers provide an interface to write XVIZ Metadata and Frames.
 
 ## Example
 
@@ -24,40 +24,26 @@ for (let i = 0; i < 10; i++) {
 xvizWriter.close();
 ```
 
-### Constructor
-
-```js
-import {FileSink, XVIZBinaryWriter} from '@xviz/io';
-const sink = new FileSink();
-const xvizWriter = new XVIZBinaryWriter(sink);
-```
-
-_Parameters:_
-
-- **sink** (Object) Object that manages writing data
-- **options** (Object)
-  - **options.flatten**
-
-### Methods
+### Interface Methods
 
 ##### writeMetadata(xvizMetadata)
 
 Writes a log metadata to the sink.
 
-_Parameters:_
+Parameters:
 
-- **xvizMetadata** (Object) - a XVIZ metadata object. See
-  [XVIZMetadataBuilder.getMetadata](/docs/api-reference/xviz-metadata-builder.md).
+- `xvizMetadata` (Object) - an XVIZ metadata object. See
+  [XVIZMetadataBuilder.getMetadata()](/docs/api-reference/xviz-metadata-builder.md#getMetadata).
 
 ##### writeFrame(frameIndex, xvizFrame)
 
 Writes an XVIZ frame to the sink.
 
-_Parameters:_
+Parameters:
 
-- **frameIndex** (Number) - the index of this frame.
-- **xvizFrame** (Object) - a XVIZ frame object. See
-  [XVIZBuilder.getFrame](/docs/api-reference/xviz-builder.md).
+- `frameIndex` (Number) - the index of this frame.
+- `xvizFrame`(Object) - an XVIZ frame object. See
+  [XVIZBuilder.getFrame()](/docs/api-reference/xviz-builder.md#getFrame).
 
 #### close()
 

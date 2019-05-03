@@ -9,10 +9,10 @@ The XVIZFormatWriter currently expects XVIZData and not a raw object.
 
 ```js
 import {XVIZMetadataBuilder, XVIZBuilder} from '@xviz/builder';
-import {XVIZBinaryWriter, FileSink} from '@xviz/io';
+import {XVIZFormatWriter, FileSink, XVIZFormat} from '@xviz/io';
 
 const sink = new FileSink('output-dir');
-const xvizWriter = new XVIZBinaryWriter(sink);
+const xvizWriter = new XVIZFormatWriter(sink, {format: XVIZFormat.BINARY});
 
 const metadataBuilder = new XVIZMetadataBuilder();
 // build metadata
@@ -30,17 +30,18 @@ xvizWriter.close();
 ### Constructor
 
 ```js
-import {FileSink, XVIZBinaryWriter} from '@xviz/io';
+import {FileSink, XVIZFormatWriter, XVIZFormat} from '@xviz/io';
 
 const sink = new FileSink('output-dir');
-const xvizWriter = new XVIZBinaryWriter(sink);
+const xvizWriter = new XVIZBinaryWriter(sink, {format: XVIZFormat.BINARY});
 ```
 
-_Parameters:_
+Parameters:
 
-- **sink** (Object) Object that manages writing data
-- **options** (Object)
-  - **options.flatten**
+- `sink` (Object) Object that manages writing data
+- `options` (Object) - Set of options that will be passed through to underlying Writer
+- `options.format` ([XVIZFormat](/docs/api-reference/io/xviz-format.md)) - Required XVIZ format to
+  write out
 
 ### Methods
 
@@ -48,20 +49,20 @@ _Parameters:_
 
 Encodes a log metadata to file.
 
-_Parameters:_
+Parameters:
 
-- **xvizMetadata** (Object) - a XVIZ metadata object. See
-  [XVIZMetadataBuilder.getMetadata](/docs/api-reference/xviz-metadata-builder.md).
+- `xvizMetadata` (Object) - an XVIZ metadata object. See
+  [XVIZMetadataBuilder.getMetadata()](/docs/api-reference/xviz-metadata-builder.md#getMetadata).
 
 ##### writeFrame(frameIndex, xvizFrame)
 
 Encodes an XVIZ frame to file.
 
-_Parameters:_
+Parameters:
 
-- **frameIndex** (Number) - the index of this frame.
-- **xvizFrame** (Object) - a XVIZ frame object. See
-  [XVIZBuilder.getFrame](/docs/api-reference/xviz-builder.md).
+- `frameIndex` (Number) - the index of this frame.
+- `xvizFrame` (Object) - an XVIZ frame object. See
+  [XVIZBuilder.getFrame()](/docs/api-reference/xviz-builder.md#getFrame).
 
 #### close()
 

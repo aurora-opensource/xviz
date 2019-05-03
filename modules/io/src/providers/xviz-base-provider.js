@@ -11,8 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-/* global console */
-/* eslint-disable no-console */
 import {XVIZData} from '../common/xviz-data';
 
 // Generic iterator that stores context for context for an iterator
@@ -72,7 +70,7 @@ export class XVIZBaseProvider {
 
     if (this.metadata && (!Number.isFinite(startTime) || !Number.isFinite(endTime))) {
       // TODO: should provide a command for the cli to regenerate the index files
-      console.log('The data source is missing the data index');
+      throw new Error('The data source is missing the data index');
     }
   }
 
@@ -120,7 +118,7 @@ export class XVIZBaseProvider {
     const endFrames = this.reader.findFrame(endTime);
 
     if (startFrames !== undefined && endFrames !== undefined) {
-      return new FrameIterator(startFrames[0], endFrames[1]);
+      return new FrameIterator(startFrames.first, endFrames.last);
     }
 
     return null;

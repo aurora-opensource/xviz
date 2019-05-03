@@ -1,18 +1,20 @@
 # MemorySourceSink
 
-A memory-based implementation for both the Source interface and Sink interface.
+A memory-based implementation for both the Source interface and Sink Interface.
 
 ## Methods
 
 ### readSync(name)
 
-_Parameters:_
+Parameters:
 
-- **name** - The identifier of the data to read.
+- `name` (string) - The name used to identify the data
+
+Returns: (Object|Buffer) - XVIZ data
 
 ### writeSync(name, data)
 
-_Parameters:_
+Parameters:
 
-- **name** - The identifier of the data to write.
-- **data** - The data to write.
+- `name` (string) - The name used to identify the data
+- `data` (Object|string|ArrayBuffer|Buffer) - The data to write

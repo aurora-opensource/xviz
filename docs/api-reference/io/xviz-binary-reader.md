@@ -14,35 +14,58 @@ const reader = new XVIZBinaryReader(source);
 
 ## Constructor
 
-_Parameters:_
+Parameters:
 
-- **source** (Object) XVIZ data source
+- `source` (Object) - XVIZ data source
 
 ## Methods
 
-### readMetadata()
+##### readMetadata()
 
 Reads a log metadata from the source.
 
-### readFrame(frameIndex)
+Returns: (Object|Buffer) - XVIZ metadata
+
+##### readFrame(frameIndex)
 
 Reads an XVIZ frame from the source.
 
-_Parameters:_
+Parameters:
 
-- **frameIndex** (Number) - the index of this frame.
-  [XVIZBuilder.getFrame](/docs/api-reference/xviz-builder.md).
+- `frameIndex` (Number) - the index of this frame.
+  [XVIZBuilder.getFrame()](/docs/api-reference/xviz-builder.md#getFrame).
 
-### timeRange()
+Returns: (Object|Buffer) - XVIZ message
 
-Returns the `{startTime, endTime}` available in the data.
+##### timeRange()
 
-### frameCount()
+Returns:
 
-Returns then number of frames available in the data.
+- (Object)
+  - `startTime` (Number) - Start time of the the source if known
+  - `endTime` (Number) - End time of the the source if known
 
-### findFrame(timestamp)
+##### frameCount()
 
-Returns an 2 element array with [minFrame, maxFrame] for the given timestamp. If the timestamp is
-before the start of the data, the start index is returned for both values. If the timestamp is
-greater than the end of the data, the end is returned for both values.
+Returns: (Number) - Number of frames available in the data
+
+##### findFrame(timestamp)
+
+Returns an object with the frame indices for the first and last indices that are the boundaries for
+this timestamp.
+
+Parameters:
+
+- `timestamp` (Number) - Timestamp used to find the frame index boundaries
+
+Returns:
+
+- (Object)
+  - `first` (Number) - First frame index that is >= timestamp, or the first index if timestamp < the
+    start of the time range
+  - `last` (Number) - Last frame index that is <= timestamp, or the last index if timestamp > the
+    end of the time range
+
+##### close()
+
+Close the reader and the underlying source.

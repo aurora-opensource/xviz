@@ -26,13 +26,13 @@ function determineWriter(sink, format, options) {
   let writer = null;
   switch (format) {
     case XVIZFormat.BINARY:
-      writer = new XVIZBinaryWriter(sink);
+      writer = new XVIZBinaryWriter(sink, options);
       break;
     case XVIZFormat.JSON_BUFFER:
-      writer = new XVIZJSONBufferWriter(sink);
+      writer = new XVIZJSONBufferWriter(sink, options);
       break;
     case XVIZFormat.JSON_STRING:
-      writer = new XVIZJSONWriter(sink);
+      writer = new XVIZJSONWriter(sink, options);
       break;
     default:
       throw new Error(`Cannot convert XVIZData to format ${format}`);
@@ -43,14 +43,14 @@ function determineWriter(sink, format, options) {
 
 // Convert XVIZData to a different XVIZFormat
 export class XVIZFormatWriter {
-  constructor(sink, {format}) {
+  constructor(sink, {format, ...options}) {
     this.format = format;
 
-    if (format === XVIZFormat.OBJECT) {
+    if (!format || format === XVIZFormat.OBJECT) {
       throw new Error('XVIZFormat.OBJECT is not supported by XVIZFormatter.');
     }
 
-    this.writer = determineWriter(sink, format);
+    this.writer = determineWriter(sink, format, options);
   }
 
   writeMetadata(xvizMetadata) {

@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 export const XVIZMessageType = Object.freeze({
-  START: 'xviz/start',
-  ERROR: 'xviz/error',
-  DONE: 'xviz/done',
-  STATE_UPDATE: 'xviz/state_update',
-  TRANSFORM_LOG: 'xviz/transform_log',
-  TRANSFORM_LOG_DONE: 'xviz/transform_log_done',
-  TRANSFORM_POINT_IN_TIME: 'xviz/transform_point_in_time',
-  RECONFIGURE: 'xviz/reconfigure'
+  START: 'start',
+  ERROR: 'error',
+  DONE: 'done',
+  STATE_UPDATE: 'state_update',
+  TRANSFORM_LOG: 'transform_log',
+  TRANSFORM_LOG_DONE: 'transform_log_done',
+  TRANSFORM_POINT_IN_TIME: 'transform_point_in_time',
+  RECONFIGURE: 'reconfigure'
 });

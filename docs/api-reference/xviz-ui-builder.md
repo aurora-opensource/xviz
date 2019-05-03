@@ -17,7 +17,7 @@ Root
 ```
 
 - UI root has a list of `panel`s
-- [Panel](#XVIZPannelBuilder) has children, which could be either _component_ or _container_
+- [Panel](#XVIZPanelBuilder) has children, which could be either _component_ or _container_
 - [Container](#XVIZContainerBuilder) children could be either _component_ or _container_
 - Component could be one of the following types:
   - [Metric](#XVIZMetricBuilder)
@@ -72,7 +72,7 @@ Parameters:
 
 ##### child(panel)
 
-Append a [`XVIZPannelBuilder`](#XVIZPannelBuilder) instance to the root. Returns the child.
+Append a [`XVIZPanelBuilder`](#XVIZPanelBuilder) instance to the root. Returns the child.
 
 ##### getUI()
 
@@ -80,7 +80,7 @@ Returns a JSON descriptor of all UI components.
 
 ##### panel(options)
 
-Returns a new [`XVIZPannelBuilder`](#XVIZPannelBuilder) instance with the specified options.
+Returns a new [`XVIZPanelBuilder`](#XVIZPanelBuilder) instance with the specified options.
 
 ```js
 const panelBuilder = xvizUIBuilder.panel(options);

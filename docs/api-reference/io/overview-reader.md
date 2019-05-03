@@ -1,6 +1,7 @@
-# XVIZJSONReader
+# XVIZ Reader
 
-XVIZJSONReader supports the JSON format for XVIZ data.
+XVIZ Readers provide an interface to read XVIZ data and provide timing and frame information about
+the source.
 
 ## Example
 
@@ -10,15 +11,15 @@ import {XVIZJSONReader, MemorySource} from '@xviz/io';
 const source = new MemorySource();
 // XVIZ data added to source
 const reader = new XVIZJSONReader(source);
+const frameCount = reader.frameCount();
+const meta = reader.readMetadata();
+
+for (const i = 0; i < frameCount; i++) {
+  const frame = reader.readFrame(i);
+}
 ```
 
-## Constructor
-
-Parameters:
-
-- `source` (Object) - XVIZ data source
-
-## Methods
+## Interface Methods
 
 ##### readMetadata()
 
@@ -34,6 +35,8 @@ Parameters:
 
 - `frameIndex` (Number) - the index of this frame.
   [XVIZBuilder.getFrame()](/docs/api-reference/xviz-builder.md#getFrame).
+
+Returns: (Object|Buffer) - XVIZ message
 
 ##### timeRange()
 
@@ -66,4 +69,4 @@ Returns:
 
 ##### close()
 
-Close the reader and the underlying source.
+Close the reader and the underlying source

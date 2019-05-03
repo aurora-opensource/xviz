@@ -15,9 +15,9 @@ passthrough handling of data verses access and modification of XVIZ data.
 which can determine the format and type of XVIZ data w/o requiring a full parse of the data. This
 makes it ideal for the pass through case when data does not need to be inspected or modified.
 
-[XVIZMessage](/docs/api-reference/xviz-message.md), which can be created from an _XVIZData_ object,
-is a parsed XVIZ object and provides access to the internals and more suited for when the data needs
-accessed or mutated.
+[XVIZMessage](/docs/api-reference/xviz-message.md), which can be created from an **XVIZData**
+object, is a parsed XVIZ object and provides access to the internals and more suited for when the
+data needs accessed or mutated.
 
 ## Writers
 
@@ -25,9 +25,6 @@ Writers serialize XVIZ data.
 
 [XVIZJSONWriter](/docs/api-reference/xviz-json-writer.md)
 [XVIZBinaryWriter](/docs/api-reference/xviz-binary-writer.md)
-
-- Used by builder
-- TODO: DOES not support XVIZData, just raw object unenveloped
 
 ## Readers
 

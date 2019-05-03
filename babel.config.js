@@ -17,9 +17,7 @@ module.exports = api => {
   const config = getBabelConfig(api);
   config.plugins = config.plugins || [];
 
-  config.plugins.push('version-inline',
-    '@babel/plugin-transform-runtime',
-    '@babel/proposal-class-properties', [
+  config.plugins.push('version-inline', '@babel/proposal-class-properties', [
     'babel-plugin-inline-import',
     {
       extensions: ['.worker.js']

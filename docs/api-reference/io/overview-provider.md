@@ -1,15 +1,11 @@
-# Providers
+# XVIZ Provider
 
-XVIZ Providers encapsulate the details for reading from a data source and return an object that
-allows you to access and iterate over the XVIZ messages.
-
-## Overview
-
-The XVIZProviderInterface defines a way to access XVIZ messages regardless of the concrete details
-of the underlying XVIZ format.
+XVIZ Providers encapsulate the details of reading a particular XVIZ source and returns an object
+that allows you to access metadata and iterate over the XVIZ messages.
 
 Clients should not construct XVIZProviders directly, but instead use the
-[XVIZProviderFactory](./docs/api-reference/io/xviz-provider-factory.md) to find create a Provider.
+[XVIZProviderFactory](/docs/api-reference/io/xviz-provider-factory.md) to find create a Provider.
+
 If a client has a custom XVIZ data source they can create their own Provider and register it with
 the factory.
 
@@ -30,42 +26,41 @@ if (provider) {
 }
 ```
 
-## XVIZProviderInterface
+### Interface Methods
 
-### Methods
-
-#### async init()
+##### async init()
 
 Attempts to verify if the **source** represents a valid XVIZ data source and sets the result from
 `valid()` appropriately.
 
 This method must be called after construction before any other method.
 
-#### valid()
+##### valid()
 
-Returns whether the object is a valid XVIZ source.
+Returns: (Boolean) - True if the source is a valid for this Provider
 
-#### xvizMetadata()
+##### xvizMetadata()
 
-Returns the XVIZ Metadata if present.
+Returns: the XVIZ Metadata if present
 
-### getFrameIterator(range, options = {})
+##### getFrameIterator(range, options)
 
-Returns an [iterator object](/docs/api-reference/io/xviz-provider-iterator.md).
+Parameters:
 
-_Parameters:_
-
-- **range.startTime** (Number, optional) - The start time to being interation. If absent, set to the
+- `range.startTime` (Number, optional) - The start time to being interation. If absent, set to the
   start of the log.
-- **range.endTime** (Number, optional) - The end time to stop iteration. If absent, set to the end
-  of the log.
-- **options** (Object) - Implementation defined.
+- `range.endTime` (Number, optional) - The end time to stop iteration. If absent, set to the end of
+  the log.
+- `options` (Object) - Implementation defined.
 
-#### xvizFrame(iterator)
+Returns: ([iterator](/docs/api-reference/io/xviz-provider-iterator.md)) - iterator object for frames
 
-Returns an XVIZData object or null if the iterator is invalid.
+##### xvizFrame(iterator)
 
-_Parameters:_
+Parameters:
 
-- **iterator** (Object) - An [iterator](./xviz-provider-iterator.md) obtained from the method
-  `getFrameIterator()`
+- `iterator` (Object) - An [iterator](/docs/api-reference/io/xviz-provider-iterator.md) obtained
+  from the method [getFrameIterator()](#getFrameIterator)
+
+Returns: ([XVIZData](/docs/api-reference/io/xviz-data.md)) - object or null if the iterator is
+invalid

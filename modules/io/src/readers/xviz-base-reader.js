@@ -66,33 +66,37 @@ export class XVIZBaseReader {
     const lastFrame = frameCount > 0 ? frameCount - 1 : 0;
 
     if (timestamp < startTime) {
-      return [0, 0];
+      return {first: 0, last: 0};
     }
 
     if (timestamp > endTime) {
-      return [lastFrame, lastFrame];
+      return {first: lastFrame, last: lastFrame};
     }
 
-    let startIndex = timing.findIndex(timeEntry => timeEntry[0] >= timestamp);
-    let endIndex = timing
-      .slice()
-      .reverse()
-      .findIndex(timeEntry => timeEntry[1] <= timestamp);
+    let first = timing.findIndex(timeEntry => timeEntry[0] >= timestamp);
 
-    if (startIndex === -1) {
-      startIndex = 0;
+    // Reverse search for end index
+    let last = -1;
+    let i = lastFrame;
+    while (i >= 0) {
+      const timeEntry = timing[i];
+      if (timeEntry[1] <= timestamp) {
+        last = i;
+        break;
+      }
+
+      i--;
     }
 
-    if (endIndex === -1) {
-      endIndex = lastFrame;
+    if (first === -1) {
+      first = 0;
     }
 
-    // TODO: this smells like an error in the logic
-    if (endIndex < startIndex) {
-      endIndex = startIndex;
+    if (last === -1) {
+      last = lastFrame;
     }
 
-    return [startIndex, endIndex];
+    return {first, last};
   }
 
   close() {

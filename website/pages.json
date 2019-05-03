@@ -256,12 +256,12 @@
             "name": "Overview",
             "markdown": "api-reference/io/overview.md"
           },
-          { "name": "Constants",
-            "markdown": "api-reference/io/constants.md"
-          },
           {
             "name": "XVIZData",
             "markdown": "api-reference/io/xviz-data.md"
+          },
+          { "name": "XVIZFormat",
+            "markdown": "api-reference/io/xviz-format.md"
           },
           {
             "name": "XVIZMessage",
@@ -270,6 +270,10 @@
           {
             "name": "Sources and Sinks",
             "children": [
+              {
+                "name": "Overview",
+                "markdown": "api-reference/io/overview-source-sink.md"
+              },
               {
                 "name": "XVIZFileSink",
                 "markdown": "api-reference/io/xviz-file-sink.md"
@@ -289,7 +293,7 @@
             "children": [
               {
                 "name": "Overview",
-                "markdown": "api-reference/io/overview-readers.md"
+                "markdown": "api-reference/io/overview-reader.md"
               },
               {
                 "name": "XVIZJSONReader",

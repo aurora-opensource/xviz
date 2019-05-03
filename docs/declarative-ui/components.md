@@ -290,8 +290,8 @@ components:
 ## Select (WARNING: Unstable feature)
 
 The Select components allows dynamically configuring the XVIZ transformation done on data sent to
-client. The component displays a list of options populated by a XVIZ variable stream, and allows the
-user to select one of them. This also known as a "combobox" or "dropdown".
+client. The component displays a list of options populated by an XVIZ variable stream, and allows
+the user to select one of them. This also known as a "combobox" or "dropdown".
 
 When a new option is selected the client sends backend a message reconfiguration with the updated
 value then:

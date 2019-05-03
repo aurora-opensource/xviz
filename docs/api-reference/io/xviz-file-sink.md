@@ -1,18 +1,18 @@
 # FileSink
 
-A file-based implementation for the SinkInterface
+A file-based implementation for the Sink Interface
 
 ## Constructor
 
-_Parameters:_
+Parameters:
 
-- **rootDirectory** - The root directory path used to read data.
+- `root` (string) - The root directory path used to read data.
 
 ## Methods
 
 ### writeSync(name, data)
 
-_Parameters:_
+Parameters:
 
-- **name** - The identifier of the data to write.
-- **data** - The data to write.
+- `name` (string) - The name used to identify the data
+- `data` (Object|string|ArrayBuffer|Buffer) - The data to write

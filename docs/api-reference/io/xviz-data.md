@@ -10,18 +10,23 @@ XVIZ data from a server.
 
 ## Constructor
 
-_Parameters:_
+Parameters:
 
-- **data** (Object|ArrayBuffer|Buffer|String) - XVIZ data of any format.
+- `data` (Object|string|ArrayBuffer|Buffer) - XVIZ data of any format
 
 ## Properties
 
-- **buffer** - the original data passed into this object.
-- **format** - The [XVIZFormat](./constants.md) of the data.
+- `buffer` (Object|string|ArrayBuffer|Buffer) - the original data passed into this object
+- `format` ([XVIZFormat](/docs/api-reference/io/xviz-format.md)) - The format of the data
 
 ## Methods
 
-- **message()** - Parses the data and returns an
-  [XVIZMessage](/docs/api-reference/io/xviz-message.md).
+### message()
 
-- **hasMessage()** - Returns \*true if the original data has been parsed into a message.
+Parses the data and returns an [XVIZMessage](/docs/api-reference/io/xviz-message.md).
+
+Returns: ([XVIZMessage](/docs/api-reference/io/xviz-message.md)) - Object to access XVIZ data
+
+### hasMessage()
+
+Returns: (Boolean) - `true` if the original data has been parsed into a message.

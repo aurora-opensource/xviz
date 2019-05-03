@@ -1,6 +1,6 @@
 # XVIZ Tool
 
-The `xviz` tool is the primary program in a XVIZ client or server developers toolkit. The goal for
+The `xviz` tool is the primary program in an XVIZ client or server developers toolkit. The goal for
 this tool is to be to a combination curl, wget, a simple HTTP server, and a specification validator
 all in one.
 
@@ -22,7 +22,7 @@ $ xviz dump --condensed ws://localhost:8088 9f54b978-1186-4082-a2e6-e8f1e70abdd7
 
 ## XVIZ Data Location
 
-All commands start with a xviz data location that specifies the source of the XVIZ data to process
+All commands start with an xviz data location that specifies the source of the XVIZ data to process
 and options to bound it.
 
 ```

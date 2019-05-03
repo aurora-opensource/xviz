@@ -49,7 +49,7 @@ export class XVIZMessage {
       return;
     }
 
-    // TODO: Should we ever support a missing envelope
+    // TODO: We should not support data w/o and envelope
     // Raw data, detect by parsing
     if (this.message.version) {
       this._message = {
@@ -70,22 +70,5 @@ export class XVIZMessage {
         data: this.message
       };
     }
-    // start
-    //  version session_type, message_format
-    //  ? what is the default
-    // error
-    //   message
-    // transform_log_done
-    //  id
-    // transform_log
-    //  id
-    //    start_timestamp
-    //    end_timestamp
-    //    desired_streams
-    // reconfigure
-    //   update_type
-    //   config_update
-    // transform_point_in_time
-    //  id, query_timestamp
   }
 }
