@@ -10,16 +10,6 @@ ENV PATH /xviz/node_modules/.bin:$PATH
 
 ENV DISPLAY :99
 
-RUN echo "deb http://archive.ubuntu.com/ubuntu/ trusty multiverse \
-deb-src http://archive.ubuntu.com/ubuntu/ trusty multiverse \
-deb http://archive.ubuntu.com/ubuntu/ trusty-updates multiverse \
-deb-src http://archive.ubuntu.com/ubuntu/ trusty-updates multiverse \
-deb http://archive.ubuntu.com/ubuntu/ trusty-security multiverse \
-deb-src http://archive.ubuntu.com/ubuntu/ trusty-security multiverse" >> /etc/apt/sources.list
-
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 40976EAF437D05B5
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 3B4FE6ACC0B21F32
-
 RUN apt-get update
 
 # required by lint script
@@ -39,6 +29,11 @@ RUN  apt-get update \
   && chmod +x /usr/sbin/wait-for-it.sh
 
 # fonts
+
+RUN apt-get install -y --no-install-recommends software-properties-common curl
+RUN apt-add-repository multiverse
+RUN apt-get update
+
 # http://askubuntu.com/a/25614
 RUN echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | debconf-set-selections
 RUN apt-get install -y --no-install-recommends fontconfig ttf-mscorefonts-installer
