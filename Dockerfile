@@ -29,11 +29,11 @@ RUN  apt-get update \
   && chmod +x /usr/sbin/wait-for-it.sh
 
 # fonts
-RUN echo "deb http://archive.ubuntu.com/ubuntu/ trusty multiverse
-deb-src http://archive.ubuntu.com/ubuntu/ trusty multiverse
-deb http://archive.ubuntu.com/ubuntu/ trusty-updates multiverse
-deb-src http://archive.ubuntu.com/ubuntu/ trusty-updates multiverse
-deb http://archive.ubuntu.com/ubuntu/ trusty-security multiverse
+RUN echo "deb http://archive.ubuntu.com/ubuntu/ trusty multiverse \
+deb-src http://archive.ubuntu.com/ubuntu/ trusty multiverse \
+deb http://archive.ubuntu.com/ubuntu/ trusty-updates multiverse \
+deb-src http://archive.ubuntu.com/ubuntu/ trusty-updates multiverse \
+deb http://archive.ubuntu.com/ubuntu/ trusty-security multiverse \
 deb-src http://archive.ubuntu.com/ubuntu/ trusty-security multiverse" >> /etc/apt/sources.list
 
 # from http://askubuntu.com/a/25614
