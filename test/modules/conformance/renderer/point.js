@@ -24,12 +24,12 @@ const STREAM_STYLES = [
   'point_color_domain'
 ];
 
-export default function renderPoint({context, pointCloud, stylesheet, project}) {
+export default function renderPoint({context, feature, stylesheet, project}) {
   const streamStyles = getStyles(stylesheet, STREAM_STYLES, {});
 
   // Resolve styles
-  const vertices = unflattenVertices(pointCloud.positions);
-  const colors = pointCloud.colors && unflattenVertices(pointCloud.colors, vertices.length);
+  const vertices = unflattenVertices(feature.points);
+  const colors = feature.colors && unflattenVertices(feature.colors, vertices.length);
   const colorMode = streamStyles.point_color_mode;
   const colorDomain = streamStyles.point_color_domain;
   const radiusPixels = streamStyles.radius_pixels;

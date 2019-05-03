@@ -58,9 +58,6 @@ export default function renderXVIZ(context, frames) {
       if (stream.features) {
         stream.features.forEach(feature => renderer({context, feature, stylesheet, project}));
       }
-      if (stream.pointCloud) {
-        renderer({context, pointCloud: stream.pointCloud, stylesheet, project});
-      }
     }
   }
 }
