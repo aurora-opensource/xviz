@@ -29,9 +29,18 @@ RUN  apt-get update \
   && chmod +x /usr/sbin/wait-for-it.sh
 
 # fonts
-RUN apt-get install msttcorefonts-installer fontconfig && \
-  update-ms-fonts && \
-  fc-cache -f
+RUN echo "deb http://archive.ubuntu.com/ubuntu/ trusty multiverse
+deb-src http://archive.ubuntu.com/ubuntu/ trusty multiverse
+deb http://archive.ubuntu.com/ubuntu/ trusty-updates multiverse
+deb-src http://archive.ubuntu.com/ubuntu/ trusty-updates multiverse
+deb http://archive.ubuntu.com/ubuntu/ trusty-security multiverse
+deb-src http://archive.ubuntu.com/ubuntu/ trusty-security multiverse" >> /etc/apt/sources.list
+
+# from http://askubuntu.com/a/25614
+RUN echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | debconf-set-selections
+RUN apt-get install -y --no-install-recommends fontconfig ttf-mscorefonts-installer
+ADD localfonts.conf /etc/fonts/local.conf
+RUN fc-cache -f -v
 
 COPY . /xviz/
 
