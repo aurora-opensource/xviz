@@ -29,11 +29,6 @@ RUN  apt-get update \
   && chmod +x /usr/sbin/wait-for-it.sh
 
 # fonts
-
-RUN apt-get install -y --no-install-recommends software-properties-common curl
-RUN apt-add-repository multiverse
-RUN apt-get update
-
 # http://askubuntu.com/a/25614
 RUN echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | debconf-set-selections
 RUN apt-get install -y fontconfig msttcorefonts-installer \
