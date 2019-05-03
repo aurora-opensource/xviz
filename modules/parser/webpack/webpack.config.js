@@ -50,6 +50,9 @@ module.exports = {
     ]
   },
 
+  // Uncomment to debug
+  // plugins: [new require('webpack-bundle-analyzer').BundleAnalyzerPlugin()],
+
   // TODO/ib - workaround for @loaders.gl/core fs dependency, remove when loaders.gl fixes this
   node: {
     fs: 'empty'

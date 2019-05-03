@@ -44,3 +44,18 @@ $ ./scripts/download-kitti-data.sh
 # Convert KITTI data if necessary and run the XVIZ Server and Client
 $ ./scripts/run-kitti-example.sh
 ```
+
+## NPM Scripts
+
+- `bootstrap` - install dependencies
+- `build` - rebuild all modules
+- `test` - run full tests (lint, unit tests in node and headless browser)
+- `test bench` | `bench` - run benchmark tests
+- `test bench-browser` - run benchmark tests in browser
+- `test node` - run unit tests in Node
+- `test browser` - run tests in browser
+- `test browser-headless` - run tests in headless browser
+- `lint` - run lint
+- `lint fix` - run prettier
+- `publish beta` - publish beta release
+- `publish prod` - publish production release

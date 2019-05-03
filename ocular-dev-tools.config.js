@@ -11,11 +11,26 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+const {resolve} = require('path');
 
-require('./modules/update-test-cases');
+module.exports = {
+  lint: {
+    paths: ['modules', 'docs', 'test', 'examples'],
+    extensions: ['js', 'md']
+  },
 
-require('./modules/builder');
-require('./modules/parser');
-require('./modules/schema');
-require('./modules/cli');
-require('./website');
+  aliases: {
+    // TEST
+    'test-data': resolve(__dirname, 'test/data'),
+
+    '@xviz/conformance': resolve(__dirname, 'modules/conformance'),
+    '@xviz/schema/dist': resolve(__dirname, 'modules/schema/dist')
+  },
+
+  entry: {
+    test: 'test/index.js',
+    'test-browser': 'test/browser.js',
+    bench: 'test/bench/index.js',
+    'bench-browser': 'test/bench/browser.js'
+  }
+};

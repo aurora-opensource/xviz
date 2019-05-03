@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import '@loaders.gl/polyfills';
 import {GLTFBuilder} from '@loaders.gl/gltf';
 import {packBinaryJson} from './xviz-pack-binary';
 

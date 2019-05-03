@@ -1,2 +1,3 @@
 **/dist*/**/*.js
 *.min.js
+test/modules/parser/*.worker.js

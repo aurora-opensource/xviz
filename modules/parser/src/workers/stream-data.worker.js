@@ -15,4 +15,6 @@
 /* global self */
 import getStreamDataWorker from './stream-data-worker';
 
-getStreamDataWorker({})(self);
+if (typeof self !== 'undefined') {
+  getStreamDataWorker({})(self);
+}
