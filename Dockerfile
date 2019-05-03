@@ -11,10 +11,9 @@ ENV PATH /xviz/node_modules/.bin:$PATH
 ENV DISPLAY :99
 
 RUN apt-get update
-RUN apt-get -y install libxi-dev libgl1-mesa-dev xvfb jq
 
-ADD .buildkite/xvfb /etc/init.d/xvfb
-RUN chmod a+x /etc/init.d/xvfb
+# required by lint script
+RUN apt-get -y install jq
 
 # https://github.com/buildkite/docker-puppeteer/blob/master/Dockerfile
 RUN  apt-get update \
@@ -28,6 +27,11 @@ RUN  apt-get update \
   && rm -rf /var/lib/apt/lists/* \
   && wget --quiet https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh -O /usr/sbin/wait-for-it.sh \
   && chmod +x /usr/sbin/wait-for-it.sh
+
+# fonts
+sudo apt-get install ttf-mscorefonts-installer
+sudo fc-cache
+fc-match Arial
 
 COPY . /xviz/
 
