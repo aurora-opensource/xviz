@@ -29,7 +29,7 @@ RUN  apt-get update \
   && chmod +x /usr/sbin/wait-for-it.sh
 
 # fonts
-RUN apk --no-cache add msttcorefonts-installer fontconfig && \
+RUN apt-get install msttcorefonts-installer fontconfig && \
   update-ms-fonts && \
   fc-cache -f
 
