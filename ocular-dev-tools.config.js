@@ -27,6 +27,13 @@ module.exports = {
     '@xviz/schema/dist': resolve(__dirname, 'modules/schema/dist')
   },
 
+  browserTest: {
+    browser: {
+      // Required by CI
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    }
+  },
+
   entry: {
     test: 'test/index.js',
     'test-browser': 'test/browser.js',

@@ -36,7 +36,7 @@
     "coveralls": "^3.0.0",
     "cross-spawn": "^6.0.5",
     "jsonlint": "^1.6.3",
-    "ocular-dev-tools": "0.0.21",
+    "ocular-dev-tools": "0.0.22",
     "pre-commit": "^1.2.2",
     "reify": "^0.18.1",
     "walk": "^2.3.14"
