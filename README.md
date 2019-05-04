@@ -1,5 +1,7 @@
 # XVIZ
 
+[![Coverage Status](https://coveralls.io/repos/github/uber/xviz/badge.svg?branch=master)](https://coveralls.io/github/uber/xviz?branch=master)
+
 XVIZ is a protocol for real-time transfer and visualization of autonomy data. Learn more in the
 [docs and specification](http://avs.auto/#/xviz).
 
