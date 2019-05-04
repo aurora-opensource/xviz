@@ -2,3 +2,14 @@ version: '2'
 services:
   xviz:
     build: .
+    environment:
+      - BUILDKITE
+      - BUILDKITE_BUILD_NUMBER
+      - BUILDKITE_BUILD_ID
+      - BUILDKITE_PULL_REQUEST
+      - BUILDKITE_COMMIT
+      - BUILDKITE_BRANCH
+      - BUILDKITE_BUILD_CREATOR
+      - BUILDKITE_BUILD_CREATOR_EMAIL
+      - BUILDKITE_MESSAGE
+      - COVERALLS_REPO_TOKEN
