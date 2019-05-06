@@ -54,7 +54,7 @@ export class VisualizationMarkerArray {
     const messages = frame[this.topic];
     if (messages) {
       for (const {message} of messages) {
-        message.markers.forEach(this._processMarker);
+        message.markers.forEach(marker => this._processMarker);
       }
     }
 
@@ -135,11 +135,11 @@ export class VisualizationMarkerArray {
     */
 
     const WRITERS = {
-      '0': this._writeArrow,
-      '2': this._writeSphere,
-      '4': this._writeLineStrip,
-      '5': this._writeLineList,
-      '9': this._writeText
+      '0': this._writeArrow.bind(this),
+      '2': this._writeSphere.bind(this),
+      '4': this._writeLineStrip.bind(this),
+      '5': this._writeLineList.bind(this),
+      '9': this._writeText.bind(this)
     };
 
     /*
@@ -161,7 +161,7 @@ export class VisualizationMarkerArray {
     });
   }
 
-  _writeArrow = (marker, xvizBuilder) => {
+  _writeArrow(marker, xvizBuilder) {
     const points = this._makeArrow(marker.points, marker.pose);
     // Add a perpendicular-ish point to form a makeshift arrow
     /*
@@ -175,9 +175,9 @@ export class VisualizationMarkerArray {
       .polyline(points)
       .style({stroke_color: this._toColor(marker)})
       .id(this._getMarkerId(marker));
-  };
+  }
 
-  _writeSphere = (marker, xvizBuilder) => {
+  _writeSphere(marker, xvizBuilder) {
     const RADIUS = marker.scale.x / 2;
     const points = this._mapPoints([{x: 0, y: 0, z: 0}], marker.pose);
 
@@ -186,17 +186,17 @@ export class VisualizationMarkerArray {
       .circle(points[0], RADIUS)
       .style({fill_color: this._toColor(marker)})
       .id(this._getMarkerId(marker));
-  };
+  }
 
-  _writeLineStrip = (marker, xvizBuilder) => {
+  _writeLineStrip(marker, xvizBuilder) {
     xvizBuilder
       .primitive(this.LINESTRIP_STREAM)
       .polyline(this._mapPoints(marker.points, marker.pose))
       .style({stroke_color: this._toColor(marker)})
       .id(this._getMarkerId(marker));
-  };
+  }
 
-  _writeLineList = (marker, xvizBuilder) => {
+  _writeLineList(marker, xvizBuilder) {
     const lines = _.chunk(marker.points, 2);
     lines.forEach((line, index) => {
       xvizBuilder
@@ -205,9 +205,9 @@ export class VisualizationMarkerArray {
         .style({stroke_color: this._toColor(marker)})
         .id([this._getMarkerId(marker), index].join(NAMESPACE_SEPARATOR));
     });
-  };
+  }
 
-  _writeText = (marker, xvizBuilder) => {
+  _writeText(marker, xvizBuilder) {
     const points = this._mapPoints(
       [
         {x: 0, y: 0, z: 2} // z=2 to float above
@@ -219,7 +219,7 @@ export class VisualizationMarkerArray {
       .primitive(this.TEXT_STREAM)
       .position(points[0])
       .text(marker.text);
-  };
+  }
 
   _toColor(marker) {
     const color = marker.color || (marker.colors || [])[0];
@@ -272,7 +272,7 @@ export class VisualizationMarkerArray {
     return [p[0], pCross, leftPt, p[1], rightPt, pCross];
   }
 
-  _processMarker = marker => {
+  _processMarker(marker) {
     const markerId = this._getMarkerId(marker);
 
     if (marker.action === ACTION_ADD) {
@@ -294,7 +294,7 @@ export class VisualizationMarkerArray {
     } else if (marker.action === ACTION_DELETE_ALL) {
       this.markersMap = {};
     }
-  };
+  }
 
   _getMarkerId(marker) {
     return [marker.ns, marker.id].join(NAMESPACE_SEPARATOR);
