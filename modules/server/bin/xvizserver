@@ -37,8 +37,9 @@ if (
   });
 
   require('source-map-support').install();
-
-  const ALIASES = require('../../../aliases');
+  const ALIASES = require('ocular-dev-tools/config/ocular.config')({
+      root: resolve(__dirname, '../../..')
+  }).aliases;
   const moduleAlias = require('module-alias');
   moduleAlias.addAliases(ALIASES);
 

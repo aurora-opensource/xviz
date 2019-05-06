@@ -20,7 +20,7 @@ export class WebsocketSink {
   }
 
   writeSync(name, data) {
-    let { compress = false } = this.options;
+    let {compress = false} = this.options;
     if (typeof data === 'string') {
       compress = true;
     }
@@ -77,7 +77,7 @@ export class XVIZWebsocketSender {
   // Data is in the desired format and can be written to sink directly
   _sendDataDirect(msg) {
     const {format} = this.options;
-    const sourceFormat = msg.data.dataFormat();
+    const sourceFormat = msg.data.format;
 
     if (!format || sourceFormat === format) {
       // need to check if object() has been called (ie it might be dirty) and repack
@@ -97,7 +97,7 @@ export class XVIZWebsocketSender {
 
       // Test to determine if msg is either string or arraybuffer
       if (
-        msg.data.dataFormat() === XVIZFormat.object ||
+        msg.data.format === XVIZFormat.object ||
         (!msg.data.hasMessage() &&
           typeof msg.data.buffer !== 'string' &&
           !msg.data.buffer.byteLength)
@@ -106,7 +106,7 @@ export class XVIZWebsocketSender {
       }
 
       // return the format set to the current data format
-      return {...this.options, format: msg.data.dataFormat()};
+      return {...this.options, format: msg.data.format};
     }
 
     return this.options;
@@ -125,7 +125,7 @@ export class XVIZWebsocketSender {
     if (this._sendDataDirect(msg)) {
       this.sink.writeSync(`1-frame`, msg.data.buffer);
     } else {
-      this._syncFormatWithWriter(format, msg.data.dataFormat());
+      this._syncFormatWithWriter(format, msg.data.format);
       this.writer.writeMetadata(msg.data);
     }
   }
@@ -136,7 +136,7 @@ export class XVIZWebsocketSender {
     if (this._sendDataDirect(msg)) {
       this.sink.writeSync('2-frame', msg.data.buffer);
     } else {
-      this._syncFormatWithWriter(format, msg.data.dataFormat());
+      this._syncFormatWithWriter(format, msg.data.format);
       this.writer.writeFrame(0, msg.data);
     }
   }
