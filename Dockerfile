@@ -13,7 +13,7 @@ ENV DISPLAY :99
 RUN apt-get update
 
 # required by lint script
-RUN apt-get -y install jq xorg-x11-fonts
+RUN apt-get -y install jq
 
 # https://github.com/buildkite/docker-puppeteer/blob/master/Dockerfile
 RUN  apt-get update \
