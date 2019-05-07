@@ -104,7 +104,7 @@ const DEFAULT_STYLES = {
   stroke_color: [0, 0, 0],
   fill_color: [255, 255, 255],
 
-  font_family: 'Arial',
+  font_family: 'Arial,Helvetica,sans-serif',
   font_weight: 'normal',
   text_size: 12,
   text_rotation: 0,
