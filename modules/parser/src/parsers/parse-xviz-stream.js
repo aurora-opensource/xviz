@@ -159,7 +159,17 @@ export function parseStreamPrimitive(primitives, streamName, time, convertPrimit
   }
 
   primitiveMap.vertices = joinFeatureVerticesToTypedArrays(primitiveMap.features);
-  primitiveMap.pointCloud = joinObjectPointCloudsToTypedArrays(primitiveMap.pointCloud);
+  const pointCloud = joinObjectPointCloudsToTypedArrays(primitiveMap.pointCloud);
+  if (pointCloud) {
+    primitiveMap.features.push({
+      type: pointCloud.type,
+      points: pointCloud.positions,
+      colors: pointCloud.colors,
+      ids: pointCloud.ids
+    });
+  }
+  // Backward compatibility
+  primitiveMap.pointCloud = pointCloud;
   primitiveMap.time = time;
 
   return primitiveMap;

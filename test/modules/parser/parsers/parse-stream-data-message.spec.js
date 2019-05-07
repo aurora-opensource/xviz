@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
+/* eslint-disable max-statements */
 import {
   setXVIZConfig,
   getXVIZConfig,
@@ -441,6 +441,11 @@ tape('parseStreamLogData timeslice without parsing metadata (v1)', t => {
     metaMessage.streams['/test/stream'].pointCloud,
     'v1 pointCloud is parsed even if metadata was not seen'
   );
+  t.is(
+    metaMessage.streams['/test/stream'].features[0].type,
+    'points3d',
+    'pointCloud exposed in features'
+  );
   t.deepEquals(metaMessage.streams['/test/stream'].pointCloud.ids, [1234], 'v1 ids are populated');
   t.end();
 });
@@ -478,11 +483,16 @@ tape('parseStreamLogData pointCloud timeslice', t => {
   // NOTE: no explicit type for this message yet.
   const slice = parseStreamLogData({...PointCloudTestTimesliceMessage});
   t.equals(slice.type, LOG_STREAM_MESSAGE.TIMESLICE, 'Message type set for timeslice');
-  t.ok(slice.streams['/test/stream'].pointCloud, 'has a point cloud');
 
   const pointCloud = slice.streams['/test/stream'].pointCloud;
+  const feature = slice.streams['/test/stream'].features[0];
+  t.ok(pointCloud, 'has a point cloud');
+  t.is(feature.type, 'point', 'pointCloud exposed in features');
+
   t.equals(pointCloud.numInstances, 1, 'Has 1 instance');
   t.equals(pointCloud.positions.length, 3, 'Has 3 values in positions');
+  t.equals(pointCloud.positions, feature.points, 'Feature has points');
+  t.equals(pointCloud.colors, feature.colors, 'Feature has colors');
 
   t.end();
 });
@@ -565,12 +575,16 @@ tape('parseStreamLogData flat JSON pointCloud', t => {
   // NOTE: no explicit type for this message yet.
   let slice = parseStreamLogData({...PointCloudTestTimesliceMessage});
   t.equals(slice.type, LOG_STREAM_MESSAGE.TIMESLICE, 'Message type set for timeslice');
-  t.ok(slice.streams['/test/stream'].pointCloud, 'has a point cloud');
 
   let pointCloud = slice.streams['/test/stream'].pointCloud;
+  const feature = slice.streams['/test/stream'].features[0];
+  t.ok(pointCloud, 'has a point cloud');
+  t.is(feature.type, 'point', 'pointCloud exposed in features');
   t.equals(pointCloud.numInstances, 1, 'Has 1 instance');
   t.deepEquals(pointCloud.positions, [1000, 1000, 200], 'Has correct values in positions');
   t.deepEquals(pointCloud.colors, null, 'Does not contain colors');
+  t.equals(pointCloud.positions, feature.points, 'Feature has points');
+  t.equals(pointCloud.colors, feature.colors, 'Feature has colors');
 
   // v1 inline color
   stream.points[0].color = [0, 0, 255];
@@ -644,12 +658,17 @@ tape('parseStreamLogData pointCloud timeslice', t => {
   // NOTE: no explicit type for this message yet.
   const slice = parseStreamLogData({...PointCloudTestTimesliceMessage});
   t.equals(slice.type, LOG_STREAM_MESSAGE.TIMESLICE, 'Message type set for timeslice');
-  t.ok(slice.streams['/test/stream'].pointCloud, 'has a point cloud');
 
   const pointCloud = slice.streams['/test/stream'].pointCloud;
+  const feature = slice.streams['/test/stream'].features[0];
+  t.ok(pointCloud, 'has a point cloud');
+  t.is(feature.type, 'point', 'pointCloud exposed in features');
+
   t.equals(pointCloud.numInstances, 2, 'Has 2 instance');
   t.equals(pointCloud.positions.length, 6, 'Has 6 values in positions');
   t.equals(pointCloud.ids.length, 2, 'Has 2 values in ids');
+  t.equals(pointCloud.positions, feature.points, 'Feature has points');
+  t.equals(pointCloud.colors, feature.colors, 'Feature has colors');
 
   t.end();
 });
