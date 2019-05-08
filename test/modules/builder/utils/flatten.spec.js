@@ -60,7 +60,7 @@ test('flatten#import', t => {
   t.end();
 });
 
-test.only('flatten#flattenToTypedArray', t => {
+test('flatten#flattenToTypedArray', t => {
   for (const tc of FLATTEN_VERTICES_TEST_CASES) {
     const result = flattenToTypedArray(tc.argument);
     t.deepEqual(result, tc.result, `flattenToTypedArray ${tc.title} returned expected result`);
