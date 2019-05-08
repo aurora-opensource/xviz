@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+function isNestedDimension(array) {
+  return array.length && Array.isArray(array) && Array.isArray(array[0]);
+}
+
 export function flattenToTypedArray(nestedArray, dimensions = 3, ArrayType = Float32Array) {
   if (nestedArray.length === 0) {
     return new Float32Array(0);
@@ -19,6 +23,11 @@ export function flattenToTypedArray(nestedArray, dimensions = 3, ArrayType = Flo
 
   if (!checkVertices(nestedArray)) {
     return null;
+  }
+
+  // Handle case where the array is already flattened.
+  if (!isNestedDimension(nestedArray)) {
+    return ArrayType.from(nestedArray);
   }
 
   const count = countVertices(nestedArray, dimensions);

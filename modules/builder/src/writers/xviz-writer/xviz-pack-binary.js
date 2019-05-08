@@ -68,17 +68,23 @@ export function packBinaryJson(json, gltfBuilder, objectKey = null, options = {}
 function flattenObject(key, object) {
   if (key === 'vertices' || key === 'points') {
     // Flatten nested vertices
-    return {
-      typedArray: flattenToTypedArray(object, 3, Float32Array),
-      size: 3
-    };
+    const typedArray = flattenToTypedArray(object, 3, Float32Array);
+    if (typedArray) {
+      return {
+        typedArray,
+        size: 3
+      };
+    }
   }
   if (key === 'colors') {
     const size = object[0].length === 4 ? 4 : 3;
-    return {
-      typedArray: flattenToTypedArray(object, size, Uint8Array),
-      size
-    };
+    const typedArray = flattenToTypedArray(object, size, Uint8Array);
+    if (typedArray) {
+      return {
+        typedArray,
+        size
+      };
+    }
   }
   return null;
 }

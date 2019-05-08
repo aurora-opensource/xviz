@@ -13,3 +13,4 @@
 // limitations under the License.
 
 import './xviz-writer.spec.js';
+import './xviz-writer-points.spec.js';
