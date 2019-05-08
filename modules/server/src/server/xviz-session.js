@@ -25,17 +25,26 @@ export class XVIZSession {
   }
 
   async newSession(socket, req) {
-    // Root is needed for some XVIZ sources
-    const root = path.join(this.options.d, req.path);
+    let provider = null;
 
-    // FileSource is used for a JSON/GLB sources
-    const source = new FileSource(root);
+    const dirs = Array.isArray(this.options.d) ? this.options.d : [this.options.d];
+    for (let i = 0; i < dirs.length; i++) {
+      // Root is needed for some XVIZ sources
+      const root = path.join(dirs[i], req.path);
 
-    const provider = await this.factory.open({
-      source,
-      options: req.params,
-      root
-    });
+      // FileSource is used for a JSON/GLB sources
+      const source = new FileSource(root);
+
+      provider = await this.factory.open({
+        source,
+        options: req.params,
+        root
+      });
+      
+      if (provider) {
+        break;
+      }
+    }
 
     if (provider) {
       return new XVIZSessionHandler(socket, req, provider, this.options);
