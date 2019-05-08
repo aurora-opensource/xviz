@@ -12,12 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-function isNestedDimension(array) {
-  return (
-    array.length &&
-    Array.isArray(array) &&
-    (Array.isArray(array[0]) || ArrayBuffer.isView(array[0]))
-  );
+function isFlattened(array) {
+  return Number.isFinite(array[0]);
 }
 
 export function flattenToTypedArray(nestedArray, dimensions = 3, ArrayType = Float32Array) {
@@ -30,7 +26,7 @@ export function flattenToTypedArray(nestedArray, dimensions = 3, ArrayType = Flo
   }
 
   // Handle case where the array is already flattened.
-  if (!isNestedDimension(nestedArray)) {
+  if (isFlattened(nestedArray)) {
     return ArrayType.from(nestedArray);
   }
 
