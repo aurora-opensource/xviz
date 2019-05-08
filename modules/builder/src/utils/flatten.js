@@ -13,7 +13,11 @@
 // limitations under the License.
 
 function isNestedDimension(array) {
-  return array.length && Array.isArray(array) && Array.isArray(array[0]);
+  return (
+    array.length &&
+    Array.isArray(array) &&
+    (Array.isArray(array[0]) || ArrayBuffer.isView(array[0]))
+  );
 }
 
 export function flattenToTypedArray(nestedArray, dimensions = 3, ArrayType = Float32Array) {
