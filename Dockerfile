@@ -12,10 +12,10 @@ ENV DISPLAY :99
 
 RUN apt-get update
 
-RUN apt-get install software-properties-common
-RUN apt-add-repository multiverse
-RUN apt-get update
-RUN apt-get install -y ttf-mscorefonts-installer
+RUN TEMP_DEB="$(mktemp)" \
+  && wget -O "$TEMP_DEB" 'http://http.us.debian.org/debian/pool/contrib/m/msttcorefonts/ttf-mscorefonts-installer_3.6_all.deb' \
+  && dpkg -i "$TEMP_DEB" \
+  && rm -f "$TEMP_DEB"
 
 # required by lint script
 RUN apt-get -y install jq
