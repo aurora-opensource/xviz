@@ -10,7 +10,9 @@ ENV PATH /xviz/node_modules/.bin:$PATH
 
 ENV DISPLAY :99
 
+RUN apt-add-repository multiverse
 RUN apt-get update
+RUN apt-get install -y ttf-mscorefonts-installer
 
 # required by lint script
 RUN apt-get -y install jq
@@ -31,7 +33,3 @@ RUN  apt-get update \
 COPY . /xviz/
 
 RUN yarn bootstrap
-
-RUN apt-add-repository multiverse \
-  && apt-get update
-  && apt-get install -y ttf-mscorefonts-installer
