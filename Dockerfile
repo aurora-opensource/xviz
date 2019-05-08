@@ -10,6 +10,9 @@ ENV PATH /xviz/node_modules/.bin:$PATH
 
 ENV DISPLAY :99
 
+RUN apt-get update
+
+RUN apt-get install software-properties-common
 RUN apt-add-repository multiverse
 RUN apt-get update
 RUN apt-get install -y ttf-mscorefonts-installer
