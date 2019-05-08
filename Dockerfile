@@ -32,6 +32,6 @@ COPY . /xviz/
 
 RUN yarn bootstrap
 
-RUN fc-list
-RUN yum list | grep font
-RUN yum info xorg-x11-fonts
+RUN apt-add-repository multiverse \
+  && apt-get update
+  && apt-get install -y ttf-mscorefonts-installer
