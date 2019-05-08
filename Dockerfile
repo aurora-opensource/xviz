@@ -12,13 +12,14 @@ ENV DISPLAY :99
 
 RUN apt-get update
 
+# required by lint script
+RUN apt-get -y install jq cabextract xfonts-utils
+
+# fonts
 RUN TEMP_DEB="$(mktemp)" \
   && wget -O "$TEMP_DEB" 'http://http.us.debian.org/debian/pool/contrib/m/msttcorefonts/ttf-mscorefonts-installer_3.6_all.deb' \
   && dpkg -i "$TEMP_DEB" \
   && rm -f "$TEMP_DEB"
-
-# required by lint script
-RUN apt-get -y install jq
 
 # https://github.com/buildkite/docker-puppeteer/blob/master/Dockerfile
 RUN  apt-get update \
