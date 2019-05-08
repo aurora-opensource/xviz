@@ -15,6 +15,12 @@
 import test from 'tape-catch';
 import {flattenToTypedArray} from '@xviz/builder/utils';
 
+const typedArray = Float32Array.from([1, 1, 1, 2, 2, 2, 3, 3, 3]);
+const nestedTypedArray = new Array(3);
+nestedTypedArray[0] = typedArray.subarray(0, 3);
+nestedTypedArray[1] = typedArray.subarray(3, 6);
+nestedTypedArray[2] = typedArray.subarray(6);
+
 const FLATTEN_VERTICES_TEST_CASES = [
   {
     title: 'empty array',
@@ -30,7 +36,18 @@ const FLATTEN_VERTICES_TEST_CASES = [
     title: 'nested one level',
     argument: [[1, 2], [1, 2, 3]],
     result: [1, 2, 0, 1, 2, 3]
+  },
+  {
+    title: 'typed array',
+    argument: typedArray,
+    result: [1, 1, 1, 2, 2, 2, 3, 3, 3]
+  },
+  {
+    title: 'nested typed array',
+    argument: nestedTypedArray,
+    result: [1, 1, 1, 2, 2, 2, 3, 3, 3]
   }
+
   // {
   //   title: 'nested empty',
   //   argument: [1, [1, 2, 3], 3],
