@@ -14,7 +14,7 @@
 
 import {writeBinaryXVIZtoFile} from './xviz-binary-writer';
 import {xvizConvertJson} from './xviz-json-encoder.js';
-import {DracoEncoder, DracoDecoder} from '@loaders.gl/draco';
+import {DracoWriter, DracoLoader} from '@loaders.gl/draco';
 
 // 0-frame is an index file for timestamp metadata
 // 1-frame is the metadata file for the log
@@ -99,8 +99,8 @@ export default class XVIZWriter {
       };
 
       if (this.options.draco) {
-        options.DracoEncoder = DracoEncoder;
-        options.DracoDecoder = DracoDecoder;
+        options.DracoWriter = DracoWriter;
+        options.DracoLoader = DracoLoader;
       }
 
       writeBinaryXVIZtoFile(this.sink, xvizDirectory, frameName(frameIndex), xvizFrame, options);
