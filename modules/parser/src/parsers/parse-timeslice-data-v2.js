@@ -13,7 +13,7 @@
 // limitations under the License.
 
 // Extracts a TIMESLICE message v2
-import {LOG_STREAM_MESSAGE} from '../constants';
+import {LOG_STREAM_MESSAGE, STATE_UPDATE_TYPE} from '../constants';
 import {getXVIZConfig} from '../config/xviz-config';
 import {parseXVIZPose} from './parse-xviz-pose';
 import {
@@ -29,11 +29,10 @@ import log from '../utils/log';
 
 export default function parseStreamSet(data, convertPrimitive) {
   const {update_type, updates} = data;
+  const updateType = STATE_UPDATE_TYPE[update_type];
 
-  if (update_type !== 'snapshot') {
-    log.error(
-      `Only XVIZ update_type of "snapshot" is currently supported. Type "${update_type}" is not supported.`
-    )();
+  if (!updateType) {
+    log.error(`update_type of "${update_type}" is not supported.`)();
     return {type: LOG_STREAM_MESSAGE.INCOMPLETE, message: 'Unsupported update type'};
   }
 
@@ -73,6 +72,7 @@ export default function parseStreamSet(data, convertPrimitive) {
   const newStreams = {};
   const result = {
     type: LOG_STREAM_MESSAGE.TIMESLICE,
+    updateType,
     streams: newStreams,
     timestamp
     // TODO/Xintong validate primary vehicle pose in each update?

@@ -64,6 +64,7 @@ message StateUpdate
         not_set = 0;
         snapshot = 1;
         incremental = 2;
+        complete_state = 3;
     }
 
     UpdateType update_type = 1;

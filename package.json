@@ -21,6 +21,7 @@
     "lint": "ocular-lint",
     "publish": "ocular-publish",
     "test": "ocular-test",
+    "test-fast": "ocular-test fast",
     "test-ci": "ocular-test cover && (cat coverage/lcov.info | coveralls)"
   },
   "devDependencies": {
@@ -47,7 +48,7 @@
   },
   "pre-commit": [
     "check-copyright-header",
-    "test"
+    "test-fast"
   ],
   "private": true,
   "dependencies": {
