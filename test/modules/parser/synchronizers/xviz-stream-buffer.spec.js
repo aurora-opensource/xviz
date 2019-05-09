@@ -44,8 +44,15 @@ const TEST_TIMESLICES = [
   },
   {
     id: 'TS-6',
+    updateType: 'INCREMENTAL',
     timestamp: 1001,
     streams: {A: 1.1}
+  },
+  {
+    id: 'TS-7',
+    updateType: 'COMPLETE',
+    timestamp: 1002,
+    streams: {A: 2.2}
   }
 ];
 
@@ -136,10 +143,14 @@ test('XVIZStreamBuffer#insert, getStreams', t => {
   });
 
   const ts1001 = timeslices.find(timeslice => timeslice.timestamp === 1001);
-  t.deepEquals(ts1001.streams, {A: 1.1, C: 1}, 'streams are deep merged');
+  t.deepEquals(ts1001.streams, {A: 1.1, C: 1}, 'incremental update is merged with existing stream');
+
+  const ts1002 = timeslices.find(timeslice => timeslice.timestamp === 1002);
+  t.deepEquals(ts1002.streams, {A: 2.2}, 'complete updates replaced existing stream');
+
   t.deepEquals(
     xvizStreamBuffer.getStreams(),
-    {A: [1.1, 2, 3, 4, 5], B: [0, -1], C: [1]},
+    {A: [1.1, 2.2, 3, 4, 5], B: [-1], C: [1]},
     'getStreams returns correct result'
   );
 

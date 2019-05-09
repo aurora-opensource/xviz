@@ -198,7 +198,7 @@ export default class XVIZStreamBuffer {
    * @params {object} timeslice - timeslice object from XVIZ stream
    */
   insert(timeslice) {
-    const {timestamp} = timeslice;
+    const {timestamp, updateType = 'INCREMENTAL'} = timeslice;
 
     if (!this.isInBufferRange(timestamp)) {
       return false;
@@ -225,10 +225,16 @@ export default class XVIZStreamBuffer {
     const timesliceAtInsertPosition = timeslices[insertPosition];
 
     if (timesliceAtInsertPosition && timesliceAtInsertPosition.timestamp === timestamp) {
-      // Same timestamp, needs a merge
-      this._mergeTimesliceAt(insertPosition, timeslice);
+      // Same timestamp
+      if (updateType === 'INCREMENTAL') {
+        // Merge if it's an incremental update
+        this._mergeTimesliceAt(insertPosition, timeslice);
+      } else {
+        // Replace if it's a complete state
+        this._insertTimesliceAt(insertPosition, 1, timeslice);
+      }
     } else {
-      this._insertTimesliceAt(insertPosition, timeslice);
+      this._insertTimesliceAt(insertPosition, 0, timeslice);
     }
 
     this.lastUpdate++;
@@ -339,16 +345,16 @@ export default class XVIZStreamBuffer {
     }
   }
 
-  _insertTimesliceAt(index, timeslice) {
+  _insertTimesliceAt(index, deleteCount, timeslice) {
     const {timeslices, streams, videos} = this;
 
-    timeslices.splice(index, 0, timeslice);
+    timeslices.splice(index, deleteCount, timeslice);
 
     for (const streamName in streams) {
-      streams[streamName].splice(index, 0, timeslice.streams[streamName]);
+      streams[streamName].splice(index, deleteCount, timeslice.streams[streamName]);
     }
     for (const streamName in videos) {
-      videos[streamName].splice(index, 0, timeslice.videos[streamName]);
+      videos[streamName].splice(index, deleteCount, timeslice.videos[streamName]);
     }
   }
 
