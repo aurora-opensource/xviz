@@ -210,6 +210,10 @@ export default class XVIZStreamBuffer {
 
     const {timeslices, streams, videos} = this;
 
+    // Note: if stream is not present in a timeslice, that index in the list holds undefined
+    // This avoids repeatedly allocating new arrays for each stream, and lowers the cost of
+    // insertion/deletion, which can be a significant perf hit depending on frame rate and
+    // buffer size.
     for (const streamName in timeslice.streams) {
       if (!streams[streamName]) {
         streams[streamName] = new Array(timeslices.length);
@@ -338,7 +342,13 @@ export default class XVIZStreamBuffer {
     });
 
     for (const streamName in timeslice.streams) {
-      streams[streamName][index] = timeslice.streams[streamName];
+      let value = timeslice.streams[streamName];
+      if (value === null) {
+        // Explicitly delete a stream
+        delete timesliceAtInsertPosition.streams[streamName];
+        value = undefined;
+      }
+      streams[streamName][index] = value;
     }
     for (const streamName in timeslice.videos) {
       videos[streamName][index] = timeslice.videos[streamName];
