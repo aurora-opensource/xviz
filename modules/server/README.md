@@ -1,83 +1,44 @@
-# XVIZServer
+# @xviz/server Overview
 
-This is a server to handle XVIZ hosting from multiple data sources.
+A server to handle hosting XVIZ data from multiple data sources.
 
-The server operates by defining a middleware stack, and options will control how that stack is
-structured and how requests and data are processed through that stack.
+The server operates by defining a middleware stack and options will control how that stack is
+structured and how requests and data are processed through the stack.
 
-The flow does try to preserve a no touch data flow, but does allow conversions and eventually
-filtering of data.
+The server tries to preserve a no-touch data flow, but does allow conversions and mutation 
+of data.
 
-This is stil a work in progress
+## Examples
 
-# XVIZServer(session, opts)
+For a list of all options type `./bin/babel-xvizserver --help`.
 
-# XVIZSession(factory)
+### KITTI data
 
-onConnection create SessionHandler if supported
+This example shows how to server the KITTI data once converted.
 
-# XVIZSessionHandler(socket, request, source, opts)
+```
+$ cd modules/server
+$ ./bin/babel-xvizserver -d ../../data/generated/kitti/2011_09_26/2011_09_26_drive_0005_sync
+```
 
-construct middleware stack for request/opts
+### Test Scenarios
 
-# XVIZServerMiddlewareStack
+The default server supports test XVIZ scenarios that can be accessed at the following URL's:
 
-Server middleware models the client side middleware to support a stack of handlers that will receive
-the `(request, msg)`.
+ - /scenario-circle
+ - /scenario-straight
 
-_request_ is the object of the original request from the client. _msg_ will be the current response
-if is is set.
+[Try this example](http://localhost:8080/scenario-circle?radius=30&duration=60) with a local server running.
 
-- \*data is an XVIZData object
+The scenarios support a few query parameters you can play with:
 
-## Connection events
+#### common options
 
-### onClose
+ - hz - number of frames per second
+ - duration - length of the scenario generated in seconds
 
-### onConnect
+#### scenario-circle
 
-## XVIZ message types
-
-### onStart
-
-### onTransformLog
-
-### onError
-
-### onMetadata
-
-### onStateUpdate
-
-### onTransformLogDone
-
-### onReconfigure
-
-# XVIZ Data Format and encoding
-
-XVIZ can be formatted a number of ways: - json string arraybuffer - glb arraybuffer
-
-## args
-
-- port
-- d, multiple
-
-- live server data w/o 'start' remove metadate start/end time do not send done
-
-- scenario
-
-- loop serverresponse hook frame index calculation middleware change frame times
-
-- delay serverResponse
-
-- limit serverResponse
-
-- filterStream mw
-- filterType mw
-
-- validate validate request validate response
-
-- format json, json_arraybuffer, binary mw
-
-XVIZSourceFactory list([path]): [ [available sources] ] // for all internal impls collect based on
-path // scenario would list everything it supports open([path], log_id): [ XVIZSource|null ] kitti
-2011/2032_005 nutonom 203 rosbag cart_bot scenario scenario_circle
+ - hz - number of frames per second
+ - duration - length of the scenario generated in seconds
+ - radius - size of the circle the vehicle traverse

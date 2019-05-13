@@ -30,18 +30,38 @@ export function setupArgs() {
 
   args.options('delay', {
     describe: 'The delay between sending messages in milliseconds',
-    type: 'number'
+    type: 'number',
+    default: 50
+  });
+
+  args.options('duration', {
+    describe: 'The length of a generated scenario log',
+    type: 'number',
+    default: 30
+  });
+
+  args.options('hz', {
+    describe: 'The frequency of updates for a generated scenario log',
+    type: 'number',
+    default: 30
   });
 
   args.options('directory', {
     alias: 'd',
     describe: 'Data directory source.  Multiple directories are supported',
     type: 'string',
+    required: true,
     group: 'Server Options:'
   });
 
   args.options('port', {
     describe: 'Port to listen on',
+    group: 'Server Options:'
+  });
+
+  args.options('verbose', {
+    alias: 'v',
+    describe: 'Logging level',
     group: 'Server Options:'
   });
 
