@@ -37,19 +37,6 @@ export class XVIZServerMiddlewareStack {
 
   onStart(request, msg) {
     this.middlewareDispatch('onStart', request, msg);
-    // send metadata
-
-    // version
-    // profile
-    // message_format json|binary
-    // session_type log|live
-    // log
-
-    // version unsupported
-    // profile unknown
-    // format unsupported
-    // session_type unknown
-    // log not found
   }
 
   onTransformLog(request, msg) {
@@ -93,9 +80,8 @@ export class XVIZServerMiddlewareStack {
     this.middlewareDispatch('onTransformLogDone', request, msg);
   }
 
-  onReconfigure(request, data) {
-    // update_type delta|full
-    // config_update: {}
+  onReconfigure(request, msg) {
+    this.middlewareDispatch('reconfigure', request, msg);
   }
 
   middlewareDispatch(name, request, msg) {
