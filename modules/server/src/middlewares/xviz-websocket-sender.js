@@ -51,8 +51,8 @@ export class XVIZWebsocketSender {
     // based on the message.
     this.format = options.format;
 
-    if (this.format === XVIZFormat.object) {
-      this.format = XVIZFormat.jsonString;
+    if (this.format === XVIZFormat.OBJECT) {
+      this.format = XVIZFormat.JSON_STRING;
     }
 
     this.writer = null;
@@ -97,12 +97,12 @@ export class XVIZWebsocketSender {
 
       // Test to determine if msg is either string or arraybuffer
       if (
-        msg.data.format === XVIZFormat.object ||
+        msg.data.format === XVIZFormat.OBJECT ||
         (!msg.data.hasMessage() &&
           typeof msg.data.buffer !== 'string' &&
           !msg.data.buffer.byteLength)
       ) {
-        return {...this.options, format: XVIZFormat.jsonString};
+        return {...this.options, format: XVIZFormat.JSON_STRING};
       }
 
       // return the format set to the current data format
