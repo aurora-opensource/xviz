@@ -13,15 +13,20 @@
 // limitations under the License.
 /* global console */
 /* eslint-disable no-console */
-const url = require('url');
+const URL = require('url').URL;
 const WebSocket = require('ws');
 
 // Extract path and params from the request
 function getRequestData(requestUrl) {
-  const req = url.parse(requestUrl, true);
+  const req = new URL(requestUrl, 'https://localhost');
+  const params = {};
+  for (const [k, v] of req.searchParams.entries()) {
+    params[k] = v;
+  }
+
   return {
     path: req.pathname,
-    params: req.query
+    params
   };
 }
 
