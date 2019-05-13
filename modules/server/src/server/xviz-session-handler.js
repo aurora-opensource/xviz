@@ -20,6 +20,7 @@ import {XVIZRequestHandler} from '../middlewares/xviz-request-handler';
 import {XVIZWebsocketSender} from '../middlewares/xviz-websocket-sender';
 
 import {XVIZServerMiddlewareStack} from '../middlewares/middleware';
+import {XVIZMiddlewareContext} from '../middlewares/context';
 
 // XVIZSessionHandler handles the socket and dispatching to the middleware
 //
@@ -37,8 +38,11 @@ export class XVIZSessionHandler {
     this.provider = provider;
     this.options = options;
 
-    // A place to store state for the middlewares for this session
-    this.context = {};
+    // session shared storage for the middlewares
+    this.context = new XVIZMiddlewareContext();
+    if (options.id) {
+      this.context.set('id', options.id);
+    }
 
     this.middleware = null;
 
@@ -95,18 +99,18 @@ export class XVIZSessionHandler {
   onConnection() {
     console.log('[> Connection] made', this.request);
 
+    // TODO: I believe this is validated elsewhere
+    // we should not do it here
     const params = this.request.params;
     if (!params.version) {
       // Assume default connection
       params.version = '2.0';
     }
 
+    // TODO: verify the behavior w.r.t the spec
     this.callMiddleware('start', params);
 
-    // if live, would send metadata & stream before
-    // middleware, on live would send data
-    // send metadata
-    // if live sendPlayResp
+    // if live, would send metadata & stream before asked
     this.callMiddleware('transform_log', {id: 'live'});
   }
 
@@ -139,6 +143,7 @@ export class XVIZSessionHandler {
         break;
       default:
         console.log('[ UNKNOWN] message', xvizType, data);
+        // TODO: send error
         break;
     }
   }

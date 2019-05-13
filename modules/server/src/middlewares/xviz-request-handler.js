@@ -38,23 +38,11 @@ function TransformLogDoneMsg(msg) {
   return {type: 'xviz/transform_log_done', data: msg};
 }
 
-function backfillWithDefault(obj, defaultObj) {
-  Object.getOwnPropertyNames(defaultObj).forEach(key => {
-    if (!obj.key) {
-      obj.key = defaultObj.key;
-    }
-  });
-
-  return obj;
-}
-
-const startMsgDefault = {
-  // version
-  // profile
-  message_format: 'binary',
-  session_type: 'log'
-  // log {}
-};
+// TODO: define logger
+// error
+// warn
+// info
+// debug
 
 // Server middleware that handles the logic of responding
 // to a request with data from a provider, processing
@@ -62,89 +50,120 @@ const startMsgDefault = {
 export class XVIZRequestHandler {
   constructor(context, socket, provider, middleware, options = {}) {
     this.context = context;
+    // TODO: this socket is not needed we go through the middleware
     this.socket = socket;
     this.provider = provider;
     this.middleware = middleware;
 
     this.options = Object.assign({}, DEFAULT_OPTIONS, options);
 
-    this.interval = null;
-
     this.t_start_time = 0;
+
+    this._setupContext();
   }
 
-  onStart(req, msg) {
-    if (!req.version || !/^2\.*/.test(req.version)) {
-      console.log('xviz onstart bad version');
-      const message = `Error: Version '${req.version}' is unsupported`;
-      this.middleware.onError(req, ErrorMsg(message));
-    } else {
-      console.log('xviz onstart good version');
-      this.context.start = backfillWithDefault(req, startMsgDefault);
+  _setupContext() {
+    // TODO: make a context specific 'configuration' methods
+    // this.context.set('providerSettings', this.provider.settings());
 
-      // Errors
-      // ? some of these are dependent on the provider/session
-      //   can only be reported once transform log is specified
-      //
-      // version unsupported
-      // profile unknown
-      // format unsupported
-      // session_type unknown
-      // log not found
+    const metadata = this.provider.xvizMetadata().message;
+    if (metadata.data.log_info) {
+      const {start_time, end_time} = metadata.data.log_info;
+      if (start_time) {
+        // TODO: make a context specific source methods
+        this.context.set('start_time', start_time);
+      }
 
-      // send metadata
-      const data = this.provider.xvizMetadata();
-      this.middleware.onMetadata(req, {data});
+      if (end_time) {
+        this.context.set('end_time', start_time);
+      }
     }
   }
 
-  onTransformLog(req, msg) {
-    if (!req.id) {
-      const message = `Error: Missing 'id' from transform_log request`;
-      this.middleware.onError(req, ErrorMsg(message));
+  onStart(req, msg) {
+    // TODO; validation
+    const error = null;
+    if (error) {
+      this.middleware.onError(req, ErrorMsg(error));
     } else {
-      this.context.transformLog = req;
-      // id
-      // start_timestamp
-      // end_timestamp
-      // desired_streams []
+      // fill in profile, format, session_type
+      // make context specific configuration fields
+      if (msg.message_format) {
+        this.context.set('message_format', msg.message_format);
+      } else {
+        this.context.set('message_format', 'binary');
+      }
 
-      // clamped timestamp
-      // time range not valid
+      if (msg.profile) {
+        this.context.set('profile', msg.profile);
+      } else {
+        this.context.set('profile', 'default');
+      }
 
-      if (this.interval === null) {
-        const frameIterator = this.provider.getFrameIterator(
+      if (msg.session_type) {
+        this.context.set('session_type', msg.session_type);
+      } else {
+        this.context.set('session_type', 'log');
+      }
+    }
+
+    // send metadata
+    const data = this.provider.xvizMetadata();
+    this.middleware.onMetadata(req, {data});
+  }
+
+  onTransformLog(req, msg) {
+    // TODO: validation
+    const error = null;
+    if (error) {
+      this.middleware.onError(req, ErrorMsg(error));
+    } else {
+      //  store id, start_timestamp, end_timestamp, desired_streams
+
+      const transform = this.context.transform(req.id);
+      if (!transform) {
+        // track transform request
+        const tformState = {
+          request: req,
+          iterator: null,
+          interval: null,
+          delay: this.options.delay
+        };
+        this.context.startTransform(req.id, tformState);
+
+        tformState.iterator = this.provider.getFrameIterator(
           req.start_timestamps,
           req.end_timestamps
         );
-        // TODO: what if out of range, or default
-        // I say default is defined by provider
-        // but we should have guidance
-        this.context.frameRequest = {
-          request: req,
-          id: req.id,
-          iterator: frameIterator
-        };
 
         // send state_updates || error
         this.t_start_time = process.hrtime();
-        if (this.options.delay < 1) {
-          this._sendAllStateUpdates(this.context.frameRequest);
+        if (tformState.delay < 1) {
+          this._sendAllStateUpdates(tformState);
         } else {
-          this._sendStateUpdate(this.context.frameRequest);
+          this._sendStateUpdate(tformState);
         }
       }
     }
   }
 
-  async _sendStateUpdate(frameReq) {
-    const {request, id, iterator} = frameReq;
+  onTransformPointInTime(req, msg) {
+    this.middleware.onError(req, ErrorMsg('Error: transform_point_in_time is not supported.'));
+  }
+
+  onReconfigure(req, data) {
+    this.middleware.onError(req, ErrorMsg('Error: reconfigure is not supported.'));
+  }
+
+  async _sendStateUpdate(id, transformState) {
+    const {delay, request, iterator} = transformState;
+    let {interval} = transformState;
 
     const frame_sent_start_time = process.hrtime();
 
-    if (this.interval) {
-      clearTimeout(this.interval);
-      this.interval = null;
+    if (interval) {
+      clearTimeout(interval);
+      interval = null;
     }
 
     if (iterator.valid()) {
@@ -158,10 +177,7 @@ export class XVIZRequestHandler {
       const datasend = deltaTimeMs(sendtime);
       console.log(`--- sendtime ${datasend}`);
 
-      this.interval = setTimeout(
-        () => this._sendStateUpdate(this.context.frameRequest),
-        this.options.delay
-      );
+      interval = setTimeout(() => this._sendStateUpdate(id, transformState), delay);
 
       const frame_sent_end_time = process.hrtime();
       this.logMsgSent(frame_sent_start_time, frame_sent_end_time, iterator.value());
@@ -169,26 +185,25 @@ export class XVIZRequestHandler {
       // TODO(twojtasz): need A XVIZData.TransformLogDone(msg);, because XVIZData is the expected pass
       // Could have XVIZData constructor that takes format + object and prepopulates the message?
       this.middleware.onTransformLogDone(request, TransformLogDoneMsg({id}));
-
-      this.context.frameRequest = null;
+      this.context.endTransform(id);
     }
   }
 
-  async _sendAllStateUpdates(frameReq) {
-    const {id, iterator} = frameReq;
+  async _sendAllStateUpdates(id, transformState) {
+    const {iterator, request} = transformState;
     while (iterator.valid()) {
       const frame_sent_start_time = process.hrtime();
 
       const data = await this.provider.xvizFrame(iterator);
-      this.middleware.onStateUpdate({}, {data});
+      this.middleware.onStateUpdate(request, {data});
 
       const frame_sent_end_time = process.hrtime();
 
       this.logMsgSent(frame_sent_start_time, frame_sent_end_time, iterator.value());
     }
 
-    this.middleware.onTransformLogDone({}, TransformLogDoneMsg({id}));
-    this.context.frameRequest = null;
+    this.middleware.onTransformLogDone(request, TransformLogDoneMsg({id}));
+    this.context.endTransform(id);
   }
 
   logMsgSent(start_time, end_time, index) {
