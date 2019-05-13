@@ -33,7 +33,8 @@ if (
   // global process
   require('@babel/register')({
     configFile: resolve(__dirname, '../../../babel.config.js'),
-    ignore: []
+    // ignore all except modules that begin with @xviz
+    ignore: [/node_modules\/(?!@xviz)/]
   });
 
   require('source-map-support').install();
