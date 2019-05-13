@@ -19,8 +19,11 @@ import {XVIZServer} from './server/server';
 import {XVIZSession} from './server/xviz-session';
 import {XVIZProviderFactory} from '@xviz/io';
 
+// For default command automatically support scenarios
+import {ScenarioProvider} from './scenarios';
+XVIZProviderFactory.addProviderClass(ScenarioProvider);
+
 export function main() {
-  // TODO: Need to collect argument handling across possible sources
   const args = setupArgs();
 
   const options = {
