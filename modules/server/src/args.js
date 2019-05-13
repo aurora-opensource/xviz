@@ -16,38 +16,34 @@ const yargs = require('yargs');
 export function setupArgs() {
   const args = yargs.alias('h', 'help');
 
-  // client can request
+  // client can request, otherwise default to source data format
   args.options('format', {
-    describe: 'output data could be json, json_buffer, binary'
+    describe: 'Output data format',
+    choices: ['JSON', 'JSON_BUFFER', 'BINARY'],
+    nargs: 1
   });
 
   args.options('live', {
-    describe: 'Setup server and data to behave like a live system',
+    describe: 'Return data as if from a live stream',
     boolean: true
   });
 
-  args.options('loop', {
-    describe: 'Setup server and data to behave like a live system'
+  args.options('delay', {
+    describe: 'The delay between sending messages in milliseconds',
+    type: 'number'
   });
 
-  args.options('duration', {
-    describe: 'Setup server and data to behave like a live system'
+  args.options('directory', {
+    alias: 'd',
+    describe: 'Data directory source.  Multiple directories are supported',
+    type: 'string',
+    group: 'Server Options:'
   });
 
-  args.options('limit', {
-    describe: 'Setup server and data to behave like a live system'
+  args.options('port', {
+    describe: 'Port to listen on',
+    group: 'Server Options:'
   });
-
-  // --delay [50]
-  // --d
-  // --port [3000]
-  // --validate
-
-  // stream filters
-  // --include
-  // --exclude
-  //
-  // preload [true]
 
   return args;
 }

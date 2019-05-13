@@ -14,7 +14,6 @@
 import {default as path} from 'path';
 
 import {XVIZSessionHandler} from './xviz-session-handler';
-// import {PreloadDataSource} from '../sources/preload-source';
 import {FileSource} from '@xviz/io';
 
 // Setup the source and return a SessionHandler or null
@@ -22,6 +21,8 @@ export class XVIZSession {
   constructor(factory, options) {
     this.factory = factory;
     this.options = options;
+
+    this.sessionCount = 0;
   }
 
   async newSession(socket, req) {
@@ -29,25 +30,29 @@ export class XVIZSession {
 
     const dirs = Array.isArray(this.options.d) ? this.options.d : [this.options.d];
     for (let i = 0; i < dirs.length; i++) {
-      // Root is needed for some XVIZ sources
+      // Root is used by some XVIZ providers
       const root = path.join(dirs[i], req.path);
 
-      // FileSource is used for a JSON/GLB sources
+      // FileSource is used for a JSON/BINARY providers
       const source = new FileSource(root);
 
+      // TODO: reconsile cli options with request options
       provider = await this.factory.open({
         source,
         options: req.params,
         root
       });
-      
+
       if (provider) {
         break;
       }
     }
 
     if (provider) {
-      return new XVIZSessionHandler(socket, req, provider, this.options);
+      return new XVIZSessionHandler(socket, req, provider, {
+        ...this.options,
+        id: this.sessionCount++
+      });
     }
 
     return null;
