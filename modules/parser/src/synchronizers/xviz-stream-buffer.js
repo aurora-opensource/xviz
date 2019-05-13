@@ -198,7 +198,7 @@ export default class XVIZStreamBuffer {
    * @params {object} timeslice - timeslice object from XVIZ stream
    */
   insert(timeslice) {
-    const {timestamp, updateType = 'INCREMENTAL'} = timeslice;
+    const {timestamp, updateType} = timeslice;
 
     if (!this.isInBufferRange(timestamp)) {
       return false;
@@ -230,12 +230,12 @@ export default class XVIZStreamBuffer {
 
     if (timesliceAtInsertPosition && timesliceAtInsertPosition.timestamp === timestamp) {
       // Same timestamp
-      if (updateType === 'INCREMENTAL') {
-        // Merge if it's an incremental update
-        this._mergeTimesliceAt(insertPosition, timeslice);
-      } else {
+      if (updateType === 'COMPLETE') {
         // Replace if it's a complete state
         this._insertTimesliceAt(insertPosition, 1, timeslice);
+      } else {
+        // Merge if it's an incremental update (default)
+        this._mergeTimesliceAt(insertPosition, timeslice);
       }
     } else {
       this._insertTimesliceAt(insertPosition, 0, timeslice);
