@@ -66,8 +66,8 @@ export class XVIZRequestHandler {
     // TODO: make a context specific 'configuration' methods
     // this.context.set('providerSettings', this.provider.settings());
 
-    const metadata = this.provider.xvizMetadata().message;
-    if (metadata.data.log_info) {
+    const metadata = this.provider.xvizMetadata().message();
+    if (metadata && metadata.data && metadata.data.log_info) {
       const {start_time, end_time} = metadata.data.log_info;
       if (start_time) {
         // TODO: make a context specific source methods
@@ -119,8 +119,8 @@ export class XVIZRequestHandler {
       this.middleware.onError(req, ErrorMsg(error));
     } else {
       //  store id, start_timestamp, end_timestamp, desired_streams
-
-      const transform = this.context.transform(req.id);
+      const id = req.id;
+      const transform = this.context.transform(id);
       if (!transform) {
         // track transform request
         const tformState = {
@@ -129,7 +129,7 @@ export class XVIZRequestHandler {
           interval: null,
           delay: this.options.delay
         };
-        this.context.startTransform(req.id, tformState);
+        this.context.startTransform(id, tformState);
 
         tformState.iterator = this.provider.getFrameIterator(
           req.start_timestamps,
@@ -139,9 +139,9 @@ export class XVIZRequestHandler {
         // send state_updates || error
         this.t_start_time = process.hrtime();
         if (tformState.delay < 1) {
-          this._sendAllStateUpdates(tformState);
+          this._sendAllStateUpdates(id, tformState);
         } else {
-          this._sendStateUpdate(tformState);
+          this._sendStateUpdate(id, tformState);
         }
       }
     }
@@ -177,7 +177,7 @@ export class XVIZRequestHandler {
       const datasend = deltaTimeMs(sendtime);
       console.log(`--- sendtime ${datasend}`);
 
-      interval = setTimeout(() => this._sendStateUpdate(id, transformState), delay);
+      interval = setTimeout(() => this._sendStateUpdate(id, transformState));
 
       const frame_sent_end_time = process.hrtime();
       this.logMsgSent(frame_sent_start_time, frame_sent_end_time, iterator.value());
