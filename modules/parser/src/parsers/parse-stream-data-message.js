@@ -113,7 +113,7 @@ function getBinaryXVIZType(arraybuffer) {
   return getXVIZType(jsonString);
 }
 
-function getDataType(data) {
+function getDataFormat(data) {
   if (data === null || data === undefined) {
     return null;
   }
@@ -125,7 +125,7 @@ function getDataType(data) {
 
 // get JSON from binary
 function decode(data, recursive) {
-  switch (getDataType(data)) {
+  switch (getDataFormat(data)) {
     case 'binary':
       if (isBinaryXVIZ(data)) {
         return parseBinaryXVIZ(data);
@@ -170,7 +170,7 @@ function decode(data, recursive) {
 //
 // else return false
 export function isXVIZMessage(data) {
-  switch (getDataType(data)) {
+  switch (getDataFormat(data)) {
     case 'binary':
       if (isBinaryXVIZ(data)) {
         return true;
@@ -201,7 +201,7 @@ export function isXVIZMessage(data) {
 //
 // else return null
 export function getXVIZMessageType(data) {
-  switch (getDataType(data)) {
+  switch (getDataFormat(data)) {
     case 'binary':
       if (isBinaryXVIZ(data)) {
         return getBinaryXVIZType(data);
