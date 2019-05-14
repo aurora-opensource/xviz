@@ -11,13 +11,13 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-/* XVIZMiddlewareContext provides state shared across
- * the middleware stack.  It includes
- * both general state about the sesson as well
- * as private state for an particular middleware
- * component.
+
+/* XVIZSessionContext provides state shared across
+ * a session.  It includes both general state about
+ * the session as well as a store for middleware state
+ * if necessary.
  */
-export class XVIZMiddlewareContext {
+export class XVIZSessionContext {
   constructor(state = {}) {
     this.map = new Map(Object.entries(state));
     this.transforms = new Map();

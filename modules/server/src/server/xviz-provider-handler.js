@@ -13,11 +13,11 @@
 // limitations under the License.
 import {default as path} from 'path';
 
-import {XVIZSessionHandler} from './xviz-session-handler';
+import {XVIZProviderSession} from './xviz-provider-session';
 import {FileSource} from '@xviz/io';
 
-// Setup the source and return a SessionHandler or null
-export class XVIZSession {
+// Setup the source and return an XVIZSession or null
+export class XVIZProviderHandler {
   constructor(factory, options) {
     this.factory = factory;
     this.options = options;
@@ -49,7 +49,7 @@ export class XVIZSession {
     }
 
     if (provider) {
-      return new XVIZSessionHandler(socket, req, provider, {
+      return new XVIZProviderSession(socket, req, provider, {
         ...this.options,
         id: this.sessionCount++
       });

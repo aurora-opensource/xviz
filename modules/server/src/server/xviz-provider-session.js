@@ -19,10 +19,10 @@ import {XVIZData} from '@xviz/io';
 import {XVIZRequestHandler} from '../middlewares/xviz-request-handler';
 import {XVIZWebsocketSender} from '../middlewares/xviz-websocket-sender';
 
-import {XVIZServerMiddlewareStack} from '../middlewares/middleware';
-import {XVIZMiddlewareContext} from '../middlewares/context';
+import {XVIZServerMiddlewareStack} from '../middlewares/xviz-server-middleware-stack';
+import {XVIZSessionContext} from '../middlewares/xviz-session-context';
 
-// XVIZSessionHandler handles the socket and dispatching to the middleware
+// XVIZProviderSession handles the socket and dispatching to the middleware
 //
 // anyone else can add their own session
 // - Would someone want to "mix" sessions?
@@ -31,7 +31,7 @@ import {XVIZMiddlewareContext} from '../middlewares/context';
 // - say they want to handle xvIZ data, but then want to mutate or
 //   add data (custom) for messages, they could try to handle first,
 //   else send to XVIZ
-export class XVIZSessionHandler {
+export class XVIZProviderSession {
   constructor(socket, request, provider, options) {
     this.socket = socket;
     this.request = request;
@@ -39,7 +39,7 @@ export class XVIZSessionHandler {
     this.options = options;
 
     // session shared storage for the middlewares
-    this.context = new XVIZMiddlewareContext();
+    this.context = new XVIZSessionContext();
     if (options.id) {
       this.context.set('id', options.id);
     }

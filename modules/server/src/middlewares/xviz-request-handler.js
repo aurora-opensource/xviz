@@ -177,7 +177,7 @@ export class XVIZRequestHandler {
       const datasend = deltaTimeMs(sendtime);
       console.log(`--- sendtime ${datasend}`);
 
-      interval = setTimeout(() => this._sendStateUpdate(id, transformState));
+      interval = setTimeout(() => this._sendStateUpdate(id, transformState), delay);
 
       const frame_sent_end_time = process.hrtime();
       this.logMsgSent(frame_sent_start_time, frame_sent_end_time, iterator.value());

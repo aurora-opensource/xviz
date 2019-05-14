@@ -41,27 +41,10 @@ export class XVIZServerMiddlewareStack {
 
   onTransformLog(request, msg) {
     this.middlewareDispatch('onTransformLog', request, msg);
-    // send state_updates
-
-    // id
-    // start_timestamp
-    // end_timestamp
-    // desired_streams []
-
-    // clamped timestamp
-
-    // time range not valid
   }
 
   onTransformPointInTime(request, msg) {
     this.middlewareDispatch('onTransformPointInTime', request, msg);
-    // send state_updates
-
-    // id
-    // query_timestamp
-    // desired_streams []
-
-    // timestamp not valid
   }
 
   onError(request, msg) {
@@ -100,7 +83,10 @@ export class XVIZServerMiddlewareStack {
         }
         args = [request, msg];
 
-        handler.apply(middleware, args);
+        const nextMiddleware = handler.apply(middleware, args);
+        if (nextMiddleware === false) {
+          break;
+        }
       }
     }
   }

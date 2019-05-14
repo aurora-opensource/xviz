@@ -15,8 +15,8 @@
 /* eslint-disable no-console */
 const setupArgs = require('./args').setupArgs;
 
-import {XVIZServer} from './server/server';
-import {XVIZSession} from './server/xviz-session';
+import {XVIZServer} from './server/xviz-server';
+import {XVIZProviderHandler} from './server/xviz-provider-handler';
 import {XVIZProviderFactory} from '@xviz/io';
 
 // For default command automatically support scenarios
@@ -34,8 +34,8 @@ export function main() {
     options.delay = args.argv.delay;
   }
 
-  const xvizSession = new XVIZSession(XVIZProviderFactory, options);
-  const wss = new XVIZServer([xvizSession], options, () => {
+  const handler = new XVIZProviderHandler(XVIZProviderFactory, options);
+  const wss = new XVIZServer([handler], options, () => {
     console.log(`[= XVIZ Server] listening on port ${wss.server.address().port}`);
   });
 }
