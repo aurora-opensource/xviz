@@ -11,8 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-/* global console */
-/* eslint-disable no-console */
 import {isXVIZMessage} from '@xviz/parser';
 import {XVIZData} from '@xviz/io';
 
@@ -50,6 +48,20 @@ export class XVIZProviderSession {
     this._setupMiddleware();
   }
 
+  log(msg, ...args) {
+    const {logger} = this.options;
+    if (logger && logger.log) {
+      logger.log(`${msg}`, ...args);
+    }
+  }
+
+  info(...msg) {
+    const {logger} = this.options;
+    if (logger && logger.info) {
+      logger.info(...msg);
+    }
+  }
+
   _setupSocket() {
     this.socket.onerror = err => {
       this.onError(err);
@@ -72,46 +84,35 @@ export class XVIZProviderSession {
     this.middleware = new XVIZServerMiddlewareStack();
 
     const stack = [
-      new XVIZRequestHandler(
-        this.context,
-        this.socket,
-        this.provider,
-        this.middleware,
-        this.options
-      ),
+      new XVIZRequestHandler(this.context, this.provider, this.middleware, this.options),
       new XVIZWebsocketSender(this.context, this.socket, this.options)
     ];
     this.middleware.set(stack);
   }
 
   onOpen() {
-    console.log('[> Connection] Open');
+    this.log('[> Connection] Open');
   }
 
   onError(error) {
-    console.log('[> Connection] Error: ', error.toString());
+    this.log('[> Connection] Error: ', error.toString());
   }
 
   onClose(event) {
-    console.log(`[> Connection] Close: Code ${event.code} Reason: ${event.reason}`);
+    this.log(`[> Connection] Close: Code ${event.code} Reason: ${event.reason}`);
   }
 
   onConnection() {
-    console.log('[> Connection] made', this.request);
+    this.log('[> Connection] made');
 
-    // TODO: I believe this is validated elsewhere
-    // we should not do it here
     const params = this.request.params;
-    if (!params.version) {
-      // Assume default connection
-      params.version = '2.0';
-    }
-
-    // TODO: verify the behavior w.r.t the spec
+    // Providers have already decided via the URL Path
+    // that this is a valid source, so we can
+    // treat connection as 'start' and send metadata
     this.callMiddleware('start', params);
 
-    // if live, would send metadata & stream before asked
-    this.callMiddleware('transform_log', {id: 'live'});
+    // TODO: if live we should start sending data immediately
+    // this.callMiddleware('transform_log', {id: 'live'});
   }
 
   onMessage(message) {
@@ -126,11 +127,13 @@ export class XVIZProviderSession {
       const xvizObj = xvizData.message();
       this.callMiddleware(xvizObj.type, xvizObj.data);
     } else {
-      console.log('[> Message] Unknown message: ', JSON.stringify(message, null, 2).slice(0, 100));
+      this.log('[> Message] Unknown message: ', JSON.stringify(message, null, 2).slice(0, 100));
     }
   }
 
   callMiddleware(xvizType, req = {}, data = {}) {
+    this.info(`[> ${xvizType.toUpperCase()}]`);
+
     switch (xvizType) {
       case 'start':
         this.middleware.onStart(req, data);
@@ -142,7 +145,7 @@ export class XVIZProviderSession {
         this.middleware.onTransformPointInTime(req, data);
         break;
       default:
-        console.log('[ UNKNOWN] message', xvizType, data);
+        this.log('[ UNKNOWN] message', xvizType, data);
         // TODO: send error
         break;
     }

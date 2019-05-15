@@ -61,6 +61,7 @@ export function setupArgs() {
 
   args.options('verbose', {
     alias: 'v',
+    count: true,
     describe: 'Logging level',
     group: 'Server Options:'
   });

@@ -11,8 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-/* global console */
-/* eslint-disable no-console */
 const URL = require('url').URL;
 const WebSocket = require('ws');
 
@@ -60,7 +58,7 @@ export class XVIZServer {
   }
 
   async handleSession(socket, request) {
-    console.log(`[> Connection] created: ${request.url}`);
+    this.log(`[> Connection] created: ${request.url}`);
     const req = getRequestData(request.url);
 
     for (const handler of this.handlers) {
@@ -73,6 +71,13 @@ export class XVIZServer {
 
     // TODO: send XVIZ error and close connection
     socket.close();
-    console.log('[> Connection] closed due to no handler found');
+    this.log('[> Connection] closed due to no handler found');
+  }
+
+  log(...msg) {
+    const {logger} = this.options;
+    if (logger && logger.log) {
+      logger.log(...msg);
+    }
   }
 }

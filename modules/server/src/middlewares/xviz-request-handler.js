@@ -11,19 +11,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-/* global console, setTimeout, clearTimeout */
-/* eslint-disable no-console, camelcase */
-// TODO: remove this and use a shared library (possibly probe.gl?)
-const process = require('process');
-const startTime = process.hrtime();
-const NS_PER_SEC = 1e9;
-
-// Return time in milliseconds since
-// argument or startTime of process.
-function deltaTimeMs(startT) {
-  const diff = process.hrtime(startT || startTime);
-  return ((diff[0] * NS_PER_SEC + diff[1]) / 1e6).toFixed(3);
-}
+/* global setTimeout, clearTimeout */
+/* eslint-disable camelcase, no-unused-expressions */
+import {Stats} from 'probe.gl';
 
 const DEFAULT_OPTIONS = {
   delay: 50 // time in milliseconds
@@ -38,26 +28,17 @@ function TransformLogDoneMsg(msg) {
   return {type: 'xviz/transform_log_done', data: msg};
 }
 
-// TODO: define logger
-// error
-// warn
-// info
-// debug
-
 // Server middleware that handles the logic of responding
 // to a request with data from a provider, processing
 // the data through the supplied middleware
 export class XVIZRequestHandler {
-  constructor(context, socket, provider, middleware, options = {}) {
+  constructor(context, provider, middleware, options = {}) {
     this.context = context;
-    // TODO: this socket is not needed we go through the middleware
-    this.socket = socket;
     this.provider = provider;
     this.middleware = middleware;
 
+    this.metrics = new Stats({id: 'xviz-request-handler'});
     this.options = Object.assign({}, DEFAULT_OPTIONS, options);
-
-    this.t_start_time = 0;
 
     this._setupContext();
   }
@@ -112,6 +93,14 @@ export class XVIZRequestHandler {
     this.middleware.onMetadata(req, {data});
   }
 
+  _setupTransformMetrics() {
+    return {
+      totalTimer: this.metrics.get(`total`),
+      loadTimer: this.metrics.get(`load`),
+      sendTimer: this.metrics.get(`send`)
+    };
+  }
+
   onTransformLog(req, msg) {
     // TODO: validation
     const error = null;
@@ -127,7 +116,8 @@ export class XVIZRequestHandler {
           request: req,
           iterator: null,
           interval: null,
-          delay: this.options.delay
+          delay: this.options.delay,
+          ...this._setupTransformMetrics()
         };
         this.context.startTransform(id, tformState);
 
@@ -137,7 +127,6 @@ export class XVIZRequestHandler {
         );
 
         // send state_updates || error
-        this.t_start_time = process.hrtime();
         if (tformState.delay < 1) {
           this._sendAllStateUpdates(id, tformState);
         } else {
@@ -156,62 +145,102 @@ export class XVIZRequestHandler {
   }
 
   async _sendStateUpdate(id, transformState) {
-    const {delay, request, iterator} = transformState;
-    let {interval} = transformState;
+    const {delay, request, interval, iterator} = transformState;
+    const {loadTimer, sendTimer, totalTimer} = transformState;
 
-    const frame_sent_start_time = process.hrtime();
+    if (!interval) {
+      // The interval is only falsy if it is the very first call
+      totalTimer && totalTimer.timeStart();
+    }
 
     if (interval) {
       clearTimeout(interval);
-      interval = null;
+      transformState.interval = null;
     }
 
     if (iterator.valid()) {
-      const loadtime = process.hrtime();
+      loadTimer && loadTimer.timeStart();
       const data = await this.provider.xvizFrame(iterator);
-      const dataload = deltaTimeMs(loadtime);
-      console.log(`--- loadtime ${dataload}`);
+      loadTimer && loadTimer.timeEnd();
 
-      const sendtime = process.hrtime();
+      sendTimer && sendTimer.timeStart();
       this.middleware.onStateUpdate(request, {data});
-      const datasend = deltaTimeMs(sendtime);
-      console.log(`--- sendtime ${datasend}`);
+      sendTimer && sendTimer.timeEnd();
 
-      interval = setTimeout(() => this._sendStateUpdate(id, transformState), delay);
+      transformState.interval = setTimeout(() => this._sendStateUpdate(id, transformState), delay);
 
-      const frame_sent_end_time = process.hrtime();
-      this.logMsgSent(frame_sent_start_time, frame_sent_end_time, iterator.value());
+      this.logMsgSent(id, iterator.value(), loadTimer, sendTimer);
     } else {
       // TODO(twojtasz): need A XVIZData.TransformLogDone(msg);, because XVIZData is the expected pass
       // Could have XVIZData constructor that takes format + object and prepopulates the message?
       this.middleware.onTransformLogDone(request, TransformLogDoneMsg({id}));
+      totalTimer && totalTimer.timeEnd();
+      this.logDone(id, loadTimer, sendTimer, totalTimer);
       this.context.endTransform(id);
+      this.metrics.reset();
     }
   }
 
   async _sendAllStateUpdates(id, transformState) {
     const {iterator, request} = transformState;
+    const {loadTimer, sendTimer, totalTimer} = transformState;
+
+    totalTimer && totalTimer.timeStart();
     while (iterator.valid()) {
-      const frame_sent_start_time = process.hrtime();
-
+      loadTimer && loadTimer.timeStart();
       const data = await this.provider.xvizFrame(iterator);
+      loadTimer && loadTimer.timeEnd();
+
+      sendTimer && sendTimer.timeStart();
       this.middleware.onStateUpdate(request, {data});
+      sendTimer && sendTimer.timeEnd();
 
-      const frame_sent_end_time = process.hrtime();
-
-      this.logMsgSent(frame_sent_start_time, frame_sent_end_time, iterator.value());
+      this.logMsgSent(id, iterator.value(), loadTimer, sendTimer);
     }
 
     this.middleware.onTransformLogDone(request, TransformLogDoneMsg({id}));
+    totalTimer && totalTimer.timeEnd();
+    this.logDone(id, loadTimer, sendTimer, totalTimer);
     this.context.endTransform(id);
+    this.metrics.reset();
   }
 
-  logMsgSent(start_time, end_time, index) {
-    const t_from_start_ms = deltaTimeMs(this.t_start_time);
-    const t_msg_start_time_ms = deltaTimeMs(start_time);
-    const t_msg_end_time_ms = deltaTimeMs(end_time);
-    console.log(
-      `[< STATE_UPDATE] ${index}): ${t_msg_start_time_ms}ms ${t_msg_end_time_ms}ms start: ${t_from_start_ms}ms`
-    );
+  logMsgSent(id, index, loadTimer, sendTimer) {
+    const {logger} = this.options;
+    if (logger && logger.verbose) {
+      let msg = `id: ${id} [< STATE_UPDATE] frame: ${index}`;
+      if (loadTimer) {
+        msg += ` ${loadTimer.name}:${loadTimer.lastTiming.toFixed(3)}ms`;
+      }
+      if (sendTimer) {
+        msg += ` ${sendTimer.name}:${sendTimer.lastTiming.toFixed(3)}ms`;
+      }
+
+      logger.verbose(msg);
+    }
+  }
+
+  logDone(id, load, send, total) {
+    const {logger} = this.options;
+    if (logger && logger.info) {
+      const msg = `id: ${id} [< DONE]`;
+      if (load) {
+        logger.info(
+          `${msg} ${load.name} Avg:${load.getAverageTime().toFixed(3)}ms Total:${load.time.toFixed(
+            3
+          )}ms Hz:${load.getHz().toFixed(3)}/sec Count:${load.count}`
+        );
+      }
+      if (send) {
+        logger.info(
+          `${msg} ${send.name} Avg:${send.getAverageTime().toFixed(3)}ms Total:${send.time.toFixed(
+            3
+          )}ms Hz:${send.getHz().toFixed(3)}/sec Count:${send.count}`
+        );
+      }
+      if (total) {
+        logger.info(`${msg} ${total.name} ${total.lastTiming.toFixed(3)}ms`);
+      }
+    }
   }
 }

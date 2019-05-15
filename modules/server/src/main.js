@@ -11,9 +11,9 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-/* global console */
-/* eslint-disable no-console */
 const setupArgs = require('./args').setupArgs;
+
+import {Log} from 'probe.gl';
 
 import {XVIZServer} from './server/xviz-server';
 import {XVIZProviderHandler} from './server/xviz-provider-handler';
@@ -26,8 +26,22 @@ XVIZProviderFactory.addProviderClass(ScenarioProvider);
 export function main() {
   const args = setupArgs();
 
+  const log = new Log({id: 'xvizserver-log'});
+
+  // Enable logging and set the level to the verbose count
+  log.enable(true).setLevel(args.argv.v);
+
+  const logger = {
+    log: (...msg) => log.log(...msg)(),
+    error: (...msg) => log.log(0, ...msg)(),
+    warn: (...msg) => log.log(1, ...msg)(),
+    info: (...msg) => log.log(1, ...msg)(),
+    verbose: (...msg) => log.log(2, ...msg)()
+  };
+
   const options = {
-    ...args.argv
+    ...args.argv,
+    logger
   };
 
   if (Number.isFinite(args.argv.delay)) {
@@ -36,6 +50,6 @@ export function main() {
 
   const handler = new XVIZProviderHandler(XVIZProviderFactory, options);
   const wss = new XVIZServer([handler], options, () => {
-    console.log(`[= XVIZ Server] listening on port ${wss.server.address().port}`);
+    logger.log(`Listening on port ${wss.server.address().port}`);
   });
 }

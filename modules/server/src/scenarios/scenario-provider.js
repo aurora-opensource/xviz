@@ -11,8 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-/* global console */
-/* eslint-disable no-console */
 import {XVIZData} from '@xviz/io';
 import {ScenarioReader} from './scenario-reader';
 
@@ -119,7 +117,6 @@ export class ScenarioProvider {
     }
 
     this.scenario = basename.substring(this.prefix.length);
-    console.log('~~~ options', this.options);
     this.data = loadScenario(this.scenario, this.options);
     if (!this.data) {
       return;
