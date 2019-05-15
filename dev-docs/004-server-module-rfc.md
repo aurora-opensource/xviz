@@ -1,6 +1,6 @@
-- Start Date: 2019-05-13
-- RFC PR: [#???](https://github.com/uber/xviz/pull/?)
-- XVIZ Issue: [#?](https://github.com/uber/xviz/issues/?)
+- Start Date: 2019-05-14
+- RFC PR: [#453](https://github.com/uber/xviz/pull/453)
+- XVIZ Issues: [#274](https://github.com/uber/xviz/issues/274)
 
 # Summary
 
@@ -28,10 +28,11 @@ server module is required.
 ## Overview
 
 The **@xviz/server** follows the **@xviz/cli** internal design by using a middleware stack defined
-in terms of the [XVIZ Session](/docs/api-reference/server/xviz-server.md) types. The server module defines core classes, described below,
-and the overall structure for how the server is designed to work. The default
-server command line application serves as an example for how to register custom [XVIZProviders](/docs/api-reference/io/overview-provider.md)
-in order for the server to construct the appropriate instance capable of handling a request.
+in terms of the [XVIZ Session](/docs/api-reference/server/xviz-server.md) types. The server module
+defines core classes, described below, and the overall structure for how the server is designed to
+work. The default server command line application serves as an example for how to register custom
+[XVIZProviders](/docs/api-reference/io/overview-provider.md) in order for the server to construct
+the appropriate instance capable of handling a request.
 
 The next step in customization would be to construct the middleware stack. There are a few components
 that are basic and required for every stack structure and included such as XVIZ message handling and
@@ -180,40 +181,26 @@ subsequent handlers will not be called.
 This interaction between the middleware instances means you must know
 what the middleware does to ensure the flow is conformant to the specification.
 
-## XVIZServer(handlers, opts, cb)
-  @handlers []
-  @options object
-  @cb function
-
-  - setups websocket server
-  - listens for connections and delegates to session handlers
-  - call cb once server has succesfully started
-
-  Upon connection the server will attempt to find a handler that can
-  satisfy the request. If a handler is found it will be manage the request
-  else the socket will be closed.
-
-## XVIZHandler
-### Interface
-#### newSession(socket, req)
-  Using the `req` the session can determine if it can satisfy the request else returns null.
-
-### newSession()
-finds an appripriate handler, and reconcise options between 
-
-*[ ]* - server options & request options
-
-returns object or null
-
-## XVIZSession
-Manages the socket once a request can be satisfied. The
-handler is responsible for routing the socket data
-through the XVIZServerMiddleware.
-
 # Future Plans
+
+## ROS Bag support
+
+ROS is very important 
 
 ## Missing Session commands
 
+The message **transform_point_in_time** and **reconfigure** are not implement. The workflow
+for them requires support from the source to change settings.  Currently settings are not
+able to be changed. This will required expanding the **Providers** in the current design
+to support settings and changes to them.
+
+The providers could even augment the Metadata with a custom UI panel for controlling settings.
+
 ## Websocket proxy for format conversion
 
-## ROS Bag support
+Connecting to an upstream websocket will be a valuable example and worth providing a
+basic implementation.
+
+## Addition of KITTI and Nutonomy Providers
+
+This will provide runtime conversion of these data sources which will make it easier to explore.

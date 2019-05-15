@@ -1,66 +1,64 @@
-# XVIZ Provider
+# XVIZSessionContext
 
-XVIZ Providers encapsulate the details of reading a particular XVIZ source and returns an object
-that allows you to access metadata and iterate over the XVIZ messages.
+This object provides state used during an
+[XVIZSssion](/docs/api-reference/server/overview-session.md) to the middleware components.
 
-Clients should not construct XVIZProviders directly, but instead use the
-[XVIZProviderFactory](/docs/api-reference/io/xviz-provider-factory.md) to find create a Provider.
+It also serves as a store for any such component to save state if is needs to do so for the duration
+of the session. XVIZ Providers encapsulate the details of reading a particular XVIZ source and
+returns an object that allows you to access metadata and iterate over the XVIZ messages.
 
-If a client has a custom XVIZ data source they can create their own Provider and register it with
-the factory.
+## Constructor
 
-## Example
-
-```js
-import {FileSource, XVIZProviderFactory} from '@xviz/io';
-
-const root = '.';
-const source = new FileSource(root);
-const provider = await XVIZProviderFactory.open({
-  source,
-  root
-});
-
-if (provider) {
-  // ...
-}
-```
-
-### Interface Methods
-
-##### async init()
-
-Attempts to verify if the **source** represents a valid XVIZ data source and sets the result from
-`valid()` appropriately.
-
-This method must be called after construction before any other method.
-
-##### valid()
-
-Returns: (Boolean) - True if the source is a valid for this Provider
-
-##### xvizMetadata()
-
-Returns: the XVIZ Metadata if present
-
-##### getFrameIterator(range, options)
+## XVIZSessionContext(state)
 
 Parameters:
 
-- `range.startTime` (Number, optional) - The start time to being interation. If absent, set to the
-  start of the log.
-- `range.endTime` (Number, optional) - The end time to stop iteration. If absent, set to the end of
-  the log.
-- `options` (Object) - Implementation defined.
+- `state` (Object) - Initial state
 
-Returns: ([iterator](/docs/api-reference/io/xviz-provider-iterator.md)) - iterator object for frames
+## Methods
 
-##### xvizFrame(iterator)
+##### set(name, val)
+
+Save state in the context.
 
 Parameters:
 
-- `iterator` (Object) - An [iterator](/docs/api-reference/io/xviz-provider-iterator.md) obtained
-  from the method [getFrameIterator()](#getFrameIterator)
+- `name` (string) - Key to save state under
+- `val` (Any) - Data to store in the context
 
-Returns: ([XVIZData](/docs/api-reference/io/xviz-data.md)) - object or null if the iterator is
-invalid
+##### get(name)
+
+Access saved state
+
+Parameters:
+
+- `name` (string) - Key used to save state
+
+Returns: (Any) - previously saved state
+
+##### startTransform(id, state)
+
+Initial tracking state for a transform request in flight
+
+Parameters:
+
+- `id` (string) - Identifier for this transform request
+- `state` (Object) - State associated with this transform object
+
+##### transform(id)
+
+Access to saved transform state
+
+Parameters:
+
+- `id` (string) - Identifier used to save transform state
+
+Returns: (Object) - state previously saved
+
+##### endTransform(id)
+
+Removal of transform state
+
+Parameters:
+
+- `id` (string) - Identifier for transform state to be removed

@@ -1,58 +1,42 @@
-# @xviz/io
+# @xviz/server
 
-The **@xviz/io** module deals with reading and writing XVIZ data in the various formats supported by
-XVIZ.
+The **@xviz/server** module provides a framework for serving XVIZ data over a Websocket.
 
-The module also provides classes to inspect and manipulate XVIZ data.
+// TODO: Server flow diagram ![@xviz/io diagram](./images/xviz-io-block-diagram.svg)
 
-![@xviz/io diagram](./images/xviz-io-block-diagram.svg)
-
-_Diagram of the @xviz/io class relationships and data flow_
+_Diagram of the @xviz/server class relationships and data flow_
 
 # Module Classes
 
-## Sources and Sinks
+## XVIZServer
 
-These objects provide a simple abstraction over reading and writing data across various data storage
-types. This layer provides an abstraction over the concrete details of reading and writing data, be
-it File, Memory, or a Socket.
+The [XVIZServer](/docs/api-reference/server/overview-server.md) is the main class that will start
+listening for connection and delegate to the
+[XVIZHandlers](/docs/api-reference/server/overview-handler.md) registered.
 
-## XVIZ Data classes
+## XVIZHandler Interface
 
-The XVIZ specification defines the shape of the data, but that data can be represented in different
-formats, such as JSON or our GLB-based binary format.
+An [XVIZHandler](/docs/api-reference/server/overview-handler.md) serves the single roll to determine
+if a connection can be handled and if so return an
+[XVIZSession](/docs/api-reference/server/overview-session.md) to manage that request.
 
-In Javascript the representation of each can vary further.
+## XVIZSession Interface
 
-- Object
-- JSON
-  - string
-  - ArrayBuffer
-  - Buffer
-- Binary
-  - ArrayBuffer
-  - Buffer
+[XVIZSession](/docs/api-reference/server/xviz-server-middleware.md) has the role to respond to
+websocket event and route the messages through the
+[XVIZServerMiddlewareStack](/docs/api-reference/server/overview-session.md)
 
-On top of this, in the future we expect additional formats, such as with protobuf, and therefore we
-want to isolate a client from the concrete form the data takes by providing an interface to take
-care of the format details.
+## XVIZServerMiddlewareStack
 
-The object [XVIZData](/docs/api-reference/io/xviz-data.md) handles consuming any format and
-providing access to the XVIZ data through the [XVIZMessage](/docs/api-reference/io/xviz-message.md).
+The [XVIZServerMiddlewareStack](/docs/api-reference/server/xviz-server-middleware.md) provides the
+structure for the middleware components and manages the routing of messages through the registered
+components.
 
-The data is still owned and managed by the XVIZData class and XVIZData is the class that should be
-passed around in an API.
+## Middleware components
 
-## Readers and Writers
+The middleware components are objects that will only define methods for the XVIZ messages they need
+to act upon. The interface for these methods is defined by the
+[XVIZServerMiddlewareStack](/docs/api-reference/server/xviz-server-middleware.md).
 
-This layer builds upon the Source and Sink to deal with the XVIZ data types of Metadata and Frames.
-
-[Readers](/docs/api-reference/io/overview-reader.md) provide an interface to access the data
-objects.
-
-[Writers](/docs/api-reference/io/overview-writer.md) provide an interface to write the data objects.
-
-## Providers
-
-An [XVIZ Provider](/docs/api-reference/io/overview-provider.md) encapsulates the specific details of
-the concrete XVIZ data format and provides a generic interface to access metadata and frames.
+These components could operate on the messages and response, store session state in a shared
+context, and make calls to the middleware stack in response to an event.
