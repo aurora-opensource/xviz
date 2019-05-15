@@ -16,6 +16,10 @@ import tape from 'tape-catch';
 
 import {XVIZData, XVIZBinaryWriter, XVIZFormat, TextEncoder} from '@xviz/io';
 
+// Enveloped glb as ArrayBuffer
+import MinimalBinaryMetadata from 'test-data/minimal-metadata';
+import MinimalBinaryStateUpdate from 'test-data/minimal-state-update';
+
 // Source test data
 import TestXVIZSnapshot from 'test-data/sample-xviz';
 
@@ -91,6 +95,39 @@ tape('XVIZData#constructor', t => {
     const msg = xvizObj.message();
     t.equal(msg.type, 'state_update', `${test.description} has expected XVIZ type`);
     t.ok(msg.data.updates[0].timestamp, `${test.description} has expected timestamp present`);
+  }
+
+  t.end();
+});
+
+tape('XVIZData#type', t => {
+  const testCases = [
+    {
+      description: 'Binary Metadata',
+      data: MinimalBinaryMetadata,
+      format: XVIZFormat.BINARY,
+      type: 'metadata'
+    },
+    {
+      description: 'Binary StateUpdate',
+      data: MinimalBinaryStateUpdate,
+      format: XVIZFormat.BINARY,
+      type: 'state_update'
+    }
+  ];
+
+  for (const test of testCases) {
+    const xvizObj = new XVIZData(test.data);
+    t.equal(
+      xvizObj.format,
+      test.format,
+      `${test.description} matches expected format ${test.format}`
+    );
+
+    t.equal(xvizObj.type, test.type, `${test.description} matches expected type ${test.type}`);
+
+    const msg = xvizObj.message();
+    t.equal(msg.type, test.type, `${test.description} matches expected message type ${test.type}`);
   }
 
   t.end();

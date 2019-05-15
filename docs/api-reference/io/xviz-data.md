@@ -18,6 +18,9 @@ Parameters:
 
 - `buffer` (Object|string|ArrayBuffer|Buffer) - the original data passed into this object
 - `format` ([XVIZFormat](/docs/api-reference/io/xviz-format.md)) - The format of the data
+- `type` (Object)
+  - `namespace` (String) - Should be 'xviz'
+  - `type` (String) - The XVIZ envelope type
 
 ## Methods
 

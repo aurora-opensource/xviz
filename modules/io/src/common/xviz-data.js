@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import {parseBinaryXVIZ, isBinaryXVIZ} from '@xviz/parser';
+import {parseBinaryXVIZ, isBinaryXVIZ, getXVIZMessageType} from '@xviz/parser';
 import {XVIZMessage} from './xviz-message';
 import {TextDecoder} from './text-encoding';
 import {XVIZFormat} from './constants';
@@ -91,13 +91,20 @@ export function isJSONString(str) {
 export class XVIZData {
   constructor(data) {
     this._data = data;
-    this._message = undefined;
+
+    // _dataFormat is an XVIZFormat for 'data'
     this._dataFormat = undefined;
+
+    // _xvizType is the XVIZ Envelope 'type'
+    this._xvizType = undefined;
+
+    // _message is an XVIZMessage and has been fully parsed
+    this._message = undefined;
 
     this._determineFormat();
 
     if (!this._dataFormat) {
-      throw new Error('Unknown XVIZ data type', JSON.stringify(data));
+      throw new Error('Unknown XVIZ data format');
     }
   }
 
@@ -107,6 +114,21 @@ export class XVIZData {
 
   get format() {
     return this._dataFormat;
+  }
+
+  get type() {
+    if (!this._xvizType) {
+      const rawType = getXVIZMessageType(this._data);
+      if (rawType) {
+        const parts = rawType.split('/');
+        this._xvizType = {
+          namespace: parts[0],
+          type: parts[1]
+        };
+      }
+    }
+
+    return this._xvizType.type;
   }
 
   hasMessage() {
