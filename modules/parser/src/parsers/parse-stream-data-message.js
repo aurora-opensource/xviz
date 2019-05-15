@@ -113,7 +113,7 @@ function getBinaryXVIZType(arraybuffer) {
   return getXVIZType(jsonString);
 }
 
-function getDataFormat(data) {
+export function getDataFormat(data) {
   if (data === null || data === undefined) {
     return null;
   }

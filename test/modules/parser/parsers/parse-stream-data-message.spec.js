@@ -19,6 +19,7 @@ import {
   isEnvelope,
   isXVIZMessage,
   getXVIZMessageType,
+  getDataFormat,
   unpackEnvelope,
   parseStreamLogData,
   LOG_STREAM_MESSAGE
@@ -997,6 +998,36 @@ tape('isXVIZMessage & getXVIZMessageType with Binary XVIZ', t => {
 
     t.is(isXVIZMessage(testCase.message), testCase.isValid, 'binary JSON object');
     validateMessageType(t, testCase, testCase.message);
+  }
+
+  t.end();
+});
+
+tape('getDataFormat', t => {
+  const XVIZUpdateObject = {type: 'xviz/state_update', data: TestTimesliceMessageV2};
+  const XVIZUpdateString = JSON.stringify(XVIZUpdateObject);
+
+  const testCases = [
+    {
+      title: 'binary format',
+      expectedFormat: 'binary',
+      message: MinimalBinaryMetadata
+    },
+    {
+      title: 'object format',
+      expectedFormat: 'object',
+      message: XVIZUpdateObject
+    },
+    {
+      title: 'format',
+      expectedFormat: 'string',
+      message: XVIZUpdateString
+    }
+  ];
+
+  for (const testCase of testCases) {
+    t.comment(testCase.title);
+    t.is(getDataFormat(testCase.message), testCase.expectedFormat, 'format matches');
   }
 
   t.end();
