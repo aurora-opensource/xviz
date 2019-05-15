@@ -18,6 +18,8 @@ import {
   parseStreamDataMessage,
   isEnvelope,
   isXVIZMessage,
+  getXVIZMessageType,
+  getDataFormat,
   unpackEnvelope,
   parseStreamLogData,
   LOG_STREAM_MESSAGE
@@ -30,6 +32,9 @@ import clone from 'clone';
 import TestMetadataMessageV2 from 'test-data/sample-metadata-message';
 import TestMetadataMessageV1 from 'test-data/sample-metadata-message-v1';
 import TestFuturesMessageV1 from 'test-data/sample-frame-futures-v1';
+
+import MinimalBinaryMetadata from 'test-data/minimal-metadata';
+import MinimalBinaryStateUpdate from 'test-data/minimal-state-update';
 
 import {resetXVIZConfigAndSettings} from '../config/config-utils';
 import {TextEncoder} from '@xviz/parser/utils/text-encoding';
@@ -898,7 +903,7 @@ tape('parseStreamDataMessage enveloped not xviz', t => {
   t.end();
 });
 
-tape('isXVIZMessage', t => {
+tape('isXVIZMessage & getXVIZMessageType', t => {
   const testCases = [
     {
       title: 'type at start',
@@ -935,16 +940,94 @@ tape('isXVIZMessage', t => {
     }
   ];
 
+  const validateMessageType = (tt, testcase, msg) => {
+    if (testcase.isValid) {
+      const type = testcase.isBinary ? testcase.expectedType : testcase.message.type;
+      tt.is(getXVIZMessageType(msg), type, 'XVIZ type matches');
+    } else {
+      tt.is(getXVIZMessageType(msg), null, 'XVIZ type correctly null');
+    }
+  };
+
   for (const testCase of testCases) {
     t.comment(testCase.title);
     t.is(isXVIZMessage(testCase.message), testCase.isValid, 'plain JSON object');
+    validateMessageType(t, testCase, testCase.message);
 
     const jsonString = JSON.stringify(testCase.message);
     t.is(isXVIZMessage(jsonString), testCase.isValid, 'JSON string');
+    validateMessageType(t, testCase, jsonString);
 
     const binary = new TextEncoder().encode(jsonString);
     t.is(isXVIZMessage(binary), testCase.isValid, 'Uint8Array');
     t.is(isXVIZMessage(binary.buffer), testCase.isValid, 'ArrayBuffer');
+    validateMessageType(t, testCase, binary);
+    validateMessageType(t, testCase, binary.buffer);
+  }
+
+  t.end();
+});
+
+tape('isXVIZMessage & getXVIZMessageType with Binary XVIZ', t => {
+  const testCases = [
+    {
+      title: 'binary metadata',
+      isValid: true,
+      expectedType: 'xviz/metadata',
+      message: MinimalBinaryMetadata
+    },
+    {
+      title: 'binary state_update',
+      isValid: true,
+      expectedType: 'xviz/state_update',
+      message: MinimalBinaryStateUpdate
+    }
+    // TODO: add non XVIZ test cases
+  ];
+
+  const validateMessageType = (tt, testcase, msg) => {
+    if (testcase.isValid) {
+      tt.is(getXVIZMessageType(msg), testcase.expectedType, 'XVIZ type matches');
+    } else {
+      tt.is(getXVIZMessageType(msg), null, 'XVIZ Type correctly null');
+    }
+  };
+
+  for (const testCase of testCases) {
+    t.comment(testCase.title);
+
+    t.is(isXVIZMessage(testCase.message), testCase.isValid, 'binary JSON object');
+    validateMessageType(t, testCase, testCase.message);
+  }
+
+  t.end();
+});
+
+tape('getDataFormat', t => {
+  const XVIZUpdateObject = {type: 'xviz/state_update', data: TestTimesliceMessageV2};
+  const XVIZUpdateString = JSON.stringify(XVIZUpdateObject);
+
+  const testCases = [
+    {
+      title: 'binary format',
+      expectedFormat: 'binary',
+      message: MinimalBinaryMetadata
+    },
+    {
+      title: 'object format',
+      expectedFormat: 'object',
+      message: XVIZUpdateObject
+    },
+    {
+      title: 'format',
+      expectedFormat: 'string',
+      message: XVIZUpdateString
+    }
+  ];
+
+  for (const testCase of testCases) {
+    t.comment(testCase.title);
+    t.is(getDataFormat(testCase.message), testCase.expectedFormat, 'format matches');
   }
 
   t.end();
