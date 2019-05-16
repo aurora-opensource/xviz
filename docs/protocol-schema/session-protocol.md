@@ -164,10 +164,33 @@ Sent to clients if there is any issue with the server system.
 
 This is a collection of stream sets for all extractor output.
 
-| Name          | Type                             | Description                                       |
-| ------------- | -------------------------------- | ------------------------------------------------- |
-| `update_type` | `enum { snapshot, incremental }` | Whether we have a complete or incremental update. |
-| `updates`     | `list<stream_set>`               |                                                   |
+| Name          | Type               | Description                                       |
+| ------------- | ------------------ | ------------------------------------------------- |
+| `update_type` | `string`           | Whether we have a complete or incremental update. |
+| `updates`     | `list<stream_set>` |                                                   |
+
+**update_type** - valid values:
+
+- `complete_state` - the provided streams contain a complete view of the world. Any stream not
+  included in is considered empty.
+- `incremental` - the provided streams replace replace the contents of existing streams
+
+The differences between these update models are more subtle, so this table below clarifies. It shows
+what to do in either the `complete_state` or `incremental` state when you receive and update based
+on whether or not you already have existing data for that stream in your buffer. The actions are:
+
+- _create_ - add new stream and data to buffer
+- _update_ - the stream already exists, so add data at the new time
+- _replace_ - remove data at this specific time and substitute the new data
+- _delete_ - at the provided timestamp mark the stream as empty
+
+| Stream In Message        | Stream in Buffer                   | `complete_state` | `incremental` |
+| ------------------------ | ---------------------------------- | ---------------- | ------------- |
+| Yes                      | No                                 | _create_         | _create_      |
+| Yes                      | Yes, but **not** at this timestamp | _update_         | _update_      |
+| Yes                      | Yes, at this timestamp             | _replace_        | _replace_     |
+| No                       | Yes                                | _delete_         | _do nothing_  |
+| Yes (as an empty marker) | Yes                                | _delete_         | _delete_      |
 
 Here is a JSON example showing an incremental update that contains a single Stream Set, which itself
 has just the single `/object/polygon` containing a
