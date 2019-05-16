@@ -12,4 +12,4 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 export {Bag} from './bag';
-export {ROSBAGDataProvider} from './providers/rosbag-data-provider';
+export {ROSBAGProvider} from './providers/rosbag-provider';
