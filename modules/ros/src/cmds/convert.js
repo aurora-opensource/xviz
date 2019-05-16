@@ -14,7 +14,7 @@
 /* global console */
 /* eslint-disable no-console, complexity, max-statements */
 import {FileSink, XVIZFormat, XVIZFormatWriter} from '@xviz/io';
-import {ROSBAGDataProvider} from '../providers/rosbag-data-provider';
+import {ROSBAGProvider} from '../providers/rosbag-provider';
 
 import process from 'process';
 import fs from 'fs';
@@ -49,7 +49,7 @@ function deleteDirRecursive(parentDir) {
 async function createProvider(args) {
   let provider = null;
   // root, dataProvider, options
-  provider = new ROSBAGDataProvider(args);
+  provider = new ROSBAGProvider(args);
   await provider.init();
 
   if (provider.valid()) {
@@ -77,7 +77,7 @@ export async function Convert(args) {
   const options = {};
   const provider = await createProvider({root: bagPath, options});
   if (!provider) {
-    throw new Error('Failed to create ROSBAGDataProvider');
+    throw new Error('Failed to create ROSBAGProvider');
   }
 
   // This abstracts the details of the filenames expected by our server
@@ -88,7 +88,7 @@ export async function Convert(args) {
     throw new Error('Error creating and iterator');
   }
 
-  const writer = new XVIZFormatWriter(sink, {format: XVIZFormat.binary});
+  const writer = new XVIZFormatWriter(sink, {format: XVIZFormat.BINARY});
 
   const md = provider.xvizMetadata();
   setMetadataTimes(md.message().data, start, end);
@@ -109,7 +109,7 @@ export async function Convert(args) {
     frameSequence += 1;
   }
 
-  writer.writeFrameIndex();
+  writer.close();
 }
 
 /* eslint-disable camelcase */
@@ -131,7 +131,7 @@ function setMetadataTimes(metadata, start, end) {
 function signalWriteIndexOnInterrupt(writer) {
   process.on('SIGINT', () => {
     console.log('Aborting, writing index file.');
-    writer.writeFrameIndex();
+    writer.close();
     process.exit(0); // eslint-disable-line no-process-exit
   });
 }
