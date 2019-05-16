@@ -198,7 +198,7 @@ export default class XVIZStreamBuffer {
    * @params {object} timeslice - timeslice object from XVIZ stream
    */
   insert(timeslice) {
-    const {timestamp} = timeslice;
+    const {timestamp, updateType} = timeslice;
 
     if (!this.isInBufferRange(timestamp)) {
       return false;
@@ -210,6 +210,10 @@ export default class XVIZStreamBuffer {
 
     const {timeslices, streams, videos} = this;
 
+    // Note: if stream is not present in a timeslice, that index in the list holds undefined
+    // This avoids repeatedly allocating new arrays for each stream, and lowers the cost of
+    // insertion/deletion, which can be a significant perf hit depending on frame rate and
+    // buffer size.
     for (const streamName in timeslice.streams) {
       if (!streams[streamName]) {
         streams[streamName] = new Array(timeslices.length);
@@ -225,10 +229,16 @@ export default class XVIZStreamBuffer {
     const timesliceAtInsertPosition = timeslices[insertPosition];
 
     if (timesliceAtInsertPosition && timesliceAtInsertPosition.timestamp === timestamp) {
-      // Same timestamp, needs a merge
-      this._mergeTimesliceAt(insertPosition, timeslice);
+      // Same timestamp
+      if (updateType === 'COMPLETE') {
+        // Replace if it's a complete state
+        this._insertTimesliceAt(insertPosition, 1, timeslice);
+      } else {
+        // Merge if it's an incremental update (default)
+        this._mergeTimesliceAt(insertPosition, timeslice);
+      }
     } else {
-      this._insertTimesliceAt(insertPosition, timeslice);
+      this._insertTimesliceAt(insertPosition, 0, timeslice);
     }
 
     this.lastUpdate++;
@@ -332,23 +342,29 @@ export default class XVIZStreamBuffer {
     });
 
     for (const streamName in timeslice.streams) {
-      streams[streamName][index] = timeslice.streams[streamName];
+      let value = timeslice.streams[streamName];
+      if (value === null) {
+        // Explicitly delete a stream
+        delete timesliceAtInsertPosition.streams[streamName];
+        value = undefined;
+      }
+      streams[streamName][index] = value;
     }
     for (const streamName in timeslice.videos) {
       videos[streamName][index] = timeslice.videos[streamName];
     }
   }
 
-  _insertTimesliceAt(index, timeslice) {
+  _insertTimesliceAt(index, deleteCount, timeslice) {
     const {timeslices, streams, videos} = this;
 
-    timeslices.splice(index, 0, timeslice);
+    timeslices.splice(index, deleteCount, timeslice);
 
     for (const streamName in streams) {
-      streams[streamName].splice(index, 0, timeslice.streams[streamName]);
+      streams[streamName].splice(index, deleteCount, timeslice.streams[streamName]);
     }
     for (const streamName in videos) {
-      videos[streamName].splice(index, 0, timeslice.videos[streamName]);
+      videos[streamName].splice(index, deleteCount, timeslice.videos[streamName]);
     }
   }
 
