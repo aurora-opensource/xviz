@@ -2,7 +2,7 @@
 
 The **@xviz/server** module provides a framework for serving XVIZ data over a Websocket.
 
-// TODO: Server flow diagram ![@xviz/io diagram](./images/xviz-io-block-diagram.svg)
+![@xviz/server diagram](./images/xviz-server-block-diagram.svg)
 
 _Diagram of the @xviz/server class relationships and data flow_
 

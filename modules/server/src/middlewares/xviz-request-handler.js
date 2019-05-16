@@ -61,7 +61,7 @@ export class XVIZRequestHandler {
     }
   }
 
-  onStart(req, msg) {
+  onStart(req, resp) {
     // TODO; validation
     const error = null;
     if (error) {
@@ -69,20 +69,20 @@ export class XVIZRequestHandler {
     } else {
       // fill in profile, format, session_type
       // make context specific configuration fields
-      if (msg.message_format) {
-        this.context.set('message_format', msg.message_format);
+      if (resp.message_format) {
+        this.context.set('message_format', resp.message_format);
       } else {
         this.context.set('message_format', 'binary');
       }
 
-      if (msg.profile) {
-        this.context.set('profile', msg.profile);
+      if (resp.profile) {
+        this.context.set('profile', resp.profile);
       } else {
         this.context.set('profile', 'default');
       }
 
-      if (msg.session_type) {
-        this.context.set('session_type', msg.session_type);
+      if (resp.session_type) {
+        this.context.set('session_type', resp.session_type);
       } else {
         this.context.set('session_type', 'log');
       }
@@ -101,7 +101,7 @@ export class XVIZRequestHandler {
     };
   }
 
-  onTransformLog(req, msg) {
+  onTransformLog(req, resp) {
     // TODO: validation
     const error = null;
     if (error) {
@@ -136,7 +136,7 @@ export class XVIZRequestHandler {
     }
   }
 
-  onTransformPointInTime(req, msg) {
+  onTransformPointInTime(req, resp) {
     this.middleware.onError(req, ErrorMsg('Error: transform_point_in_time is not supported.'));
   }
 
@@ -171,8 +171,6 @@ export class XVIZRequestHandler {
 
       this.logMsgSent(id, iterator.value(), loadTimer, sendTimer);
     } else {
-      // TODO(twojtasz): need A XVIZData.TransformLogDone(msg);, because XVIZData is the expected pass
-      // Could have XVIZData constructor that takes format + object and prepopulates the message?
       this.middleware.onTransformLogDone(request, TransformLogDoneMsg({id}));
       totalTimer && totalTimer.timeEnd();
       this.logDone(id, loadTimer, sendTimer, totalTimer);

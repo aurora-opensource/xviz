@@ -75,13 +75,13 @@ export class XVIZWebsocketSender {
   }
 
   // Data is in the desired format and can be written to sink directly
-  _sendDataDirect(msg) {
+  _sendDataDirect(resp) {
     const {format} = this.options;
-    const sourceFormat = msg.data.format;
+    const sourceFormat = resp.data.format;
 
     if (!format || sourceFormat === format) {
       // need to check if object() has been called (ie it might be dirty) and repack
-      if (!msg.data.hasMessage()) {
+      if (!resp.data.hasMessage()) {
         return true;
       }
     }
@@ -112,39 +112,39 @@ export class XVIZWebsocketSender {
     return this.options;
   }
 
-  onError(req, msg) {
+  onError(req, resp) {
     // TODO: This message is almost always just a plain object
     // but the special handling for here feels awkard
-    const resp = JSON.stringify(msg.data.buffer);
-    this.sink.writeSync('error', resp);
+    const response = JSON.stringify(resp.data.buffer);
+    this.sink.writeSync('error', response);
   }
 
-  onMetadata(req, msg) {
-    const {format} = this._getFormatOptions(msg);
+  onMetadata(req, resp) {
+    const {format} = this._getFormatOptions(resp);
 
-    if (this._sendDataDirect(msg)) {
-      this.sink.writeSync(`1-frame`, msg.data.buffer);
+    if (this._sendDataDirect(resp)) {
+      this.sink.writeSync(`1-frame`, resp.data.buffer);
     } else {
-      this._syncFormatWithWriter(format, msg.data.format);
-      this.writer.writeMetadata(msg.data);
+      this._syncFormatWithWriter(format, resp.data.format);
+      this.writer.writeMetadata(resp.data);
     }
   }
 
-  onStateUpdate(req, msg) {
-    const {format} = this._getFormatOptions(msg);
+  onStateUpdate(req, resp) {
+    const {format} = this._getFormatOptions(resp);
 
-    if (this._sendDataDirect(msg)) {
-      this.sink.writeSync('2-frame', msg.data.buffer);
+    if (this._sendDataDirect(resp)) {
+      this.sink.writeSync('2-frame', resp.data.buffer);
     } else {
-      this._syncFormatWithWriter(format, msg.data.format);
-      this.writer.writeFrame(0, msg.data);
+      this._syncFormatWithWriter(format, resp.data.format);
+      this.writer.writeFrame(0, resp.data);
     }
   }
 
-  onTransformLogDone(req, msg) {
+  onTransformLogDone(req, resp) {
     // TODO: This message is almost always just a plain object
     // but the special handling for here feels awkard
-    const resp = JSON.stringify(msg.data.buffer);
-    this.sink.writeSync('done', resp);
+    const response = JSON.stringify(resp.data.buffer);
+    this.sink.writeSync('done', response);
   }
 }
