@@ -23,6 +23,9 @@ import {XVIZProviderFactory} from '@xviz/io';
 import {ScenarioProvider} from './scenarios';
 XVIZProviderFactory.addProviderClass(ScenarioProvider);
 
+import {ROSBAGProvider} from '@xviz/ros';
+XVIZProviderFactory.addProviderClass(ROSBAGProvider);
+
 export function main() {
   const args = setupArgs();
 

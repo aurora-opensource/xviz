@@ -61,7 +61,7 @@ class FrameIterator {
 // keyTopic is required
 // stream metadtata and vehicle relative
 //
-export class ROSBAGDataProvider {
+export class ROSBAGProvider {
   constructor({root, options}) {
     this.bagPath = root.endsWith('.bag') ? root : `${root}.bag`;
     this.options = options;
