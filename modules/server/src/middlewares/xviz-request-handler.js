@@ -163,13 +163,15 @@ export class XVIZRequestHandler {
       const data = await this.provider.xvizFrame(iterator);
       loadTimer && loadTimer.timeEnd();
 
-      sendTimer && sendTimer.timeStart();
-      this.middleware.onStateUpdate(request, {data});
-      sendTimer && sendTimer.timeEnd();
+      if (data) {
+        sendTimer && sendTimer.timeStart();
+        this.middleware.onStateUpdate(request, {data});
+        sendTimer && sendTimer.timeEnd();
+
+        this.logMsgSent(id, iterator.value(), loadTimer, sendTimer);
+      }
 
       transformState.interval = setTimeout(() => this._sendStateUpdate(id, transformState), delay);
-
-      this.logMsgSent(id, iterator.value(), loadTimer, sendTimer);
     } else {
       this.middleware.onTransformLogDone(request, TransformLogDoneMsg({id}));
       totalTimer && totalTimer.timeEnd();
@@ -189,11 +191,13 @@ export class XVIZRequestHandler {
       const data = await this.provider.xvizFrame(iterator);
       loadTimer && loadTimer.timeEnd();
 
-      sendTimer && sendTimer.timeStart();
-      this.middleware.onStateUpdate(request, {data});
-      sendTimer && sendTimer.timeEnd();
+      if (data) {
+        sendTimer && sendTimer.timeStart();
+        this.middleware.onStateUpdate(request, {data});
+        sendTimer && sendTimer.timeEnd();
 
-      this.logMsgSent(id, iterator.value(), loadTimer, sendTimer);
+        this.logMsgSent(id, iterator.value(), loadTimer, sendTimer);
+      }
     }
 
     this.middleware.onTransformLogDone(request, TransformLogDoneMsg({id}));

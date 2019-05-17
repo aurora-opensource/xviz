@@ -52,48 +52,56 @@ export class XVIZWebsocketSender {
     this.format = options.format;
 
     if (this.format === XVIZFormat.OBJECT) {
-      this.format = XVIZFormat.JSON_STRING;
+      // We can not output OBJECT on a websocket
+      this.format = XVIZFormat.BINARY;
     }
 
     this.writer = null;
+    // If format is undefined we want to send the 'natural' format of
+    // the data (as long as it's not an OBJECT).
+    // Keep track of current 'writer' format
+    this.writerFormat = null;
+
     this._syncFormatWithWriter(this.format);
   }
 
+  log(...msg) {
+    const {logger} = this.options;
+    logger.log(...msg);
+  }
+
   // Sets this.writer based on 'format'
-  // If format is not defined, but the xvizData.hasMessage(), meaning it may
-  // have been mutated, we must format to the fallbackFormat.
-  _syncFormatWithWriter(format, fallbackFormat) {
+  _syncFormatWithWriter(format) {
     // Cover the case where we have a format and no writer or when the
     // format does not match.
-    if (format && (!this.writer || this.format !== format)) {
+    if (format && (!this.writer || this.writerFormat !== format)) {
       this.writer = new XVIZFormatWriter(this.sink, {format});
-      this.format = format;
-    } else if (fallbackFormat && this.format !== fallbackFormat) {
-      this.writer = new XVIZFormatWriter(this.sink, {format: fallbackFormat});
-      this.format = fallbackFormat;
+      this.writerFormat = format;
     }
   }
 
   // Data is in the desired format and can be written to sink directly
-  _sendDataDirect(resp) {
-    const {format} = this.options;
+  _sendDataDirect(format, resp) {
+    // if format === sourceFormat &&
+    // resp.data.
+    //
     const sourceFormat = resp.data.format;
 
-    if (!format || sourceFormat === format) {
-      // need to check if object() has been called (ie it might be dirty) and repack
-      if (!resp.data.hasMessage()) {
-        return true;
-      }
+    // need to check if object() has been called (ie it might be dirty) and repack
+    if (format === sourceFormat && !resp.data.hasMessage()) {
+      return true;
     }
 
     return false;
   }
 
+  // If the format is unspecified we output the 'natural' format
+  // if it is valid. Make that determination here.
   _getFormatOptions(msg) {
     // default should be pass-thru of original data
-    if (!this.options.format) {
-      // If no format is specified, we need to ensure we send a
-      // string or arraybuffer through the websocket
+    if (!this.format) {
+      // If no format is specified, we send the 'natural' format
+      // but it must be a string or arraybuffer, not an OBJECT
 
       // Test to determine if msg is either string or arraybuffer
       if (
@@ -102,14 +110,14 @@ export class XVIZWebsocketSender {
           typeof msg.data.buffer !== 'string' &&
           !msg.data.buffer.byteLength)
       ) {
-        return {...this.options, format: XVIZFormat.JSON_STRING};
+        return XVIZFormat.BINARY;
       }
 
       // return the format set to the current data format
-      return {...this.options, format: msg.data.format};
+      return msg.data.format;
     }
 
-    return this.options;
+    return this.format;
   }
 
   onError(req, resp) {
@@ -120,23 +128,23 @@ export class XVIZWebsocketSender {
   }
 
   onMetadata(req, resp) {
-    const {format} = this._getFormatOptions(resp);
+    const format = this._getFormatOptions(resp);
 
-    if (this._sendDataDirect(resp)) {
+    if (this._sendDataDirect(format, resp)) {
       this.sink.writeSync(`1-frame`, resp.data.buffer);
     } else {
-      this._syncFormatWithWriter(format, resp.data.format);
+      this._syncFormatWithWriter(format);
       this.writer.writeMetadata(resp.data);
     }
   }
 
   onStateUpdate(req, resp) {
-    const {format} = this._getFormatOptions(resp);
+    const format = this._getFormatOptions(resp);
 
-    if (this._sendDataDirect(resp)) {
+    if (this._sendDataDirect(format, resp)) {
       this.sink.writeSync('2-frame', resp.data.buffer);
     } else {
-      this._syncFormatWithWriter(format, resp.data.format);
+      this._syncFormatWithWriter(format);
       this.writer.writeFrame(0, resp.data);
     }
   }
