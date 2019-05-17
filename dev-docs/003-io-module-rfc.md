@@ -12,7 +12,7 @@ The goal for the **@xviz/io** module is to provide the basic input/output functi
 encapsulate the data and format variations across various interfaces to support the current and
 future use-cases.
 
-![@xviz/io diagram](../../docs/api-reference/io/images/xviz-io-block-diagram.svg)
+![@xviz/io diagram](../docs/api-reference/io/images/xviz-io-block-diagram.svg)
 
 # Motivation
 
