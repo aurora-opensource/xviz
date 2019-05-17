@@ -25,7 +25,7 @@ class XVIZJSONBufferWriter extends XVIZJSONWriter {
 function determineWriter(sink, format, options) {
   let writer = null;
   switch (format) {
-    case XVIZFormat.BINARY:
+    case XVIZFormat.BINARY_GLB:
       writer = new XVIZBinaryWriter(sink, options);
       break;
     case XVIZFormat.JSON_BUFFER:
@@ -47,7 +47,7 @@ export class XVIZFormatWriter {
     this.format = format;
 
     if (!format || format === XVIZFormat.OBJECT) {
-      throw new Error('XVIZFormat.OBJECT is not supported by XVIZFormatter.');
+      throw new Error(`Format ${format} is not supported by XVIZFormatter.`);
     }
 
     this.writer = determineWriter(sink, format, options);

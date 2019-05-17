@@ -61,7 +61,7 @@ const TestCases = [
   {
     data: TestXVIZSnapshotGLB,
     description: 'XVIZ Binary Buffer',
-    format: XVIZFormat.BINARY
+    format: XVIZFormat.BINARY_GLB
   },
   {
     data: Buffer.from(TestXVIZSnapshotBuffer),
@@ -72,7 +72,7 @@ const TestCases = [
   {
     data: Buffer.from(TestXVIZSnapshotGLB),
     description: 'XVIZ Binary NodeBuffer',
-    format: 'BINARY',
+    format: 'BINARY_GLB',
     nodeOnly: true
   }
 ];
@@ -105,13 +105,13 @@ tape('XVIZData#type', t => {
     {
       description: 'Binary Metadata',
       data: MinimalBinaryMetadata,
-      format: XVIZFormat.BINARY,
+      format: XVIZFormat.BINARY_GLB,
       type: 'metadata'
     },
     {
       description: 'Binary StateUpdate',
       data: MinimalBinaryStateUpdate,
-      format: XVIZFormat.BINARY,
+      format: XVIZFormat.BINARY_GLB,
       type: 'state_update'
     }
   ];

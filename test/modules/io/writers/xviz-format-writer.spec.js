@@ -48,7 +48,7 @@ tape('XVIZFormatWriter#full matrix', t => {
   for (const source of dataSources) {
     const xvizObj = new XVIZData(source);
 
-    for (const format of [XVIZFormat.BINARY, XVIZFormat.JSON_BUFFER, XVIZFormat.JSON_STRING]) {
+    for (const format of [XVIZFormat.BINARY_GLB, XVIZFormat.JSON_BUFFER, XVIZFormat.JSON_STRING]) {
       const sink = new MemorySourceSink();
 
       t.comment(`-- TestCase ${xvizObj.format} to ${format}`);
@@ -77,7 +77,7 @@ tape('XVIZFormatWriter#frame writing', t => {
   const xvizObj = new XVIZData(TestXVIZSnapshot);
   const sink = new MemorySourceSink();
 
-  const formatWriter = new XVIZFormatWriter(sink, {format: XVIZFormat.BINARY});
+  const formatWriter = new XVIZFormatWriter(sink, {format: XVIZFormat.BINARY_GLB});
 
   formatWriter.writeFrame(0, xvizObj);
   formatWriter.writeFrame(1, xvizObj);

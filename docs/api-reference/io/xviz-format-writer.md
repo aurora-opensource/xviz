@@ -12,7 +12,7 @@ import {XVIZMetadataBuilder, XVIZBuilder} from '@xviz/builder';
 import {XVIZFormatWriter, FileSink, XVIZFormat} from '@xviz/io';
 
 const sink = new FileSink('output-dir');
-const xvizWriter = new XVIZFormatWriter(sink, {format: XVIZFormat.BINARY});
+const xvizWriter = new XVIZFormatWriter(sink, {format: XVIZFormat.BINARY_GLB});
 
 const metadataBuilder = new XVIZMetadataBuilder();
 // build metadata
@@ -33,7 +33,7 @@ xvizWriter.close();
 import {FileSink, XVIZFormatWriter, XVIZFormat} from '@xviz/io';
 
 const sink = new FileSink('output-dir');
-const xvizWriter = new XVIZBinaryWriter(sink, {format: XVIZFormat.BINARY});
+const xvizWriter = new XVIZBinaryWriter(sink, {format: XVIZFormat.BINARY_GLB});
 ```
 
 Parameters:

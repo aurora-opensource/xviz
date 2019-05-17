@@ -144,7 +144,7 @@ export class XVIZData {
 
     let data = this._data;
     switch (this._dataFormat) {
-      case XVIZFormat.BINARY:
+      case XVIZFormat.BINARY_GLB:
         if (data instanceof Buffer) {
           data = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
         }
@@ -189,7 +189,7 @@ export class XVIZData {
         }
 
         if (isBinaryXVIZ(data)) {
-          this._dataFormat = XVIZFormat.BINARY;
+          this._dataFormat = XVIZFormat.BINARY_GLB;
         }
 
         if (data instanceof ArrayBuffer) {
