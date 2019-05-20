@@ -17,7 +17,7 @@ export {XVIZSessionContext} from './middlewares/xviz-session-context';
 export {XVIZServerMiddlewareStack} from './middlewares/xviz-server-middleware-stack';
 export {XVIZMessageToMiddleware} from './middlewares/xviz-message-to-middleware';
 
-export {XVIZRequestHandler} from './middlewares/xviz-request-handler';
+export {XVIZProviderRequestHandler} from './middlewares/xviz-provider-request-handler';
 export {XVIZWebsocketSender} from './middlewares/xviz-websocket-sender';
 
 export {XVIZProviderSession} from './server/xviz-provider-session';

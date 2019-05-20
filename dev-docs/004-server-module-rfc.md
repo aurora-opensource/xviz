@@ -141,7 +141,7 @@ class CustomSession {
     // In addition we are passing the 'middleware' to the components so
     // they may make calls in response to a particular context.
     const stack = [
-      new XVIZRequestHandler(this.context, this.middleware, ...),
+      new XVIZProviderRequestHandler(this.context, this.middleware, ...),
       new XVIZWebsocketSender(this.context, this.middleware, this.socket, ...)
     ];
 

@@ -31,13 +31,13 @@ function TransformLogDoneMsg(msg) {
 // Server middleware that handles the logic of responding
 // to a request with data from a provider, processing
 // the data through the supplied middleware
-export class XVIZRequestHandler {
+export class XVIZProviderRequestHandler {
   constructor(context, provider, middleware, options = {}) {
     this.context = context;
     this.provider = provider;
     this.middleware = middleware;
 
-    this.metrics = new Stats({id: 'xviz-request-handler'});
+    this.metrics = new Stats({id: 'xviz-provider-request-handler'});
     this.options = Object.assign({}, DEFAULT_OPTIONS, options);
 
     this._setupContext();

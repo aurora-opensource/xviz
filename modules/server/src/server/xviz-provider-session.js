@@ -14,7 +14,7 @@
 import {isXVIZMessage} from '@xviz/parser';
 import {XVIZData} from '@xviz/io';
 
-import {XVIZRequestHandler} from '../middlewares/xviz-request-handler';
+import {XVIZProviderRequestHandler} from '../middlewares/xviz-provider-request-handler';
 import {XVIZWebsocketSender} from '../middlewares/xviz-websocket-sender';
 
 import {XVIZServerMiddlewareStack} from '../middlewares/xviz-server-middleware-stack';
@@ -84,7 +84,7 @@ export class XVIZProviderSession {
     this.middleware = new XVIZServerMiddlewareStack();
 
     const stack = [
-      new XVIZRequestHandler(this.context, this.provider, this.middleware, this.options),
+      new XVIZProviderRequestHandler(this.context, this.provider, this.middleware, this.options),
       new XVIZWebsocketSender(this.context, this.socket, this.options)
     ];
     this.middleware.set(stack);

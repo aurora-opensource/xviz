@@ -24,7 +24,7 @@ import {
 } from './common-test-helpers';
 
 import {
-  XVIZRequestHandler,
+  XVIZProviderRequestHandler,
   XVIZSessionContext,
   XVIZServerMiddlewareStack,
   XVIZServer,
@@ -40,7 +40,7 @@ import {XVIZFormat} from '@xviz/io';
 // send transform_log
 // get 2 state_updates
 // get done
-tape('XVIZRequestHandler#simple flow', t => {
+tape('XVIZServer#simple flow', t => {
   const testCase = {
     path: '/foo',
     params: {bar: '1'}
@@ -53,7 +53,7 @@ tape('XVIZRequestHandler#simple flow', t => {
     const provider = new TestProvider(makeXVIZData(100, 110));
     const middleware = new XVIZServerMiddlewareStack();
     const stack = [
-      new XVIZRequestHandler(context, provider, middleware),
+      new XVIZProviderRequestHandler(context, provider, middleware),
       new XVIZWebsocketSender(context, socket, {format: XVIZFormat.JSON_STRING})
     ];
     middleware.set(stack);
