@@ -1,7 +1,7 @@
 # Middleware
 
 The middleware provides a structured pipeline for controlling and customizing the data flow for a
-request.
+message.
 
 Middleware is managed by the
 [XVIZServerMiddlewareStack](/docs/api-reference/server/xviz-server-middleware.md) and called in
@@ -13,15 +13,15 @@ The arguments to every method are the same
 
 Parameters:
 
-- `request` ([XVIZData](/docs/api-reference/io/xviz-data.md)) - The message received from the client
-- `response` ([XVIZData](/docs/api-reference/io/xviz-data.md)) - XVIZ data to be sent back to client
+- `message` ([XVIZData](/docs/api-reference/io/xviz-data.md)) - The message being processed by the
+  middleware
 
 Returns: (Boolean) - If `false` then this message flow should abort. Useful when one message type
 triggers another message type or if an error occurs.
 
 ## Session Events
 
-##### onConnect(request, response)
+##### onConnect()
 
 Called when a connection is accepted.
 
@@ -31,30 +31,30 @@ Called when a connection is closed.
 
 ### XVIZ Message Events
 
-##### onStart(request, response)
+##### onStart(message)
 
 Called when a `xviz/start` message is inititiated
 
-##### onTransformLog(request, response)
+##### onTransformLog(message)
 
 Called when a `xviz/tranform_log` message is inititiated
 
-##### onError(request, response)
+##### onError(message)
 
 Called when a `xviz/error` message is inititiated
 
-##### onMetadata(request, response)
+##### onMetadata(message)
 
 Called when a `xviz/metadata` message is inititiated
 
-##### onStateUpdate(request, response)
+##### onStateUpdate(message)
 
 Called when a `xviz/state_update` message is inititiated
 
-##### onTransformLogDone(request, response)
+##### onTransformLogDone(message)
 
 Called when a `xviz/transform_log_done` message is inititiated
 
-##### onReconfigure(request, response)
+##### onReconfigure(message)
 
 Called when a `xviz/transform_log_done` message is inititiated

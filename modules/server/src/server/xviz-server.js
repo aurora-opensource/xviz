@@ -64,7 +64,7 @@ export class XVIZServer {
     for (const handler of this.handlers) {
       const session = await handler.newSession(socket, req);
       if (session) {
-        session.onConnection();
+        session.onConnect();
         return;
       }
     }

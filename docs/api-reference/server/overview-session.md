@@ -7,7 +7,7 @@ session is responsible for for routing the socket message through the
 
 ### Interface Methods
 
-##### onConnection()
+##### onConnect()
 
 This marks the beginning of a connect that will be handled by this session. The concrete class
 implementing this function should be passed all necessary state in the constructor.

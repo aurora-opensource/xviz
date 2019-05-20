@@ -76,11 +76,11 @@ stopping at the first valid session returned and calling the
 `onConnection` method for that session.
 
 ```
-XVIZServer.onConnection(socket, request) {
+XVIZServer.onConnect(socket, request) {
   for (const handler in this.handlers) {
     const session = handler.newSession(socket, request);
     if (session) {
-      session.onConnection();
+      session.onConnect();
       break;
     }
   }

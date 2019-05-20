@@ -102,7 +102,7 @@ export class XVIZProviderSession {
     this.log(`[> Connection] Close: Code ${event.code} Reason: ${event.reason}`);
   }
 
-  onConnection() {
+  onConnect() {
     this.log('[> Connection] made');
 
     const params = this.request.params;

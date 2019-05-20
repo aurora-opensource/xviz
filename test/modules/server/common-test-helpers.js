@@ -86,8 +86,8 @@ export class TestSession {
   }
 
   // Called by handler
-  onConnection() {
-    this.handler.callMiddleware('connection');
+  onConnect() {
+    this.handler.callMiddleware('connect');
   }
 
   // Socket events
