@@ -19,7 +19,7 @@ export function setupArgs() {
   // client can request, otherwise default to source data format
   args.options('format', {
     describe: 'Output data format',
-    choices: ['JSON', 'JSON_BUFFER', 'BINARY'],
+    choices: ['JSON_STRING', 'JSON_BUFFER', 'BINARY_GLB'],
     nargs: 1
   });
 

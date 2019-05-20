@@ -53,7 +53,7 @@ export class XVIZWebsocketSender {
 
     if (this.format === XVIZFormat.OBJECT) {
       // We can not output OBJECT on a websocket
-      this.format = XVIZFormat.BINARY;
+      this.format = XVIZFormat.BINARY_GLB;
     }
 
     this.writer = null;
