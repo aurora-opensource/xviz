@@ -15,12 +15,13 @@
 import tape from 'tape-catch';
 
 import {
+  connect,
+  makeXVIZData,
   TestClient,
   TestHandler,
-  TestSession,
+  TestLogger,
   TestProvider,
-  connect,
-  makeXVIZData
+  TestSession
 } from './common-test-helpers';
 
 import {
@@ -48,12 +49,14 @@ tape('XVIZServer#simple flow', t => {
 
   let wss = null;
 
+  const logger = new TestLogger();
+
   const testSessionMaker = (socket, req) => {
     const context = new XVIZSessionContext();
     const provider = new TestProvider(makeXVIZData(100, 110));
     const middleware = new XVIZServerMiddlewareStack();
     const stack = [
-      new XVIZProviderRequestHandler(context, provider, middleware),
+      new XVIZProviderRequestHandler(context, provider, middleware, {logger}),
       new XVIZWebsocketSender(context, socket, {format: XVIZFormat.JSON_STRING})
     ];
     middleware.set(stack);
@@ -111,6 +114,7 @@ tape('XVIZServer#simple flow', t => {
     ];
 
     const client = new TestClient(clientSocket, sequence, () => {
+      t.equal(logger.count(), 5, 'logger is working');
       wss.close();
       t.end();
     });

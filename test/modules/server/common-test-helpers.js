@@ -266,3 +266,49 @@ export class MiddlewareEcho {
     this.log(`${this.prefix} onError`);
   }
 }
+
+export class TestLogger {
+  constructor() {
+    this.log = [];
+  }
+
+  _append(level, log) {
+    this.log.push({level, log});
+  }
+
+  log(...args) {
+    this._append('log', args);
+  }
+
+  info(...args) {
+    this._append('log', args);
+  }
+
+  warn(...args) {
+    this._append('log', args);
+  }
+
+  error(...args) {
+    this._append('log', args);
+  }
+
+  verbose(...args) {
+    this._append('log', args);
+  }
+
+  count(level) {
+    if (level) {
+      return this.log.filter(x => level === x.level).length;
+    }
+
+    return this.log.length;
+  }
+
+  logs(level) {
+    if (level) {
+      return this.log.filter(x => level === x.level);
+    }
+
+    return this.log;
+  }
+}

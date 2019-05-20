@@ -53,7 +53,7 @@ export class XVIZMessageToMiddleware {
 
     switch (xvizType) {
       // Connection events
-      case 'connection':
+      case 'connect':
         this.middleware.onConnect();
         break;
       case 'close':
@@ -88,7 +88,6 @@ export class XVIZMessageToMiddleware {
 
       default:
         const message = `Error: unknown XVIZ message type ${xvizType}`;
-        this.log(message);
         this.middleware.onError({type: 'xviz/error', data: {message}});
         break;
     }
