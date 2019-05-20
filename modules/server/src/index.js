@@ -12,4 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 export {XVIZServer} from './server/xviz-server';
+
+export {XVIZSessionContext} from './middlewares/xviz-session-context';
+export {XVIZServerMiddlewareStack} from './middlewares/xviz-server-middleware-stack';
+export {XVIZMessageToMiddleware} from './middlewares/xviz-message-to-middleware';
+
+export {XVIZRequestHandler} from './middlewares/xviz-request-handler';
+export {XVIZWebsocketSender} from './middlewares/xviz-websocket-sender';
+
+export {XVIZProviderSession} from './server/xviz-provider-session';
+
 export {main} from './main';

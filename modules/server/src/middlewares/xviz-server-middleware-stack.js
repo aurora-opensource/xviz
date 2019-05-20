@@ -31,43 +31,43 @@ export class XVIZServerMiddlewareStack {
   }
 
   // Server middleware
-  onConnect(request, response) {
-    this.middlewareDispatch('onConnect', request, response);
+  onConnect() {
+    this.middlewareDispatch('onConnect');
   }
 
-  onStart(request, response) {
-    this.middlewareDispatch('onStart', request, response);
+  onStart(msg) {
+    this.middlewareDispatch('onStart', msg);
   }
 
-  onTransformLog(request, response) {
-    this.middlewareDispatch('onTransformLog', request, response);
+  onTransformLog(msg) {
+    this.middlewareDispatch('onTransformLog', msg);
   }
 
-  onTransformPointInTime(request, response) {
-    this.middlewareDispatch('onTransformPointInTime', request, response);
+  onTransformPointInTime(msg) {
+    this.middlewareDispatch('onTransformPointInTime', msg);
   }
 
-  onError(request, response) {
-    this.middlewareDispatch('onError', request, response);
+  onError(msg) {
+    this.middlewareDispatch('onError', msg);
   }
 
-  onMetadata(request, response) {
-    this.middlewareDispatch('onMetadata', request, response);
+  onMetadata(msg) {
+    this.middlewareDispatch('onMetadata', msg);
   }
 
-  onStateUpdate(request, response) {
-    this.middlewareDispatch('onStateUpdate', request, response);
+  onStateUpdate(msg) {
+    this.middlewareDispatch('onStateUpdate', msg);
   }
 
-  onTransformLogDone(request, response) {
-    this.middlewareDispatch('onTransformLogDone', request, response);
+  onTransformLogDone(msg) {
+    this.middlewareDispatch('onTransformLogDone', msg);
   }
 
-  onReconfigure(request, response) {
-    this.middlewareDispatch('reconfigure', request, response);
+  onReconfigure(msg) {
+    this.middlewareDispatch('reconfigure', msg);
   }
 
-  middlewareDispatch(name, request, response) {
+  middlewareDispatch(name, msg) {
     const arrayLength = this.middlewares.length;
     for (let i = 0; i < arrayLength; i++) {
       const middleware = this.middlewares[i];
@@ -78,10 +78,10 @@ export class XVIZServerMiddlewareStack {
         let args = [];
 
         // Support JS objects
-        if (response.data && !(response.data instanceof XVIZData)) {
-          response.data = new XVIZData(response.data);
+        if (msg && !(msg instanceof XVIZData)) {
+          msg = new XVIZData(msg);
         }
-        args = [request, response];
+        args = [msg];
 
         const nextMiddleware = handler.apply(middleware, args);
         if (nextMiddleware === false) {

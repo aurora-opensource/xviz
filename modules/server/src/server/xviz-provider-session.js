@@ -109,6 +109,7 @@ export class XVIZProviderSession {
     // Providers have already decided via the URL Path
     // that this is a valid source, so we can
     // treat connection as 'start' and send metadata
+    // TODO: this is totally wrong.  params is not an XVIZ Message
     this.callMiddleware('start', params);
 
     // TODO: if live we should start sending data immediately
@@ -121,31 +122,27 @@ export class XVIZProviderSession {
       // we get is simple and instantiate the message immediately
       // We also need to do this to get the "type()"
       const xvizData = new XVIZData(message.data);
-
-      // TODO: I need to get the type w/o instantiating the message()
-      // need to add this to binary/glb parsing
-      const xvizObj = xvizData.message();
-      this.callMiddleware(xvizObj.type, xvizObj.data);
+      this.callMiddleware(xvizData.type, xvizData);
     } else {
       this.log('[> Message] Unknown message: ', JSON.stringify(message, null, 2).slice(0, 100));
     }
   }
 
-  callMiddleware(xvizType, req = {}, data = {}) {
+  callMiddleware(xvizType, msg = {}) {
     this.info(`[> ${xvizType.toUpperCase()}]`);
 
     switch (xvizType) {
       case 'start':
-        this.middleware.onStart(req, data);
+        this.middleware.onStart(msg);
         break;
       case 'transform_log':
-        this.middleware.onTransformLog(req, data);
+        this.middleware.onTransformLog(msg);
         break;
       case 'transform_point_in_time':
-        this.middleware.onTransformPointInTime(req, data);
+        this.middleware.onTransformPointInTime(msg);
         break;
       default:
-        this.log('[ UNKNOWN] message', xvizType, data);
+        this.log('[ UNKNOWN] message', xvizType, msg);
         // TODO: send error
         break;
     }

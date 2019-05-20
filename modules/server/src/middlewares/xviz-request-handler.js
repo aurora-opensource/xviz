@@ -16,7 +16,7 @@
 import {Stats} from 'probe.gl';
 
 const DEFAULT_OPTIONS = {
-  delay: 50 // time in milliseconds
+  delay: 0 // time in milliseconds
 };
 
 // TODO: move to @xviz/io
@@ -61,36 +61,37 @@ export class XVIZRequestHandler {
     }
   }
 
-  onStart(req, resp) {
+  onStart(msg) {
     // TODO; validation
     const error = null;
     if (error) {
-      this.middleware.onError(req, ErrorMsg(error));
+      this.middleware.onError(ErrorMsg(error));
     } else {
       // fill in profile, format, session_type
       // make context specific configuration fields
-      if (resp.message_format) {
-        this.context.set('message_format', resp.message_format);
+      const message = msg.message();
+      if (message.data.message_format) {
+        this.context.set('message_format', message.data.message_format);
       } else {
         this.context.set('message_format', 'binary');
       }
 
-      if (resp.profile) {
-        this.context.set('profile', resp.profile);
+      if (message.data.profile) {
+        this.context.set('profile', message.data.profile);
       } else {
         this.context.set('profile', 'default');
       }
 
-      if (resp.session_type) {
-        this.context.set('session_type', resp.session_type);
+      if (message.data.session_type) {
+        this.context.set('session_type', message.data.session_type);
       } else {
         this.context.set('session_type', 'log');
       }
     }
 
     // send metadata
-    const data = this.provider.xvizMetadata();
-    this.middleware.onMetadata(req, {data});
+    const metadata = this.provider.xvizMetadata();
+    this.middleware.onMetadata(metadata);
   }
 
   _setupTransformMetrics() {
@@ -101,19 +102,20 @@ export class XVIZRequestHandler {
     };
   }
 
-  onTransformLog(req, resp) {
+  onTransformLog(msg) {
     // TODO: validation
     const error = null;
     if (error) {
-      this.middleware.onError(req, ErrorMsg(error));
+      this.middleware.onError(ErrorMsg(error));
     } else {
       //  store id, start_timestamp, end_timestamp, desired_streams
-      const id = req.id;
+      const message = msg.message();
+      const id = message.data.id;
       const transform = this.context.transform(id);
       if (!transform) {
         // track transform request
         const tformState = {
-          request: req,
+          request: message.data,
           iterator: null,
           interval: null,
           delay: this.options.delay,
@@ -122,8 +124,8 @@ export class XVIZRequestHandler {
         this.context.startTransform(id, tformState);
 
         tformState.iterator = this.provider.getFrameIterator(
-          req.start_timestamps,
-          req.end_timestamps
+          message.data.start_timestamp,
+          message.data.end_timestamp
         );
 
         // send state_updates || error
@@ -136,16 +138,23 @@ export class XVIZRequestHandler {
     }
   }
 
-  onTransformPointInTime(req, resp) {
-    this.middleware.onError(req, ErrorMsg('Error: transform_point_in_time is not supported.'));
+  onTransformPointInTime(msg) {
+    this.middleware.onError(ErrorMsg('Error: transform_point_in_time is not supported.'));
   }
 
-  onReconfigure(req, data) {
-    this.middleware.onError(req, ErrorMsg('Error: reconfigure is not supported.'));
+  onReconfigure(msg) {
+    this.middleware.onError(ErrorMsg('Error: reconfigure is not supported.'));
+  }
+
+  log(...msg) {
+    const {logger} = this.options;
+    if (logger && logger.log) {
+      logger.log(...msg);
+    }
   }
 
   async _sendStateUpdate(id, transformState) {
-    const {delay, request, interval, iterator} = transformState;
+    const {delay, interval, iterator} = transformState;
     const {loadTimer, sendTimer, totalTimer} = transformState;
 
     if (!interval) {
@@ -165,7 +174,7 @@ export class XVIZRequestHandler {
 
       if (data) {
         sendTimer && sendTimer.timeStart();
-        this.middleware.onStateUpdate(request, {data});
+        this.middleware.onStateUpdate(data);
         sendTimer && sendTimer.timeEnd();
 
         this.logMsgSent(id, iterator.value(), loadTimer, sendTimer);
@@ -173,7 +182,7 @@ export class XVIZRequestHandler {
 
       transformState.interval = setTimeout(() => this._sendStateUpdate(id, transformState), delay);
     } else {
-      this.middleware.onTransformLogDone(request, TransformLogDoneMsg({id}));
+      this.middleware.onTransformLogDone(TransformLogDoneMsg({id}));
       totalTimer && totalTimer.timeEnd();
       this.logDone(id, loadTimer, sendTimer, totalTimer);
       this.context.endTransform(id);
@@ -182,7 +191,7 @@ export class XVIZRequestHandler {
   }
 
   async _sendAllStateUpdates(id, transformState) {
-    const {iterator, request} = transformState;
+    const {iterator} = transformState;
     const {loadTimer, sendTimer, totalTimer} = transformState;
 
     totalTimer && totalTimer.timeStart();
@@ -193,14 +202,14 @@ export class XVIZRequestHandler {
 
       if (data) {
         sendTimer && sendTimer.timeStart();
-        this.middleware.onStateUpdate(request, {data});
+        this.middleware.onStateUpdate(data);
         sendTimer && sendTimer.timeEnd();
 
         this.logMsgSent(id, iterator.value(), loadTimer, sendTimer);
       }
     }
 
-    this.middleware.onTransformLogDone(request, TransformLogDoneMsg({id}));
+    this.middleware.onTransformLogDone(TransformLogDoneMsg({id}));
     totalTimer && totalTimer.timeEnd();
     this.logDone(id, loadTimer, sendTimer, totalTimer);
     this.context.endTransform(id);
