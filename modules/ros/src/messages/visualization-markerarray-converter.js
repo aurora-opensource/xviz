@@ -54,7 +54,7 @@ export class VisualizationMarkerArray {
     const messages = frame[this.topic];
     if (messages) {
       for (const {message} of messages) {
-        message.markers.forEach(marker => this._processMarker);
+        message.markers.forEach(marker => this._processMarker(marker));
       }
     }
 

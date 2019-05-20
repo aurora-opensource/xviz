@@ -278,8 +278,12 @@ export class Bag {
       }
     }
 
-    const frm = xvizBuilder.getFrame();
-    return frm;
+    try {
+      const frm = xvizBuilder.getFrame();
+      return frm;
+    } catch (err) {
+      return null;
+    }
   }
 
   // We synchronize frames along messages in the `keyTopic`.
