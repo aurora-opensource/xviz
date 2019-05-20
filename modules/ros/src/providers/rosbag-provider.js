@@ -122,6 +122,10 @@ export class ROSBAGProvider {
 
     // Read Frame by keyTopic/stream
     const frame = await this.bag.readFrameByTime(start, end);
-    return new XVIZData(frame);
+    if (frame) {
+      return new XVIZData(frame);
+    }
+
+    return null;
   }
 }
