@@ -7,9 +7,9 @@
     "update_type": {
       "type": "string",
       "enum": [
-        "snapshot",
+        "complete_state",
         "incremental",
-        "complete_state"
+        "snapshot"
       ]
     },
     "updates": {

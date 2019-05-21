@@ -20,7 +20,11 @@
  */
 /* global Blob, Uint8Array */
 import {LOG_STREAM_MESSAGE} from '../constants';
-import {parseBinaryXVIZ, isBinaryXVIZ} from '../loaders/xviz-loader/xviz-binary-loader';
+import {
+  parseBinaryXVIZ,
+  isBinaryXVIZ,
+  getBinaryXVIZJSONBuffer
+} from '../loaders/xviz-loader/xviz-binary-loader';
 import {parseLogMetadata} from './parse-log-metadata';
 import {parseStreamVideoMessage} from './parse-stream-video-message';
 import {TextDecoder} from '../utils/text-encoding';
@@ -42,25 +46,74 @@ function isJSONString(str) {
   return (firstChar === '{' && lastChar === '}') || (firstChar === '[' && lastChar === ']');
 }
 
-const XVIZ_TYPE_PATTERN = /"type":\s*"xviz\//;
+const XVIZ_TYPE_PATTERN = /"type":\s*"(xviz\/\w*)"/;
+const XVIZ_TYPE_VALUE_PATTERN = /xviz\/\w*/;
 
-// returns true if the input represents an enveloped XVIZ object as a JSON string.
-// Can be either string or Uint8Array
-function isXVIZJSONString(str) {
-  // {"type":"xviz/
-  let firstChunk = str.slice(0, 14);
+// Returns the XVIZ message 'type' from the input strings
+// else null if not found.
+function getXVIZType(firstChunk, lastChunk) {
+  let result = firstChunk.match(XVIZ_TYPE_PATTERN);
+  if (!result && lastChunk) {
+    result = lastChunk.match(XVIZ_TYPE_PATTERN);
+  }
+
+  if (result) {
+    // return the first match group which contains the type
+    return result[1];
+  }
+
+  return null;
+}
+
+// Returns the XVIZ message 'type' from the input string
+// else null if not found.
+function getObjectXVIZType(type) {
+  const match = type.match(XVIZ_TYPE_VALUE_PATTERN);
+  if (match) {
+    return match[0];
+  }
+
+  return null;
+}
+
+// return the XVIZ type string if the input represents an enveloped XVIZ
+// object as a JSON string.
+// 'str' can be either string or Uint8Array
+function getJSONXVIZType(str) {
+  // We are trying to capture
+  // "type"\s*:\s*"xviz/transform_point_in_time"
+  // which the smallest is 37 bytes. Grab 50
+  // to provide room for spacing
+
+  // {"type":"xviz/*"
+  let firstChunk = str.slice(0, 50);
   // "type":"xviz/*"}
-  let lastChunk = str.slice(-36);
+  let lastChunk = str.slice(-50);
 
   if (Number.isFinite(firstChunk[0])) {
     firstChunk = String.fromCharCode.apply(null, firstChunk);
     lastChunk = String.fromCharCode.apply(null, lastChunk);
   }
 
-  return XVIZ_TYPE_PATTERN.test(firstChunk) || XVIZ_TYPE_PATTERN.test(lastChunk);
+  return getXVIZType(firstChunk, lastChunk);
 }
 
-function getDataType(data) {
+function getBinaryXVIZType(arraybuffer) {
+  const jsonBuffer = getBinaryXVIZJSONBuffer(arraybuffer);
+  if (!jsonBuffer) {
+    return null;
+  }
+
+  // We have no choice but to decode the JSON portion of the buffer
+  // since it also contains all the GLB headers. This means we do not
+  // have any meaningful limits for where to search for the 'type' string
+  const textDecoder = new TextDecoder('utf8');
+  const jsonString = textDecoder.decode(jsonBuffer);
+
+  return getXVIZType(jsonString);
+}
+
+export function getDataFormat(data) {
   if (data === null || data === undefined) {
     return null;
   }
@@ -72,7 +125,7 @@ function getDataType(data) {
 
 // get JSON from binary
 function decode(data, recursive) {
-  switch (getDataType(data)) {
+  switch (getDataFormat(data)) {
     case 'binary':
       if (isBinaryXVIZ(data)) {
         return parseBinaryXVIZ(data);
@@ -108,10 +161,16 @@ function decode(data, recursive) {
 }
 
 // Efficiently check if an object is a supported XVIZ message, without decoding it.
-// Returns true for the following formats: XVIZ binary (GLB), eveloped JSON object,
-// eveloped JSON string, eveloped JSON string as arraybuffer
+//
+// Returns true for the following formats:
+// - XVIZ binary (GLB)
+// - enveloped JSON object,
+// - enveloped JSON string
+// - enveloped JSON string as arraybuffer
+//
+// else return false
 export function isXVIZMessage(data) {
-  switch (getDataType(data)) {
+  switch (getDataFormat(data)) {
     case 'binary':
       if (isBinaryXVIZ(data)) {
         return true;
@@ -119,10 +178,10 @@ export function isXVIZMessage(data) {
       if (data instanceof ArrayBuffer) {
         data = new Uint8Array(data);
       }
-      return isXVIZJSONString(data);
+      return getJSONXVIZType(data) !== null;
 
     case 'string':
-      return isXVIZJSONString(data);
+      return getJSONXVIZType(data) !== null;
 
     case 'object':
       return data.type ? data.type.startsWith('xviz/') : false;
@@ -130,6 +189,37 @@ export function isXVIZMessage(data) {
     default:
   }
   return false;
+}
+
+// Efficiently check if an object is a supported XVIZ message, with minimal decoding.
+//
+// Returns the 'type' for the following formats:
+//  - XVIZ binary (GLB)
+//  - enveloped JSON object
+//  - enveloped JSON string
+//  - enveloped JSON string as arraybuffer
+//
+// else return null
+export function getXVIZMessageType(data) {
+  switch (getDataFormat(data)) {
+    case 'binary':
+      if (isBinaryXVIZ(data)) {
+        return getBinaryXVIZType(data);
+      }
+      if (data instanceof ArrayBuffer) {
+        data = new Uint8Array(data);
+      }
+      return getJSONXVIZType(data);
+
+    case 'string':
+      return getJSONXVIZType(data);
+
+    case 'object':
+      return data.type ? getObjectXVIZType(data.type) : null;
+
+    default:
+  }
+  return null;
 }
 
 // Parse apart the namespace and type for the enveloped data

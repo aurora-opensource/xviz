@@ -47,6 +47,8 @@ export {
   parseStreamDataMessage,
   parseStreamLogData,
   isXVIZMessage,
+  getXVIZMessageType,
+  getDataFormat,
   isEnvelope,
   unpackEnvelope
 } from './parsers/parse-stream-data-message';
