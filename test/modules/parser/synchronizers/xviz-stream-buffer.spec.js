@@ -16,42 +16,70 @@ import test from 'tape-catch';
 
 import {XVIZStreamBuffer} from '@xviz/parser';
 
-const TEST_TIMESLICES = [
+const TEST_CASES = [
   {
     id: 'TS-1',
-    timestamp: 1002,
-    streams: {A: 2, B: 0}
+    message: {
+      timestamp: 1002,
+      streams: {A: 2, B: -3}
+    },
+    snapshot: {A: 2, B: -3}
   },
   {
     id: 'TS-2',
-    timestamp: 1001,
-    streams: {A: 1, C: 1}
+    message: {
+      timestamp: 1001,
+      streams: {A: 1, B: -2, C: 1}
+    },
+    snapshot: {A: 1, B: -2, C: 1}
   },
   {
     id: 'TS-3',
-    timestamp: 1005,
-    streams: {A: 5}
+    message: {
+      timestamp: 1005,
+      streams: {A: 5}
+    },
+    snapshot: {A: 5}
   },
   {
     id: 'TS-4',
-    timestamp: 1003,
-    streams: {A: 3}
+    message: {
+      timestamp: 1003,
+      streams: {A: 3}
+    },
+    snapshot: {A: 3}
   },
   {
     id: 'TS-5',
-    timestamp: 1004,
-    streams: {A: 4, B: -1}
+    message: {
+      timestamp: 1004,
+      streams: {A: 4, B: -1}
+    },
+    snapshot: {A: 4, B: -1}
   },
   {
     id: 'TS-6',
-    timestamp: 1001,
-    streams: {A: 1.1}
+    message: {
+      updateType: 'INCREMENTAL',
+      timestamp: 1001,
+      streams: {A: 1.1, B: null}
+    },
+    snapshot: {A: 1.1, C: 1}
+  },
+  {
+    id: 'TS-8',
+    message: {
+      updateType: 'COMPLETE',
+      timestamp: 1002,
+      streams: {A: 2.2}
+    },
+    snapshot: {A: 2.2}
   }
 ];
 
-const TEST_TIMESLICES_SORTED = TEST_TIMESLICES.slice(0, 5).sort(
-  (ts1, ts2) => ts1.timestamp - ts2.timestamp
-);
+const TEST_TIMESLICES_SORTED = TEST_CASES.slice(0, 5)
+  .map(testCase => testCase.message)
+  .sort((ts1, ts2) => ts1.timestamp - ts2.timestamp);
 
 test('XVIZStreamBuffer#constructor', t => {
   const xvizStreamBuffer = new XVIZStreamBuffer();
@@ -114,13 +142,13 @@ test('XVIZStreamBuffer#insert, getStreams', t => {
   let timeslices;
   let {lastUpdate} = xvizStreamBuffer;
 
-  TEST_TIMESLICES.forEach(sample => {
-    xvizStreamBuffer.insert(sample);
+  TEST_CASES.forEach(sample => {
+    xvizStreamBuffer.insert(sample.message);
 
     timeslices = xvizStreamBuffer.getTimeslices();
 
-    const inserted = timeslices.find(timeslice => timeslice.timestamp === sample.timestamp);
-    t.ok(inserted && inserted.id === sample.id, 'timeslice is inserted');
+    const inserted = timeslices.find(timeslice => timeslice.timestamp === sample.message.timestamp);
+    t.deepEquals(inserted.streams, sample.snapshot, 'timeslice is inserted');
 
     t.not(lastUpdate, xvizStreamBuffer.lastUpdate, 'lastUpdate timestamp has changed');
 
@@ -135,11 +163,9 @@ test('XVIZStreamBuffer#insert, getStreams', t => {
     t.ok(isInOrder, 'timeslices are ordered by timestamp');
   });
 
-  const ts1001 = timeslices.find(timeslice => timeslice.timestamp === 1001);
-  t.deepEquals(ts1001.streams, {A: 1.1, C: 1}, 'streams are deep merged');
   t.deepEquals(
     xvizStreamBuffer.getStreams(),
-    {A: [1.1, 2, 3, 4, 5], B: [0, -1], C: [1]},
+    {A: [1.1, 2.2, 3, 4, 5], B: [-1], C: [1]},
     'getStreams returns correct result'
   );
 
@@ -187,7 +213,7 @@ test('XVIZStreamBuffer#setCurrentTime', t => {
 test('XVIZStreamBuffer#hasBuffer', t => {
   const xvizStreamBuffer = new XVIZStreamBuffer();
 
-  TEST_TIMESLICES.forEach(sample => xvizStreamBuffer.insert(sample));
+  TEST_CASES.forEach(sample => xvizStreamBuffer.insert(sample.message));
 
   t.ok(xvizStreamBuffer.hasBuffer(1001, 1005), 'returns true for range covered by timeslice');
   t.end();
@@ -196,7 +222,7 @@ test('XVIZStreamBuffer#hasBuffer', t => {
 test('XVIZStreamBuffer#updateFixedBuffer contraction, removes invalid data', t => {
   const xvizStreamBuffer = new XVIZStreamBuffer();
   xvizStreamBuffer.updateFixedBuffer(1000, 1010);
-  TEST_TIMESLICES.forEach(sample => xvizStreamBuffer.insert(sample));
+  TEST_CASES.forEach(sample => xvizStreamBuffer.insert(sample.message));
   const {start, end, oldStart, oldEnd} = xvizStreamBuffer.updateFixedBuffer(1002, 1003);
 
   t.is(start, 1002, 'contracts buffer start');

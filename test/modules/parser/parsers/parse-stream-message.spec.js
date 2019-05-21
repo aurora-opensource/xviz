@@ -33,7 +33,7 @@ const metadataMessageV2 = {
 const xvizUpdateV2 = {
   type: 'xviz/state_update',
   data: {
-    update_type: 'snapshot',
+    update_type: 'complete_state',
     updates: [
       {
         timestamp: 1001.3,

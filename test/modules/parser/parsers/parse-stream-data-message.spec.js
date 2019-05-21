@@ -91,7 +91,7 @@ const TestTimesliceMessageV1 = {
 };
 
 const TestTimesliceMessageV2 = {
-  update_type: 'snapshot',
+  update_type: 'complete_state',
   updates: [
     {
       timestamp: 1001.0,
@@ -295,7 +295,7 @@ tape('parseStreamLogData validate result when missing updates', t => {
 
   const metaMessage = parseStreamLogData(
     {
-      update_type: 'snapshot'
+      update_type: 'complete_state'
     },
     {v2Type: 'state_update'}
   );
@@ -312,7 +312,7 @@ tape('parseStreamLogData validate result when updates is empty', t => {
 
   const metaMessage = parseStreamLogData(
     {
-      update_type: 'snapshot',
+      update_type: 'complete_state',
       updates: []
     },
     {v2Type: 'state_update'}
@@ -330,7 +330,7 @@ tape('parseStreamLogData validate result when missing timestamp in updates', t =
 
   const metaMessage = parseStreamLogData(
     {
-      update_type: 'snapshot',
+      update_type: 'complete_state',
       updates: [{}]
     },
     {v2Type: 'state_update'}
@@ -416,12 +416,40 @@ tape('parseStreamLogData timeslice', t => {
   setXVIZConfig({currentMajorVersion: 2});
 
   // NOTE: no explicit type for this message yet.
-  const metaMessage = parseStreamLogData({...TestTimesliceMessageV2}, {v2Type: 'state_update'});
-  t.equals(metaMessage.type, LOG_STREAM_MESSAGE.TIMESLICE, 'Message type set for timeslice');
+  let result = parseStreamLogData({...TestTimesliceMessageV2}, {v2Type: 'state_update'});
+  t.equals(result.type, LOG_STREAM_MESSAGE.TIMESLICE, 'Message type set for timeslice');
+  t.equal(result.updateType, 'COMPLETE', 'XVIZ update type is parsed');
   t.equals(
-    metaMessage.timestamp,
+    result.timestamp,
     TestTimesliceMessageV2.updates[0].poses['/vehicle_pose'].timestamp,
     'Message timestamp set from vehicle_pose'
+  );
+
+  // Incremental update
+  result = parseStreamLogData(
+    {...TestTimesliceMessageV2, update_type: 'incremental'},
+    {v2Type: 'state_update'}
+  );
+  t.equals(result.type, LOG_STREAM_MESSAGE.TIMESLICE, 'Message type set for timeslice');
+  t.equal(result.updateType, 'INCREMENTAL', 'XVIZ update type is parsed');
+
+  // Deprecated 'snapshot' update type
+  result = parseStreamLogData(
+    {...TestTimesliceMessageV2, update_type: 'snapshot'},
+    {v2Type: 'state_update'}
+  );
+  t.equals(result.type, LOG_STREAM_MESSAGE.TIMESLICE, 'Message type set for timeslice');
+  t.equal(result.updateType, 'INCREMENTAL', 'XVIZ update type is parsed');
+
+  // Unknown update type
+  result = parseStreamLogData(
+    {...TestTimesliceMessageV2, update_type: ''},
+    {v2Type: 'state_update'}
+  );
+  t.equals(
+    result.type,
+    LOG_STREAM_MESSAGE.INCOMPLETE,
+    'Should not parse timeslice of unsupported update type'
   );
 
   t.end();
@@ -682,7 +710,7 @@ tape('parseStreamLogData variable timeslice', t => {
   resetXVIZConfigAndSettings();
   setXVIZConfig({currentMajorVersion: 2});
   const VariableTestTimesliceMessage = {
-    update_type: 'snapshot',
+    update_type: 'complete_state',
     updates: [
       {
         timestamp: 1001.0,

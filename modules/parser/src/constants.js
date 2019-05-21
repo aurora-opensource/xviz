@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/* eslint-disable camelcase */
 export const LOG_STREAM_MESSAGE = {
   METADATA: 'METADATA',
   TIMESLICE: 'TIMESLICE',
@@ -20,4 +21,12 @@ export const LOG_STREAM_MESSAGE = {
   VIDEO_FRAME: 'VIDEO_FRAME',
   ERROR: 'ERROR',
   INCOMPLETE: 'INCOMPLETE'
+};
+
+export const STATE_UPDATE_TYPE = {
+  complete_state: 'COMPLETE',
+  incremental: 'INCREMENTAL',
+
+  // Deprecated
+  snapshot: 'INCREMENTAL'
 };
