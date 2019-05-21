@@ -24,8 +24,11 @@ import {
   TestSession
 } from './common-test-helpers';
 
+import {XVIZProviderFactory} from '@xviz/io';
 import {
+  ScenarioProvider,
   XVIZProviderRequestHandler,
+  XVIZProviderHandler,
   XVIZSessionContext,
   XVIZServerMiddlewareStack,
   XVIZServer,
@@ -33,6 +36,8 @@ import {
 } from '@xviz/server';
 
 import {XVIZFormat} from '@xviz/io';
+
+XVIZProviderFactory.addProviderClass(ScenarioProvider);
 
 // Test this flow:
 // Connect
@@ -115,6 +120,114 @@ tape('XVIZServer#simple flow', t => {
 
     const client = new TestClient(clientSocket, sequence, () => {
       t.equal(logger.count(), 5, 'logger is working');
+      wss.close();
+      t.end();
+    });
+  });
+});
+
+tape('XVIZServer#scenario-circle', t => {
+  const testCase = {
+    path: '/scenario-circle',
+    params: {duration: '1', hz: '1'}
+  };
+
+  const handler = new XVIZProviderHandler(XVIZProviderFactory, {d: '.'});
+  const wss = new XVIZServer([handler], {port: 0}, () => {
+    const clientSocket = connect(
+      wss,
+      testCase
+    );
+    const start = Date.now() / 1000;
+    const end = start + 1;
+
+    const sequence = [
+      {
+        expect: msg => {
+          t.equal(msg, undefined, 'onOpen sends no message');
+        },
+        response: {
+          type: 'xviz/transform_log',
+          data: {
+            id: '1',
+            start_timestamp: start,
+            end_timestamp: end
+          }
+        }
+      },
+      {
+        expect: msg => {
+          t.equal(msg.type, 'metadata', 'received metadata');
+        }
+      },
+      {
+        expect: msg => {
+          t.equal(msg.type, 'state_update', 'received state_update');
+        }
+      },
+      {
+        expect: msg => {
+          t.equal(msg.type, 'transform_log_done', 'received done');
+        }
+      }
+    ];
+
+    const client = new TestClient(clientSocket, sequence, () => {
+      // t.equal(logger.count(), 5, 'logger is working');
+      wss.close();
+      t.end();
+    });
+  });
+});
+
+tape('XVIZServer#scenario-straight', t => {
+  const testCase = {
+    path: '/scenario-straight',
+    params: {duration: '1', hz: '1'}
+  };
+
+  const handler = new XVIZProviderHandler(XVIZProviderFactory, {d: '.'});
+  const wss = new XVIZServer([handler], {port: 0}, () => {
+    const clientSocket = connect(
+      wss,
+      testCase
+    );
+    const start = Date.now() / 1000;
+    const end = start + 1;
+
+    const sequence = [
+      {
+        expect: msg => {
+          t.equal(msg, undefined, 'onOpen sends no message');
+        },
+        response: {
+          type: 'xviz/transform_log',
+          data: {
+            id: '1',
+            start_timestamp: start,
+            end_timestamp: end
+          }
+        }
+      },
+      {
+        expect: msg => {
+          t.equal(msg.type, 'metadata', 'received metadata');
+        }
+      },
+      {
+        expect: msg => {
+          t.equal(msg.type, 'state_update', 'received state_update');
+        }
+      },
+      {
+        expect: msg => {
+          t.equal(msg.type, 'transform_log_done', 'received done');
+        }
+      }
+    ];
+
+    const client = new TestClient(clientSocket, sequence, () => {
+      // t.equal(logger.count(), 5, 'logger is working');
       wss.close();
       t.end();
     });

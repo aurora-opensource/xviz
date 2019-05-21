@@ -20,6 +20,9 @@ export {XVIZMessageToMiddleware} from './middlewares/xviz-message-to-middleware'
 export {XVIZProviderRequestHandler} from './middlewares/xviz-provider-request-handler';
 export {XVIZWebsocketSender} from './middlewares/xviz-websocket-sender';
 
+export {XVIZProviderHandler} from './server/xviz-provider-handler';
 export {XVIZProviderSession} from './server/xviz-provider-session';
+
+export {ScenarioProvider} from './scenarios';
 
 export {main} from './main';
