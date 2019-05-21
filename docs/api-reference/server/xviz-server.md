@@ -28,19 +28,19 @@ Parameters:
   instances to service requests
 - `options` (Object) - Options for the Server
 
-  - `options.port` (Number) - Port to listen on
-  - `options.maxPayload` (Number) - Port to listen on
-  - `options.perMessageDeflate` (Boolean) - Setting if message compress on the websocket is enabled
-  - `options.delay` (Number) - millisecond delay between sending response messages
-  - `options.logger` (Object) - logger object passed through the system
+  - `port` (Number) - Port to listen on
+  - `maxPayload` (Number) - Port to listen on
+  - `perMessageDeflate` (Boolean) - Setting if message compress on the websocket is enabled
+  - `delay` (Number) - Millisecond delay between sending response messages
+  - `logger` (Object) - Logger object passed through the system
 
-    - `options.logger.log` (Function) - Log function that will always display the message
-    - `options.logger.error` (Function) - Log function for error level messages
-    - `options.logger.warn` (Function) - Log function for warning level messages
-    - `options.logger.info` (Function) - Log function for info level messages
-    - `options.logger.verbose` (Function) - Log function for verbose level messages
+    - `log` (Function) - Function that will always display the message
+    - `error` (Function) - Function for error level messages
+    - `warn` (Function) - Function for warning level messages
+    - `info` (Function) - Function for info level messages
+    - `verbose` (Function) - Function for verbose level messages
 
-- `cb` (Function) - Function callback called when the server is listening.
+- `cb` (Function) - Callback called when the server is listening.
 
 ## Properties
 
@@ -55,13 +55,3 @@ Returns: (Object) - The underlying WebSocket server object
 ##### close()
 
 Terminate the server.
-
-##### async handleSession(socket, request)
-
-Upon a `connection` event this will be called to delegate to the registered handlers and hand over
-the connection handling to the first session returned from a handler.
-
-Parameters:
-
-- `socket` (Object) - Socket object TODO link to node/external docs
-- `request` (Object) - Request object TODO link to node/external docs

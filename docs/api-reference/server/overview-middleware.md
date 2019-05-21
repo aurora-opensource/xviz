@@ -4,12 +4,60 @@ The middleware provides a structured pipeline for controlling and customizing th
 message.
 
 Middleware is managed by the
-[XVIZServerMiddlewareStack](/docs/api-reference/server/xviz-server-middleware.md) and called in
-order unless a handler chooses to stop further subsequent flow.
+[XVIZServerMiddlewareStack](/docs/api-reference/server/xviz-server-middleware-stack.md) and called
+in order unless a handler chooses to stop further subsequent flow.
 
-The arguments to every method are the same
+## Example
+
+The [XVIZServerMiddlewareStack](/docs/api-reference/server/xviz-server-middleware-stack.md) is
+something that would be instantiated by an XVIZSession. The XVIZSession would create the middleware
+then setup the components to define the pipeline for handing requests, manipulating data, and
+sending the response.
+
+```js
+import {
+  XVIZProviderRequestHandler
+  XVIZMessageToMiddleware
+  XVIZServerMiddlewareStack
+  XVIZSessionContext
+  XVIZWebsocketSender} from '@xviz/server';
+
+export class ExampleSession {
+  constructor(socket, request, provider, options) {
+    this.socket = socket;
+    this.provider = provider;
+    this.request = request;
+    this.options = options;
+
+    // Session shared storage for the middlewares
+    this.context = new XVIZSessionContext();
+
+    // The middleware will manage calling the components in the stack
+    this.middleware = new XVIZServerMiddlewareStack();
+
+    // Setup a pipeline to respond to request and send back messages
+    const stack = [
+      new XVIZProviderRequestHandler(this.context, this.provider, this.middleware, this.options),
+      new XVIZWebsocketSender(this.context, this.socket, this.options)
+    ];
+    this.middleware.set(stack);
+
+    // The XVIZMessageToMiddleware object is a convenience class to
+    // simply inspect a message and if it is an XVIZ message call the middleware
+    this.handler = new XVIZMessageToMiddleware(this.middleware);
+
+    this.socket.onmessage = message => {
+      if (!this.handler.onMessage(message)) {
+        // Handle non-XVIZ message here
+      }
+    };
+  }
+}
+```
 
 ## Common Method Parameters
+
+The middleware operates at an XVIZ message level.
 
 Parameters:
 
@@ -19,7 +67,7 @@ Parameters:
 Returns: (Boolean) - If `false` then this message flow should abort. Useful when one message type
 triggers another message type or if an error occurs.
 
-## Session Events
+## Middleware Interface
 
 ##### onConnect()
 

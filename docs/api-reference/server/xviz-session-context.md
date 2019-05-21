@@ -1,7 +1,7 @@
 # XVIZSessionContext
 
 This object provides state used during an
-[XVIZSssion](/docs/api-reference/server/overview-session.md) to the middleware components.
+[XVIZSession](/docs/api-reference/server/overview-session.md) to the middleware components.
 
 It also serves as a store for any such component to save state if is needs to do so for the duration
 of the session. XVIZ Providers encapsulate the details of reading a particular XVIZ source and

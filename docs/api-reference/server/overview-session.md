@@ -3,7 +3,7 @@
 An object satisfying this interface is returned by an
 [XVIZHandler](/docs/api-reference/server/overview-handler.md) to manage the socket and messages. The
 session is responsible for for routing the socket message through the
-[XVIZServerMiddlewareStack](/docs/api-reference/server/overview-handler.md).
+[XVIZServerMiddlewareStack](/docs/api-reference/server/xviz-server-middleware-stack.md).
 
 ### Interface Methods
 

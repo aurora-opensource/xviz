@@ -403,12 +403,33 @@
             "markdown": "api-reference/server/overview-session.md"
           },
           {
-            "name": "XVIZSessionContext",
-            "markdown": "api-reference/server/xviz-session-context.md"
-          },
-          {
-            "name": "XVIZ Server Middleware Interface",
-            "markdown": "api-reference/server/overview-middleware.md"
+            "name": "Middleware",
+            "children": [
+              {
+                "name": "Overview",
+                "markdown": "api-reference/server/overview-middleware.md"
+              },
+              {
+                "name": "XVIZServerMiddlewareStack",
+                "markdown": "api-reference/server/xviz-server-middleware-stack.md"
+              },
+              {
+                "name": "XVIZSessionContext",
+                "markdown": "api-reference/server/xviz-session-context.md"
+              },
+              {
+                "name": "XVIZMessageToMiddleware",
+                "markdown": "api-reference/server/xviz-message-to-middleware.md"
+              },
+              {
+                "name": "XVIZProviderRequestHandler",
+                "markdown": "api-reference/server/xviz-provider-request-handler.md"
+              },
+              {
+                "name": "XVIZWebsocketSender",
+                "markdown": "api-reference/server/xviz-websocket-sender.md"
+              }
+            ]
           }
         ]
       }
