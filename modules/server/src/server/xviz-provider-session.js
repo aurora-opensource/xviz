@@ -11,11 +11,10 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import {isXVIZMessage} from '@xviz/parser';
-import {XVIZData} from '@xviz/io';
 
 import {XVIZProviderRequestHandler} from '../middlewares/xviz-provider-request-handler';
 import {XVIZWebsocketSender} from '../middlewares/xviz-websocket-sender';
+import {XVIZMessageToMiddleware} from '../middlewares/xviz-message-to-middleware';
 
 import {XVIZServerMiddlewareStack} from '../middlewares/xviz-server-middleware-stack';
 import {XVIZSessionContext} from '../middlewares/xviz-session-context';
@@ -35,6 +34,7 @@ export class XVIZProviderSession {
     this.request = request;
     this.provider = provider;
     this.options = options;
+    this.middleware = null;
 
     // session shared storage for the middlewares
     this.context = new XVIZSessionContext();
@@ -42,10 +42,10 @@ export class XVIZProviderSession {
       this.context.set('id', options.id);
     }
 
-    this.middleware = null;
-
     this._setupSocket();
     this._setupMiddleware();
+
+    this.handler = new XVIZMessageToMiddleware(this.middleware);
   }
 
   log(msg, ...args) {
@@ -110,41 +110,15 @@ export class XVIZProviderSession {
     // that this is a valid source, so we can
     // treat connection as 'start' and send metadata
     // TODO: this is totally wrong.  params is not an XVIZ Message
-    this.callMiddleware('start', params);
+    this.handler.callMiddleware('start', params);
 
     // TODO: if live we should start sending data immediately
-    // this.callMiddleware('transform_log', {id: 'live'});
+    // this.handler.callMiddleware('transform_log', {id: 'live'});
   }
 
   onMessage(message) {
-    if (isXVIZMessage(message.data)) {
-      // Since this is the server we assume the message
-      // we get is simple and instantiate the message immediately
-      // We also need to do this to get the "type()"
-      const xvizData = new XVIZData(message.data);
-      this.callMiddleware(xvizData.type, xvizData);
-    } else {
+    if (!this.handler.onMessage(message)) {
       this.log('[> Message] Unknown message: ', JSON.stringify(message, null, 2).slice(0, 100));
-    }
-  }
-
-  callMiddleware(xvizType, msg = {}) {
-    this.info(`[> ${xvizType.toUpperCase()}]`);
-
-    switch (xvizType) {
-      case 'start':
-        this.middleware.onStart(msg);
-        break;
-      case 'transform_log':
-        this.middleware.onTransformLog(msg);
-        break;
-      case 'transform_point_in_time':
-        this.middleware.onTransformPointInTime(msg);
-        break;
-      default:
-        this.log('[ UNKNOWN] message', xvizType, msg);
-        // TODO: send error
-        break;
     }
   }
 }
