@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /* eslint-disable camelcase */
-export const LOG_STREAM_MESSAGE = {
+export const XVIZ_MESSAGE = {
   METADATA: 'METADATA',
   TIMESLICE: 'TIMESLICE',
   DONE: 'DONE',

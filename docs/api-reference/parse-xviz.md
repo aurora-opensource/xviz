@@ -1,15 +1,15 @@
-# parseStreamMessage
+# parseXVIZMessage
 
 ```js
-import {parseStreamMessage, LOG_STREAM_MESSAGE} from '@xviz/parser';
+import {parseXVIZMessage, XVIZ_MESSAGE} from '@xviz/parser';
 
-parseStreamMessage({
+parseXVIZMessage({
   message,
   onResult: data => {
     switch (data.type) {
-      case LOG_STREAM_MESSAGE.METADATA: // do something
-      case LOG_STREAM_MESSAGE.TIMESLICE: // do something
-      case LOG_STREAM_MESSAGE.INCOMPLETE: // do something
+      case XVIZ_MESSAGE.METADATA: // do something
+      case XVIZ_MESSAGE.TIMESLICE: // do something
+      case XVIZ_MESSAGE.INCOMPLETE: // do something
     }
   },
   onError: console.error,
@@ -23,7 +23,7 @@ Parameters:
 - `opts` (Object)
   - `message` (Object|String|ArrayBuffer) - XVIZ message to decode.
   - `onResult` (Function) - callback if the message is parsed successfully. Receives a single
-    argument `data`. `data.type` is one of `LOG_STREAM_MESSAGE`.
+    argument `data`. `data.type` is one of `XVIZ_MESSAGE`.
   - `onError` (Function) - callback if the parser encouters an error.
   - `debug` (Function) - callback to log debug info.
   - `worker` (Boolean|String) - use Web Wroker to parse the message. Enabling worker is recommended
@@ -37,7 +37,7 @@ Parameters:
   - `capacity` (Number) - the limit on the number of messages to queue for the workers to process,
     has no effect if set ot `null`. Default `null`.
 
-##### LOG_STREAM_MESSAGE
+##### XVIZ_MESSAGE
 
 Enum of stream message types.
 

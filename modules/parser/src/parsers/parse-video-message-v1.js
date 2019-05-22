@@ -19,18 +19,18 @@
  * `data` refers to pre-processed data objects (blob, arraybuffer, JSON object)
  */
 /* global Blob */
-import {LOG_STREAM_MESSAGE} from '../constants';
+import {XVIZ_MESSAGE} from '../constants';
 import {TextDecoder} from '../utils/text-encoding';
 import {blobToArrayBuffer} from '../utils/binary';
 
 import {parseLogMetadata} from './parse-log-metadata';
 
 // Handle messages from the stand alone video server
-export function parseStreamVideoMessage(message, onResult, onError) {
+export function parseVideoMessageV1(message, onResult, onError) {
   if (message instanceof Blob) {
     blobToArrayBuffer(message)
       .then(arrayBuffer => {
-        parseStreamVideoMessage(arrayBuffer, onResult, onError);
+        parseVideoMessageV1(arrayBuffer, onResult, onError);
       })
       .catch(onError);
     return;
@@ -57,13 +57,13 @@ export function parseStreamVideoData(data) {
     return parseVideoMetadata(data);
   }
   // Unknown message
-  return {type: LOG_STREAM_MESSAGE.ERROR, message: 'Unknown stream data type', data};
+  return {type: XVIZ_MESSAGE.ERROR, message: 'Unknown stream data type', data};
 }
 
 // Extract metadata from stream message
 function parseVideoMetadata(data) {
   const result = parseLogMetadata(data);
-  result.type = LOG_STREAM_MESSAGE.VIDEO_METADATA;
+  result.type = XVIZ_MESSAGE.VIDEO_METADATA;
 
   return result;
 }
@@ -74,7 +74,7 @@ export function parseVideoFrame(arrayBuffer) {
   const view = new DataView(arrayBuffer);
 
   // Read off version
-  const result = {type: LOG_STREAM_MESSAGE.VIDEO_FRAME};
+  const result = {type: XVIZ_MESSAGE.VIDEO_FRAME};
   const littleEndian = true;
   const utf8Decoder = new TextDecoder('utf-8');
 
