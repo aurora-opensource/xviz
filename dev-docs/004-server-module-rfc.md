@@ -6,6 +6,8 @@
 
 **@xviz/server** will implement a complete XVIZ Server module.
 
+![@xviz/server diagram](../docs/api-reference/server/images/xviz-server-block-diagram.svg)
+
 This server will support the following:
  - Multiple log support
  - Dynamic XVIZ conversion
