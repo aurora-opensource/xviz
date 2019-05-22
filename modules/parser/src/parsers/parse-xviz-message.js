@@ -12,16 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {parseStreamDataMessage} from './parse-stream-data-message';
+import {parseXVIZMessageSync} from './parse-xviz-message-sync';
 import {postDeserialize} from './serialize';
-import {getWorkerFarm, initializeWorkerFarm} from './parse-stream-workerfarm';
+import {getWorkerFarm, initializeWorkerFarm} from './parse-xviz-message-workerfarm';
 
 // Public function for initializing workers
 export function initializeWorkers({worker, maxConcurrency = 4, capacity = null}) {
   initializeWorkerFarm({worker, maxConcurrency, capacity});
 }
 
-export function parseStreamMessage({
+export function parseXVIZMessage({
   message,
   // callbacks
   onResult,
@@ -46,6 +46,6 @@ export function parseStreamMessage({
     const onMessage = data => onResult(postDeserialize(data));
     workerFarm.process(message, onMessage, onError);
   } else {
-    parseStreamDataMessage(message, onResult, onError);
+    parseXVIZMessageSync(message, onResult, onError);
   }
 }

@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {initializeWorkers, getXVIZConfig, setXVIZConfig, parseStreamMessage} from '@xviz/parser';
-import {destroyWorkerFarm} from '@xviz/parser/parsers/parse-stream-workerfarm';
+import {initializeWorkers, getXVIZConfig, setXVIZConfig, parseXVIZMessage} from '@xviz/parser';
+import {destroyWorkerFarm} from '@xviz/parser/parsers/parse-xviz-message-workerfarm';
 
 import tape from 'tape-catch';
 import TestMetadataMessageV2 from 'test-data/sample-metadata-message';
@@ -51,8 +51,8 @@ const xvizUpdateV2 = {
   }
 };
 
-tape('parseStreamMessage#parseMetadata', t => {
-  parseStreamMessage({
+tape('parseXVIZMessage#parseMetadata', t => {
+  parseXVIZMessage({
     message: metadataMessageV2,
     onResult: result => {
       t.equal(result.type, 'METADATA', 'Message type detected as metadata');
@@ -67,7 +67,7 @@ tape('parseStreamMessage#parseMetadata', t => {
 });
 
 /* global window */
-tape('parseStreamMessage#parseMetadata worker wrong version', t => {
+tape('parseXVIZMessage#parseMetadata worker wrong version', t => {
   if (isBrowser) {
     // Ensure the version is 1
     setXVIZConfig({currentMajorVersion: 1});
@@ -76,7 +76,7 @@ tape('parseStreamMessage#parseMetadata worker wrong version', t => {
     initializeWorkers({worker: true, maxConcurrency: 4});
 
     // Verify the XVIZ v2 message is properly parsed
-    parseStreamMessage({
+    parseXVIZMessage({
       message: xvizUpdateV2,
       onResult: result => {
         t.equal(
@@ -98,14 +98,14 @@ tape('parseStreamMessage#parseMetadata worker wrong version', t => {
   }
 });
 
-tape('parseStreamMessage#parseMetadata worker', t => {
+tape('parseXVIZMessage#parseMetadata worker', t => {
   if (isBrowser) {
     // XVIZ Version of workers would be set to 1 by default
     initializeWorkers({worker: true, maxConcurrency: 4});
 
     // After parsing on main thread, this will call setXVIZConfig, which
     // should trigger workers to have their XVIZ version updated
-    parseStreamMessage({
+    parseXVIZMessage({
       message: metadataMessageV2,
       onResult: result => {
         t.equal(result.type, 'METADATA', 'Message type detected as metadata');
@@ -117,7 +117,7 @@ tape('parseStreamMessage#parseMetadata worker', t => {
     });
 
     // Verify the XVIZ v2 message is properly parsed
-    parseStreamMessage({
+    parseXVIZMessage({
       message: xvizUpdateV2,
       onResult: result => {
         t.equal(result.type, 'TIMESLICE', 'XVIZ message properly parsed on worker');

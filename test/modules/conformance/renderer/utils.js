@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {parseStreamMessage} from '@xviz/parser';
+import {parseXVIZMessage} from '@xviz/parser';
 
 export function parseFrame(frame) {
   let result;
@@ -21,7 +21,7 @@ export function parseFrame(frame) {
     throw error;
   };
 
-  parseStreamMessage({
+  parseXVIZMessage({
     message: frame,
     onResult: message => {
       result = message;

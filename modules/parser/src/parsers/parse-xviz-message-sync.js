@@ -19,14 +19,14 @@
  * `data` refers to pre-processed data objects (blob, arraybuffer, JSON object)
  */
 /* global Blob, Uint8Array */
-import {LOG_STREAM_MESSAGE} from '../constants';
+import {XVIZ_MESSAGE_TYPE} from '../constants';
 import {
   parseBinaryXVIZ,
   isBinaryXVIZ,
   getBinaryXVIZJSONBuffer
 } from '../loaders/xviz-loader/xviz-binary-loader';
 import {parseLogMetadata} from './parse-log-metadata';
-import {parseStreamVideoMessage} from './parse-stream-video-message';
+import {parseVideoMessageV1} from './parse-video-message-v1';
 import {TextDecoder} from '../utils/text-encoding';
 import parseTimesliceDataV1 from './parse-timeslice-data-v1';
 import parseTimesliceDataV2 from './parse-timeslice-data-v2';
@@ -238,12 +238,12 @@ export function isEnvelope(data) {
 }
 
 // Post processes a stream message to make it easy to use for JavaScript applications
-export function parseStreamDataMessage(message, onResult, onError, opts) {
+export function parseXVIZMessageSync(message, onResult, onError, opts) {
   // TODO(twojtasz): better message dispatching
   // here, not all arraybuffer may be image (packed point cloud)
   // TODO(jlisee): Node.js support for blobs for better unit testing
   if (typeof Blob !== 'undefined' && message instanceof Blob) {
-    parseStreamVideoMessage(message, onResult, onError);
+    parseVideoMessageV1(message, onResult, onError);
     return;
   }
 
@@ -262,7 +262,7 @@ export function parseStreamDataMessage(message, onResult, onError, opts) {
     }
 
     if (parseData) {
-      const result = parseStreamLogData(data, {...opts, v2Type});
+      const result = parseXVIZData(data, {...opts, v2Type});
       onResult(result);
     }
   } catch (error) {
@@ -270,7 +270,7 @@ export function parseStreamDataMessage(message, onResult, onError, opts) {
   }
 }
 
-export function parseStreamLogData(data, opts = {}) {
+export function parseXVIZData(data, opts = {}) {
   // TODO(twojtasz): this data.message is due an
   // uncoordinated change on the XVIZ server, temporary.
   const typeKey = opts.v2Type || data.type || data.message || data.update_type;
@@ -282,16 +282,16 @@ export function parseStreamLogData(data, opts = {}) {
       return {
         ...parseLogMetadata(data),
         // ensure application sees the metadata type set to the uppercase version
-        type: LOG_STREAM_MESSAGE.METADATA
+        type: XVIZ_MESSAGE_TYPE.METADATA
       };
     case 'transform_log_done':
-      return {...data, type: LOG_STREAM_MESSAGE.DONE};
+      return {...data, type: XVIZ_MESSAGE_TYPE.DONE};
     case 'error':
-      return {...data, message: 'Stream server error', type: LOG_STREAM_MESSAGE.ERROR};
+      return {...data, message: 'Stream server error', type: XVIZ_MESSAGE_TYPE.ERROR};
 
     // v1 types
     case 'done':
-      return {...data, type: LOG_STREAM_MESSAGE.DONE};
+      return {...data, type: XVIZ_MESSAGE_TYPE.DONE};
     default:
       //  TODO(twojtasz): XVIZ should be tagging this with a type
       return parseTimesliceData(data, opts.convertPrimitive);

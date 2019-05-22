@@ -18,7 +18,7 @@ export {default as xvizStats} from './utils/stats';
 // GENERIC XVIZ EXPORTS
 
 // Common constants
-export {LOG_STREAM_MESSAGE} from './constants';
+export {XVIZ_MESSAGE_TYPE} from './constants';
 
 // Configuration
 export {setXVIZConfig, getXVIZConfig} from './config/xviz-config';
@@ -42,20 +42,28 @@ export {default as XVIZObjectCollection} from './objects/xviz-object-collection'
 export {parseLogMetadata} from './parsers/parse-log-metadata';
 export {parseVehiclePose} from './parsers/parse-vehicle-pose';
 export {parseEtlStream} from './parsers/parse-etl-stream';
-export {parseStreamMessage, initializeWorkers} from './parsers/parse-stream-message';
+export {parseXVIZMessage, initializeWorkers} from './parsers/parse-xviz-message';
 export {
-  parseStreamDataMessage,
-  parseStreamLogData,
+  parseXVIZMessageSync,
+  parseXVIZData,
   isXVIZMessage,
   getXVIZMessageType,
   getDataFormat,
   isEnvelope,
   unpackEnvelope
-} from './parsers/parse-stream-data-message';
-export {parseStreamVideoMessage} from './parsers/parse-stream-video-message';
+} from './parsers/parse-xviz-message-sync';
 
 export {default as lidarPointCloudWorker} from './workers/lidar-point-cloud-worker';
 export {default as streamDataWorker} from './workers/stream-data-worker';
 
 // Loaders
 export {parseBinaryXVIZ, isBinaryXVIZ} from './loaders/xviz-loader/xviz-binary-loader';
+
+// Deprecated
+export {parseXVIZMessage as parseStreamMessage} from './parsers/parse-xviz-message';
+export {
+  parseXVIZMessageSync as parseStreamDataMessage,
+  parseXVIZData as parseStreamLogData
+} from './parsers/parse-xviz-message-sync';
+export {parseVideoMessageV1 as parseStreamVideoMessage} from './parsers/parse-video-message-v1';
+export {XVIZ_MESSAGE_TYPE as LOG_STREAM_MESSAGE} from './constants';

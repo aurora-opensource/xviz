@@ -14,7 +14,7 @@
 
 // Extracts a TIMESLICE message v1
 import {getXVIZConfig} from '../config/xviz-config';
-import {LOG_STREAM_MESSAGE} from '../constants';
+import {XVIZ_MESSAGE_TYPE} from '../constants';
 import {parseStreamFutures, parseStreamPrimitive, parseStreamVariable} from './parse-xviz-stream';
 
 export default function parseTimesliceData(data, convertPrimitive) {
@@ -32,13 +32,13 @@ export default function parseTimesliceData(data, convertPrimitive) {
 
   if (!timestamp) {
     // Incomplete stream message, just tag it accordingly so client can ignore it
-    return {type: LOG_STREAM_MESSAGE.INCOMPLETE};
+    return {type: XVIZ_MESSAGE_TYPE.INCOMPLETE};
   }
 
   const newStreams = {};
   const result = {
     ...otherInfo,
-    type: LOG_STREAM_MESSAGE.TIMESLICE,
+    type: XVIZ_MESSAGE_TYPE.TIMESLICE,
     streams: newStreams,
     timestamp
   };

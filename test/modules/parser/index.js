@@ -21,8 +21,8 @@ import './synchronizers/xviz-stream-buffer.spec';
 
 import './parsers/filter-vertices.spec';
 import './parsers/parse-log-metadata.spec';
-import './parsers/parse-stream-data-message.spec';
-import './parsers/parse-stream-message.spec';
+import './parsers/parse-xviz-message-sync.spec';
+import './parsers/parse-xviz-message.spec';
 import './parsers/parse-vehicle-pose.spec';
 import './parsers/parse-xviz-pose.spec';
 import './parsers/parse-xviz-stream.spec';
