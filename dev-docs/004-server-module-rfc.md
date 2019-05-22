@@ -156,10 +156,10 @@ class CustomSession {
       const xvizData = new XVIZData(message.data);
       switch (xvizData.type) {
         case 'start':
-          this.middleware.onStart(xvizData.data, data);
+          this.middleware.onStart(xvizData);
           break;
         case 'transform_log':
-          this.middleware.onTransformLog(xvizData.data, data);
+          this.middleware.onTransformLog(xvizData);
           break;
         default:
           break; 
