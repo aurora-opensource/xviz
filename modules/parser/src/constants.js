@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /* eslint-disable camelcase */
-export const XVIZ_MESSAGE = {
+export const XVIZ_MESSAGE_TYPE = {
   METADATA: 'METADATA',
   TIMESLICE: 'TIMESLICE',
   DONE: 'DONE',

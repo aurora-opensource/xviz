@@ -19,7 +19,7 @@
  * `data` refers to pre-processed data objects (blob, arraybuffer, JSON object)
  */
 /* global Blob, Uint8Array */
-import {XVIZ_MESSAGE} from '../constants';
+import {XVIZ_MESSAGE_TYPE} from '../constants';
 import {
   parseBinaryXVIZ,
   isBinaryXVIZ,
@@ -282,16 +282,16 @@ export function parseXVIZData(data, opts = {}) {
       return {
         ...parseLogMetadata(data),
         // ensure application sees the metadata type set to the uppercase version
-        type: XVIZ_MESSAGE.METADATA
+        type: XVIZ_MESSAGE_TYPE.METADATA
       };
     case 'transform_log_done':
-      return {...data, type: XVIZ_MESSAGE.DONE};
+      return {...data, type: XVIZ_MESSAGE_TYPE.DONE};
     case 'error':
-      return {...data, message: 'Stream server error', type: XVIZ_MESSAGE.ERROR};
+      return {...data, message: 'Stream server error', type: XVIZ_MESSAGE_TYPE.ERROR};
 
     // v1 types
     case 'done':
-      return {...data, type: XVIZ_MESSAGE.DONE};
+      return {...data, type: XVIZ_MESSAGE_TYPE.DONE};
     default:
       //  TODO(twojtasz): XVIZ should be tagging this with a type
       return parseTimesliceData(data, opts.convertPrimitive);

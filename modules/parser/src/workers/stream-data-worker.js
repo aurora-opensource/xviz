@@ -16,7 +16,7 @@ import {setXVIZConfig} from '../config/xviz-config';
 import {parseXVIZMessageSync} from '../parsers/parse-xviz-message-sync';
 import {preSerialize} from '../parsers/serialize';
 import {getTransferList} from '../utils/worker-utils';
-import {XVIZ_MESSAGE} from '../constants';
+import {XVIZ_MESSAGE_TYPE} from '../constants';
 
 export default config => self => {
   setXVIZConfig(config);
@@ -25,7 +25,7 @@ export default config => self => {
     const transfers = new Set();
 
     switch (message.type) {
-      case XVIZ_MESSAGE.TIMESLICE:
+      case XVIZ_MESSAGE_TYPE.TIMESLICE:
         for (const streamName in message.streams) {
           const stream = message.streams[streamName];
           getTransferList(stream.pointCloud, true, transfers);
@@ -36,7 +36,7 @@ export default config => self => {
         }
         break;
 
-      case XVIZ_MESSAGE.VIDEO_FRAME:
+      case XVIZ_MESSAGE_TYPE.VIDEO_FRAME:
         // v1 video stream
         getTransferList(message.imageData, false, transfers);
         break;

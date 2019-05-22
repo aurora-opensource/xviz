@@ -14,10 +14,10 @@
 
 import tape from 'tape-catch';
 import {preSerialize, postDeserialize} from '@xviz/parser/parsers/serialize';
-import {XVIZ_MESSAGE} from '@xviz/parser';
+import {XVIZ_MESSAGE_TYPE} from '@xviz/parser';
 
 const MESSAGE = {
-  type: XVIZ_MESSAGE.TIMESLICE,
+  type: XVIZ_MESSAGE_TYPE.TIMESLICE,
   // TODO - need to add object stream
   streams: {}
 };

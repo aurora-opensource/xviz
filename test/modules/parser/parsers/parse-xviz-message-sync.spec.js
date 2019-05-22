@@ -22,7 +22,7 @@ import {
   getDataFormat,
   unpackEnvelope,
   parseXVIZData,
-  XVIZ_MESSAGE
+  XVIZ_MESSAGE_TYPE
 } from '@xviz/parser';
 import {XVIZValidator} from '@xviz/schema';
 
@@ -174,7 +174,7 @@ tape('parseXVIZData metadata', t => {
 
   const metaMessage = parseXVIZData(TestMetadataMessageV2, {v2Type: 'metadata'});
 
-  t.equals(metaMessage.type, XVIZ_MESSAGE.METADATA, 'Metadata type set');
+  t.equals(metaMessage.type, XVIZ_MESSAGE_TYPE.METADATA, 'Metadata type set');
   t.equals(
     getXVIZConfig().currentMajorVersion,
     2,
@@ -201,7 +201,7 @@ tape('parseXVIZData metadata v1', t => {
 
   const metaMessage = parseXVIZData(TestMetadataMessageV1);
 
-  t.equals(metaMessage.type, XVIZ_MESSAGE.METADATA, 'Metadata type set');
+  t.equals(metaMessage.type, XVIZ_MESSAGE_TYPE.METADATA, 'Metadata type set');
   t.equals(
     getXVIZConfig().currentMajorVersion,
     1,
@@ -263,7 +263,7 @@ tape('parseXVIZData metadata with full log time only', t => {
 
   const metaMessage = parseXVIZData(metadataWithLogStartEnd, {v2Type: 'metadata'});
 
-  t.equals(metaMessage.type, XVIZ_MESSAGE.METADATA, 'Metadata type set');
+  t.equals(metaMessage.type, XVIZ_MESSAGE_TYPE.METADATA, 'Metadata type set');
   t.equals(
     getXVIZConfig().currentMajorVersion,
     2,
@@ -300,7 +300,7 @@ tape('parseXVIZData validate result when missing updates', t => {
     {v2Type: 'state_update'}
   );
 
-  t.equals(metaMessage.type, XVIZ_MESSAGE.INCOMPLETE, 'Type after parse set to error');
+  t.equals(metaMessage.type, XVIZ_MESSAGE_TYPE.INCOMPLETE, 'Type after parse set to error');
   t.ok(/Missing required/.test(metaMessage.message), 'Message details on what is missing');
 
   t.end();
@@ -318,7 +318,7 @@ tape('parseXVIZData validate result when updates is empty', t => {
     {v2Type: 'state_update'}
   );
 
-  t.equals(metaMessage.type, XVIZ_MESSAGE.INCOMPLETE, 'Type after parse set to error');
+  t.equals(metaMessage.type, XVIZ_MESSAGE_TYPE.INCOMPLETE, 'Type after parse set to error');
   t.ok(/"updates" has length of 0/.test(metaMessage.message), 'Message details length is 0');
 
   t.end();
@@ -336,7 +336,7 @@ tape('parseXVIZData validate result when missing timestamp in updates', t => {
     {v2Type: 'state_update'}
   );
 
-  t.equals(metaMessage.type, XVIZ_MESSAGE.INCOMPLETE, 'Type after parse set to error');
+  t.equals(metaMessage.type, XVIZ_MESSAGE_TYPE.INCOMPLETE, 'Type after parse set to error');
   t.ok(
     /Missing timestamp in "updates"/.test(metaMessage.message),
     'Message details missing timestamp'
@@ -350,7 +350,7 @@ tape('parseXVIZData error', t => {
   setXVIZConfig({currentMajorVersion: 2});
 
   const metaMessage = parseXVIZData({message: 'my message'}, {v2Type: 'error'});
-  t.equals(metaMessage.type, XVIZ_MESSAGE.ERROR, 'Metadata type set to error');
+  t.equals(metaMessage.type, XVIZ_MESSAGE_TYPE.ERROR, 'Metadata type set to error');
 
   t.end();
 });
@@ -367,7 +367,7 @@ tape('parseXVIZData timeslice INCOMPLETE', t => {
     },
     {v2Type: 'state_update'}
   );
-  t.equals(metaMessage.type, XVIZ_MESSAGE.TIMESLICE, 'Missing timestamp is ok');
+  t.equals(metaMessage.type, XVIZ_MESSAGE_TYPE.TIMESLICE, 'Missing timestamp is ok');
 
   metaMessage = parseXVIZData(
     {
@@ -376,7 +376,7 @@ tape('parseXVIZData timeslice INCOMPLETE', t => {
     },
     {v2Type: 'state_update'}
   );
-  t.equals(metaMessage.type, XVIZ_MESSAGE.INCOMPLETE, 'Missing updates incomplete');
+  t.equals(metaMessage.type, XVIZ_MESSAGE_TYPE.INCOMPLETE, 'Missing updates incomplete');
 
   metaMessage = parseXVIZData(
     {
@@ -393,7 +393,7 @@ tape('parseXVIZData timeslice INCOMPLETE', t => {
     },
     {v2Type: 'state_update'}
   );
-  t.equals(metaMessage.type, XVIZ_MESSAGE.INCOMPLETE, 'Missing updates is incomplete');
+  t.equals(metaMessage.type, XVIZ_MESSAGE_TYPE.INCOMPLETE, 'Missing updates is incomplete');
 
   metaMessage = parseXVIZData(
     {
@@ -406,7 +406,7 @@ tape('parseXVIZData timeslice INCOMPLETE', t => {
     },
     {v2Type: 'state_update'}
   );
-  t.equals(metaMessage.type, XVIZ_MESSAGE.INCOMPLETE, 'Missing timestamp is incomplete');
+  t.equals(metaMessage.type, XVIZ_MESSAGE_TYPE.INCOMPLETE, 'Missing timestamp is incomplete');
 
   t.end();
 });
@@ -417,7 +417,7 @@ tape('parseXVIZData timeslice', t => {
 
   // NOTE: no explicit type for this message yet.
   let result = parseXVIZData({...TestTimesliceMessageV2}, {v2Type: 'state_update'});
-  t.equals(result.type, XVIZ_MESSAGE.TIMESLICE, 'Message type set for timeslice');
+  t.equals(result.type, XVIZ_MESSAGE_TYPE.TIMESLICE, 'Message type set for timeslice');
   t.equal(result.updateType, 'COMPLETE', 'XVIZ update type is parsed');
   t.equals(
     result.timestamp,
@@ -430,7 +430,7 @@ tape('parseXVIZData timeslice', t => {
     {...TestTimesliceMessageV2, update_type: 'incremental'},
     {v2Type: 'state_update'}
   );
-  t.equals(result.type, XVIZ_MESSAGE.TIMESLICE, 'Message type set for timeslice');
+  t.equals(result.type, XVIZ_MESSAGE_TYPE.TIMESLICE, 'Message type set for timeslice');
   t.equal(result.updateType, 'INCREMENTAL', 'XVIZ update type is parsed');
 
   // Deprecated 'snapshot' update type
@@ -438,14 +438,14 @@ tape('parseXVIZData timeslice', t => {
     {...TestTimesliceMessageV2, update_type: 'snapshot'},
     {v2Type: 'state_update'}
   );
-  t.equals(result.type, XVIZ_MESSAGE.TIMESLICE, 'Message type set for timeslice');
+  t.equals(result.type, XVIZ_MESSAGE_TYPE.TIMESLICE, 'Message type set for timeslice');
   t.equal(result.updateType, 'INCREMENTAL', 'XVIZ update type is parsed');
 
   // Unknown update type
   result = parseXVIZData({...TestTimesliceMessageV2, update_type: ''}, {v2Type: 'state_update'});
   t.equals(
     result.type,
-    XVIZ_MESSAGE.INCOMPLETE,
+    XVIZ_MESSAGE_TYPE.INCOMPLETE,
     'Should not parse timeslice of unsupported update type'
   );
 
@@ -461,7 +461,7 @@ tape('parseXVIZData timeslice without parsing metadata (v1)', t => {
 
   // NOTE: no explicit type for this message yet.
   const metaMessage = parseXVIZData({...TestTimesliceMessageV1});
-  t.equals(metaMessage.type, XVIZ_MESSAGE.TIMESLICE, 'Message type set for timeslice');
+  t.equals(metaMessage.type, XVIZ_MESSAGE_TYPE.TIMESLICE, 'Message type set for timeslice');
   t.equals(
     metaMessage.timestamp,
     TestTimesliceMessageV1.vehicle_pose.time,
@@ -512,7 +512,7 @@ tape('parseXVIZData pointCloud timeslice', t => {
 
   // NOTE: no explicit type for this message yet.
   const slice = parseXVIZData({...PointCloudTestTimesliceMessage});
-  t.equals(slice.type, XVIZ_MESSAGE.TIMESLICE, 'Message type set for timeslice');
+  t.equals(slice.type, XVIZ_MESSAGE_TYPE.TIMESLICE, 'Message type set for timeslice');
 
   const pointCloud = slice.streams['/test/stream'].pointCloud;
   const feature = slice.streams['/test/stream'].features[0];
@@ -547,7 +547,7 @@ tape('parseXVIZData polyline flat', t => {
 
   // NOTE: no explicit type for this message yet.
   const slice = parseXVIZData({...TestTimeslice});
-  t.equals(slice.type, XVIZ_MESSAGE.TIMESLICE, 'Message type set for timeslice');
+  t.equals(slice.type, XVIZ_MESSAGE_TYPE.TIMESLICE, 'Message type set for timeslice');
 
   const features = slice.streams['/test/stream'].features;
   t.equals(features.length, 1, 'has has object');
@@ -581,7 +581,7 @@ tape('parseXVIZData polygon flat', t => {
 
   // NOTE: no explicit type for this message yet.
   const slice = parseXVIZData({...TestTimeslice});
-  t.equals(slice.type, XVIZ_MESSAGE.TIMESLICE, 'Message type set for timeslice');
+  t.equals(slice.type, XVIZ_MESSAGE_TYPE.TIMESLICE, 'Message type set for timeslice');
 
   const features = slice.streams['/test/stream'].features;
   t.equals(features.length, 1, 'has has object');
@@ -604,7 +604,7 @@ tape('parseXVIZData flat JSON pointCloud', t => {
 
   // NOTE: no explicit type for this message yet.
   let slice = parseXVIZData({...PointCloudTestTimesliceMessage});
-  t.equals(slice.type, XVIZ_MESSAGE.TIMESLICE, 'Message type set for timeslice');
+  t.equals(slice.type, XVIZ_MESSAGE_TYPE.TIMESLICE, 'Message type set for timeslice');
 
   let pointCloud = slice.streams['/test/stream'].pointCloud;
   const feature = slice.streams['/test/stream'].features[0];
@@ -647,7 +647,7 @@ tape('parseXVIZData pointCloud timeslice TypedArray', t => {
 
   // NOTE: no explicit type for this message yet.
   let slice = parseXVIZData({...PointCloudTestTimesliceMessage});
-  t.equals(slice.type, XVIZ_MESSAGE.TIMESLICE, 'Message type set for timeslice');
+  t.equals(slice.type, XVIZ_MESSAGE_TYPE.TIMESLICE, 'Message type set for timeslice');
   t.ok(slice.streams['/test/stream'].pointCloud, 'has a point cloud');
 
   let pointCloud = slice.streams['/test/stream'].pointCloud;
@@ -687,7 +687,7 @@ tape('parseXVIZData pointCloud timeslice', t => {
 
   // NOTE: no explicit type for this message yet.
   const slice = parseXVIZData({...PointCloudTestTimesliceMessage});
-  t.equals(slice.type, XVIZ_MESSAGE.TIMESLICE, 'Message type set for timeslice');
+  t.equals(slice.type, XVIZ_MESSAGE_TYPE.TIMESLICE, 'Message type set for timeslice');
 
   const pointCloud = slice.streams['/test/stream'].pointCloud;
   const feature = slice.streams['/test/stream'].features[0];
@@ -740,7 +740,7 @@ tape('parseXVIZData variable timeslice', t => {
 
   // NOTE: no explicit type for this message yet.
   const slice = parseXVIZData({...VariableTestTimesliceMessage});
-  t.equals(slice.type, XVIZ_MESSAGE.TIMESLICE, 'Message type set for timeslice');
+  t.equals(slice.type, XVIZ_MESSAGE_TYPE.TIMESLICE, 'Message type set for timeslice');
   t.ok(slice.streams['/foo'].variable, 'has variable');
 
   const variable = slice.streams['/foo'].variable;
@@ -756,7 +756,7 @@ tape('parseXVIZData futures timeslice v1', t => {
   setXVIZConfig({currentMajorVersion: 1});
 
   const slice = parseXVIZData({...TestFuturesMessageV1});
-  t.equals(slice.type, XVIZ_MESSAGE.TIMESLICE, 'Message type set for timeslice');
+  t.equals(slice.type, XVIZ_MESSAGE_TYPE.TIMESLICE, 'Message type set for timeslice');
   t.ok(slice.streams['/test/polygon'].lookAheads, 'has lookAheads field');
 
   const lookAheads = slice.streams['/test/polygon'].lookAheads;
@@ -826,7 +826,7 @@ tape('parseXVIZMessageSync', t => {
     );
 
     t.equals(undefined, error, 'No errors received while parsing');
-    t.equals(result.type, XVIZ_MESSAGE.TIMESLICE, 'Message type set for timeslice');
+    t.equals(result.type, XVIZ_MESSAGE_TYPE.TIMESLICE, 'Message type set for timeslice');
     t.equals(
       result.timestamp,
       TestTimesliceMessageV2.updates[0].poses['/vehicle_pose'].timestamp,
@@ -862,7 +862,7 @@ tape('parseXVIZMessageSync#enveloped#metadata', t => {
 
   t.equals(undefined, error, 'No errors received while parsing');
   t.notEquals(undefined, result, 'Update units');
-  t.equals(result.type, XVIZ_MESSAGE.METADATA, 'Message type set for metadata');
+  t.equals(result.type, XVIZ_MESSAGE_TYPE.METADATA, 'Message type set for metadata');
   t.equals(result.version, enveloped.data.version);
 
   t.end();
@@ -893,7 +893,7 @@ tape('parseXVIZMessageSync#enveloped#transform_log_done', t => {
 
   t.equals(undefined, error, 'No errors received while parsing');
   t.notEquals(undefined, result, 'Update units');
-  t.equals(result.type, XVIZ_MESSAGE.DONE, 'Message type set to done');
+  t.equals(result.type, XVIZ_MESSAGE_TYPE.DONE, 'Message type set to done');
   t.equals(result.id, enveloped.data.id);
 
   t.end();

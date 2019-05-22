@@ -15,7 +15,7 @@
 /**
  * Convert stream messages for safe transfer between threads
  */
-import {XVIZ_MESSAGE} from '../constants';
+import {XVIZ_MESSAGE_TYPE} from '../constants';
 import {getXVIZConfig} from '../config/xviz-config';
 import XVIZObject from '../objects/xviz-object';
 
@@ -41,7 +41,7 @@ function observeObjects(objects, timestamp) {
  * @params message {object} - received dehydrated message from other threads
  */
 export function postDeserialize(message) {
-  if (message.type !== XVIZ_MESSAGE.TIMESLICE) {
+  if (message.type !== XVIZ_MESSAGE_TYPE.TIMESLICE) {
     return message;
   }
 

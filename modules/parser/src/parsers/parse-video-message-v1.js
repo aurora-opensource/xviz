@@ -19,7 +19,7 @@
  * `data` refers to pre-processed data objects (blob, arraybuffer, JSON object)
  */
 /* global Blob */
-import {XVIZ_MESSAGE} from '../constants';
+import {XVIZ_MESSAGE_TYPE} from '../constants';
 import {TextDecoder} from '../utils/text-encoding';
 import {blobToArrayBuffer} from '../utils/binary';
 
@@ -57,13 +57,13 @@ export function parseStreamVideoData(data) {
     return parseVideoMetadata(data);
   }
   // Unknown message
-  return {type: XVIZ_MESSAGE.ERROR, message: 'Unknown stream data type', data};
+  return {type: XVIZ_MESSAGE_TYPE.ERROR, message: 'Unknown stream data type', data};
 }
 
 // Extract metadata from stream message
 function parseVideoMetadata(data) {
   const result = parseLogMetadata(data);
-  result.type = XVIZ_MESSAGE.VIDEO_METADATA;
+  result.type = XVIZ_MESSAGE_TYPE.VIDEO_METADATA;
 
   return result;
 }
@@ -74,7 +74,7 @@ export function parseVideoFrame(arrayBuffer) {
   const view = new DataView(arrayBuffer);
 
   // Read off version
-  const result = {type: XVIZ_MESSAGE.VIDEO_FRAME};
+  const result = {type: XVIZ_MESSAGE_TYPE.VIDEO_FRAME};
   const littleEndian = true;
   const utf8Decoder = new TextDecoder('utf-8');
 

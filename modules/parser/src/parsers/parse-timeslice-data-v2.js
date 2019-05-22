@@ -13,7 +13,7 @@
 // limitations under the License.
 
 // Extracts a TIMESLICE message v2
-import {XVIZ_MESSAGE, STATE_UPDATE_TYPE} from '../constants';
+import {XVIZ_MESSAGE_TYPE, STATE_UPDATE_TYPE} from '../constants';
 import {getXVIZConfig} from '../config/xviz-config';
 import {parseXVIZPose} from './parse-xviz-pose';
 import {
@@ -33,16 +33,16 @@ export default function parseStreamSet(data, convertPrimitive) {
 
   if (!updateType) {
     log.error(`update_type of "${update_type}" is not supported.`)();
-    return {type: XVIZ_MESSAGE.INCOMPLETE, message: 'Unsupported update type'};
+    return {type: XVIZ_MESSAGE_TYPE.INCOMPLETE, message: 'Unsupported update type'};
   }
 
   if (!updates) {
-    return {type: XVIZ_MESSAGE.INCOMPLETE, message: 'Missing required "updates" property'};
+    return {type: XVIZ_MESSAGE_TYPE.INCOMPLETE, message: 'Missing required "updates" property'};
   }
 
   if (updates && updates.length === 0) {
     return {
-      type: XVIZ_MESSAGE.INCOMPLETE,
+      type: XVIZ_MESSAGE_TYPE.INCOMPLETE,
       message: 'Property "updates" has length of 0, no data?'
     };
   }
@@ -66,12 +66,12 @@ export default function parseStreamSet(data, convertPrimitive) {
 
   if (!timestamp) {
     // Incomplete stream message, just tag it accordingly so client can ignore it
-    return {type: XVIZ_MESSAGE.INCOMPLETE, message: 'Missing timestamp in "updates"'};
+    return {type: XVIZ_MESSAGE_TYPE.INCOMPLETE, message: 'Missing timestamp in "updates"'};
   }
 
   const newStreams = {};
   const result = {
-    type: XVIZ_MESSAGE.TIMESLICE,
+    type: XVIZ_MESSAGE_TYPE.TIMESLICE,
     updateType,
     streams: newStreams,
     timestamp
