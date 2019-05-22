@@ -33,11 +33,11 @@ class StraightScenario {
   constructor(options = {}) {
     // timestamp needs to be seconds, not milliseconds
     this.timestamp = Date.now() / 1000;
-    this.lineGap = 5;
 
-    this.hz = parseInt(options.hz, 10) || 10;
-    this.duration = parseInt(options.duration, 10) || 30;
-    this.live = Boolean(options.live);
+    this.lineGap = 5;
+    this.duration = options.duration || 30;
+    this.live = options.live;
+    this.speed = options.speed || 10; // meters per second
   }
 
   getMetadata() {
@@ -54,14 +54,14 @@ class StraightScenario {
     return metadata;
   }
 
-  getFrame(frameNumber) {
-    return this._getFrame(frameNumber);
+  getFrame(timeOffset) {
+    return this._getFrame(timeOffset);
   }
 
-  _getFrame(frameNumber) {
-    const timestep = 1.0 / this.hz;
-    const timestamp = this.timestamp + timestep * frameNumber;
+  _getFrame(timeOffset) {
+    const timestamp = this.timestamp + timeOffset;
 
+    const x = this._getPositionX(timestamp);
     return {
       type: 'xviz/state_update',
       data: {
@@ -69,20 +69,20 @@ class StraightScenario {
         updates: [
           {
             timestamp,
-            poses: this._drawPose(frameNumber, timestamp),
-            primitives: this._drawLines(frameNumber)
+            poses: this._drawPose(timestamp, x),
+            primitives: this._drawLines(x)
           }
         ]
       }
     };
   }
 
-  _drawPose(frameNumber, timestamp) {
+  _drawPose(timestamp, x) {
     return {
       '/vehicle_pose': {
         timestamp,
         orientation: [0, 0, 0],
-        position: [frameNumber, 0, 0]
+        position: [x, 0, 0]
       }
     };
   }
@@ -105,22 +105,26 @@ class StraightScenario {
     ];
   }
 
-  _drawLines(frameNumber) {
+  _getPositionX(timestamp) {
+    return this.speed * (timestamp - this.timestamp);
+  }
+
+  _drawLines(x) {
     // Car position matches the frameNumber
     // place the farthest 20
-    const lineStart = (frameNumber - 15) / this.lineGap;
-    const lineEnd = (frameNumber + 20) / this.lineGap;
+    const lineStart = (x - 15) / this.lineGap;
+    const lineEnd = (x + 20) / this.lineGap;
 
     const lineSpacing = this._range(Math.ceil(lineStart), Math.floor(lineEnd));
-    const lineSpacingXVIZ = lineSpacing.map(x => {
+    const lineSpacingXVIZ = lineSpacing.map(lineX => {
       return {
         base: {
           style: {
             stroke_width: 0.2,
-            stroke_color: this._lineColor(x)
+            stroke_color: this._lineColor(lineX)
           }
         },
-        vertices: [x, -40, 0, x, 40, 0]
+        vertices: [lineX, -40, 0, lineX, 40, 0]
       };
     });
 

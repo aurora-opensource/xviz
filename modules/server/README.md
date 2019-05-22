@@ -27,18 +27,18 @@ The default server supports test XVIZ scenarios that can be accessed at the foll
 - /scenario-circle
 - /scenario-straight
 
-[Try this example](http://localhost:8080/scenario-circle?radius=30&duration=60) with a local server
-running.
+[Try this example](http://localhost:8080/scenario-circle?radius=30&duration=60&speed=90&hz=20) with
+a local server running.
 
 The scenarios support a few query parameters you can play with:
 
 #### common options
 
-- hz - number of frames per second
-- duration - length of the scenario generated in seconds
+- `hz` (Number) - number of frames per second
+- `duration` (Number) - length of the scenario generated in seconds
+- `speed` (Number) - meters per second of the vehicle
+- `live` (Boolean) - Treat the data stream as 'live' which means no start/end time in the metadata
 
 #### scenario-circle
 
-- hz - number of frames per second
-- duration - length of the scenario generated in seconds
-- radius - size of the circle the vehicle traverse
+- `radius` (Number) - size of the circle the vehicle traverse in meters

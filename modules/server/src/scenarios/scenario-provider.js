@@ -22,12 +22,34 @@ const Scenarios = {
   ...ScenarioStraight
 };
 
-function loadScenario(name, options = {}) {
-  const opts = Object.assign({duration: 30, hz: 10}, options);
+// Normalize all the possible query parameters
+// for all the scenarios
+function normalizeOptions(options) {
+  if (typeof options.duration === 'string') {
+    options.duration = parseFloat(options.duration, 10);
+  }
 
-  // These are also used by scenarios for metadata
-  const duration = parseInt(opts.duration, 10);
-  const hz = parseInt(opts.hz, 10);
+  if (typeof options.hz === 'string') {
+    options.hz = parseInt(options.hz, 10);
+  }
+
+  if (typeof options.live === 'string') {
+    options.live = Boolean(options.live);
+  }
+
+  if (typeof options.speed === 'string') {
+    options.speed = parseFloat(options.speed);
+  }
+
+  if (typeof options.radius === 'string') {
+    options.radius = parseFloat(options.radius);
+  }
+
+  return options;
+}
+
+function loadScenario(name, options = {}) {
+  const opts = Object.assign({duration: 30, hz: 10, live: false}, normalizeOptions(options));
 
   if (!Scenarios[name]) {
     return null;
@@ -43,10 +65,12 @@ function loadScenario(name, options = {}) {
     timing: []
   };
 
-  const frameLimit = duration * hz;
+  const frameLimit = opts.duration * opts.hz;
+  const frameLength = 1.0 / opts.hz;
 
   for (let i = 0; i < frameLimit; i++) {
-    const frame = scenario.getFrame(i);
+    const timeOffset = frameLength * i;
+    const frame = scenario.getFrame(timeOffset);
     data.timing.push(frame.data.updates[0].timestamp);
     // TODO: this also seems strange? why stringify
     // I think the XVIZformatWriter should take care of this

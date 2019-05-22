@@ -19,7 +19,6 @@
  */
 /* eslint-disable camelcase */
 const DEG_1_AS_RAD = Math.PI / 180;
-const DEG_6_AS_RAD = 6 * DEG_1_AS_RAD;
 const DEG_90_AS_RAD = 90 * DEG_1_AS_RAD;
 
 const circle_metadata = {
@@ -58,12 +57,11 @@ class CircleScenario {
   constructor(options = {}) {
     // timestamp needs to be seconds, not milliseconds
     this.timestamp = Date.now() / 1000;
-    this.options = options;
 
-    this.hz = parseInt(options.hz, 10) || 10;
-    this.radius = parseInt(options.radius, 10) || 30;
-    this.duration = parseInt(options.duration, 10) || 30;
-    this.live = Boolean(options.live);
+    this.radius = options.radius || 30;
+    this.duration = options.duration || 10;
+    this.live = options.live;
+    this.speed = options.speed || 10; // meters per second
 
     this.grid = this._drawGrid();
   }
@@ -82,13 +80,12 @@ class CircleScenario {
     return metadata;
   }
 
-  getFrame(frameNumber) {
-    return this._getFrame(frameNumber);
+  getFrame(timeOffset) {
+    return this._getFrame(timeOffset);
   }
 
-  _getFrame(frameNumber) {
-    const timestep = 1.0 / this.hz;
-    const timestamp = this.timestamp + timestep * frameNumber;
+  _getFrame(timeOffset) {
+    const timestamp = this.timestamp + timeOffset;
 
     return {
       type: 'xviz/state_update',
@@ -97,7 +94,7 @@ class CircleScenario {
         updates: [
           {
             timestamp,
-            poses: this._drawPose(frameNumber, timestamp),
+            poses: this._drawPose(timestamp),
             primitives: this.grid
           }
         ]
@@ -105,14 +102,16 @@ class CircleScenario {
     };
   }
 
-  _drawPose(frameNumber, timestamp) {
-    // 6 degrees per frame
-    const angle = frameNumber * 6 * DEG_1_AS_RAD;
+  _drawPose(timestamp) {
+    const circumference = Math.PI * this.radius * 2;
+    const degreesPerSecond = 360 / (circumference / this.speed);
+    const currentDegrees = timestamp * degreesPerSecond;
+    const angle = currentDegrees * DEG_1_AS_RAD;
     return {
       '/vehicle_pose': {
         timestamp,
         // Make the car orient the the proper direction on the circle
-        orientation: [0, 0, DEG_90_AS_RAD + frameNumber * DEG_6_AS_RAD],
+        orientation: [0, 0, DEG_90_AS_RAD + currentDegrees * DEG_1_AS_RAD],
         position: [this.radius * Math.cos(angle), this.radius * Math.sin(angle), 0]
       }
     };
@@ -158,6 +157,15 @@ class CircleScenario {
           {
             center: [0.0, 0.0, 0.0],
             radius: this.radius
+          },
+          {
+            center: [this.radius, 0.0, 0.1],
+            radius: 1,
+            base: {
+              style: {
+                fill_color: [0, 0, 255]
+              }
+            }
           }
         ]
       }
