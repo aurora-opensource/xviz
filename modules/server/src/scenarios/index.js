@@ -11,13 +11,5 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-require('reify');
-require('./modules/update-test-cases');
 
-require('./modules/builder');
-require('./modules/parser');
-require('./modules/io');
-require('./modules/schema');
-require('./modules/server');
-require('./modules/cli');
-require('./website');
+export {ScenarioProvider} from './scenario-provider.js';
