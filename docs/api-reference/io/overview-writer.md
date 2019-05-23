@@ -6,7 +6,8 @@ XVIZ Writers provide an interface to write XVIZ Metadata and Frames.
 
 ```js
 import {XVIZMetadataBuilder, XVIZBuilder} from '@xviz/builder';
-import {XVIZBinaryWriter, FileSink} from '@xviz/io';
+import {XVIZBinaryWriter}
+import {FileSink} from '@xviz/io/node';
 
 const sink = new FileSink('output-dir');
 const xvizWriter = new XVIZBinaryWriter(sink);

@@ -9,7 +9,8 @@ The XVIZFormatWriter currently expects XVIZData and not a raw object.
 
 ```js
 import {XVIZMetadataBuilder, XVIZBuilder} from '@xviz/builder';
-import {XVIZFormatWriter, FileSink, XVIZFormat} from '@xviz/io';
+import {XVIZFormatWriter, XVIZFormat} from '@xviz/io';
+import {FileSink} from '@xviz/io/node';
 
 const sink = new FileSink('output-dir');
 const xvizWriter = new XVIZFormatWriter(sink, {format: XVIZFormat.BINARY_GLB});
@@ -30,7 +31,8 @@ xvizWriter.close();
 ### Constructor
 
 ```js
-import {FileSink, XVIZFormatWriter, XVIZFormat} from '@xviz/io';
+import {XVIZFormatWriter, XVIZFormat} from '@xviz/io';
+import {FileSink} from '@xviz/io/node';
 
 const sink = new FileSink('output-dir');
 const xvizWriter = new XVIZBinaryWriter(sink, {format: XVIZFormat.BINARY_GLB});

@@ -12,7 +12,8 @@ the factory.
 ## Example
 
 ```js
-import {FileSource, XVIZProviderFactory} from '@xviz/io';
+import {XVIZProviderFactory} from '@xviz/io';
+import {FileSource} from '@xviz/io/node';
 
 const root = '.';
 const source = new FileSource(root);

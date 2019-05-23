@@ -18,8 +18,6 @@ export {XVIZFormatWriter} from './writers/xviz-format-writer';
 export {XVIZJSONReader} from './readers/xviz-json-reader';
 export {XVIZBinaryReader} from './readers/xviz-binary-reader';
 
-export {FileSink} from './io/fs-sink';
-export {FileSource} from './io/fs-source';
 export {MemorySourceSink} from './io/memory-source-sink';
 
 export {TextEncoder, TextDecoder} from './common/text-encoding';
