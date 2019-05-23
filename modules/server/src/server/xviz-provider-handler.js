@@ -14,7 +14,7 @@
 import {default as path} from 'path';
 
 import {XVIZProviderSession} from './xviz-provider-session';
-import {FileSource} from '@xviz/io';
+import {FileSource} from '@xviz/io/node';
 
 // Setup the source and return an XVIZSession or null
 export class XVIZProviderHandler {

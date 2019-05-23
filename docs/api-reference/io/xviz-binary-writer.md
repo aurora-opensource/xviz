@@ -6,7 +6,8 @@ The class `XVIZBinaryWriter` will output the GLB based binary format of XVIZ dat
 
 ```js
 import {XVIZMetadataBuilder, XVIZBuilder} from '@xviz/builder';
-import {XVIZBinaryWriter, FileSink} from '@xviz/io';
+import {XVIZBinaryWriter} from '@xviz/io';
+import {FileSink} from '@xviz/io/node';
 
 const sink = new FileSink('output-dir');
 const xvizWriter = new XVIZBinaryWriter(sink);
@@ -27,7 +28,8 @@ xvizWriter.close();
 ### Constructor
 
 ```js
-import {FileSink, XVIZBinaryWriter} from '@xviz/io';
+import {XVIZBinaryWriter} from '@xviz/io';
+import {FileSink} from '@xviz/io/node';
 
 const sink = new FileSink('output-dir');
 const xvizWriter = new XVIZBinaryWriter(sink);

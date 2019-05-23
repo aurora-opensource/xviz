@@ -6,7 +6,8 @@ The class `XVIZJSONWriter` will output the JSON format of XVIZ data.
 
 ```js
 import {XVIZMetadataBuilder, XVIZBuilder} from '@xviz/builder';
-import {XVIZJSONWriter, FileSink} from '@xviz/io';
+import {XVIZJSONWriter} from '@xviz/io';
+import {FileSink} from '@xviz/io/node';
 
 const sink = new FileSink('output-dir');
 const xvizWriter = new XVIZJSONWriter(sink);
@@ -27,7 +28,8 @@ xvizWriter.close();
 ### Constructor
 
 ```js
-import {FileSink, XVIZJSONWriter} from '@xviz/io';
+import {XVIZJSONWriter} from '@xviz/io';
+import {FileSink} from '@xviz/io/node';
 
 const sink = new FileSink('output-dir');
 const xvizWriter = new XVIZJSONWriter(sink);

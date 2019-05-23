@@ -11,7 +11,8 @@
   "module": "dist/esm/index.js",
   "esnext": "dist/es6/index.js",
   "files": [
-    "dist"
+    "dist",
+    "node.js"
   ],
   "dependencies": {
     "@loaders.gl/draco": "^0.7.1",
@@ -28,6 +29,10 @@
     "build-es5": "BABEL_ENV=es5 babel src --config-file ../../babel.config.js --out-dir dist/es5 --source-maps --ignore 'node_modules/'",
     "build": "npm run clean && npm run build-es6 && npm run build-esm && npm run build-es5",
     "cover": "NODE_ENV=test BABEL_ENV=cover npx nyc node ../../test/start.js cover"
+  },
+  "browser": {
+    "./src/io/fs-sink.js": false,
+    "./src/io/fs-source.js": false
   },
   "engines": {
     "node": ">= 8",

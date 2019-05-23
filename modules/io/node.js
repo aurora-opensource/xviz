@@ -11,8 +11,4 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import './writers';
-import './common';
-import './readers';
-import './providers';
-import './io';
+module.exports = require('./dist/es5/node');
