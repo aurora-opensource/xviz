@@ -35,7 +35,8 @@ registered components.
 ## Middleware components
 
 The middleware components are objects that will only define methods for the XVIZ messages they need
-to act upon. The interface for these methods is defined by the
+to act upon. The [interface](/docs/api-reference/server/overview-middleware.md) for these methods is
+derived from the
 [XVIZServerMiddlewareStack](/docs/api-reference/server/xviz-server-middleware-stack.md).
 
 These components could operate on the messages and response, store session state in a shared

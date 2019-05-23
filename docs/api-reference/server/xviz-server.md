@@ -29,9 +29,8 @@ Parameters:
 - `options` (Object) - Options for the Server
 
   - `port` (Number) - Port to listen on
-  - `maxPayload` (Number) - Port to listen on
+  - `maxPayload` (Number) - Maximum allowed message size in bytes
   - `perMessageDeflate` (Boolean) - Setting if message compress on the websocket is enabled
-  - `delay` (Number) - Millisecond delay between sending response messages
   - `logger` (Object) - Logger object passed through the system
 
     - `log` (Function) - Function that will always display the message

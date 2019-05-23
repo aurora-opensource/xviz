@@ -1,7 +1,8 @@
 # XVIZServerMiddlewareStack
 
-XVIZServerMiddlewareStack conforms to the middleware interface and routes messages through the
-middleware stack.
+XVIZServerMiddlewareStack defines and conforms to the
+[Middleware Interface](/docs/api-reference/io/overview-middleware.md) and routes messages through
+the middleware stack.
 
 It serves as the entrypoint to the entire middleware dataflow.
 

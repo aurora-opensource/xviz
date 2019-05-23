@@ -15,5 +15,5 @@ Parameters:
 - `socket` (Object) - The socket from the server
 - `request` (Object) - The request object from the server
 
-Returns: ([XVIZSession](/docs/api-reference/server/overview-session.md)) - A session to handle this
-connection.
+Returns: ([XVIZSession](/docs/api-reference/server/overview-session.md)|null) - A session to handle
+this connection or null if the request cannot be handled.
