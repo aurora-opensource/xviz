@@ -70,8 +70,11 @@ test('WorkerFarm#Normal', t => {
   const CHUNKS_TOTAL = 6;
   const MAX_CONCURRENCY = 3;
 
+  const updates = [];
+
   const callback = message => {
     t.comment(`Processing with worker ${message.worker}, backlog ${message.backlog}`);
+    updates.push(message);
   };
 
   const workerFarmConfig = {
@@ -83,6 +86,14 @@ test('WorkerFarm#Normal', t => {
 
   const onFinished = workerFarm => {
     t.equals(0, workerFarm.dropped, 'No data dropped');
+
+    const messageCounts = {};
+    updates.forEach(u => {
+      messageCounts[u.message] = messageCounts[u.message] + 1 || 1;
+    });
+
+    t.equals(messageCounts.processing, CHUNKS_TOTAL, 'worker sends processing messages');
+    t.ok(messageCounts.waiting >= MAX_CONCURRENCY, 'worker sends waiting messages');
   };
 
   runWorkerTest(t, CHUNKS_TOTAL, workerFarmConfig, onFinished);
