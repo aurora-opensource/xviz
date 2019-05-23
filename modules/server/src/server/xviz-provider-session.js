@@ -64,19 +64,19 @@ export class XVIZProviderSession {
 
   _setupSocket() {
     this.socket.onerror = err => {
-      this.onError(err);
+      this._onSocketError(err);
     };
 
     this.socket.onclose = event => {
-      this.onClose(event);
+      this._onSocketClose(event);
     };
 
     this.socket.onopen = () => {
-      this.onOpen();
+      this._onSocketOpen();
     };
 
     this.socket.onmessage = message => {
-      this.onMessage(message);
+      this._onSocketMessage(message);
     };
   }
 
@@ -90,16 +90,22 @@ export class XVIZProviderSession {
     this.middleware.set(stack);
   }
 
-  onOpen() {
-    this.log('[> Connection] Open');
+  _onSocketOpen() {
+    this.log('[> Socket] Open');
   }
 
-  onError(error) {
-    this.log('[> Connection] Error: ', error.toString());
+  _onSocketError(error) {
+    this.log('[> Socket] Error: ', error.toString());
   }
 
-  onClose(event) {
-    this.log(`[> Connection] Close: Code ${event.code} Reason: ${event.reason}`);
+  _onSocketClose(event) {
+    this.log(`[> Socket] Close: Code ${event.code} Reason: ${event.reason}`);
+  }
+
+  _onSocketMessage(message) {
+    if (!this.handler.onMessage(message)) {
+      this.log('[> Socket] Unknown message: ', JSON.stringify(message, null, 2).slice(0, 100));
+    }
   }
 
   onConnect() {
@@ -109,16 +115,11 @@ export class XVIZProviderSession {
     // Providers have already decided via the URL Path
     // that this is a valid source, so we can
     // treat connection as 'start' and send metadata
-    // TODO: this is totally wrong.  params is not an XVIZ Message
     this.handler.callMiddleware('start', params);
 
-    // TODO: if live we should start sending data immediately
-    // this.handler.callMiddleware('transform_log', {id: 'live'});
-  }
-
-  onMessage(message) {
-    if (!this.handler.onMessage(message)) {
-      this.log('[> Message] Unknown message: ', JSON.stringify(message, null, 2).slice(0, 100));
+    if (params.session_type === 'live') {
+      // If 'live' we start sending data immediately
+      this.handler.callMiddleware('transform_log', {id: 'live', ...params});
     }
   }
 }
