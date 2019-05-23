@@ -1,0 +1,257 @@
+// Copyright (c) 2019 Uber Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+/* global setTimeout, clearTimeout */
+/* eslint-disable camelcase, no-unused-expressions */
+import {Stats} from 'probe.gl';
+
+const DEFAULT_OPTIONS = {
+  delay: 0 // time in milliseconds
+};
+
+// TODO: move to @xviz/io
+function ErrorMsg(message) {
+  return {type: 'xviz/error', data: {message}};
+}
+
+function TransformLogDoneMsg(msg) {
+  return {type: 'xviz/transform_log_done', data: msg};
+}
+
+// Server middleware that handles the logic of responding
+// to a request with data from a provider, processing
+// the data through the supplied middleware
+export class XVIZProviderRequestHandler {
+  constructor(context, provider, middleware, options = {}) {
+    this.context = context;
+    this.provider = provider;
+    this.middleware = middleware;
+
+    this.metrics = new Stats({id: 'xviz-provider-request-handler'});
+    this.options = Object.assign({}, DEFAULT_OPTIONS, options);
+
+    this._setupContext();
+  }
+
+  _setupContext() {
+    // TODO: make a context specific 'configuration' methods
+    // this.context.set('providerSettings', this.provider.settings());
+
+    const metadata = this.provider.xvizMetadata().message();
+    if (metadata && metadata.data && metadata.data.log_info) {
+      const {start_time, end_time} = metadata.data.log_info;
+      if (start_time) {
+        // TODO: make a context specific source methods
+        this.context.set('start_time', start_time);
+      }
+
+      if (end_time) {
+        this.context.set('end_time', start_time);
+      }
+    }
+  }
+
+  onStart(msg) {
+    // TODO; validation
+    const error = null;
+    if (error) {
+      this.middleware.onError(ErrorMsg(error));
+    } else {
+      // fill in profile, format, session_type
+      // make context specific configuration fields
+      const message = msg.message();
+      if (message.data.message_format) {
+        this.context.set('message_format', message.data.message_format);
+      } else {
+        this.context.set('message_format', 'binary');
+      }
+
+      if (message.data.profile) {
+        this.context.set('profile', message.data.profile);
+      } else {
+        this.context.set('profile', 'default');
+      }
+
+      if (message.data.session_type) {
+        this.context.set('session_type', message.data.session_type);
+      } else {
+        this.context.set('session_type', 'log');
+      }
+    }
+
+    // send metadata
+    const metadata = this.provider.xvizMetadata();
+    this.middleware.onMetadata(metadata);
+  }
+
+  _setupTransformMetrics() {
+    return {
+      totalTimer: this.metrics.get(`total`),
+      loadTimer: this.metrics.get(`load`),
+      sendTimer: this.metrics.get(`send`)
+    };
+  }
+
+  onTransformLog(msg) {
+    // TODO: validation
+    const error = null;
+    if (error) {
+      this.middleware.onError(ErrorMsg(error));
+    } else {
+      //  store id, start_timestamp, end_timestamp, desired_streams
+      const message = msg.message();
+      const id = message.data.id;
+      const transform = this.context.transform(id);
+      if (!transform) {
+        // track transform request
+        const tformState = {
+          request: message.data,
+          iterator: null,
+          interval: null,
+          delay: this.options.delay,
+          ...this._setupTransformMetrics()
+        };
+        this.context.startTransform(id, tformState);
+
+        tformState.iterator = this.provider.getFrameIterator(
+          message.data.start_timestamp,
+          message.data.end_timestamp
+        );
+
+        // send state_updates || error
+        if (tformState.delay < 1) {
+          this._sendAllStateUpdates(id, tformState);
+        } else {
+          this._sendStateUpdate(id, tformState);
+        }
+      }
+    }
+  }
+
+  onTransformPointInTime(msg) {
+    this.middleware.onError(ErrorMsg('Error: transform_point_in_time is not supported.'));
+  }
+
+  onReconfigure(msg) {
+    this.middleware.onError(ErrorMsg('Error: reconfigure is not supported.'));
+  }
+
+  log(...msg) {
+    const {logger} = this.options;
+    if (logger && logger.log) {
+      logger.log(...msg);
+    }
+  }
+
+  async _sendStateUpdate(id, transformState) {
+    const {delay, interval, iterator} = transformState;
+    const {loadTimer, sendTimer, totalTimer} = transformState;
+
+    if (!interval) {
+      // The interval is only falsy if it is the very first call
+      totalTimer && totalTimer.timeStart();
+    }
+
+    if (interval) {
+      clearTimeout(interval);
+      transformState.interval = null;
+    }
+
+    if (iterator.valid()) {
+      loadTimer && loadTimer.timeStart();
+      const data = await this.provider.xvizFrame(iterator);
+      loadTimer && loadTimer.timeEnd();
+
+      if (data) {
+        sendTimer && sendTimer.timeStart();
+        this.middleware.onStateUpdate(data);
+        sendTimer && sendTimer.timeEnd();
+
+        this.logMsgSent(id, iterator.value(), loadTimer, sendTimer);
+      }
+
+      transformState.interval = setTimeout(() => this._sendStateUpdate(id, transformState), delay);
+    } else {
+      this.middleware.onTransformLogDone(TransformLogDoneMsg({id}));
+      totalTimer && totalTimer.timeEnd();
+      this.logDone(id, loadTimer, sendTimer, totalTimer);
+      this.context.endTransform(id);
+      this.metrics.reset();
+    }
+  }
+
+  async _sendAllStateUpdates(id, transformState) {
+    const {iterator} = transformState;
+    const {loadTimer, sendTimer, totalTimer} = transformState;
+
+    totalTimer && totalTimer.timeStart();
+    while (iterator.valid()) {
+      loadTimer && loadTimer.timeStart();
+      const data = await this.provider.xvizFrame(iterator);
+      loadTimer && loadTimer.timeEnd();
+
+      if (data) {
+        sendTimer && sendTimer.timeStart();
+        this.middleware.onStateUpdate(data);
+        sendTimer && sendTimer.timeEnd();
+
+        this.logMsgSent(id, iterator.value(), loadTimer, sendTimer);
+      }
+    }
+
+    this.middleware.onTransformLogDone(TransformLogDoneMsg({id}));
+    totalTimer && totalTimer.timeEnd();
+    this.logDone(id, loadTimer, sendTimer, totalTimer);
+    this.context.endTransform(id);
+    this.metrics.reset();
+  }
+
+  logMsgSent(id, index, loadTimer, sendTimer) {
+    const {logger} = this.options;
+    if (logger && logger.verbose) {
+      let msg = `id: ${id} [< STATE_UPDATE] frame: ${index}`;
+      if (loadTimer) {
+        msg += ` ${loadTimer.name}:${loadTimer.lastTiming.toFixed(3)}ms`;
+      }
+      if (sendTimer) {
+        msg += ` ${sendTimer.name}:${sendTimer.lastTiming.toFixed(3)}ms`;
+      }
+
+      logger.verbose(msg);
+    }
+  }
+
+  logDone(id, load, send, total) {
+    const {logger} = this.options;
+    if (logger && logger.info) {
+      const msg = `id: ${id} [< DONE]`;
+      if (load) {
+        logger.info(
+          `${msg} ${load.name} Avg:${load.getAverageTime().toFixed(3)}ms Total:${load.time.toFixed(
+            3
+          )}ms Hz:${load.getHz().toFixed(3)}/sec Count:${load.count}`
+        );
+      }
+      if (send) {
+        logger.info(
+          `${msg} ${send.name} Avg:${send.getAverageTime().toFixed(3)}ms Total:${send.time.toFixed(
+            3
+          )}ms Hz:${send.getHz().toFixed(3)}/sec Count:${send.count}`
+        );
+      }
+      if (total) {
+        logger.info(`${msg} ${total.name} ${total.lastTiming.toFixed(3)}ms`);
+      }
+    }
+  }
+}
