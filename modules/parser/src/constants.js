@@ -30,3 +30,5 @@ export const STATE_UPDATE_TYPE = {
   // Deprecated
   snapshot: 'INCREMENTAL'
 };
+
+export const XVIZ_GLTF_EXTENSION = 'AVS_xviz';

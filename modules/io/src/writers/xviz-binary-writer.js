@@ -14,9 +14,30 @@
 
 import {XVIZBaseWriter} from './xviz-base-writer';
 import {GLTFBuilder} from '@loaders.gl/gltf';
-import {toBuffer} from '@loaders.gl/core';
 import {DracoWriter, DracoLoader} from '@loaders.gl/draco';
 import {_packBinaryJson as packBinaryJson} from '@xviz/builder';
+import {XVIZ_GLTF_EXTENSION} from '@xviz/parser';
+
+// Convert (copy) ArrayBuffer to Buffer
+// This is from @loaders.gl/core/src/node/utils/to-buffer.node.js
+// but the function is no longer exported
+function toBuffer(binaryData) {
+  if (ArrayBuffer.isView(binaryData)) {
+    binaryData = binaryData.buffer;
+  }
+
+  if (typeof Buffer !== 'undefined' && binaryData instanceof ArrayBuffer) {
+    /* global Buffer */
+    const buffer = new Buffer(binaryData.byteLength);
+    const view = new Uint8Array(binaryData);
+    for (let i = 0; i < buffer.length; ++i) {
+      buffer[i] = view[i];
+    }
+    return buffer;
+  }
+
+  throw new Error('Failed to convert to buffer');
+}
 
 // 0-frame is an index file for timestamp metadata
 // 1-frame is the metadata file for the log
@@ -30,7 +51,12 @@ export function encodeBinaryXVIZ(xvizJson, options) {
   const packedData = packBinaryJson(xvizJson, gltfBuilder, null, options);
 
   // As permitted by glTF, we put all XVIZ data in a top-level subfield.
-  gltfBuilder.addApplicationData('xviz', packedData, {nopack: true});
+  const {compatible} = options;
+  if (compatible === true) {
+    gltfBuilder.addExtension(XVIZ_GLTF_EXTENSION, packedData, {nopack: true});
+  } else {
+    gltfBuilder.addApplicationData('xviz', packedData, {nopack: true});
+  }
 
   return gltfBuilder.encodeAsGLB(options);
 }

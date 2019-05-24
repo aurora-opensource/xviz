@@ -17,7 +17,12 @@ import test from 'tape-catch';
 import {toLowPrecision} from '@xviz/builder/utils';
 
 import {encodeBinaryXVIZ} from '@xviz/builder';
-import {parseBinaryXVIZ} from '@xviz/parser';
+import {parseBinaryXVIZ, XVIZ_GLTF_EXTENSION} from '@xviz/parser';
+
+import {GLBWriter} from '@loaders.gl/gltf';
+import {encodeSync} from '@loaders.gl/core';
+
+import clone from 'clone';
 
 const TEST_CASES = {
   flat: {
@@ -54,6 +59,79 @@ const TEST_CASES = {
 
   full: require('../../../data/sample-xviz.json')
 };
+
+test('XVIZLoader#parse', t => {
+  const expectedStateUpdate = {
+    type: 'xviz/state_update',
+    data: {
+      update_type: 'complete_state',
+      updates: [
+        {
+          timestamp: 1001.3,
+          primitives: {
+            '/object/points': {
+              points: [
+                {
+                  points: [1, 2, 3, 4, 5, 6]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  };
+
+  // Replace the array content with an accessor
+  const accessorStateUpdate = clone(expectedStateUpdate);
+  accessorStateUpdate.data.updates[0].primitives['/object/points'].points[0].points =
+    '#/accessors/0';
+
+  // Legacy format
+  const baseGlbJsonObject = {
+    asset: {version: '2.0'},
+    accessors: [{bufferView: 0, componentType: 5121, count: 2, type: 'VEC3'}],
+    bufferViews: [{buffer: 0, byteOffset: 0, byteLength: 8}],
+    buffers: [{byteLength: 8}]
+  };
+
+  const legacyGlbJsonObject = {
+    xviz: accessorStateUpdate,
+    ...baseGlbJsonObject
+  };
+
+  const glbBinary = new Uint8Array([1, 2, 3, 4, 5, 6]); // "\x1\x2\x3\x4\x4\x2";
+  const arrayBuffer = encodeSync({json: legacyGlbJsonObject, binary: glbBinary}, GLBWriter, {});
+
+  const json = parseBinaryXVIZ(arrayBuffer);
+  delete json.data.updates[0].primitives['/object/points'].points[0].points.accessor;
+
+  t.deepEqual(json, expectedStateUpdate, 'Parse legacy GLB correctly');
+
+  // New more compatible format
+  const extensions = {};
+  extensions[XVIZ_GLTF_EXTENSION] = accessorStateUpdate;
+
+  const compatibleGlbJsonObject = {
+    extensions,
+    extensionsUsed: [XVIZ_GLTF_EXTENSION],
+    ...baseGlbJsonObject
+  };
+
+  const compatibleArrayBuffer = encodeSync(
+    {json: compatibleGlbJsonObject, binary: glbBinary},
+    GLBWriter,
+    {}
+  );
+
+  const compatibleJson = parseBinaryXVIZ(compatibleArrayBuffer);
+  console.log(`RESULT: |${JSON.stringify(compatibleJson, '', 4)}|`);
+  delete compatibleJson.data.updates[0].primitives['/object/points'].points[0].points.accessor;
+
+  t.deepEqual(compatibleJson, expectedStateUpdate, 'Parse compatible GLB correctly');
+
+  t.end();
+});
 
 test('XVIZLoader#encode-and-parse', t => {
   for (const tcName in TEST_CASES) {

@@ -67,3 +67,4 @@ export {
 } from './parsers/parse-xviz-message-sync';
 export {parseVideoMessageV1 as parseStreamVideoMessage} from './parsers/parse-video-message-v1';
 export {XVIZ_MESSAGE_TYPE as LOG_STREAM_MESSAGE} from './constants';
+export {XVIZ_GLTF_EXTENSION} from './constants';
