@@ -27,6 +27,6 @@
       "minValue": 0
     }
   },
-  "required": [ "position", "data", "width_px", "height_px" ],
+  "required": [ "data", "width_px", "height_px" ],
   "additionalProperties": false
 }
