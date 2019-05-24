@@ -62,6 +62,7 @@
     "primitives/point/per_point_colors.json",
     "primitives/point/simple.json",
     "primitives/image/complex.json",
+    "primitives/image/required.json",
     "primitives/image/simple.json",
     "primitives/circle/complex.json",
     "primitives/circle/simple.json",
