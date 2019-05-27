@@ -14,7 +14,7 @@
 
 import {XVIZStyleParser} from '@xviz/parser';
 
-import {parseFrame, getTransform} from './utils';
+import {parseMessage, getTransform} from './utils';
 
 import renderCircle from './circle';
 import renderPoint from './point';
@@ -33,9 +33,9 @@ const renderers = {
   stadium: renderStadium
 };
 
-export default function renderXVIZ(context, frames) {
-  const metadata = parseFrame(frames[0]);
-  const timeslice = parseFrame(frames[1]);
+export default function renderXVIZ(context, messages) {
+  const metadata = parseMessage(messages[0]);
+  const timeslice = parseMessage(messages[1]);
   const styleParser = new XVIZStyleParser(metadata.styles);
   const {width, height} = context.canvas;
 

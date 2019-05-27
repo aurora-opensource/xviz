@@ -87,7 +87,7 @@ simple interface for the layers above.
 [Reader](/docs/api-reference/io/overview-writer.md) and
 [Writers](/docs/api-reference/io/overview-reader.md) are concerned with XVIZ level constructs.
 Readers and Writers take Sources and Sinks, respectively, and provide an interface for dealing with
-Metadata and Frames.
+Metadata and Messages.
 
 # Providers
 

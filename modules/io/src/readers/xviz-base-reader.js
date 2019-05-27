@@ -20,22 +20,22 @@ export class XVIZBaseReader {
     this.options = options;
     this.suffix = options.suffix || '-frame.json';
 
-    // Read the frame index
+    // Read the message index
     this.index = this._readIndex();
     /* Index schema
      * startTime,
      * endTime,
-     * timing: [ [minFrameTime, maxFrameTime, index, name], ...]
+     * timing: [ [minMessageTime, maxMessageTime, index, name], ...]
      */
   }
 
   readMetadata() {
-    return this.source.readSync(this._xvizFrame(1));
+    return this.source.readSync(this._xvizMessage(1));
   }
 
-  readFrame(frameIndex) {
-    // Data frames begin at the filename 2-frame.*
-    return this.source.readSync(this._xvizFrame(2 + frameIndex));
+  readMessage(messageIndex) {
+    // Data messages begin at the filename 2-frame.*
+    return this.source.readSync(this._xvizMessage(2 + messageIndex));
   }
 
   timeRange() {
@@ -47,7 +47,7 @@ export class XVIZBaseReader {
     return {startTime: null, endTime: null};
   }
 
-  frameCount() {
+  messageCount() {
     if (this.index) {
       return this.index.timing.length;
     }
@@ -55,29 +55,29 @@ export class XVIZBaseReader {
     return undefined;
   }
 
-  // Returns 2 indices covering the frames that bound the requested timestamp
-  findFrame(timestamp) {
+  // Returns 2 indices covering the messages that bound the requested timestamp
+  findMessage(timestamp) {
     if (!this.index) {
       return undefined;
     }
 
     const {startTime, endTime, timing} = this.index;
-    const frameCount = this.frameCount();
-    const lastFrame = frameCount > 0 ? frameCount - 1 : 0;
+    const messageCount = this.messageCount();
+    const lastMessage = messageCount > 0 ? messageCount - 1 : 0;
 
     if (timestamp < startTime) {
       return {first: 0, last: 0};
     }
 
     if (timestamp > endTime) {
-      return {first: lastFrame, last: lastFrame};
+      return {first: lastMessage, last: lastMessage};
     }
 
     let first = timing.findIndex(timeEntry => timeEntry[0] >= timestamp);
 
     // Reverse search for end index
     let last = -1;
-    let i = lastFrame;
+    let i = lastMessage;
     while (i >= 0) {
       const timeEntry = timing[i];
       if (timeEntry[1] <= timestamp) {
@@ -93,7 +93,7 @@ export class XVIZBaseReader {
     }
 
     if (last === -1) {
-      last = lastFrame;
+      last = lastMessage;
     }
 
     return {first, last};
@@ -103,8 +103,8 @@ export class XVIZBaseReader {
     this.source.close();
   }
 
-  // Support various formatted frame names
-  _xvizFrame(index) {
+  // Support various formatted message names
+  _xvizMessage(index) {
     if (index === 0) {
       // index file is always json
       return `0-frame.json`;
@@ -114,7 +114,7 @@ export class XVIZBaseReader {
   }
 
   _readIndex() {
-    const indexData = this.source.readSync(this._xvizFrame(0));
+    const indexData = this.source.readSync(this._xvizMessage(0));
     if (indexData) {
       if (isJSONString(indexData)) {
         return JSON.parse(indexData);

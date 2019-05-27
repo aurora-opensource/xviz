@@ -35,14 +35,14 @@ export default class BaseConverter {
     this.timestamps = getTimestamps(timeFilePath);
   }
 
-  async loadFrame(frameNumber) {
-    // Load the data for this frame
-    const fileName = this.fileNames[frameNumber];
+  async loadMessage(messageNumber) {
+    // Load the data for this message
+    const fileName = this.fileNames[messageNumber];
     const srcFilePath = path.join(this.dataDir, fileName);
     const data = fs.readFileSync(srcFilePath);
 
     // Get the time stamp
-    const timestamp = this.timestamps[frameNumber];
+    const timestamp = this.timestamps[messageNumber];
 
     return {data, timestamp};
   }

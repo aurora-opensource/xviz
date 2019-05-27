@@ -80,11 +80,11 @@ class CircleScenario {
     return metadata;
   }
 
-  getFrame(timeOffset) {
-    return this._getFrame(timeOffset);
+  getMessage(timeOffset) {
+    return this._getMessage(timeOffset);
   }
 
-  _getFrame(timeOffset) {
+  _getMessage(timeOffset) {
     const timestamp = this.timestamp + timeOffset;
 
     return {

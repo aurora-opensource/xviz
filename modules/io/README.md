@@ -25,4 +25,4 @@ to store XVIZ in a particular format.
 # Providers
 
 [XVIZ Providers](/docs/api-reference/io/overview-provider.md) are a level above Readers and Writers
-where a Provider interface only deals with metadata and frames and providing access to that data.
+where a Provider interface only deals with metadata and messages and providing access to that data.

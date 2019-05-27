@@ -133,12 +133,11 @@ for assets.
 ### Format Support
 
 [XVIZBinaryWriter](/docs/api-reference/xviz-binary-writer.md) will output the GLB binary format of
-the XVIZ data. This will be output for both Metadata and Frames, but not the FrameIndex, which is
-always output as JSON.
+the XVIZ data. This will be output for both Metadata and Messages, but not the MessageIndex, which
+is always output as JSON.
 
 [XVIZJSONWriter](/docs/api-reference/xviz-json-writer.md) will output the JSON format of the XVIZ
-data. This will be output for both Metadata and Frames, but not the FrameIndex, which is always
-output as JSON.
+data. This will be output for both Metadata, Messages, and MessageIndex.
 
 ### Parsing Support
 

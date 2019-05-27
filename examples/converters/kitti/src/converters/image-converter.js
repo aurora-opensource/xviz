@@ -27,21 +27,21 @@ export default class ImageConverter extends BaseConverter {
     this.options = options;
   }
 
-  async loadFrame(frameNumber) {
-    // Load the data for this frame
-    const fileName = this.fileNames[frameNumber];
+  async loadMessage(messageNumber) {
+    // Load the data for this message
+    const fileName = this.fileNames[messageNumber];
     const {maxWidth, maxHeight} = this.options;
     const srcFilePath = path.join(this.dataDir, fileName);
     const {data, width, height} = await resizeImage(srcFilePath, maxWidth, maxHeight);
 
     // Get the time stamp
-    const timestamp = this.timestamps[frameNumber];
+    const timestamp = this.timestamps[messageNumber];
 
     return {data, timestamp, width, height};
   }
 
-  async convertFrame(frameNumber, xvizBuilder) {
-    const {data, width, height} = await this.loadFrame(frameNumber);
+  async convertMessage(messageNumber, xvizBuilder) {
+    const {data, width, height} = await this.loadMessage(messageNumber);
 
     xvizBuilder
       .primitive(this.streamName)

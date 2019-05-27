@@ -25,7 +25,7 @@ To see a full list of options of the converter, run `yarn start --help`.
 - `-o, --output` Path to generated data. Relative path will resolved relative to
   /data/generated/kitti/
 - `--disable-streams` Comma separated stream names to disable
-- `--frame-limit` Limit XVIZ frame generation to this value. Useful testing conversion quickly
+- `--message-limit` Limit XVIZ message generation to this value. Useful testing conversion quickly
 - `--image-max-width` max width allowed with aspect ratio preserved. Default is 400.
 - `--image-max-height` max height allowed with aspect ratio preserved Default is 300.
 

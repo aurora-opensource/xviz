@@ -62,9 +62,9 @@ test('XVIZBuilder#single-pose', t => {
     ]
   };
 
-  const frame = builder.getFrame();
-  t.deepEqual(frame, expected, 'XVIZBuilder single pose matches expected output');
-  schemaValidator.validate('session/state_update', frame);
+  const message = builder.getMessage();
+  t.deepEqual(message, expected, 'XVIZBuilder single pose matches expected output');
+  schemaValidator.validate('session/state_update', message);
   t.end();
 });
 
@@ -97,9 +97,9 @@ test('XVIZBuilder#multiple-poses', t => {
     ]
   };
 
-  const frame = builder.getFrame();
-  t.deepEqual(frame, expected, 'XVIZBuilder single pose matches expected output');
-  schemaValidator.validate('session/state_update', frame);
+  const message = builder.getMessage();
+  t.deepEqual(message, expected, 'XVIZBuilder single pose matches expected output');
+  schemaValidator.validate('session/state_update', message);
   t.end();
 });
 
@@ -144,9 +144,9 @@ test('XVIZBuilder#polygon', t => {
     ]
   };
 
-  const frame = builder.getFrame();
-  t.deepEqual(frame, expected, 'XVIZBuilder pose and polygon match expected output');
-  schemaValidator.validate('session/state_update', frame);
+  const message = builder.getMessage();
+  t.deepEqual(message, expected, 'XVIZBuilder pose and polygon match expected output');
+  schemaValidator.validate('session/state_update', message);
   t.end();
 });
 
@@ -188,9 +188,9 @@ test('XVIZBuilder#points', t => {
     ]
   };
 
-  const frame = builder.getFrame();
-  t.deepEqual(frame, expected, 'XVIZBuilder points match expected output');
-  schemaValidator.validate('session/state_update', frame);
+  const message = builder.getMessage();
+  t.deepEqual(message, expected, 'XVIZBuilder points match expected output');
+  schemaValidator.validate('session/state_update', message);
   t.end();
 });
 
@@ -246,9 +246,9 @@ test('XVIZBuilder#single-stream-multiple-polygons', t => {
     ]
   };
 
-  const frame = builder.getFrame();
-  t.deepEqual(frame, expected, 'XVIZBuilder multiple polygon match expected output');
-  schemaValidator.validate('session/state_update', frame);
+  const message = builder.getMessage();
+  t.deepEqual(message, expected, 'XVIZBuilder multiple polygon match expected output');
+  schemaValidator.validate('session/state_update', message);
   t.end();
 });
 
@@ -281,9 +281,9 @@ test('XVIZBuilder#polyline', t => {
     ]
   };
 
-  const frame = builder.getFrame();
-  t.deepEqual(frame, expected, 'XVIZBuilder polyline matches expected output');
-  schemaValidator.validate('session/state_update', frame);
+  const message = builder.getMessage();
+  t.deepEqual(message, expected, 'XVIZBuilder polyline matches expected output');
+  schemaValidator.validate('session/state_update', message);
   t.end();
 });
 
@@ -316,9 +316,9 @@ test('XVIZBuilder#circle', t => {
     ]
   };
 
-  const frame = builder.getFrame();
-  t.deepEqual(frame, expected, 'XVIZBuilder circle matches expected output');
-  schemaValidator.validate('session/state_update', frame);
+  const message = builder.getMessage();
+  t.deepEqual(message, expected, 'XVIZBuilder circle matches expected output');
+  schemaValidator.validate('session/state_update', message);
   t.end();
 });
 
@@ -354,9 +354,9 @@ test('XVIZBuilder#text', t => {
     ]
   };
 
-  const frame = builder.getFrame();
-  t.deepEqual(frame, expected, 'XVIZBuilder text matches expected output');
-  schemaValidator.validate('session/state_update', frame);
+  const message = builder.getMessage();
+  t.deepEqual(message, expected, 'XVIZBuilder text matches expected output');
+  schemaValidator.validate('session/state_update', message);
   t.end();
 });
 
@@ -391,9 +391,9 @@ test('XVIZBuilder#stadium', t => {
     ]
   };
 
-  const frame = builder.getFrame();
-  t.deepEqual(frame, expected, 'XVIZBuilder stadium matches expected output');
-  schemaValidator.validate('session/state_update', frame);
+  const message = builder.getMessage();
+  t.deepEqual(message, expected, 'XVIZBuilder stadium matches expected output');
+  schemaValidator.validate('session/state_update', message);
   t.end();
 });
 
@@ -433,9 +433,9 @@ test('XVIZBuilder#image', t => {
     ]
   };
 
-  const frame = builder.getFrame();
-  t.deepEqual(frame, expected, 'XVIZBuilder image matches expected output');
-  schemaValidator.validate('session/state_update', frame);
+  const message = builder.getMessage();
+  t.deepEqual(message, expected, 'XVIZBuilder image matches expected output');
+  schemaValidator.validate('session/state_update', message);
   t.end();
 });
 
@@ -466,9 +466,9 @@ test('XVIZBuilder#variable', t => {
     ]
   };
 
-  const frame = builder.getFrame();
-  t.deepEqual(frame, expected, 'XVIZBuilder variable matches expected output');
-  schemaValidator.validate('session/state_update', frame);
+  const message = builder.getMessage();
+  t.deepEqual(message, expected, 'XVIZBuilder variable matches expected output');
+  schemaValidator.validate('session/state_update', message);
   t.end();
 });
 
@@ -508,9 +508,9 @@ test('XVIZBuilder#multiple-variables', t => {
     ]
   };
 
-  const frame = builder.getFrame();
-  t.deepEqual(frame, expected, 'XVIZBuilder multiple variables match expected output');
-  schemaValidator.validate('session/state_update', frame);
+  const message = builder.getMessage();
+  t.deepEqual(message, expected, 'XVIZBuilder multiple variables match expected output');
+  schemaValidator.validate('session/state_update', message);
   t.end();
 });
 
@@ -552,9 +552,9 @@ test('XVIZBuilder#time_series', t => {
     ]
   };
 
-  const frame = builder.getFrame();
-  t.deepEqual(frame, expected, 'XVIZBuilder variable matches expected output');
-  schemaValidator.validate('session/state_update', frame);
+  const message = builder.getMessage();
+  t.deepEqual(message, expected, 'XVIZBuilder variable matches expected output');
+  schemaValidator.validate('session/state_update', message);
   t.end();
 });
 
@@ -594,9 +594,9 @@ test('XVIZBuilder#futures-single-primitive', t => {
     ]
   };
 
-  const frame = builder.getFrame();
-  t.deepEqual(frame, expected, 'XVIZBuilder single primitive futures matches expected output');
-  schemaValidator.validate('session/state_update', frame);
+  const message = builder.getMessage();
+  t.deepEqual(message, expected, 'XVIZBuilder single primitive futures matches expected output');
+  schemaValidator.validate('session/state_update', message);
   t.end();
 });
 
@@ -659,9 +659,9 @@ test('XVIZBuilder#futures-multiple-primitive reverse timestamp insert', t => {
     ]
   };
 
-  const frame = builder.getFrame();
-  t.deepEqual(frame, expected, 'XVIZBuilder multiple primitives futures matches expected output');
-  schemaValidator.validate('session/state_update', frame);
+  const message = builder.getMessage();
+  t.deepEqual(message, expected, 'XVIZBuilder multiple primitives futures matches expected output');
+  schemaValidator.validate('session/state_update', message);
   t.end();
 });
 
@@ -732,8 +732,8 @@ test('XVIZBuilder#futures-multiple-primitive-per-ts', t => {
     ]
   };
 
-  const frame = builder.getFrame();
-  t.deepEqual(frame, expected, 'XVIZBuilder multiple primitives futures matches expected output');
-  schemaValidator.validate('session/state_update', frame);
+  const message = builder.getMessage();
+  t.deepEqual(message, expected, 'XVIZBuilder multiple primitives futures matches expected output');
+  schemaValidator.validate('session/state_update', message);
   t.end();
 });

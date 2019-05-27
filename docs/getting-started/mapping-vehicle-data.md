@@ -38,8 +38,8 @@ important there is a required name `/vehicle_pose`. The list of
 [category values](/docs/protocol-schema/session-protocol.md#stream_metadata) can be seen in the
 specification.
 
-On every frame we must define the current Pose. We use the
-[XVIZBuilder](/docs/api-reference/xviz-builder.md#pose-streamid-) to create this for each frame.
+On every message we must define the current Pose. We use the
+[XVIZBuilder](/docs/api-reference/xviz-builder.md#pose-streamid-) to create this for each message.
 
 ```js
 xvizBuilder
@@ -87,7 +87,7 @@ specification.
 
 The `unit()` is a free form string to define the units that will be displayed in the UI.
 
-The data for each frame is converted as follows.
+The data for each message is converted as follows.
 
 ```
 xvizBuilder

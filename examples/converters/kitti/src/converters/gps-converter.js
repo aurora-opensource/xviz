@@ -45,21 +45,21 @@ export default class GPSConverter extends BaseConverter {
     });
   }
 
-  getPose(frameNumber) {
-    return this.poses[frameNumber].pose;
+  getPose(messageNumber) {
+    return this.poses[messageNumber].pose;
   }
 
   getPoses() {
     return this.poses;
   }
 
-  async convertFrame(frameNumber, xvizBuilder) {
-    const entry = this.poses[frameNumber];
+  async convertMessage(messageNumber, xvizBuilder) {
+    const entry = this.poses[messageNumber];
 
     const {pose, velocity, acceleration} = entry;
-    console.log(`processing gps data frame ${frameNumber}/${this.timestamps.length}`); // eslint-disable-line
+    console.log(`processing gps data message ${messageNumber}/${this.timestamps.length}`); // eslint-disable-line
 
-    // Every frame *MUST* have a pose. The pose can be considered
+    // Every message *MUST* have a pose. The pose can be considered
     // the core reference point for other data and usually drives the timing
     // of the system.
     xvizBuilder
@@ -96,8 +96,8 @@ export default class GPSConverter extends BaseConverter {
 
     const poseTrajectory = _getPoseTrajectory({
       poses: this.poses,
-      startFrame: frameNumber,
-      endFrame: Math.min(frameNumber + MOTION_PLANNING_STEPS, this.poses.length)
+      startFrame: messageNumber,
+      endFrame: Math.min(messageNumber + MOTION_PLANNING_STEPS, this.poses.length)
     });
 
     xvizBuilder.primitive(this.VEHICLE_TRAJECTORY).polyline(poseTrajectory);

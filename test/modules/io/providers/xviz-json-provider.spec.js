@@ -27,27 +27,27 @@ test('XVIZJSONProvider#default-ctor init', async t => {
   t.end();
 });
 
-test('XVIZJSONProvider#frame iteration', async t => {
+test('XVIZJSONProvider#message iteration', async t => {
   const provider = new XVIZJSONProvider({source});
   await provider.init();
   t.ok(provider.valid(), 'Provider is valid');
 
-  const iterator = provider.getFrameIterator(1000.5, 1010.5);
+  const iterator = provider.getMessageIterator(1000.5, 1010.5);
 
-  const testFrame = async timestamp => {
+  const testMessage = async timestamp => {
     t.ok(iterator.valid());
 
-    const frame = await provider.xvizFrame(iterator);
-    t.ok(frame, 'frame data is present');
+    const message = await provider.xvizMessage(iterator);
+    t.ok(message, 'message data is present');
 
-    const frameData = frame.message().data;
-    t.equals(frameData.updates[0].timestamp, timestamp, 'First frame matches expected value');
+    const messageData = message.message().data;
+    t.equals(messageData.updates[0].timestamp, timestamp, 'First message matches expected value');
   };
 
-  testFrame(1000.5);
-  testFrame(1010.5);
+  testMessage(1000.5);
+  testMessage(1010.5);
 
-  t.not(provider.xvizFrame(iterator), 'iterator is correctly invalid at end');
+  t.not(provider.xvizMessage(iterator), 'iterator is correctly invalid at end');
 
   t.end();
 });

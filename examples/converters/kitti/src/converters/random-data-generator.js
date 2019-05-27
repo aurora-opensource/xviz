@@ -68,7 +68,7 @@ export default class RandomDataGenerator {
 
   load() {}
 
-  async convertFrame(frameNumber, xvizBuilder) {
+  async convertMessage(messageNumber, xvizBuilder) {
     for (const streamName in this.streams) {
       const info = this.streams[streamName];
       const builder = xvizBuilder[CATEGORY_BUILDER_COMMAND[info.category]](streamName);

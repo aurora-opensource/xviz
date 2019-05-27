@@ -45,12 +45,13 @@ function determineWriter(sink, format, options) {
 export class XVIZFormatWriter {
   constructor(sink, {format, ...options}) {
     this.format = format;
+    this.options = {flattenArrays: true, ...options};
 
     if (!format || format === XVIZFormat.OBJECT) {
       throw new Error(`Format ${format} is not supported by XVIZFormatter.`);
     }
 
-    this.writer = determineWriter(sink, format, options);
+    this.writer = determineWriter(sink, format, this.options);
   }
 
   writeMetadata(xvizMetadata) {
@@ -58,9 +59,9 @@ export class XVIZFormatWriter {
     this.writer.writeMetadata(msg.data);
   }
 
-  writeFrame(frameIndex, xvizData) {
+  writeMessage(messageIndex, xvizData) {
     const msg = xvizData.message();
-    this.writer.writeFrame(frameIndex, msg.data);
+    this.writer.writeMessage(messageIndex, msg.data);
   }
 
   close() {

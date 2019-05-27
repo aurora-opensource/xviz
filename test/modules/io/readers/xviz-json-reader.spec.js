@@ -58,7 +58,7 @@ test('XVIZJSONReader#readMetadata', t => {
   t.end();
 });
 
-test('XVIZJSONReader#readFrame', t => {
+test('XVIZJSONReader#readMessage', t => {
   const source = new MemorySourceSink();
   const binBuilder = new XVIZJSONReader(source);
 
@@ -70,8 +70,8 @@ test('XVIZJSONReader#readFrame', t => {
   };
 
   source.writeSync('2-frame.json', testData);
-  const result = binBuilder.readFrame(0);
+  const result = binBuilder.readMessage(0);
 
-  t.deepEquals(result, testData, 'readFrame(0) works with object');
+  t.deepEquals(result, testData, 'readMessage(0) works with object');
   t.end();
 });

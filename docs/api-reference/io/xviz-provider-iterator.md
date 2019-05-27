@@ -1,7 +1,7 @@
 # XVIZ Provider Iterator
 
 This object is returned from the
-[XVIZProvider.getFrameIterator()](/docs/api-reference/io/overview-provider.md) function.
+[XVIZProvider.getMessageIterator()](/docs/api-reference/io/overview-provider.md) function.
 
 The iterator represents the state necessary to walk the XVIZ data over a specified time range.
 

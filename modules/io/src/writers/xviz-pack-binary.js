@@ -11,18 +11,15 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-// TODO(twojtasz): This appears broken in loaders, fix then update here
-// import {flattenToTypedArray} from '@loaders.gl/core';
 import {flattenToTypedArray} from '@xviz/builder';
 
-function packBinaryJsonTypedArray(gltfBuilder, object, objectKey) {
+function packBinaryJsonTypedArray(gltfBuilder, object, objectKey, info) {
   if (gltfBuilder.isImage(object)) {
     const imageIndex = gltfBuilder.addImage(object);
     return `#/images/${imageIndex}`;
   }
   // if not an image, pack as accessor
-  const opts = objectKey === 'colors' ? {size: 4} : {size: 3};
+  const opts = info && info.size ? {size: info.size} : {size: 3};
   const bufferIndex = gltfBuilder.addBuffer(object, opts);
   return `#/accessors/${bufferIndex}`;
 }
@@ -30,10 +27,10 @@ function packBinaryJsonTypedArray(gltfBuilder, object, objectKey) {
 // Follows a convention used by @loaders.gl to use JSONPointers
 // to encode where the binary data for an XVIZ element resides.
 // The unpacking is handled automatically by @loaders.gl
-/* eslint-disable complexity */
 export function packBinaryJson(json, gltfBuilder, objectKey = null, options = {}) {
-  const {flattenArrays = false} = options;
+  const {flattenArrays = true} = options;
   let object = json;
+  let objectInfo = null;
 
   // Check if string has same syntax as our "JSON pointers", if so "escape it".
   if (typeof object === 'string' && object.indexOf('#/') === 0) {
@@ -42,9 +39,10 @@ export function packBinaryJson(json, gltfBuilder, objectKey = null, options = {}
 
   if (Array.isArray(object)) {
     // TODO - handle numeric arrays, flatten them etc.
-    const typedArray = flattenArrays && flattenToTypedArray(object);
-    if (typedArray) {
-      object = typedArray;
+    const flatObject = flattenArrays && flattenObject(objectKey, object);
+    if (flatObject) {
+      object = flatObject.typedArray;
+      objectInfo = flatObject;
     } else {
       return object.map(element => packBinaryJson(element, gltfBuilder, options));
     }
@@ -52,7 +50,7 @@ export function packBinaryJson(json, gltfBuilder, objectKey = null, options = {}
 
   // Typed arrays, pack them as binary
   if (ArrayBuffer.isView(object) && gltfBuilder) {
-    return packBinaryJsonTypedArray(gltfBuilder, object, objectKey);
+    return packBinaryJsonTypedArray(gltfBuilder, object, objectKey, objectInfo);
   }
 
   if (object !== null && typeof object === 'object') {
@@ -65,4 +63,31 @@ export function packBinaryJson(json, gltfBuilder, objectKey = null, options = {}
 
   return object;
 }
-/* eslint-enable complexity */
+
+function flattenObject(key, object) {
+  let typedArray = null;
+  let size = 3;
+  const toTypedArrayMinimumLength = 20;
+
+  if (object.length < toTypedArrayMinimumLength) {
+    return null;
+  }
+
+  if (key === 'vertices' || key === 'points') {
+    // Flatten nested vertices
+    typedArray = flattenToTypedArray(object, size, Float32Array);
+  }
+  if (key === 'colors') {
+    size = object[0].length === 4 ? 4 : 3;
+    typedArray = flattenToTypedArray(object, size, Uint8Array);
+  }
+
+  if (typedArray) {
+    return {
+      typedArray,
+      size
+    };
+  }
+
+  return null;
+}

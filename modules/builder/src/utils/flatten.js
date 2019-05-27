@@ -18,7 +18,7 @@ function isFlattened(array) {
 
 export function flattenToTypedArray(nestedArray, dimensions = 3, ArrayType = Float32Array) {
   if (nestedArray.length === 0) {
-    return new Float32Array(0);
+    return null;
   }
 
   if (!checkVertices(nestedArray)) {

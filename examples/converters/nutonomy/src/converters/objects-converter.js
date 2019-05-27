@@ -129,11 +129,11 @@ export default class ObjectsConverter {
     this.objectsByFrame = loadObjects(objects, staticData.instances);
   }
 
-  convertFrame(frameIndex, xvizBuilder) {
+  convertMessage(messageIndex, xvizBuilder) {
     // only key frames have objects data
     // each frame has a unique token,
     // each keyframe has a unique sample_token
-    const frameToken = this.frames[frameIndex].sample_token;
+    const frameToken = this.frames[messageIndex].sample_token;
 
     // objects of given sample
     const objects = this.objectsByFrame[frameToken];
@@ -159,8 +159,8 @@ export default class ObjectsConverter {
       Object.values(objects).forEach(object => {
         const objectTrajectory = this._getObjectTrajectory(
           object,
-          frameIndex,
-          Math.min(frameIndex + 50, this.frames.length)
+          messageIndex,
+          Math.min(messageIndex + 50, this.frames.length)
         );
 
         xvizBuilder.primitive(this.OBJECTS_TRAJECTORY).polyline(objectTrajectory);

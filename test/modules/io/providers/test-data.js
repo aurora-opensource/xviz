@@ -22,7 +22,7 @@ const index = {
 const metadata = {
   version: '2.0.0'
 };
-const frame1 = {
+const msg1 = {
   type: 'xviz/state_update',
   data: {
     update_type: 'snapshot',
@@ -33,7 +33,7 @@ const frame1 = {
     ]
   }
 };
-const frame2 = {
+const msg2 = {
   type: 'xviz/state_update',
   data: {
     update_type: 'snapshot',
@@ -49,8 +49,8 @@ export function getJSONTestDataSource() {
   const source = new MemorySourceSink();
   source.writeSync('0-frame.json', index);
   source.writeSync('1-frame.json', metadata);
-  source.writeSync('2-frame.json', frame1);
-  source.writeSync('3-frame.json', frame2);
+  source.writeSync('2-frame.json', msg1);
+  source.writeSync('3-frame.json', msg2);
 
   return source;
 }
@@ -59,8 +59,8 @@ export function getBinaryTestDataSource() {
   const source = new MemorySourceSink();
   source.writeSync('0-frame.json', index);
   source.writeSync('1-frame.glb', metadata);
-  source.writeSync('2-frame.glb', frame1);
-  source.writeSync('3-frame.glb', frame2);
+  source.writeSync('2-frame.glb', msg1);
+  source.writeSync('3-frame.glb', msg2);
 
   return source;
 }

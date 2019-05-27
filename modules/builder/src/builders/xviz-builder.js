@@ -107,7 +107,7 @@ export default class XVIZBuilder {
   }
 
   /*
-  frame data:
+  message data:
   {
     update_type: 'snapshot',
     updates: [{
@@ -119,11 +119,11 @@ export default class XVIZBuilder {
     }]
   }
    */
-  getFrame() {
+  getMessage() {
     const {poses} = this._poseBuilder.getData();
 
     if (!poses || !poses[PRIMARY_POSE_STREAM]) {
-      this._validator.error(`Every frame requires a ${PRIMARY_POSE_STREAM} stream`);
+      this._validator.error(`Every message requires a ${PRIMARY_POSE_STREAM} stream`);
     }
 
     const primitives = this._primitivesBuilder.getData();
@@ -153,12 +153,12 @@ export default class XVIZBuilder {
       data.ui_primitives = uiPrimitives;
     }
 
-    const frame = {
+    const message = {
       update_type: 'snapshot',
       updates: [data]
     };
 
-    return frame;
+    return message;
   }
 
   _reset() {

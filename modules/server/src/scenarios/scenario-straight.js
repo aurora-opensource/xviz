@@ -54,11 +54,11 @@ class StraightScenario {
     return metadata;
   }
 
-  getFrame(timeOffset) {
-    return this._getFrame(timeOffset);
+  getMessage(timeOffset) {
+    return this._getMessage(timeOffset);
   }
 
-  _getFrame(timeOffset) {
+  _getMessage(timeOffset) {
     const timestamp = this.timestamp + timeOffset;
 
     const x = this._getPositionX(timestamp);
@@ -110,7 +110,7 @@ class StraightScenario {
   }
 
   _drawLines(x) {
-    // Car position matches the frameNumber
+    // Car position matches the messageNumber
     // place the farthest 20
     const lineStart = (x - 15) / this.lineGap;
     const lineEnd = (x + 20) / this.lineGap;

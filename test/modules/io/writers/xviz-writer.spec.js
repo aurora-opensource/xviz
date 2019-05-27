@@ -45,7 +45,7 @@ const SAMPLE_STATE_UPDATE = {
   ]
 };
 
-// Type m for metadata, f for frame
+// Type m for metadata, f for message
 const TestCases = [
   {
     name: 'envelope metadata',
@@ -53,17 +53,17 @@ const TestCases = [
     data: SAMPLE_METADATA
   },
   {
-    name: 'frame',
+    name: 'message',
     type: 'f',
     data: SAMPLE_STATE_UPDATE
   },
   {
-    name: 'frame index',
+    name: 'message index',
     type: 'f',
     data: SAMPLE_STATE_UPDATE,
     postTest: (t, tc, writer, sink) => {
       writer.close();
-      t.ok(sink.has('0-frame.json'), 'wrote index for frames');
+      t.ok(sink.has('0-frame.json'), 'wrote index for messages');
       t.deepEquals(
         JSON.parse(sink.readSync('0-frame.json')),
         {
@@ -75,7 +75,7 @@ const TestCases = [
   }
 ];
 
-// Setup then test writing meta or frame and validate output
+// Setup then test writing meta or message and validate output
 function testWriter(t, testCase, Writer, suffix) {
   const sink = new MemorySourceSink();
   const writer = new Writer(sink, testCase.options);
@@ -93,7 +93,7 @@ function testWriter(t, testCase, Writer, suffix) {
   } else if (testCase.type === 'f') {
     lookup = '2-frame';
     resultType = 'state_update';
-    writer.writeFrame(0, testCase.data);
+    writer.writeMessage(0, testCase.data);
   } else {
     t.fail('Unknown testCase type');
   }
@@ -136,14 +136,14 @@ const ThrowingTestCases = [
     testMessage: 'Throws if updates missing timestamp'
   },
   {
-    name: 'writeFrame after close',
+    name: 'writeMessage after close',
     data: SAMPLE_STATE_UPDATE,
     preTest: (t, tc, writer, sink) => {
-      writer.writeFrame(0, tc.data);
+      writer.writeMessage(0, tc.data);
       writer.close();
     },
     exceptionRegex: /Cannot use this Writer after .close()/,
-    testMessage: 'throws if writeFrame() called after close()'
+    testMessage: 'throws if writeMessage() called after close()'
   }
 ];
 
@@ -156,7 +156,7 @@ function testWriterThrows(t, testCase, Writer) {
   }
 
   t.throws(
-    () => writer.writeFrame(0, testCase.data),
+    () => writer.writeMessage(0, testCase.data),
     testCase.exceptionRegex,
     testCase.testMessage
   );
@@ -166,7 +166,7 @@ function testWriterThrows(t, testCase, Writer) {
   }
 }
 
-// Setup then test writing frame that throws and validate output
+// Setup then test writing message that throws and validate output
 test('XVIZWriter#ThrowingTestCases', t => {
   for (const testCase of ThrowingTestCases) {
     t.comment(`-- ThrowTestCase: ${testCase.name}`);
@@ -176,7 +176,7 @@ test('XVIZWriter#ThrowingTestCases', t => {
   t.end();
 });
 
-test('XVIZWriter#default-ctor frames close()', t => {
+test('XVIZWriter#default-ctor messages close()', t => {
   const sink = new MemorySourceSink();
   const jsBuilder = new XVIZJSONWriter(sink);
   const binBuilder = new XVIZBinaryWriter(sink);
@@ -184,10 +184,10 @@ test('XVIZWriter#default-ctor frames close()', t => {
   const data = SAMPLE_STATE_UPDATE;
 
   for (const builder of [jsBuilder, binBuilder]) {
-    builder.writeFrame(0, data);
+    builder.writeMessage(0, data);
     builder.close();
 
-    t.ok(sink.has('0-frame.json'), 'wrote index for frames');
+    t.ok(sink.has('0-frame.json'), 'wrote index for messages');
 
     const expected = {
       timing: [[100, 100, 0, '2-frame']]

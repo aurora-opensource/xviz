@@ -44,7 +44,7 @@ Returns: (Boolean) - True if the source is a valid for this Provider
 
 Returns: the XVIZ Metadata if present
 
-##### getFrameIterator(range, options)
+##### getMessageIterator(range, options)
 
 Parameters:
 
@@ -54,14 +54,15 @@ Parameters:
   the log.
 - `options` (Object) - Implementation defined.
 
-Returns: ([iterator](/docs/api-reference/io/xviz-provider-iterator.md)) - iterator object for frames
+Returns: ([iterator](/docs/api-reference/io/xviz-provider-iterator.md)) - iterator object for
+messages
 
-##### xvizFrame(iterator)
+##### xvizMessage(iterator)
 
 Parameters:
 
 - `iterator` (Object) - An [iterator](/docs/api-reference/io/xviz-provider-iterator.md) obtained
-  from the method [getFrameIterator()](#getFrameIterator)
+  from the method [getMessageIterator()](#getMessageIterator)
 
 Returns: ([XVIZData](/docs/api-reference/io/xviz-data.md)) - object or null if the iterator is
 invalid

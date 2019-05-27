@@ -37,10 +37,13 @@ export default class LidarConverter {
     });
   }
 
-  convertFrame(frameIndex, xvizBuilder) {
-    const frameToken = this.frames[frameIndex].token;
+  convertMessage(messageIndex, xvizBuilder) {
+    const frameToken = this.frames[messageIndex].token;
 
     const filepath = this.pointCloudFilePathByToken[frameToken];
+    if (!fs.existsSync(filepath)) {
+      return;
+    }
     const buffer = fs.readFileSync(filepath);
     const arraybuffer = toArrayBuffer(buffer);
     const pointCloud = this._parsePointCloud(arraybuffer);

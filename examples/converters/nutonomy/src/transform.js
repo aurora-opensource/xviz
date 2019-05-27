@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /* eslint-disable camelcase */
-import {XVIZWriter} from '@xviz/builder';
+import {FileSink} from '@xviz/io/node';
+import {XVIZBinaryWriter} from '@xviz/io';
 
 import {zeroPaddedPrefix} from './common';
 import NuTonomyConverter from './converters/nutonomy-converter';
@@ -25,7 +26,7 @@ module.exports = async function main(args) {
     samplesDir,
     disabledStreams,
     fakeStreams,
-    frameLimit,
+    messageLimit,
     scenes,
     imageMaxWidth,
     imageMaxHeight,
@@ -53,25 +54,26 @@ module.exports = async function main(args) {
     converter.initialize();
 
     // This abstracts the details of the filenames expected by our server
-    const xvizWriter = new XVIZWriter();
+    const sink = new FileSink(outputDir);
+    const xvizWriter = new XVIZBinaryWriter(sink);
 
     // Write metadata file
     const xvizMetadata = converter.getMetadata();
-    xvizWriter.writeMetadata(outputDir, xvizMetadata);
+    xvizWriter.writeMetadata(xvizMetadata);
 
     const start = Date.now();
 
-    const limit = Math.min(frameLimit, converter.frameCount());
+    const limit = Math.min(messageLimit, converter.messageCount());
     for (let i = 0; i < limit; i++) {
-      const xvizFrame = await converter.convertFrame(i);
-      if (xvizFrame) {
-        xvizWriter.writeFrame(outputDir, i, xvizFrame);
+      const xvizMessage = await converter.convertMessage(i);
+      if (xvizMessage) {
+        xvizWriter.writeMessage(i, xvizMessage);
       }
     }
 
-    xvizWriter.writeFrameIndex(outputDir);
+    xvizWriter.close();
 
     const end = Date.now();
-    console.log(`Generate ${limit} frames in ${end - start}s`); // eslint-disable-line
+    console.log(`Generate ${limit} messages in ${end - start}s`); // eslint-disable-line
   }
 };

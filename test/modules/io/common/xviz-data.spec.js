@@ -34,7 +34,7 @@ const writer = new XVIZBinaryWriter({
     TestXVIZSnapshotGLB = d;
   }
 });
-writer.writeFrame(0, TestXVIZSnapshot);
+writer.writeMessage(0, TestXVIZSnapshot);
 
 // Load the data in XVIZData and verify the format
 const TestCases = [
