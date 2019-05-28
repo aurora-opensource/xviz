@@ -25,7 +25,7 @@ const FLATTEN_VERTICES_TEST_CASES = [
   {
     title: 'empty array',
     argument: [],
-    result: []
+    result: null
   },
   {
     title: 'flat arrays',
@@ -65,5 +65,19 @@ test('flatten#flattenToTypedArray', t => {
     const result = flattenToTypedArray(tc.argument);
     t.deepEqual(result, tc.result, `flattenToTypedArray ${tc.title} returned expected result`);
   }
+  t.end();
+});
+
+test('flattenToTypedArray#zero array returns null', t => {
+  const newArray = flattenToTypedArray([]);
+
+  t.equal(newArray, null, 'flattenToTypedArray with 0 length input returns null');
+  t.end();
+});
+
+test('flattenToTypedArray#array with objects', t => {
+  const newArray = flattenToTypedArray([{a: 1}]);
+
+  t.equal(newArray, null, 'flattenToTypedArray with array of objects returns null');
   t.end();
 });
