@@ -1,0 +1,276 @@
+// --------------------------------------------------------
+// WARNING: XVIZ Protobuf files are unstable, do not use
+// --------------------------------------------------------
+
+syntax = "proto3";
+
+import "core.proto";
+import "style.proto";
+import "options.proto";
+
+import "google/protobuf/struct.proto";
+
+package xviz.v2.session;
+
+message Start
+{
+    option (xviz_json_schema) = "session/start";
+
+    string version = 1;
+
+    string profile = 2;
+
+    enum SessionType {
+        session_type_not_set = 0;
+        live = 1;
+        log = 2;
+        unbuffered_log = 3;
+    }
+
+    SessionType session_type = 3;
+
+    enum MessageFormat {
+        message_format_not_set = 0;
+        json = 1;
+        binary = 2;
+    }
+
+    MessageFormat message_format = 4;
+
+    string log = 5;
+}
+
+
+message TransformLog
+{
+    option (xviz_json_schema) = "session/transform_log";
+
+    string id = 1;
+
+    double start_timestamp = 2;
+
+    double end_timestamp = 3;
+
+    repeated string desired_streams = 4;
+}
+
+
+message StateUpdate
+{
+    option (xviz_json_schema) = "session/state_update";
+
+    enum UpdateType
+    {
+        not_set = 0;
+        snapshot = 1; // DO NOT USE - same as incremental
+        incremental = 2;
+        complete_state = 3;
+    }
+
+    UpdateType update_type = 1;
+
+    repeated core.StreamSet updates = 2;
+}
+
+
+message TransformLogDone
+{
+    option (xviz_json_schema) = "session/transform_log_done";
+
+    string id = 1;
+}
+
+
+message TransformPointInTime
+{
+    option (xviz_json_schema) = "session/transform_point_in_time";
+
+    string id = 1;
+
+    double query_timestamp = 2;
+
+    repeated string desired_streams = 3;
+}
+
+
+message Reconfigure
+{
+    option (xviz_json_schema) = "session/reconfigure";
+
+    enum UpdateType
+    {
+        not_set = 0;
+        delta = 1;
+        full = 2;
+    }
+
+    UpdateType update_type = 1;
+
+    google.protobuf.Struct config_update = 2;
+}
+
+
+message Metadata
+{
+    option (xviz_json_schema) = "session/metadata";
+
+    string version = 1;
+
+    map<string, StreamMetadata> streams = 2;
+
+    map<string, CameraInfo> cameras = 3;
+
+    map<string, string> stream_aliases = 4;
+
+    map<string, UIPanelInfo> ui_config = 5;
+
+    LogInfo log_info = 6;
+}
+
+
+message Error
+{
+    option (xviz_json_schema) = "session/error";
+
+    string message = 1;
+}
+
+
+message StreamMetadata
+{
+    option (xviz_json_schema) = "session/stream_metadata";
+
+    string source = 1;
+
+    string units = 2;
+
+    // Type information
+
+    enum Category
+    {
+        category_not_set = 0;
+        primitive = 1;
+        time_series = 2;
+        variable = 3;
+        annotation = 4;
+        future_instance = 5;
+        pose = 6;
+        ui_primitive = 7;
+    }
+
+    Category category = 3;
+
+    enum ScalarType
+    {
+        scalar_type_not_set = 0;
+        float = 1;
+        in32 = 2;
+        string = 3;
+        bool = 4;
+    }
+
+    ScalarType scalar_type = 4;
+
+    enum PrimitiveType
+    {
+        primitive_type_not_set = 0;
+        circle = 1;
+        image = 2;
+        point = 3;
+        polygon = 4;
+        polyline = 5;
+        stadium = 6;
+        text = 7;
+    }
+
+    PrimitiveType primitive_type = 5;
+
+    enum UIPrimitiveType
+    {
+        ui_primitive_type_not_set = 0;
+        treetable = 1;
+    }
+
+    UIPrimitiveType ui_primitive_type = 6;
+
+    enum AnnotationType
+    {
+        annotation_type_not_set = 0;
+        visual = 1;
+    }
+
+    AnnotationType annotation_type = 7;
+
+
+    // Style information
+
+    style.StreamValue stream_style = 8;
+
+    repeated style.Class style_classes = 9;
+
+
+    // Coordinate information
+
+    enum CoordinateType
+    {
+        NOT_SET = 0;
+        GEOGRAPHIC = 1;
+        IDENTITY = 2;
+        DYNAMIC = 3;
+        VEHICLE_RELATIVE = 4;
+    }
+
+    CoordinateType coordinate = 10;
+
+    /// 4x4 matrix flattened into 16 elements
+    repeated double transform = 11;
+
+    string transform_callback = 12;
+}
+
+
+message CameraInfo
+{
+    option (xviz_json_schema) = "session/camera_info";
+
+    string human_name = 1;
+
+    string source = 2;
+
+    /// (x,y,z) vehicle position as 3 elements
+    repeated double vehicle_position = 3;
+
+    /// 3x3 matrix, flattened into 9 elements
+    repeated double vehicle_orientation = 4;
+
+    double pixel_width = 5;
+
+    double pixel_height = 6;
+
+    /// 3x3 matrix, flattened into 9 elements
+    repeated double rectification_projection = 7;
+
+    /// 4x4 matrix, flattened into 9 elements
+    repeated double gl_projection = 8;
+}
+
+
+message UIPanelInfo
+{
+    option (xviz_json_schema) = "session/ui_panel_info";
+
+    string name = 1;
+
+    repeated string needed_streams = 2;
+
+    string config = 3;
+}
+
+message LogInfo
+{
+    option (xviz_json_schema) = "session/log_info";
+
+    double start_time = 1;
+
+    double end_time = 2;
+}

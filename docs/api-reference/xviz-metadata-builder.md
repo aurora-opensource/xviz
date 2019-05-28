@@ -213,8 +213,8 @@ special and cannot be overwritten.
 
 Special keys:
 
-- `start_time`
-- `end_time`
+- `start_time` (Number) - Start time for the log data
+- `end_time` (Number) - End time for the log data
 
 Parameters:
 
