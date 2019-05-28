@@ -44,6 +44,11 @@ export default class TrackletsConverter {
   }
 
   load() {
+    if (!fs.existsSync(this.trackletFile)) {
+      this.trackletFile = null;
+      return;
+    }
+
     const xml = fs.readFileSync(this.trackletFile, 'utf8');
     this.data = loadTracklets(xml);
 
@@ -72,12 +77,16 @@ export default class TrackletsConverter {
     this.poses = this.getPoses();
   }
 
-  async convertFrame(frameNumber, xvizBuilder) {
-    if (frameNumber < this.frameStart || frameNumber >= this.frameLimit) {
+  async convertMessage(messageNumber, xvizBuilder) {
+    if (!this.trackletFile) {
       return;
     }
 
-    const tracklets = this.trackletFrames.get(frameNumber);
+    if (messageNumber < this.frameStart || messageNumber >= this.frameLimit) {
+      return;
+    }
+
+    const tracklets = this.trackletFrames.get(messageNumber);
     tracklets.forEach(tracklet => {
       // Here you can see how the *classes* are used to tag the object
       // allowing for the *style* information to be shared across
@@ -105,14 +114,18 @@ export default class TrackletsConverter {
 
     // object is in this frame
     this.data.objects
-      .filter(object => frameNumber >= object.firstFrame && frameNumber < object.lastFrame)
+      .filter(object => messageNumber >= object.firstFrame && messageNumber < object.lastFrame)
       .forEach(object => {
         const objectTrajectory = getObjectTrajectory({
           targetObject: object,
           objectFrames: this.trackletFrames,
           poseFrames: this.poses,
-          startFrame: frameNumber,
-          endFrame: Math.min(frameNumber + MOTION_PLANNING_STEPS, object.lastFrame, this.frameLimit)
+          startFrame: messageNumber,
+          endFrame: Math.min(
+            messageNumber + MOTION_PLANNING_STEPS,
+            object.lastFrame,
+            this.frameLimit
+          )
         });
 
         xvizBuilder.primitive(this.TRACKLETS_TRAJECTORY).polyline(objectTrajectory);

@@ -35,7 +35,7 @@ export class KittiConverter {
       maxHeight: imageMaxHeight
     };
 
-    this.numFrames = 0;
+    this.numMessages = 0;
     this.metadata = null;
   }
 
@@ -45,7 +45,7 @@ export class KittiConverter {
 
     createDir(this.outputDir);
 
-    this.numFrames = this.timestamps.length;
+    this.numMessages = this.timestamps.length;
 
     // These are the converters for the various data sources.
     // Notice that some data sources are passed to others when a data dependency
@@ -73,11 +73,11 @@ export class KittiConverter {
     this.metadata = this.getMetadata();
   }
 
-  frameCount() {
-    return this.numFrames;
+  messageCount() {
+    return this.numMessages;
   }
 
-  async convertFrame(frameNumber) {
+  async convertMessage(messageNumber) {
     // The XVIZBuilder provides a fluent API to construct objects.
     // This makes it easier to incrementally build objects that may have
     // many different options or variant data types supported.
@@ -89,10 +89,10 @@ export class KittiConverter {
     // As builder instance is shared across all the converters, to avoid race conditions',
     // Need wait for each converter to finish
     for (let i = 0; i < this.converters.length; i++) {
-      await this.converters[i].convertFrame(frameNumber, xvizBuilder);
+      await this.converters[i].convertMessage(messageNumber, xvizBuilder);
     }
 
-    return xvizBuilder.getFrame();
+    return xvizBuilder.getMessage();
   }
 
   getMetadata() {

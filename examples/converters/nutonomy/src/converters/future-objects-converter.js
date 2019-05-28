@@ -41,11 +41,11 @@ export default class FutureObjectsConverter {
     this.frames = frames;
   }
 
-  convertFrame(frameIndex, xvizBuilder) {
-    const futureFrameLimit = Math.min(frameIndex + FUTURE_STEPS, this.frames.length);
+  convertMessage(messageIndex, xvizBuilder) {
+    const futureFrameLimit = Math.min(messageIndex + FUTURE_STEPS, this.frames.length);
 
-    for (let i = frameIndex; i < futureFrameLimit; i++) {
-      const objects = this._convertObjectsFutureFrame(frameIndex, i);
+    for (let i = messageIndex; i < futureFrameLimit; i++) {
+      const objects = this._convertObjectsFutureFrame(messageIndex, i);
       const frameToken = this.frames[i].token;
       const pose = this.posesByFrame[frameToken];
 

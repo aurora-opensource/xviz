@@ -61,27 +61,27 @@ function loadScenario(name, options = {}) {
     // TODO: w/o stringify, the the object is not sent properly
     // means metadata as an object is broken in server
     metadata: JSON.stringify(scenario.getMetadata()),
-    frames: [],
+    messages: [],
     timing: []
   };
 
-  const frameLimit = opts.duration * opts.hz;
-  const frameLength = 1.0 / opts.hz;
+  const messageLimit = opts.duration * opts.hz;
+  const messageLength = 1.0 / opts.hz;
 
-  for (let i = 0; i < frameLimit; i++) {
-    const timeOffset = frameLength * i;
-    const frame = scenario.getFrame(timeOffset);
-    data.timing.push(frame.data.updates[0].timestamp);
+  for (let i = 0; i < messageLimit; i++) {
+    const timeOffset = messageLength * i;
+    const message = scenario.getMessage(timeOffset);
+    data.timing.push(message.data.updates[0].timestamp);
     // TODO: this also seems strange? why stringify
     // I think the XVIZformatWriter should take care of this
-    data.frames.push(JSON.stringify(frame));
+    data.messages.push(JSON.stringify(message));
   }
 
   return data;
 }
 
 // Generic iterator that stores context for context for an iterator
-class FrameIterator {
+class MessageIterator {
   constructor(start, end, increment = 1) {
     this.start = start;
     this.end = end;
@@ -169,14 +169,14 @@ export class ScenarioProvider {
     return this.metadata;
   }
 
-  async xvizFrame(iterator) {
+  async xvizMessage(iterator) {
     const {valid, data} = iterator.next();
     if (!valid) {
       return null;
     }
 
-    const frame = this._readFrame(data);
-    return frame;
+    const message = this._readMessage(data);
+    return message;
   }
 
   // The Provider provides an iterator since
@@ -186,7 +186,7 @@ export class ScenarioProvider {
   // If startTime and endTime cover the actual range, then
   // they will be clamped to the actual range.
   // Otherwise return undefined.
-  getFrameIterator({startTime, endTime} = {}, options = {}) {
+  getMessageIterator({startTime, endTime} = {}, options = {}) {
     const {startTime: start, endTime: end} = this.reader.timeRange();
 
     if (!Number.isFinite(startTime)) {
@@ -201,19 +201,19 @@ export class ScenarioProvider {
       return null;
     }
 
-    const startFrames = this.reader.findFrame(startTime);
-    const endFrames = this.reader.findFrame(endTime);
+    const startMessages = this.reader.findMessage(startTime);
+    const endMessages = this.reader.findMessage(endTime);
 
-    if (startFrames !== undefined && endFrames !== undefined) {
-      return new FrameIterator(startFrames.first, endFrames.last);
+    if (startMessages !== undefined && endMessages !== undefined) {
+      return new MessageIterator(startMessages.first, endMessages.last);
     }
 
     return null;
   }
 
-  // return XVIZData for frame or undefined
-  _readFrame(frame) {
-    const data = this.reader.readFrame(frame);
+  // return XVIZData for message or undefined
+  _readMessage(message) {
+    const data = this.reader.readMessage(message);
     if (data) {
       return new XVIZData(data);
     }

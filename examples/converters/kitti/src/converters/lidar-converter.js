@@ -30,12 +30,12 @@ export default class LidarConverter extends BaseConverter {
       .some(x => x === true);
   }
 
-  async convertFrame(frameNumber, xvizBuilder) {
+  async convertMessage(messageNumber, xvizBuilder) {
     if (this.disabled) {
       return;
     }
 
-    const {data} = await this.loadFrame(frameNumber);
+    const {data} = await this.loadMessage(messageNumber);
     const lidarData = loadLidarData(data);
 
     xvizBuilder

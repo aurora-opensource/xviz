@@ -48,6 +48,11 @@ export default class FutureTrackletsConverter {
   }
 
   load() {
+    if (!fs.existsSync(this.trackletFile)) {
+      this.trackletFile = null;
+      return;
+    }
+
     const xml = fs.readFileSync(this.trackletFile, 'utf8');
     this.data = loadTracklets(xml);
 
@@ -69,15 +74,19 @@ export default class FutureTrackletsConverter {
     this.poses = this.getPoses();
   }
 
-  async convertFrame(frameNumber, xvizBuilder) {
-    if (frameNumber < this.frameStart || frameNumber >= this.frameLimit) {
+  async convertMessage(messageNumber, xvizBuilder) {
+    if (!this.trackletFile) {
       return;
     }
 
-    const futureFrameLimit = Math.min(frameNumber + FUTURE_STEPS, this.frameLimit);
+    if (messageNumber < this.frameStart || messageNumber >= this.frameLimit) {
+      return;
+    }
 
-    for (let i = frameNumber; i < futureFrameLimit; i++) {
-      const tracklets = this._convertTrackletsFutureFrame(frameNumber, i);
+    const futureFrameLimit = Math.min(messageNumber + FUTURE_STEPS, this.frameLimit);
+
+    for (let i = messageNumber; i < futureFrameLimit; i++) {
+      const tracklets = this._convertTrackletsFutureMessage(messageNumber, i);
 
       tracklets.forEach(tracklet => {
         const future_ts = this.ts[i];
@@ -125,7 +134,7 @@ export default class FutureTrackletsConverter {
   }
 
   // create set of data for the currentFrameIndex that represents the tracklets from the futureFrameIndex
-  _convertTrackletsFutureFrame(currentFrameIndex, futureFrameIndex) {
+  _convertTrackletsFutureMessage(currentFrameIndex, futureFrameIndex) {
     return (
       this.data.objects
         // make sure object exists in current frame and the future frame

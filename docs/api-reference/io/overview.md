@@ -45,7 +45,8 @@ passed around in an API.
 
 ## Readers and Writers
 
-This layer builds upon the Source and Sink to deal with the XVIZ data types of Metadata and Frames.
+This layer builds upon the Source and Sink to deal with the XVIZ data types of Metadata and
+Messages.
 
 [Readers](/docs/api-reference/io/overview-reader.md) provide an interface to access the data
 objects.
@@ -55,4 +56,4 @@ objects.
 ## Providers
 
 An [XVIZ Provider](/docs/api-reference/io/overview-provider.md) encapsulates the specific details of
-the concrete XVIZ data format and provides a generic interface to access metadata and frames.
+the concrete XVIZ data format and provides a generic interface to access metadata and messages.

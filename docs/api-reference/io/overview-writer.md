@@ -1,6 +1,6 @@
 # XVIZ Writer
 
-XVIZ Writers provide an interface to write XVIZ Metadata and Frames.
+XVIZ Writers provide an interface to write XVIZ Metadata and Messages.
 
 ## Example
 
@@ -18,8 +18,8 @@ xvizWriter.writeMetadata(metadataBuilder.getMetadata());
 
 const builder = new XVIZBuilder();
 for (let i = 0; i < 10; i++) {
-  // build frames
-  xvizWriter.writeFrame(i, builder.getFrame());
+  // build messages
+  xvizWriter.writeMessage(i, builder.getMessage());
 }
 
 xvizWriter.close();
@@ -36,15 +36,15 @@ Parameters:
 - `xvizMetadata` (Object) - an XVIZ metadata object. See
   [XVIZMetadataBuilder.getMetadata()](/docs/api-reference/xviz-metadata-builder.md#getMetadata).
 
-##### writeFrame(frameIndex, xvizFrame)
+##### writeMessage(messageIndex, xvizMessage)
 
-Writes an XVIZ frame to the sink.
+Writes an XVIZ message to the sink.
 
 Parameters:
 
-- `frameIndex` (Number) - the index of this frame.
-- `xvizFrame`(Object) - an XVIZ frame object. See
-  [XVIZBuilder.getFrame()](/docs/api-reference/xviz-builder.md#getFrame).
+- `messageIndex` (Number) - the index of this message.
+- `xvizMessage`(Object) - an XVIZ message object. See
+  [XVIZBuilder.getMessage()](/docs/api-reference/xviz-builder.md#getMessage).
 
 #### close()
 

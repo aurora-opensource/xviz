@@ -37,8 +37,8 @@ xvizBuilder
   .primitive('/pedestrian-1-trajectory')
   .polygon([[1.23, 0.45, 0.06], [2.45, 0.67, 0.08], [1.67, 0.53, 0.07], [1.23, 0.45, 0.06]]);
 
-const frame = xvizBuilder.getFrame();
-console.log(JSON.stringify(frame, null, 2));
+const message = xvizBuilder.getMessage();
+console.log(JSON.stringify(message, null, 2));
 ```
 
 ## XVIZBuilder
@@ -56,7 +56,7 @@ Parameters:
   [XVIZMetadataBuilder](/docs/api-reference/xviz-metadata-builder.md) for generating metadata
   objects.
 - `options.disableStreams` (Array) - a list of stream names to disable. Disabled streams are not
-  flushed to frame.
+  flushed to the message.
 - `options.validateWarn` (Function) - called when there is a validation warning. Default is
   `console.warn`.
 - `options.validateError` (Function) - called when there is a validation error. Default is
@@ -64,9 +64,9 @@ Parameters:
 
 ### Methods
 
-##### getFrame()
+##### getMessage()
 
-Return a JSON object with xviz protocol containing all the streams in current frame built from the
+Return a JSON object with xviz protocol containing all the streams in current message built from the
 XVIZBuilder instance.
 
 ##### pose(streamId)
@@ -77,7 +77,7 @@ Start building a [pose](/docs/protocol-schema/core-protocol.md#Poses) stream. Re
 Parameters:
 
 - `streamId` (String) - the name of the pose stream. Default to `/vehicle_pose` if not specified.
-  Note that for a valid frame, stream `/vehicle_pose` must be defined. Additional poses can be
+  Note that for a valid message, stream `/vehicle_pose` must be defined. Additional poses can be
   defined but are not required.
 
 ##### primitive(streamId)

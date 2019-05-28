@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /* eslint-disable camelcase */
-import {XVIZWriter} from '@xviz/builder';
+import {FileSink} from '@xviz/io/node';
+import {XVIZJSONWriter, XVIZBinaryWriter} from '@xviz/io';
 
 import {KittiConverter} from './converters';
 
@@ -23,7 +24,7 @@ module.exports = async function main(args) {
     outputDir,
     disabledStreams,
     fakeStreams,
-    frameLimit,
+    messageLimit,
     cameraSources,
     imageMaxWidth,
     imageMaxHeight,
@@ -46,32 +47,33 @@ module.exports = async function main(args) {
   converter.initialize();
 
   // This abstracts the details of the filenames expected by our server
-  const xvizWriter = new XVIZWriter({binary: !writeJson, json: writeJson});
+  const sink = new FileSink(outputDir);
+  const xvizWriter = writeJson ? new XVIZJSONWriter(sink) : new XVIZBinaryWriter(sink);
 
   // Write metadata file
   const xvizMetadata = converter.getMetadata();
-  xvizWriter.writeMetadata(outputDir, xvizMetadata);
+  xvizWriter.writeMetadata(xvizMetadata);
 
   const start = Date.now();
 
-  const limit = Math.min(frameLimit, converter.frameCount());
-  // Convert each frame and write it to a file
+  const limit = Math.min(messageLimit, converter.messageCount());
+  // Convert each message and write it to a file
   //
-  // A *frame* is a point in time, where each frame will contain
+  // A *message* is a point in time, where each message will contain
   // a *pose* and any number of XVIZ data sets.
   //
-  // In the KITTI data set we are able to iterate directly by *frame* number
+  // In the KITTI data set we are able to iterate directly by *message* number
   // since the data has been synchronized. However, another approach
   // would be to iterate over data sets by time.  Since dealing with synchronized
   // data is easier, we have choosen this path for the initial example to avoid
   // any unnecessary complications
   for (let i = 0; i < limit; i++) {
-    const xvizFrame = await converter.convertFrame(i);
-    xvizWriter.writeFrame(outputDir, i, xvizFrame);
+    const xvizMessage = await converter.convertMessage(i);
+    xvizWriter.writeMessage(i, xvizMessage);
   }
 
-  xvizWriter.writeFrameIndex(outputDir);
+  xvizWriter.close();
 
   const end = Date.now();
-  console.log(`Generate ${limit} frames in ${end - start}s`); // eslint-disable-line
+  console.log(`Generate ${limit} messages in ${end - start}s`); // eslint-disable-line
 };

@@ -14,7 +14,7 @@
 import {XVIZData} from '../common/xviz-data';
 
 // Generic iterator that stores context for context for an iterator
-class FrameIterator {
+class MessageIterator {
   constructor(start, end, increment = 1) {
     this.start = start;
     this.end = end;
@@ -82,14 +82,14 @@ export class XVIZBaseProvider {
     return this.metadata;
   }
 
-  async xvizFrame(iterator) {
+  async xvizMessage(iterator) {
     const {valid, data} = iterator.next();
     if (!valid) {
       return null;
     }
 
-    const frame = this._readFrame(data);
-    return frame;
+    const message = this._readMessage(data);
+    return message;
   }
 
   // The Provider provides an iterator since
@@ -99,7 +99,7 @@ export class XVIZBaseProvider {
   // If startTime and endTime cover the actual range, then
   // they will be clamped to the actual range.
   // Otherwise return undefined.
-  getFrameIterator({startTime, endTime} = {}, options = {}) {
+  getMessageIterator({startTime, endTime} = {}, options = {}) {
     const {startTime: start, endTime: end} = this.reader.timeRange();
 
     if (!Number.isFinite(startTime)) {
@@ -114,19 +114,19 @@ export class XVIZBaseProvider {
       return null;
     }
 
-    const startFrames = this.reader.findFrame(startTime);
-    const endFrames = this.reader.findFrame(endTime);
+    const startMessages = this.reader.findMessage(startTime);
+    const endMessages = this.reader.findMessage(endTime);
 
-    if (startFrames !== undefined && endFrames !== undefined) {
-      return new FrameIterator(startFrames.first, endFrames.last);
+    if (startMessages !== undefined && endMessages !== undefined) {
+      return new MessageIterator(startMessages.first, endMessages.last);
     }
 
     return null;
   }
 
-  // return XVIZData for frame or undefined
-  _readFrame(frame) {
-    const data = this.reader.readFrame(frame);
+  // return XVIZData for message or undefined
+  _readMessage(message) {
+    const data = this.reader.readMessage(message);
     if (data) {
       return new XVIZData(data);
     }

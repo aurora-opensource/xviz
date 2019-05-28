@@ -44,7 +44,7 @@ parser.addArgument(['--disable-streams'], {
   help: 'Comma separated stream names to disable'
 });
 
-parser.addArgument(['--frame-limit'], {
+parser.addArgument(['--message-limit'], {
   defaultValue: Number.MAX_SAFE_INTEGER,
   help: 'Limit XVIZ frame generation to this value. Useful for testing conversion quickly'
 });
@@ -95,7 +95,7 @@ module.exports = function getArgs() {
     fakeStreams: args.fake_streams,
     imageMaxWidth: Number(args.image_max_width),
     imageMaxHeight: Number(args.image_max_height),
-    frameLimit: Number(args.frame_limit),
+    messageLimit: Number(args.message_limit),
     listScenes: args.list_scenes,
     scenes,
     keyframes: args.keyframes

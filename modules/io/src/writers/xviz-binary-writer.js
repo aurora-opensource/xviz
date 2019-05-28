@@ -15,13 +15,13 @@
 import {XVIZBaseWriter} from './xviz-base-writer';
 import {GLTFBuilder} from '@loaders.gl/gltf';
 import {toBuffer} from '@loaders.gl/core';
-import {DracoEncoder, DracoDecoder} from '@loaders.gl/draco';
-import {packBinaryJson} from './xviz-pack-binary';
+import {DracoWriter, DracoLoader} from '@loaders.gl/draco';
+import {_packBinaryJson as packBinaryJson} from '@xviz/builder';
 
 // 0-frame is an index file for timestamp metadata
 // 1-frame is the metadata file for the log
 // 2-frame is where the actual XVIZ updates begin
-const frameName = index => `${index + 2}-frame`;
+const messageName = index => `${index + 2}-frame`;
 
 export function encodeBinaryXVIZ(xvizJson, options) {
   const gltfBuilder = new GLTFBuilder(options);
@@ -39,20 +39,20 @@ export class XVIZBinaryWriter extends XVIZBaseWriter {
   constructor(sink, options = {}) {
     super(sink);
 
-    const {envelope = true, draco = false} = options;
-    this.frameTimings = {
-      frames: new Map()
+    const {envelope = true, flattenArrays = true, draco = false} = options;
+    this.messageTimings = {
+      messages: new Map()
     };
-    this.wroteFrameIndex = null;
-    this.options = {envelope, draco};
+    this.wroteMessageIndex = null;
+    this.options = {envelope, flattenArrays, draco};
 
     this.encodingOptions = {
-      flattenArrays: false
+      flattenArrays: this.options.flattenArrays
     };
 
     if (this.options.draco) {
-      this.encodingOptions.DracoEncoder = DracoEncoder;
-      this.encodingOptions.DracoDecoder = DracoDecoder;
+      this.encodingOptions.DracoWriter = DracoWriter;
+      this.encodingOptions.DracoLoader = DracoLoader;
     }
   }
 
@@ -70,57 +70,58 @@ export class XVIZBinaryWriter extends XVIZBaseWriter {
     this.sink.writeSync(`1-frame.glb`, toBuffer(glbFileBuffer), {flag: 'w'});
   }
 
-  writeFrame(frameIndex, xvizFrame) {
+  writeMessage(messageIndex, xvizMessage) {
     this._checkValid();
-    this._saveTimestamp(xvizFrame, frameIndex);
+    this._saveTimestamp(xvizMessage, messageIndex);
 
     if (this.options.envelope) {
-      xvizFrame = {type: 'xviz/state_update', data: xvizFrame};
+      xvizMessage = {type: 'xviz/state_update', data: xvizMessage};
     }
 
-    const glbFileBuffer = encodeBinaryXVIZ(xvizFrame, this.encodingOptions);
-    this.sink.writeSync(`${frameName(frameIndex)}.glb`, toBuffer(glbFileBuffer), {flag: 'w'});
+    const glbFileBuffer = encodeBinaryXVIZ(xvizMessage, this.encodingOptions);
+    this.sink.writeSync(`${messageName(messageIndex)}.glb`, toBuffer(glbFileBuffer), {flag: 'w'});
   }
 
-  _writeFrameIndex() {
+  _writeMessageIndex() {
     this._checkValid();
-    const {startTime, endTime, frames} = this.frameTimings;
-    const frameTimings = {};
+    const {startTime, endTime, messages} = this.messageTimings;
+    const messageTimings = {};
 
     if (startTime) {
-      frameTimings.startTime = startTime;
+      messageTimings.startTime = startTime;
     }
 
     if (endTime) {
-      frameTimings.endTime = endTime;
+      messageTimings.endTime = endTime;
     }
 
-    // Sort frames by index before writing out as an array
-    const frameTimes = Array.from(frames.keys()).sort((a, b) => a - b);
+    // Sort messages by index before writing out as an array
+    const messageTimes = Array.from(messages.keys()).sort((a, b) => a - b);
 
     const timing = [];
-    frameTimes.forEach((value, index) => {
-      // Value is two greater than frame index
+    messageTimes.forEach((value, index) => {
+      // Value is two greater than message index
       const limit = timing.length;
       if (value > limit) {
-        // Adding 2 because 1-frame is metadata file, so frame data starts at 2
+        // Adding 2 because 1-frame is metadata file, so message data starts at 2
         throw new Error(
-          `Error writing time index file. Frames are missing between ${limit + 2} and ${value + 2}`
+          `Error writing time index file. Messages are missing between ${limit + 2} and ${value +
+            2}`
         );
       }
 
-      timing.push(frames.get(value));
+      timing.push(messages.get(value));
     });
-    frameTimings.timing = timing;
+    messageTimings.timing = timing;
 
-    this.sink.writeSync('0-frame.json', JSON.stringify(frameTimings));
-    this.wroteFrameIndex = timing.length;
+    this.sink.writeSync('0-frame.json', JSON.stringify(messageTimings));
+    this.wroteMessageIndex = timing.length;
   }
 
   close() {
     if (this.sink) {
-      if (!this.wroteFrameIndex) {
-        this._writeFrameIndex();
+      if (!this.wroteMessageIndex) {
+        this._writeMessageIndex();
       }
 
       super.close();
@@ -136,11 +137,11 @@ export class XVIZBinaryWriter extends XVIZBaseWriter {
       if (log_info) {
         const {start_time, end_time} = log_info || {};
         if (start_time) {
-          this.frameTimings.startTime = start_time;
+          this.messageTimings.startTime = start_time;
         }
 
         if (end_time) {
-          this.frameTimings.endTime = end_time;
+          this.messageTimings.endTime = end_time;
         }
       }
     } else if (updates) {
@@ -151,7 +152,7 @@ export class XVIZBinaryWriter extends XVIZBaseWriter {
       const min = Math.min(updates.map(update => update.timestamp));
       const max = Math.max(updates.map(update => update.timestamp));
 
-      this.frameTimings.frames.set(index, [min, max, index, frameName(index)]);
+      this.messageTimings.messages.set(index, [min, max, index, messageName(index)]);
     } else {
       // Missing updates & index is invalid call
       throw new Error('Cannot find timestamp');

@@ -55,8 +55,8 @@ export default class GPSConverter {
     }
   }
 
-  convertFrame(frameIndex, xvizBuilder) {
-    const frameToken = this.frames[frameIndex].token;
+  convertMessage(messageIndex, xvizBuilder) {
+    const frameToken = this.frames[messageIndex].token;
 
     const pose = this.poseByFrames[frameToken];
     xvizBuilder
@@ -67,8 +67,8 @@ export default class GPSConverter {
       .orientation(pose.roll, pose.pitch, pose.yaw);
 
     const poseTrajectory = this._getPoseTrajectory(
-      frameIndex,
-      Math.min(this.frames.length, frameIndex + 50)
+      messageIndex,
+      Math.min(this.frames.length, messageIndex + 50)
     );
     xvizBuilder.primitive(this.VEHICLE_TRAJECTORY).polyline(poseTrajectory);
   }

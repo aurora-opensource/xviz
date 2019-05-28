@@ -140,7 +140,7 @@ export class XVIZWebsocketSender {
       this.sink.writeSync('2-frame', msg.buffer);
     } else {
       this._syncFormatWithWriter(format);
-      this.writer.writeFrame(0, msg);
+      this.writer.writeMessage(0, msg);
     }
   }
 

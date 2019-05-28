@@ -17,12 +17,12 @@ export class ScenarioReader {
     this.source = source;
     /*
      * metadata
-     * frames
+     * messages
      * timing
      */
     this.options = options;
 
-    // Read the frame index
+    // Read the message index
     this.index = this._readIndex();
     /* 
      * startTime,
@@ -35,8 +35,8 @@ export class ScenarioReader {
     return this.source.metadata;
   }
 
-  readFrame(frameIndex) {
-    return this.source.frames[frameIndex];
+  readMessage(messageIndex) {
+    return this.source.messages[messageIndex];
   }
 
   timeRange() {
@@ -48,7 +48,7 @@ export class ScenarioReader {
     return {startTime: null, endTime: null};
   }
 
-  frameCount() {
+  messageCount() {
     if (this.index) {
       return this.index.timing.length;
     }
@@ -56,29 +56,29 @@ export class ScenarioReader {
     return undefined;
   }
 
-  // Returns 2 indices covering the frames that bound the requested timestamp
-  findFrame(timestamp) {
+  // Returns 2 indices covering the messages that bound the requested timestamp
+  findMessage(timestamp) {
     if (!this.index) {
       return undefined;
     }
 
     const {startTime, endTime, timing} = this.index;
-    const frameCount = this.frameCount();
-    const lastFrame = frameCount > 0 ? frameCount - 1 : 0;
+    const messageCount = this.messageCount();
+    const lastMessage = messageCount > 0 ? messageCount - 1 : 0;
 
     if (timestamp < startTime) {
       return {first: 0, last: 0};
     }
 
     if (timestamp > endTime) {
-      return {first: lastFrame, last: lastFrame};
+      return {first: lastMessage, last: lastMessage};
     }
 
     let first = timing.findIndex(timeEntry => timeEntry >= timestamp);
 
     // Reverse search for end index
     let last = -1;
-    let i = lastFrame;
+    let i = lastMessage;
     while (i >= 0) {
       if (timing[i] <= timestamp) {
         last = i;
@@ -93,7 +93,7 @@ export class ScenarioReader {
     }
 
     if (last === -1) {
-      last = lastFrame;
+      last = lastMessage;
     }
 
     return {first, last};

@@ -107,7 +107,7 @@ export default class NuTonomyConverter {
     this.metadata = this.getMetadata();
   }
 
-  async convertFrame(frameIndex) {
+  async convertMessage(messageIndex) {
     const xvizBuilder = new XVIZBuilder({
       metadata: this.metadata,
       disabledStreams: this.disabledStreams
@@ -116,17 +116,17 @@ export default class NuTonomyConverter {
     // As builder instance is shared across all the converters, to avoid race conditions,
     // Need wait for each converter to finish
     for (let i = 0; i < this.converters.length; i++) {
-      await this.converters[i].convertFrame(frameIndex, xvizBuilder);
+      await this.converters[i].convertMessage(messageIndex, xvizBuilder);
     }
 
-    return xvizBuilder.getFrame();
+    return xvizBuilder.getMessage();
   }
 
-  getFrames() {
+  getMessages() {
     return this.frames;
   }
 
-  frameCount() {
+  messageCount() {
     return this.frames.length;
   }
 

@@ -36,5 +36,5 @@ import {XVIZValidator} from '@xviz/schema;
 
 const validator = new XVIZValidator();
 
-validator.validateStateUpdate(builder.getFrame())
+validator.validateStateUpdate(builder.getMessage())
 ```

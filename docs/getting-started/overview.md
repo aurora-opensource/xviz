@@ -13,7 +13,7 @@ We will link to relevant detailed XVIZ documentation, but following up with
 
 The data is divided into directories for each data types and each type has one file per KITTI frame.
 A _frame_ here represents the data at that point in time. We will process each KITTI frame and
-convert them into an XVIZ frame.
+convert them into an XVIZ message.
 
 The KITTI data provides us a rich set of source material, including:
 

@@ -14,7 +14,7 @@
 
 import {parseXVIZMessage} from '@xviz/parser';
 
-export function parseFrame(frame) {
+export function parseMessage(message) {
   let result;
 
   const onError = error => {
@@ -22,9 +22,9 @@ export function parseFrame(frame) {
   };
 
   parseXVIZMessage({
-    message: frame,
-    onResult: message => {
-      result = message;
+    message,
+    onResult: msg => {
+      result = msg;
     },
     onError
   });

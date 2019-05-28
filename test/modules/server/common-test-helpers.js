@@ -40,16 +40,16 @@ class TestIterator {
   }
 }
 
-// Provider on top of given metadata and frames
+// Provider on top of given metadata and messages
 export class TestProvider {
-  constructor({metadata, frames}) {
+  constructor({metadata, messages}) {
     this.metadata = metadata;
-    this.frames = frames;
+    this.messages = messages;
 
-    const firstMsg = this.frames[0];
+    const firstMsg = this.messages[0];
     this.start_time = firstMsg.data.updates[0].timestamp;
 
-    const lastMsg = this.frames[this.frames.length - 1];
+    const lastMsg = this.messages[this.messages.length - 1];
     this.end_time = lastMsg.data.updates[0].timestamp;
   }
 
@@ -57,16 +57,16 @@ export class TestProvider {
     return new XVIZData(this.metadata);
   }
 
-  getFrameIterator(s, e) {
+  getMessageIterator(s, e) {
     return new TestIterator(s, e);
   }
 
-  xvizFrame(iter) {
+  xvizMessage(iter) {
     const value = iter.next();
-    for (let i = 0; i < this.frames.length; i++) {
-      const msg = this.frames[i];
+    for (let i = 0; i < this.messages.length; i++) {
+      const msg = this.messages[i];
       if (msg.data.updates[0].timestamp >= value) {
-        return new XVIZData(this.frames[i]);
+        return new XVIZData(this.messages[i]);
       }
     }
 
@@ -154,9 +154,9 @@ export function makeXVIZData(start, end) {
     }
   };
 
-  const frames = [];
+  const messages = [];
   for (let i = start; i <= end; i++) {
-    frames.push({
+    messages.push({
       type: 'xviz/state_update',
       data: {
         update_type: 'snapshot',
@@ -187,7 +187,7 @@ export function makeXVIZData(start, end) {
     });
   }
 
-  return {metadata, frames};
+  return {metadata, messages};
 }
 
 export class TestClient {

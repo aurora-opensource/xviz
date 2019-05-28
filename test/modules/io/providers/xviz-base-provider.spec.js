@@ -19,36 +19,36 @@ import {getJSONTestDataSource} from './test-data';
 
 const source = getJSONTestDataSource();
 
-test('XVIZJSONProvider#getFrameIterator()', async t => {
+test('XVIZJSONProvider#getMessageIterator()', async t => {
   const provider = new XVIZJSONProvider({source});
   await provider.init();
   t.ok(provider.valid(), 'Provider is valid');
 
   // Default to start/end of index file
-  let iterator = provider.getFrameIterator();
+  let iterator = provider.getMessageIterator();
   t.equals(iterator.start, 0, 'iterator w/o time starts is 0');
   t.equals(iterator.end, 1, 'iterator w/o time is 1');
   t.equals(iterator.current, 0, 'iterator w/o time current is 0');
 
   // Clamp to start/end of data
-  iterator = provider.getFrameIterator({startTime: 1000, endTime: 1012});
+  iterator = provider.getMessageIterator({startTime: 1000, endTime: 1012});
   t.equals(iterator.start, 0, 'iterator start clamped to beginning');
   t.equals(iterator.end, 1, 'iterator end clamped to end');
   t.equals(iterator.current, 0, 'iterator current is 0');
 
   // Exact start/end of data
-  iterator = provider.getFrameIterator({startTime: 1000.5, endTime: 1010.5});
+  iterator = provider.getMessageIterator({startTime: 1000.5, endTime: 1010.5});
   t.equals(iterator.start, 0, 'iterator start exact at beginning');
   t.equals(iterator.end, 1, 'iterator end exact at end');
   t.equals(iterator.current, 0, 'iterator current is 0');
 
   // Exact start/end beyond start, start is 1, end is clamped
-  iterator = provider.getFrameIterator({startTime: 1001.5, endTime: 1011.5});
+  iterator = provider.getMessageIterator({startTime: 1001.5, endTime: 1011.5});
   t.equals(iterator.start, 1, 'iterator start at 1');
   t.equals(iterator.end, 1, 'iterator end at 1');
   t.equals(iterator.current, 1, 'iterator current is 1');
 
-  iterator = provider.getFrameIterator({startTime: 1010.5, endTime: 1000.5});
+  iterator = provider.getMessageIterator({startTime: 1010.5, endTime: 1000.5});
   t.notOk(iterator);
 
   t.end();

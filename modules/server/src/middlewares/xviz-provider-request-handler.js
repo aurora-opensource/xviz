@@ -123,7 +123,7 @@ export class XVIZProviderRequestHandler {
         };
         this.context.startTransform(id, tformState);
 
-        tformState.iterator = this.provider.getFrameIterator(
+        tformState.iterator = this.provider.getMessageIterator(
           message.data.start_timestamp,
           message.data.end_timestamp
         );
@@ -169,7 +169,7 @@ export class XVIZProviderRequestHandler {
 
     if (iterator.valid()) {
       loadTimer && loadTimer.timeStart();
-      const data = await this.provider.xvizFrame(iterator);
+      const data = await this.provider.xvizMessage(iterator);
       loadTimer && loadTimer.timeEnd();
 
       if (data) {
@@ -197,7 +197,7 @@ export class XVIZProviderRequestHandler {
     totalTimer && totalTimer.timeStart();
     while (iterator.valid()) {
       loadTimer && loadTimer.timeStart();
-      const data = await this.provider.xvizFrame(iterator);
+      const data = await this.provider.xvizMessage(iterator);
       loadTimer && loadTimer.timeEnd();
 
       if (data) {
@@ -219,7 +219,7 @@ export class XVIZProviderRequestHandler {
   logMsgSent(id, index, loadTimer, sendTimer) {
     const {logger} = this.options;
     if (logger && logger.verbose) {
-      let msg = `id: ${id} [< STATE_UPDATE] frame: ${index}`;
+      let msg = `id: ${id} [< STATE_UPDATE] message: ${index}`;
       if (loadTimer) {
         msg += ` ${loadTimer.name}:${loadTimer.lastTiming.toFixed(3)}ms`;
       }

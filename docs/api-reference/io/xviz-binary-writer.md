@@ -18,8 +18,8 @@ xvizWriter.writeMetadata(metadataBuilder.getMetadata());
 
 const builder = new XVIZBuilder();
 for (let i = 0; i < 10; i++) {
-  // build frames
-  xvizWriter.writeFrame(i, builder.getFrame());
+  // build messages
+  xvizWriter.writeMessage(i, builder.getMessage());
 }
 
 xvizWriter.close();
@@ -51,15 +51,15 @@ Parameters:
 - `xvizMetadata` (Object) - an XVIZ metadata object. See
   [XVIZMetadataBuilder.getMetadata()](/docs/api-reference/xviz-metadata-builder.md#getMetadata).
 
-##### writeFrame(frameIndex, xvizFrame)
+##### writeMessage(messageIndex, xvizMessage)
 
-Encodes an XVIZ frame to file.
+Encodes an XVIZ message to file.
 
 Parameters:
 
-- `frameIndex` (Number) - the index of this frame.
-- `xvizFrame` (Object) - an XVIZ frame object. See
-  [XVIZBuilder.getFrame()](/docs/api-reference/xviz-builder.md#getFrame).
+- `messageIndex` (Number) - the index of this message.
+- `xvizMessage` (Object) - an XVIZ message object. See
+  [XVIZBuilder.getMessage()](/docs/api-reference/xviz-builder.md#getMessage).
 
 ##### close()
 

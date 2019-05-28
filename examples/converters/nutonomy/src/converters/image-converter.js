@@ -51,8 +51,8 @@ export default class ImageConverter {
     });
   }
 
-  async convertFrame(frameIndex, xvizBuilder) {
-    const frameToken = this.frames[frameIndex].token;
+  async convertMessage(messageIndex, xvizBuilder) {
+    const frameToken = this.frames[messageIndex].token;
     const frame = await this.loadFrame(frameToken);
     if (frame) {
       const {data, width, height} = frame;

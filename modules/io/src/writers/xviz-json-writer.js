@@ -19,17 +19,17 @@ import {TextEncoder} from '../common/text-encoding';
 // 0-frame is an index file for timestamp metadata
 // 1-frame is the metadata file for the log
 // 2-frame is where the actual XVIZ updates begin
-const frameName = index => `${index + 2}-frame`;
+const messageName = index => `${index + 2}-frame`;
 
 export class XVIZJSONWriter extends XVIZBaseWriter {
   constructor(sink, options = {}) {
     super(sink);
 
     const {envelope = true, precision = 10, asArrayBuffer = false} = options;
-    this.frameTimings = {
-      frames: new Map()
+    this.messageTimings = {
+      messages: new Map()
     };
-    this.wroteFrameIndex = null;
+    this.wroteMessageIndex = null;
     this.options = {envelope, precision, asArrayBuffer};
   }
 
@@ -47,12 +47,12 @@ export class XVIZJSONWriter extends XVIZBaseWriter {
     this.writeToSink('1-frame.json', msg);
   }
 
-  writeFrame(frameIndex, xvizFrame) {
+  writeMessage(messageIndex, xvizMessage) {
     this._checkValid();
-    this._saveTimestamp(xvizFrame, frameIndex);
+    this._saveTimestamp(xvizMessage, messageIndex);
 
     if (this.options.envelope) {
-      xvizFrame = {type: 'xviz/state_update', data: xvizFrame};
+      xvizMessage = {type: 'xviz/state_update', data: xvizMessage};
     }
 
     // Limit precision to save space
@@ -64,51 +64,52 @@ export class XVIZJSONWriter extends XVIZBaseWriter {
       return value;
     };
 
-    const jsonXVIZFrame = xvizConvertJson(xvizFrame);
-    const msg = JSON.stringify(jsonXVIZFrame, numberRounder);
-    this.writeToSink(`${frameName(frameIndex)}.json`, msg);
+    const jsonXVIZMessage = xvizConvertJson(xvizMessage);
+    const msg = JSON.stringify(jsonXVIZMessage, numberRounder);
+    this.writeToSink(`${messageName(messageIndex)}.json`, msg);
   }
 
-  _writeFrameIndex() {
+  _writeMessageIndex() {
     this._checkValid();
-    const {startTime, endTime, frames} = this.frameTimings;
-    const frameTimings = {};
+    const {startTime, endTime, messages} = this.messageTimings;
+    const messageTimings = {};
 
     if (startTime) {
-      frameTimings.startTime = startTime;
+      messageTimings.startTime = startTime;
     }
 
     if (endTime) {
-      frameTimings.endTime = endTime;
+      messageTimings.endTime = endTime;
     }
 
-    // Sort frames by index before writing out as an array
-    const frameTimes = Array.from(frames.keys()).sort((a, b) => a - b);
+    // Sort messages by index before writing out as an array
+    const messageTimes = Array.from(messages.keys()).sort((a, b) => a - b);
 
     const timing = [];
-    frameTimes.forEach((value, index) => {
-      // Value is two greater than frame index
+    messageTimes.forEach((value, index) => {
+      // Value is two greater than message index
       const limit = timing.length;
       if (value > limit) {
-        // Adding 2 because 1-frame is metadata file, so frame data starts at 2
+        // Adding 2 because 1-frame is metadata file, so message data starts at 2
         throw new Error(
-          `Error writing time index file. Frames are missing between ${limit + 2} and ${value + 2}`
+          `Error writing time index file. Messages are missing between ${limit + 2} and ${value +
+            2}`
         );
       }
 
-      timing.push(frames.get(value));
+      timing.push(messages.get(value));
     });
-    frameTimings.timing = timing;
+    messageTimings.timing = timing;
 
-    const msg = JSON.stringify(frameTimings);
+    const msg = JSON.stringify(messageTimings);
     this.writeToSink('0-frame.json', msg);
-    this.wroteFrameIndex = timing.length;
+    this.wroteMessageIndex = timing.length;
   }
 
   close() {
     if (this.sink) {
-      if (!this.wroteFrameIndex) {
-        this._writeFrameIndex();
+      if (!this.wroteMessageIndex) {
+        this._writeMessageIndex();
       }
 
       super.close();
@@ -124,11 +125,11 @@ export class XVIZJSONWriter extends XVIZBaseWriter {
       if (log_info) {
         const {start_time, end_time} = log_info || {};
         if (start_time) {
-          this.frameTimings.startTime = start_time;
+          this.messageTimings.startTime = start_time;
         }
 
         if (end_time) {
-          this.frameTimings.endTime = end_time;
+          this.messageTimings.endTime = end_time;
         }
       }
     } else if (updates) {
@@ -139,7 +140,7 @@ export class XVIZJSONWriter extends XVIZBaseWriter {
       const min = Math.min(updates.map(update => update.timestamp));
       const max = Math.max(updates.map(update => update.timestamp));
 
-      this.frameTimings.frames.set(index, [min, max, index, frameName(index)]);
+      this.messageTimings.messages.set(index, [min, max, index, messageName(index)]);
     } else {
       // Missing updates & index is invalid call
       throw new Error('Cannot find timestamp');
