@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 /* eslint-disable camelcase */
 import test from 'tape-catch';
 import {XVIZWriter} from '@xviz/builder';
@@ -73,30 +74,15 @@ function makeFrame(points, colors) {
   };
 }
 
-function flattenArray(array) {
-  return array.reduce((arr, entry) => arr.concat(entry), []);
-}
-
 test('XVIZBuilder#points', t => {
-  // We just need to generate nested array data for the test
-  const makeRandomPoints = (count, size) =>
-    Array(count)
-      .fill()
-      .map(() =>
-        Array(size)
-          .fill()
-          .map(() => Math.round(Math.random() * 255))
-      );
+  const points_flat = [0, 0, 0, 4, 0, 0, 4, 3, 0];
+  const colors_flat = [255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255];
 
-  // Must have minimum of 20 elements to be converted to binary
-  const points_nested = makeRandomPoints(20, 3);
-  const colors_nested = makeRandomPoints(20, 4);
+  const points_nested = [[0, 0, 0], [4, 0, 0], [4, 3, 0]];
+  const colors_nested = [[255, 0, 0, 255], [0, 255, 0, 255], [0, 0, 255, 255]];
 
-  const points_flat = flattenArray(points_nested);
-  const colors_flat = flattenArray(colors_nested);
-
-  const points_typed = Float32Array.from(points_flat);
-  const colors_typed = Uint8Array.from(colors_flat);
+  const points_typed = Float32Array.from([0, 0, 0, 4, 0, 0, 4, 3, 0]);
+  const colors_typed = Uint8Array.from([255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255]);
 
   // Generate a frame with specific points and colors
   [
@@ -117,33 +103,6 @@ test('XVIZBuilder#points', t => {
     const data = sink.get('test', '2-frame.glb');
     t.ok(data.toString().includes('#/accessors/0'), 'data has accessor 0');
     t.ok(data.toString().includes('#/accessors/1'), 'data has accessor 1');
-  });
-  t.end();
-});
-
-test('XVIZBuilder#points not made binary because too few elements', t => {
-  // Must have minimum of 20 elements to be converted to binary
-  const points_flat = [0, 0, 0, 4, 0, 0, 4, 3, 0];
-  const colors_flat = [255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255];
-
-  const points_nested = [[0, 0, 0], [4, 0, 0], [4, 3, 0]];
-  const colors_nested = [[255, 0, 0, 255], [0, 255, 0, 255], [0, 0, 255, 255]];
-
-  // Generate a frame with specific points and colors
-  [makeFrame(points_flat, colors_flat), makeFrame(points_nested, colors_nested)].forEach(frame => {
-    // Test that each "points" field is properly replaced.
-    const sink = new MemorySink();
-    const writer = new XVIZWriter({dataSink: sink, envelope: true, binary: true});
-
-    writer.writeFrame('test', 0, frame);
-
-    t.ok(sink.has('test', '2-frame.glb'), 'wrote binary frame');
-
-    // TODO: once this is merged into @xviz/io replace this with actual
-    // parsing and validation of the structure.
-    const data = sink.get('test', '2-frame.glb');
-    t.notOk(data.toString().includes('#/accessors/0'), 'data has accessor 0');
-    t.notOk(data.toString().includes('#/accessors/1'), 'data has accessor 1');
   });
   t.end();
 });
