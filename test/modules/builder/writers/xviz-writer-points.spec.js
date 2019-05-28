@@ -73,6 +73,10 @@ function makeFrame(points, colors) {
   };
 }
 
+function flattenArray(array) {
+  return array.reduce((arr, entry) => arr.concat(entry), []);
+}
+
 test('XVIZBuilder#points', t => {
   // We just need to generate nested array data for the test
   const makeRandomPoints = (count, size) =>
@@ -88,8 +92,8 @@ test('XVIZBuilder#points', t => {
   const points_nested = makeRandomPoints(20, 3);
   const colors_nested = makeRandomPoints(20, 4);
 
-  const points_flat = points_nested.flat();
-  const colors_flat = colors_nested.flat();
+  const points_flat = flattenArray(points_nested);
+  const colors_flat = flattenArray(colors_nested);
 
   const points_typed = Float32Array.from(points_flat);
   const colors_typed = Uint8Array.from(colors_flat);
