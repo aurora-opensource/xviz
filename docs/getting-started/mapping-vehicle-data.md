@@ -34,11 +34,11 @@ xb.stream('/vehicle_pose').category('pose');
 ```
 
 We are simply defining the **stream name** and the **category**. However because pose is so
-important there is a required name `/vehicle_pose`. The list of
+important there is currently a required name `/vehicle_pose`. The list of
 [category values](/docs/protocol-schema/session-protocol.md#stream_metadata) can be seen in the
 specification.
 
-On every message we must define the current Pose. We use the
+Currently every message requires a Pose. We use the
 [XVIZBuilder](/docs/api-reference/xviz-builder.md#pose-streamid-) to create this for each message.
 
 ```js
