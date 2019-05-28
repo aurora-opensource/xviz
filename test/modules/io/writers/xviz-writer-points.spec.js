@@ -13,30 +13,7 @@
 // limitations under the License.
 /* eslint-disable camelcase */
 import test from 'tape-catch';
-import {XVIZWriter} from '@xviz/builder';
-
-class MemorySink {
-  constructor() {
-    this.data = new Map();
-  }
-
-  _key(scope, name) {
-    return `${scope}/${name}`;
-  }
-
-  writeSync(scope, name, data) {
-    const key = this._key(scope, name);
-    this.data.set(key, data);
-  }
-
-  has(scope, name) {
-    return this.data.has(this._key(scope, name));
-  }
-
-  get(scope, name) {
-    return this.data.get(this._key(scope, name));
-  }
-}
+import {XVIZBinaryWriter, MemorySourceSink} from '@xviz/io';
 
 const PRIMARY_POSE_STREAM = '/vehicle_pose';
 const DEFAULT_POSE = {
@@ -73,7 +50,7 @@ function makeFrame(points, colors) {
   };
 }
 
-test('XVIZBuilder#points', t => {
+test('XVIZBinaryWriter#points', t => {
   // We just need to generate nested array data for the test
   const makeRandomPoints = (count, size) =>
     Array(count)
@@ -101,23 +78,23 @@ test('XVIZBuilder#points', t => {
     makeFrame(points_typed, colors_typed)
   ].forEach(frame => {
     // Test that each "points" field is properly replaced.
-    const sink = new MemorySink();
-    const writer = new XVIZWriter({dataSink: sink, envelope: true, binary: true});
+    const sink = new MemorySourceSink();
+    const writer = new XVIZBinaryWriter(sink);
 
-    writer.writeFrame('test', 0, frame);
+    writer.writeMessage(0, frame);
 
-    t.ok(sink.has('test', '2-frame.glb'), 'wrote binary frame');
+    t.ok(sink.has('2-frame.glb'), 'wrote binary frame');
 
     // TODO: once this is merged into @xviz/io replace this with actual
     // parsing and validation of the structure.
-    const data = sink.get('test', '2-frame.glb');
+    const data = sink.readSync('2-frame.glb');
     t.ok(data.toString().includes('#/accessors/0'), 'data has accessor 0');
     t.ok(data.toString().includes('#/accessors/1'), 'data has accessor 1');
   });
   t.end();
 });
 
-test('XVIZBuilder#points not made binary because too few elements', t => {
+test('XVIZBinaryWriter#points not made binary because too few elements', t => {
   // Must have minimum of 20 elements to be converted to binary
   const points_flat = [0, 0, 0, 4, 0, 0, 4, 3, 0];
   const colors_flat = [255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255];
@@ -128,16 +105,16 @@ test('XVIZBuilder#points not made binary because too few elements', t => {
   // Generate a frame with specific points and colors
   [makeFrame(points_flat, colors_flat), makeFrame(points_nested, colors_nested)].forEach(frame => {
     // Test that each "points" field is properly replaced.
-    const sink = new MemorySink();
-    const writer = new XVIZWriter({dataSink: sink, envelope: true, binary: true});
+    const sink = new MemorySourceSink();
+    const writer = new XVIZBinaryWriter(sink);
 
-    writer.writeFrame('test', 0, frame);
+    writer.writeMessage(0, frame);
 
-    t.ok(sink.has('test', '2-frame.glb'), 'wrote binary frame');
+    t.ok(sink.has('2-frame.glb'), 'wrote binary frame');
 
     // TODO: once this is merged into @xviz/io replace this with actual
     // parsing and validation of the structure.
-    const data = sink.get('test', '2-frame.glb');
+    const data = sink.readSync('2-frame.glb');
     t.notOk(data.toString().includes('#/accessors/0'), 'data has accessor 0');
     t.notOk(data.toString().includes('#/accessors/1'), 'data has accessor 1');
   });

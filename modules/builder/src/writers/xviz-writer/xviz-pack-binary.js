@@ -68,6 +68,10 @@ export function packBinaryJson(json, gltfBuilder, objectKey = null, options = {}
 function flattenObject(key, object) {
   let typedArray = null;
   let size = 3;
+  // The overhead of creating binary data makes it inefficient unless the arrays
+  // are larger than an particular size.  From a byte-count perspective any point array
+  // with less than 20 entries results if increasing the overall size.  Therefore we
+  // only flatten entries with arrays > 20 elements.
   const toTypedArrayMinimumLength = 20;
 
   if (object.length < toTypedArrayMinimumLength) {

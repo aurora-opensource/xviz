@@ -15,6 +15,9 @@
 // UTILS
 export {loadUri} from './utils/load-uri.js';
 export {flattenToTypedArray} from './utils/flatten.js';
+// This is used in @xviz/io and will eventually be moved there. Prefix with underscore
+// to mark this as a private export
+export {packBinaryJson as _packBinaryJson} from './writers/xviz-writer/xviz-pack-binary';
 
 // WRITERS
 export {default as XVIZWriter} from './writers/xviz-writer/xviz-writer';
