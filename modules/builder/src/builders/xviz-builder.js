@@ -161,6 +161,11 @@ export default class XVIZBuilder {
     return message;
   }
 
+  // DEPRECATED: change to using getMessage()
+  getFrame() {
+    return this.getMessage();
+  }
+
   _reset() {
     this._streamBuilder = null;
   }

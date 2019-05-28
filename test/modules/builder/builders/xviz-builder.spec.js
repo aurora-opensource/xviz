@@ -662,6 +662,14 @@ test('XVIZBuilder#futures-multiple-primitive reverse timestamp insert', t => {
   const message = builder.getMessage();
   t.deepEqual(message, expected, 'XVIZBuilder multiple primitives futures matches expected output');
   schemaValidator.validate('session/state_update', message);
+
+  const deprecatedAPIFrame = builder.getFrame();
+  t.deepEqual(
+    deprecatedAPIFrame,
+    message,
+    'XVIZBuilder deprecated API getFrame() returns same data'
+  );
+
   t.end();
 });
 
