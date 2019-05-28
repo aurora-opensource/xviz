@@ -15,8 +15,8 @@
 import {XVIZBaseWriter} from './xviz-base-writer';
 import {GLTFBuilder} from '@loaders.gl/gltf';
 import {toBuffer} from '@loaders.gl/core';
-import {DracoEncoder, DracoDecoder} from '@loaders.gl/draco';
-import {packBinaryJson} from './xviz-pack-binary';
+import {DracoWriter, DracoLoader} from '@loaders.gl/draco';
+import {_packBinaryJson as packBinaryJson} from '@xviz/builder';
 
 // 0-frame is an index file for timestamp metadata
 // 1-frame is the metadata file for the log
@@ -51,8 +51,8 @@ export class XVIZBinaryWriter extends XVIZBaseWriter {
     };
 
     if (this.options.draco) {
-      this.encodingOptions.DracoEncoder = DracoEncoder;
-      this.encodingOptions.DracoDecoder = DracoDecoder;
+      this.encodingOptions.DracoWriter = DracoWriter;
+      this.encodingOptions.DracoLoader = DracoLoader;
     }
   }
 
