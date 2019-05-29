@@ -50,7 +50,7 @@ export class VisualizationMarkerArray {
     return 'visualization_msgs/MarkerArray';
   }
 
-  convertFrame(frame, xvizBuilder) {
+  convertMessage(frame, xvizBuilder) {
     const messages = frame[this.topic];
     if (messages) {
       for (const {message} of messages) {

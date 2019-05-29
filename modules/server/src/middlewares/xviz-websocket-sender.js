@@ -105,7 +105,7 @@ export class XVIZWebsocketSender {
         msg.format === XVIZFormat.OBJECT ||
         (!msg.hasMessage() && typeof msg.buffer !== 'string' && !msg.buffer.byteLength)
       ) {
-        return XVIZFormat.BINARY;
+        return XVIZFormat.BINARY_GLB;
       }
 
       // return the format set to the current data format

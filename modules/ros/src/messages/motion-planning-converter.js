@@ -23,7 +23,7 @@ export default class MotionPlanningConverter {
     this.PLAN_STREAM = [this.ns, 'plan'].join('/');
   }
 
-  convertFrame(frame, xvizBuilder) {
+  convertMessage(frame, xvizBuilder) {
     const planMessages = frame[MP_PLAN];
     if (!planMessages) {
       return;

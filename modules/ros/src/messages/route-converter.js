@@ -23,7 +23,7 @@ export default class RouteConverter extends Converter {
     this.ROUTE = xvizNamespace;
   }
 
-  convertFrame(frame, xvizBuilder) {
+  convertMessage(frame, xvizBuilder) {
     let routeMessages = frame[ROUTE];
     if (!routeMessages) {
       if (!this.previousRouteMessages) {

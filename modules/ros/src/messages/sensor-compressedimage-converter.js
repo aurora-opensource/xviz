@@ -21,7 +21,7 @@ export class SensorCompressedImage {
     return 'sensor_msgs/CompressedImage';
   }
 
-  async convertFrame(frame, xvizBuilder) {
+  async convertMessage(frame, xvizBuilder) {
     const msgs = frame[this.topic];
     if (!msgs) {
       return;

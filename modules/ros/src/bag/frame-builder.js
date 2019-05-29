@@ -16,7 +16,7 @@ import Promise from 'bluebird';
 
 import {XVIZMetadataBuilder, XVIZBuilder} from '@xviz/builder';
 
-export class FrameBuilder {
+export class MessageBuilder {
   constructor({origin, frameIdToPoseMap, disableStreams}) {
     this.disableStreams = disableStreams;
     /*
@@ -43,13 +43,13 @@ export class FrameBuilder {
   }
   */
 
-  async buildFrame(frame) {
+  async buildMessage(frame) {
     const xvizBuilder = new XVIZBuilder(this.metadata, this.disableStreams, {});
-    await Promise.map(this.converters, c => c.convertFrame(frame, xvizBuilder), {
+    await Promise.map(this.converters, c => c.convertMessage(frame, xvizBuilder), {
       concurrency: 1 // xvizBuilder cannot build multiple streams "concurrently"
     });
 
-    const frm = xvizBuilder.getFrame();
+    const frm = xvizBuilder.getMessage();
     return frm;
   }
 

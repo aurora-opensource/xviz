@@ -31,7 +31,7 @@ export default class TrackletsConverter {
     return null;
   }
 
-  convertFrame(frame, xvizBuilder) {
+  convertMessage(frame, xvizBuilder) {
     const trackMessages = frame[TRACKS_LIST];
     if (!trackMessages) {
       return;

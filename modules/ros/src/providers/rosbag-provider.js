@@ -17,7 +17,7 @@ import {XVIZData} from '@xviz/io';
 import {Bag} from '@xviz/ros';
 
 // Generic iterator that stores context for context for an iterator
-class FrameIterator {
+class MessageIterator {
   constructor(start, end, increment = 1) {
     this.start = start;
     this.end = end;
@@ -88,7 +88,7 @@ export class ROSBAGProvider {
     return new XVIZData(this.metadata);
   }
 
-  getFrameIterator(startTime, endTime) {
+  getMessageIterator(startTime, endTime) {
     // metadata
     let {start_time: start, end_time: end} = this.metadata.data;
 
@@ -108,10 +108,10 @@ export class ROSBAGProvider {
       }
     }
     // todo: server limit on duration
-    return new FrameIterator(start, end, 0.1);
+    return new MessageIterator(start, end, 0.1);
   }
 
-  async xvizFrame(iterator) {
+  async xvizMessage(iterator) {
     const {
       valid,
       data: {start, end}
@@ -120,10 +120,10 @@ export class ROSBAGProvider {
       return null;
     }
 
-    // Read Frame by keyTopic/stream
-    const frame = await this.bag.readFrameByTime(start, end);
-    if (frame) {
-      return new XVIZData(frame);
+    // Read Message by keyTopic/stream
+    const msg = await this.bag.readMessageByTime(start, end);
+    if (msg) {
+      return new XVIZData(msg);
     }
 
     return null;

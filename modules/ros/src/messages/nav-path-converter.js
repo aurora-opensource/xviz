@@ -25,7 +25,7 @@ export class NavPath extends Converter {
     return 'nav_msgs/Path';
   }
 
-  async convertFrame(frame, xvizBuilder) {
+  async convertMessage(frame, xvizBuilder) {
     const data = frame[this.topic];
     if (!data) {
       return;

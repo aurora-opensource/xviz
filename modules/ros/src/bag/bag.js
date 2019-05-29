@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 /* global Buffer */
-/* eslint-disable no-console, camelcase */
+/* eslint-disable camelcase */
 import {open, TimeUtil} from 'rosbag';
 import {quaternionToEuler} from '../common/quaternion';
 import {topicMapper} from '../messages';
@@ -71,9 +71,9 @@ export const ALL = [
  * manage "configuration"
  *
  * reconfigure
- * critical topics and building frames
- * - frame by topic
- * - frame by time
+ * critical topics and building messages
+ * - message by topic
+ * - message by time
  *
  * // tool to create this automagically
  *
@@ -233,8 +233,8 @@ export class Bag {
     };
   }
 
-  // We synchronize frames along messages in the `keyTopic`.
-  async readFrameByTime(start, end) {
+  // We synchronize xviz messages along messages in the `keyTopic`.
+  async readMessageByTime(start, end) {
     const bag = await open(this.bagPath);
     const frame = {};
 
@@ -266,35 +266,35 @@ export class Bag {
       frame[result.topic].push(result);
     });
 
-    return await this.buildFrame(frame);
+    return await this.buildMessage(frame);
   }
 
-  async buildFrame(frame) {
+  async buildMessage(frame) {
     const xvizBuilder = new XVIZBuilder(this.xvizMetadata.data, this.disableStreams, {});
 
     for (const topicName in this.topicType) {
       if (this.topicType[topicName].converter) {
-        await this.topicType[topicName].converter.convertFrame(frame, xvizBuilder);
+        await this.topicType[topicName].converter.convertMessage(frame, xvizBuilder);
       }
     }
 
     try {
-      const frm = xvizBuilder.getFrame();
+      const frm = xvizBuilder.getMessage();
       return frm;
     } catch (err) {
       return null;
     }
   }
 
-  // We synchronize frames along messages in the `keyTopic`.
-  async readFrameByKeyTopic(start, end) {
+  // We synchronize messages along messages in the `keyTopic`.
+  async readMessageByKeyTopic(start, end) {
     const bag = await open(this.bagPath);
     let frame = {};
 
-    async function flushFrame() {
+    async function flushMessage() {
       if (frame.keyTopic) {
         // This needs to be address, was used to flush on keyTopic message to sync
-        // await onFrame(frame);
+        // await onMessage(frame);
         frame = {};
       }
     }
@@ -314,7 +314,7 @@ export class Bag {
         result.message.data = Buffer.from(result.message.data);
       }
       if (result.topic === this.keyTopic) {
-        await flushFrame();
+        await flushMessage();
         frame.keyTopic = result;
       }
       frame[result.topic] = frame[result.topic] || [];
@@ -322,6 +322,6 @@ export class Bag {
     });
 
     // Flush the final frame
-    await flushFrame();
+    await flushMessage();
   }
 }

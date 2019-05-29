@@ -17,7 +17,7 @@
 export default class Converter {
   constructor() {}
 
-  async convertFrame(frame, xvizBuilder) {
+  async convertMessage(frame, xvizBuilder) {
     throw new Error('Implement me');
   }
 

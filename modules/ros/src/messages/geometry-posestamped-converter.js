@@ -25,7 +25,7 @@ export class GeometryPoseStamped {
     return 'geometry_msgs/PoseStamped';
   }
 
-  async convertFrame(frame, xvizBuilder) {
+  async convertMessage(frame, xvizBuilder) {
     const msg = frame[this.topic];
     if (!msg) {
       return;

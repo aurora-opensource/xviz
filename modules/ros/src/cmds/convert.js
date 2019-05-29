@@ -83,7 +83,7 @@ export async function Convert(args) {
   // This abstracts the details of the filenames expected by our server
   const sink = new FileSink(outputDir);
 
-  const iterator = provider.getFrameIterator(start, end);
+  const iterator = provider.getMessageIterator(start, end);
   if (!iterator.valid()) {
     throw new Error('Error creating and iterator');
   }
@@ -99,13 +99,13 @@ export async function Convert(args) {
 
   let frameSequence = 0;
   while (iterator.valid()) {
-    const data = await provider.xvizFrame(iterator);
+    const data = await provider.xvizMessage(iterator);
     if (!data) {
       throw new Error(`No data for frame ${frameSequence}`);
     }
 
     process.stdout.write(`Writing frame ${frameSequence}\r`);
-    writer.writeFrame(frameSequence, data);
+    writer.writeMessage(frameSequence, data);
     frameSequence += 1;
   }
 

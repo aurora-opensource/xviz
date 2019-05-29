@@ -56,7 +56,7 @@ export class LidarConverter {
     return 'sensor_msgs/PointCloud2';
   }
 
-  async convertFrame(frame, xvizBuilder) {
+  async convertMessage(frame, xvizBuilder) {
     this._buildPoints(frame, xvizBuilder, {
       topic: this.topic,
       color: '#00ff00aa'
