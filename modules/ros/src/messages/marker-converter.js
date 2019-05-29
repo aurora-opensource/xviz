@@ -22,7 +22,7 @@ export default class MarkerConverter extends MarkerArrayConverter {
     super(...args);
   }
 
-  convertFrame(frame, xvizBuilder) {
+  convertMessage(frame, xvizBuilder) {
     const messages = frame[this.topic];
     if (messages) {
       const markers = _.map(messages, 'message');

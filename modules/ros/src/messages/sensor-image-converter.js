@@ -23,7 +23,7 @@ export class SensorImage {
     return 'sensor_msgs/Image';
   }
 
-  async convertFrame(frame, xvizBuilder) {
+  async convertMessage(frame, xvizBuilder) {
     const msgs = frame[this.topic];
     if (!msgs) {
       return;
