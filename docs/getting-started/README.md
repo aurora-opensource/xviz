@@ -29,6 +29,6 @@ relationships.
 This tutorial will also cover some optional data generation to showcase some XVIZ features that are
 not currently present in the KITTI data but are supported by XVIZ and streetscape.gl
 
-Once the XVIZ data has been generated we will cover how to server up the XVIZ data using our simple
-[XVIZ Server](/docs/getting-started/xviz-server.md) and view it using the example
-[XVIZ Viewer](/docs/example-guide/xviz-viewer.md) web application.
+Once the XVIZ data has been generated we will cover how to server up the XVIZ data using our
+[XVIZ Server](/docs/getting-started/xviz-server.md) and view it using the
+[streetscape.gl starter kit](https://github.com/uber/streetscape.gl/blob/master/docs/get-started/starter-kit.md).

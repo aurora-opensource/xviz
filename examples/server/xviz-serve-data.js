@@ -698,8 +698,13 @@ function packFrame({json, isBinary}) {
 }
 
 // Main
-/* eslint-disable complexity */
+/* eslint-disable complexity, max-statements */
 module.exports = function main(args) {
+  console.warn('!!!');
+  console.warn(
+    '!!! NOTE: This script has been deprecated and will eventually be removed. Please switch to the @xviz/server module and scripts as a replacement'
+  );
+  console.warn('!!!');
   const runScenario = args.scenario.length > 0;
 
   // Until scenarios generate data in a way that is compatible with

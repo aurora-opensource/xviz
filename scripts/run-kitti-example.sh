@@ -66,7 +66,7 @@ if [ "$force_xviz_conversion" = "true" ] || ([ ! -f "${OUTPUT_DIR}/1-frame.json"
 fi
 
 # Start server & web app
-cd "${SCRIPT_DIR}/../examples/server" && node ./index.js  -d "${OUTPUT_DIR}" &
+cd "${SCRIPT_DIR}/../modules/server" && ./bin/xvizserver -d "${OUTPUT_DIR}" --port 8081 &
 pids[1]=$!
 
 echo "##"
