@@ -75,6 +75,10 @@ export class WebSocketInterface {
         // Convert from binary to JSON object
         const parsed = parseBinaryXVIZ(message.data);
         this.processMessage(parsed);
+      } else {
+        const utf8decoder = new TextDecoder();
+        const parsed = JSON.parse(utf8decoder.decode(message.data));
+        this.processMessage(parsed);
       }
     } else {
       const parsed = JSON.parse(message.data);

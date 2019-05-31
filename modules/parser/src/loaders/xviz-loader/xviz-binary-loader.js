@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-/* eslint-disable */
+
 import {GLTFParser} from '@loaders.gl/gltf';
 
 import {XVIZ_GLTF_EXTENSION} from '../../constants';
@@ -29,10 +29,9 @@ export function parseBinaryXVIZ(arrayBuffer) {
 
   // TODO/ib - Fix when loaders.gl API is fixed
   let xviz = gltfParser.getApplicationData('xviz');
-  console.log(`FOO: ${xviz}`);
+
   if (xviz === undefined) {
     xviz = gltfParser.getExtension(XVIZ_GLTF_EXTENSION);
-    console.log(`BAR: ${xviz}`);
   }
 
   return xviz;
