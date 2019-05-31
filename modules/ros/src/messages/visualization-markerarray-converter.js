@@ -13,6 +13,7 @@
 // limitations under the License.
 /* global console */
 /* eslint-disable no-console, camelcase, no-invalid-this */
+import Converter from './converter';
 import _ from 'lodash';
 import {Vector3} from 'math.gl';
 
@@ -25,15 +26,11 @@ const NAMESPACE_SEPARATOR = '/';
 /**
  * Handles converting MarkerArray messages
  */
-export class VisualizationMarkerArray {
-  constructor(
-    topic /* Topic to convert */,
-    xvizStream /* The top-level xviz namespace to use for this set of marker streams */,
-    acceptMarker /* Function to filter the markers to use (if not defined, uses all markers) */
-  ) {
-    this.topic = topic;
-    this.xvizStream = xvizStream || topic;
-    this.acceptMarker = acceptMarker || (() => true);
+export class VisualizationMarkerArray extends Converter {
+  constructor(config) {
+    // acceptMarker /* Function to filter the markers to use (if not defined, uses all markers) */
+    super(config);
+    this.acceptMarker = this.config.acceptMarker || (() => true);
 
     console.log('~~~ Marker CTOR:', this.topic, this.xvizStream);
 
@@ -45,8 +42,11 @@ export class VisualizationMarkerArray {
     this.LINELIST_STREAM = [this.xvizStream, 'linelist'].join(NAMESPACE_SEPARATOR);
     this.TEXT_STREAM = [this.xvizStream, 'text'].join(NAMESPACE_SEPARATOR);
   }
+  static get name() {
+    return 'VisualizationMarkerArray';
+  }
 
-  static get topicType() {
+  static get messageType() {
     return 'visualization_msgs/MarkerArray';
   }
 

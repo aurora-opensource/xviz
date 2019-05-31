@@ -16,7 +16,7 @@
 import {XVIZData} from '@xviz/io';
 import {Bag} from '@xviz/ros';
 
-// Generic iterator that stores context for context for an iterator
+// Generic iterator that stores context for an iterator
 class MessageIterator {
   constructor(start, end, increment = 1) {
     this.start = start;
@@ -50,8 +50,6 @@ class MessageIterator {
       }
     };
   }
-
-  // [Symbol.iterator] = () => this;
 }
 
 // People will need to create their own ROSBAGDataProvider
@@ -63,18 +61,43 @@ class MessageIterator {
 //
 export class ROSBAGProvider {
   constructor({root, options}) {
-    this.bagPath = root.endsWith('.bag') ? root : `${root}.bag`;
-    this.options = options;
-    this.metadata = null;
 
-    this.bag = null;
+    this.bagPath = root.endsWith('.bag') ? root : `${root}.bag`;
+    this.bagClass = options && options.bagClass || Bag;
+
+    // These likely come from ROSBagProvider arguments passed
+    // when added to the XVIZProviderFactory
+    this.ros2xvizFactory = options && options.ros2xvizFactory;
+    this.topicConfig = options && options.topicConfig;
+    this.mapping = options && options.mapping;
+
+    this.options = options || {};
+    this.metadata = null;
+    this.ros2xviz = null;
+
+    if (!this.ros2xvizFactory) {
+      throw new Error('The ROSBAGProvider requires a ROS2XVIZFactory instance');
+    }
+  }
+
+  log(msg) {
+    const logger = this.options;
+    if (logger && logger.info) {
+      logger.info(msg);
+    }
   }
 
   async init() {
     try {
-      // TODO test what happens when bagPath is not a bag
-      this.bag = new Bag(this.bagPath, '/current_pose');
-      this.metadata = await this.bag.init();
+      // options: {logger}
+      this.ros2xviz = this.ros2xvizFactory.create(this.mapping, this.options);
+
+      this.bag = new this.bagClass(this.bagPath, this.topicConfig);
+
+      if (this.bag) {
+        // TODO: need to separate out init from metadata gathering
+        this.metadata = await this.bag.init(this.ros2xviz);
+      }
     } catch (err) {
       console.log(err);
     }
@@ -90,7 +113,7 @@ export class ROSBAGProvider {
 
   getMessageIterator(startTime, endTime) {
     // metadata
-    let {start_time: start, end_time: end} = this.metadata.data;
+    let {start_time: start, end_time: end} = this.metadata.data.log_info;
 
     // bounds check params
     if (startTime) {
@@ -103,11 +126,11 @@ export class ROSBAGProvider {
       if (endTime >= start && endTime <= end) {
         end = endTime;
       } else {
-        // todo: allow server duration limit
+        // todo: allow default duration to be an option
         end = start + 30;
       }
     }
-    // todo: server limit on duration
+
     return new MessageIterator(start, end, 0.1);
   }
 
@@ -116,12 +139,15 @@ export class ROSBAGProvider {
       valid,
       data: {start, end}
     } = iterator.next();
+
     if (!valid) {
       return null;
     }
 
     // Read Message by keyTopic/stream
-    const msg = await this.bag.readMessageByTime(start, end);
+    const dataset = await this.bag.readMessageByTime(start, end);
+    const msg = await this.ros2xviz.buildMessage(dataset);
+
     if (msg) {
       return new XVIZData(msg);
     }

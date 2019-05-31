@@ -15,17 +15,36 @@ import Converter from './converter';
 import {quaternionToEuler} from '../common/quaternion';
 import {TimeUtil} from 'rosbag';
 
-export class GeometryPoseStamped extends Converter {
+export class SensorNavSatFix extends Converter {
   constructor(config) {
     super(config);
   }
 
   static get name() {
-    return 'GeometryPoseStamped';
+    return 'SensorNavSatFix';
   }
 
   static get messageType() {
-    return 'geometry_msgs/PoseStamped';
+    return 'sensor_msgs/NavSatFix';
+  }
+
+  _convertVehicleState(frame) {
+    const msg = frame['/vehicle_state'];
+    if (!msg) {
+      return;
+    }
+
+    const {timestamp, message} = msg[msg.length - 1];
+    const {state} = message;
+
+    // Every frame *MUST* have a pose. The pose can be considered
+    // the core reference point for other data and usually drives the timing
+    // of the system.
+    // Position, decimal degrees
+    const rotation = quaternionToEuler(state.pose.orientation);
+    const {position} = state.pose;
+
+    return {position, rotation};
   }
 
   async convertMessage(frame, xvizBuilder) {
@@ -36,22 +55,28 @@ export class GeometryPoseStamped extends Converter {
 
     const {timestamp, message} = msg[msg.length - 1];
 
+    const state = this._convertVehicleState(frame);
+
     // Every frame *MUST* have a pose. The pose can be considered
     // the core reference point for other data and usually drives the timing
     // of the system.
     // Position, decimal degrees
-    const rotation = quaternionToEuler(message.pose.orientation);
-    const {position} = message.pose;
     const poseBuilder = xvizBuilder
       .pose(this.xvizStream)
-      .position(position.x, position.y, 0)
-      .orientation(rotation.roll, rotation.pitch, rotation.yaw)
+      .mapOrigin(message.longitude, message.latitude, message.altitude)
       .timestamp(TimeUtil.toDate(timestamp).getTime() / 1e3);
 
-    // TODO: Document how this works
-    if (this.config.origin) {
-      const {origin} = this.config;
-      poseBuilder.mapOrigin(origin.longitude, origin.latitude, origin.altitude);
+    if (state) {
+      const {position, rotation} = state;
+      if (position) {
+        // poseBuilder.position(position.x, position.y, position.z);
+        poseBuilder.position(0, 0, 0);
+      }
+
+      if (rotation) {
+        poseBuilder
+          .orientation(rotation.roll, rotation.pitch, rotation.yaw);
+      }
     }
   }
 

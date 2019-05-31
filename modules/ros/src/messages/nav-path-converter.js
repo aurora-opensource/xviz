@@ -15,13 +15,15 @@
 import Converter from './converter';
 
 export class NavPath extends Converter {
-  constructor(topic, xvizStream) {
-    super();
-    this.topic = topic;
-    this.xvizStream = xvizStream || topic;
+  constructor(config) {
+    super(config);
   }
 
-  static get topicType() {
+  static get name() {
+    return 'NavPath';
+  }
+
+  static get messageType() {
     return 'nav_msgs/Path';
   }
 
@@ -38,14 +40,10 @@ export class NavPath extends Converter {
       });
 
       xvizBuilder
-        .primitive(this._stream)
+        .primitive(this.xvizStream)
         .polyline(polyline)
         .id('vehicle-path');
     }
-  }
-
-  get _stream() {
-    return this.xvizStream || this.topic;
   }
 
   getMetadata(xvizMetaBuilder) {
@@ -53,7 +51,7 @@ export class NavPath extends Converter {
     // This helps validate data consistency and has automatic
     // behavior tied to the viewer.
     xvizMetaBuilder
-      .stream(this._stream)
+      .stream(this.xvizStream)
       .coordinate('IDENTITY')
       .category('primitive')
       .type('polyline')

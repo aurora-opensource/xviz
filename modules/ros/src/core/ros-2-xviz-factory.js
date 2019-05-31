@@ -11,19 +11,17 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-export {Bag} from './bag';
-export {ROSBAGProvider} from './providers/rosbag-provider';
+import {ROS2XVIZ} from './ros-2-xviz';
 
-export {
-  // Individual converter
-  GeometryPoseStamped,
-  NavPath,
-  LidarConverter,
-  SensorImage,
-  SensorCompressedImage,
-  VisualizationMarkerArray,
+// Provided a list of all converters
+// can create an instance of the ROS2XVIZ
+// along with the mapping config for a provider instance
+export class ROS2XVIZFactory {
+  constructor(converters) {
+    this.converters = converters;
+  }
 
-  // All the above converters in an array
-  defaultConverters
-} from './messages';
-export {ROS2XVIZFactory} from './core/ros-2-xviz-factory';
+  create(mapping, options) {
+    return new ROS2XVIZ(this.converters, mapping, options);
+  }
+};

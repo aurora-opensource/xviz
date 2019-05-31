@@ -11,11 +11,29 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-export {GeometryPoseStamped} from './geometry-posestamped-converter';
-export {NavPath} from './nav-path-converter';
-export {LidarConverter} from './lidar-converter';
-export {SensorImage} from './sensor-image-converter';
-export {SensorCompressedImage} from './sensor-compressedimage-converter';
-export {VisualizationMarkerArray} from './visualization-markerarray-converter';
+import {GeometryPoseStamped} from './geometry-posestamped-converter';
+import {NavPath} from './nav-path-converter';
+import {LidarConverter} from './lidar-converter';
+import {SensorImage} from './sensor-image-converter';
+import {SensorCompressedImage} from './sensor-compressedimage-converter';
+import {SensorNavSatFix} from './sensor-navsatfix-converter';
+import {VisualizationMarkerArray} from './visualization-markerarray-converter';
 
-export {topicMapper} from './topic-mapper';
+export {
+  GeometryPoseStamped,
+  NavPath,
+  LidarConverter,
+  SensorImage,
+  SensorCompressedImage,
+  SensorNavSatFix,
+  VisualizationMarkerArray};
+
+export const defaultConverters = [
+  GeometryPoseStamped,
+  NavPath,
+  LidarConverter,
+  SensorCompressedImage,
+  SensorImage,
+  SensorNavSatFix,
+  VisualizationMarkerArray
+];

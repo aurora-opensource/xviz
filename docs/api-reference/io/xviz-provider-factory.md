@@ -3,6 +3,8 @@
 The XVIZProviderFactory provides the ability to create a Provider without knowing the specific
 implementation that handles the underlying data source.
 
+XVIZProviderFactory by default is populated with the XVIZJSONProvider and XVIZBinaryProvider.
+
 ## Example
 
 ```js
@@ -35,3 +37,12 @@ Parameters:
 - `options` (Object) - options passed through to the underlying Providers
 
 Returns: ([XVIZ Provider](/docs/api-reference/io/overview-provider.md)) - Provider object
+
+##### addProviderClass(class, args)
+
+Adds an custom XVIZProvider to the factory
+
+Parameters:
+
+- `class` (Class) - The class that will be instantiated to test if it supports the supplied arguments
+- `args` (Object) - Additional arguments that will be added to the class during construction

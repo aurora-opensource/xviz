@@ -66,5 +66,10 @@ export function setupArgs() {
     group: 'Server Options:'
   });
 
+  args.options('rosConfig', {
+    describe: 'Path to ROS Bag configuration',
+    type: 'string'
+  });
+
   return args;
 }
