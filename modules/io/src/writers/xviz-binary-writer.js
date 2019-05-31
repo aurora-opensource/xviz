@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import '@loaders.gl/polyfills';
 import {XVIZBaseWriter} from './xviz-base-writer';
 import {GLTFBuilder} from '@loaders.gl/gltf';
 import {DracoWriter, DracoLoader} from '@loaders.gl/draco';
