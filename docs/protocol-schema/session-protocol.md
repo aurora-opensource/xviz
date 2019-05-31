@@ -148,10 +148,10 @@ created.
 
 **log_info** - timing information
 
-| Name             | Type                  | Description                                 |
-| ---------------- | --------------------- | ------------------------------------------- |
-| `start_time`     | `optional<timestamp>` | Starting timestamp for the log              |
-| `end_time`       | `optional<timestamp>` | Final timestamp for the log                 |
+| Name         | Type                  | Description                    |
+| ------------ | --------------------- | ------------------------------ |
+| `start_time` | `optional<timestamp>` | Starting timestamp for the log |
+| `end_time`   | `optional<timestamp>` | Final timestamp for the log    |
 
 **vehicle_info** - currently unspecified
 
