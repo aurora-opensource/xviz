@@ -62,7 +62,7 @@ OUTPUT_DIR="${SCRIPT_DIR}/../data/generated/kitti/2011_09_26/2011_09_26_drive_00
 if [ "$force_xviz_conversion" = "true" ] || ([ ! -f "${OUTPUT_DIR}/1-frame.json" ] && [ ! -f "${OUTPUT_DIR}/1-frame.glb" ]) ; then
     echo "Generating default KITTI XVIZ data"
     mkdir -p "${OUTPUT_DIR}"
-    (cd "${SCRIPT_DIR}/../examples/converters/kitti" && yarn start -d ${INPUT_DIR} -o "${OUTPUT_DIR}")
+    (cd "${SCRIPT_DIR}/../examples/converters/kitti" && yarn && yarn start -d ${INPUT_DIR} -o "${OUTPUT_DIR}")
 fi
 
 # Start server & web app
