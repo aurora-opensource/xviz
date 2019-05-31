@@ -14,6 +14,8 @@
 
 import {GLTFParser} from '@loaders.gl/gltf';
 
+import {XVIZ_GLTF_EXTENSION} from '../../constants';
+
 const MAGIC_XVIZ = 0x5856495a; // XVIZ in Big-Endian ASCII
 const MAGIC_GLTF = 0x676c5446; // glTF in Big-Endian ASCII
 const LE = true; // Binary GLTF is little endian.
@@ -26,7 +28,13 @@ export function parseBinaryXVIZ(arrayBuffer) {
   gltfParser.parse(arrayBuffer, {createImages: false});
 
   // TODO/ib - Fix when loaders.gl API is fixed
-  return gltfParser.getApplicationData('xviz');
+  let xviz = gltfParser.getApplicationData('xviz');
+
+  if (xviz === undefined) {
+    xviz = gltfParser.getExtension(XVIZ_GLTF_EXTENSION);
+  }
+
+  return xviz;
 }
 
 export function isBinaryXVIZ(arrayBuffer) {
