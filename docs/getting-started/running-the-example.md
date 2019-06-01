@@ -54,14 +54,22 @@ $ yarn start -d 2011_09_26/2011_09_26_drive_0005_sync --image-max-width=300 --di
 Run the [example XVIZ server](/docs/getting-started/xviz-server.md) to serve your converted data:
 
 ```
-$ cd examples/server
-$ yarn  # install dependencies
-$ yarn start -d kitti/2011_09_26/2011_09_26_drive_0005_sync
+$ yarn bootstrap # Install deps and build modules
+$ ./modules/server/bin/babel-xvizserver -d data/generated/kitti/2011_09_26/2011_09_26_drive_0005_sync --port 8081
 ```
 
-To see a full list of options of the stream server, run `yarn start --help`.
+To see a full list of options of the stream server, run
+`./modules/server/bin/babel-xvizserver --help`.
 
 # Start Client Application
 
 See
-[streetscape.gl starter kit](https://github.com/uber/streetscape.gl/blob/master/docs/get-started/starter-kit.md).
+[streetscape.gl starter kit](https://github.com/uber/streetscape.gl/blob/master/docs/get-started/starter-kit.md)
+to get the web application setup.
+
+Once you have finished the setup the only change to run against the local server you started above
+is the following:
+
+```
+streetscape.gl/examples/get-started$ yarn start-streaming-local
+```

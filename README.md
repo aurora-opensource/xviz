@@ -13,15 +13,16 @@ This repo contains the following submodules:
 
 - `@xviz/builder` - Node.js utilities for converting data to the XVIZ protocol.
 - `@xviz/cli` - CLI utilities for the XVIZ protocol.
+- `@xviz/io` - Library for loading, accessing, and manipiulating XVIZ data.
 - `@xviz/parser` - Client-side decoder and synchronizer for consuming XVIZ data.
 - `@xviz/schema` - Validation and schemas for the XVIZ protocol.
+- `@xviz/server` - A complete server module supporting the full XVIZ protocol.
 
 And examples:
 
 - Sample converters that convert open datasets such as
   [KITTI](http://www.cvlibs.net/datasets/kitti/raw_data.php) and [Nutonomy](https://nuscenes.org) to
   the XVIZ protocol.
-- A minimal Node.js-based XVIZ stream server.
 
 ## Quick start
 
