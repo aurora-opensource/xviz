@@ -3,6 +3,20 @@
 All notable changes to XVIZ will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 
+## [1.0.0-beta.14]
+
+- XVIZ GLB data encoded with AVS_xviz extension & loaders.gl 1.1.0 (#462)
+- Change use of 'Frame' to 'Message' in XVIZ (#467)
+- Schema change remove "position" as required field for images (#458)
+- @xviz/server module (#453)
+- Add getXVIZMessageType() to return the XVIZ type with minimal parsing (#451)
+- API Audit - rename confusing parser functions (#459)
+- New module @xviz/io consolidates general reading and writing (#435)
+
+## [1.0.0-beta.12]
+
+- Add getXVIZMessageType() to return the XVIZ type with minimal parsing (#451)
+
 ## [1.0.0-beta.11]
 
 - Maintain xviz compatibility after parsing (#442)
