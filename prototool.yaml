@@ -1,0 +1,20 @@
+lint:
+  ignores:
+  - id: ENUM_FIELD_NAMES_UPPER_SNAKE_CASE
+    files:
+    - xviz/v2/annotation.proto
+    - xviz/v2/core.proto
+    - xviz/v2/options.proto
+    - xviz/v2/primitives.proto
+    - xviz/v2/session.proto
+    - xviz/v2/style.proto
+    - xviz/v2/uiprimitives.proto
+  - id: ENUM_FIELD_PREFIXES
+    files:
+    - xviz/v2/annotation.proto
+    - xviz/v2/core.proto
+    - xviz/v2/options.proto
+    - xviz/v2/primitives.proto
+    - xviz/v2/session.proto
+    - xviz/v2/style.proto
+    - xviz/v2/uiprimitives.proto

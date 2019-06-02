@@ -220,6 +220,10 @@
           {
             "name": "Binary Protocol",
             "markdown": "protocol-formats/binary-protocol.md"
+          },
+          {
+            "name": "Protobuf Protocol",
+            "markdown": "protocol-formats/protobuf-protocol.md"
           }
         ]
       }

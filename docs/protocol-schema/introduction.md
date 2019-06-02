@@ -73,3 +73,5 @@ types described below:
   types into JSON
 - [Binary protocol](/docs/protocol-formats/binary-protocol.md) - a Hybrid JSON binary protocol
   designed for larger data sets and faster performance
+- [Protobuf protocol](/docs/protocol-formats/protobuf-protocol.md) - an in development Protobuf
+  schema that is compatible with the JSON protocol
