@@ -23,10 +23,10 @@
         "type": "number"
       },
       "text_anchor": {
-        "enum": ["start", "middle", "end"]
+        "enum": ["START", "MIDDLE", "END"]
       },
       "text_baseline": {
-        "enum": ["top", "center", "bottom"]
+        "enum": ["TOP", "CENTER", "BOTTOM"]
       },
       "height": {
         "type": "number"

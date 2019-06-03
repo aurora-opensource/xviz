@@ -5,7 +5,7 @@
   "allOf": [{ "$ref": "#/definitions/with_children" }],
   "properties": {
     "type": {
-      "enum": ["panel"]
+      "enum": ["PANEL"]
     },
     "name": {},
     "layout": {},
@@ -25,15 +25,15 @@
         },
         "layout": {
           "type": "string",
-          "enum": ["vertical", "horizontal"]
+          "enum": ["VERTICAL", "HORIZONTAL"]
         },
         "interactions": {
           "type": "array",
           "items": {
             "type": "string",
             "enum": [
-              "reorderable",
-              "dragout"
+              "REORDERABLE",
+              "DRAGOUT"
             ]
           },
           "additionalItems": false
@@ -65,7 +65,7 @@
       "allOf": [{ "$ref": "#/definitions/with_children" }],
       "properties": {
         "type": {
-          "enum": ["container"]
+          "enum": ["CONTAINER"]
         },
         "name": {},
         "layout": {},

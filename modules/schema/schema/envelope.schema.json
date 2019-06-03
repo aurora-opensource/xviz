@@ -12,7 +12,7 @@
       "properties":  {
         "type": {
           "type": "string",
-          "pattern": "^((?!xviz\/).)*$"
+          "pattern": "^((?!XVIZ\/).)*$"
         },
         "data": {
           "type": "object"
@@ -23,7 +23,7 @@
       "properties":  {
         "type": {
           "enum": [
-            "xviz/start"
+            "XVIZ/START"
           ]
         },
         "data": {
@@ -35,7 +35,7 @@
       "properties":  {
         "type": {
           "enum": [
-            "xviz/metadata"
+            "XVIZ/METADATA"
           ]
         },
         "data": {
@@ -47,7 +47,7 @@
       "properties":  {
         "type": {
           "enum": [
-            "xviz/transform_log"
+            "XVIZ/TRANSFORM_LOG"
           ]
         },
         "data": {
@@ -59,7 +59,7 @@
       "properties":  {
         "type": {
           "enum": [
-            "xviz/state_update"
+            "XVIZ/STATE_UPDATE"
           ]
         },
         "data": {
@@ -71,7 +71,7 @@
       "properties":  {
         "type": {
           "enum": [
-            "xviz/transform_log_done"
+            "XVIZ/TRANSFORM_LOG_DONE"
           ]
         },
         "data": {
@@ -83,7 +83,7 @@
       "properties":  {
         "type": {
           "enum": [
-            "xviz/reconfigure"
+            "XVIZ/RECONFIGURE"
           ]
         },
         "data": {
@@ -95,7 +95,7 @@
       "properties":  {
         "type": {
           "enum": [
-            "xviz/error"
+            "XVIZ/ERROR"
           ]
         },
         "data": {
@@ -107,7 +107,7 @@
       "properties":  {
         "type": {
           "enum": [
-            "xviz/transform_point_in_time"
+            "XVIZ/TRANSFORM_POINT_IN_TIME"
           ]
         },
         "data": {
