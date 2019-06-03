@@ -30,13 +30,25 @@ const PRIMITIVE_PROTO_TYPES = new Set([
   'bytes'
 ]);
 
-export function protoEnumsToInts(protoType, jsonObject) {
+export function getProtoEnumTypes(protoTypeObj) {
   const enumTypes = {};
 
-  protoType.nestedArray.map(function store(e) {
-    enumTypes[e.name] = e.values;
-    return e;
+  protoTypeObj.nestedArray.map(function store(e) {
+    if (e.values !== undefined) {
+      // enumTypes[e.name] = e.values;
+      enumTypes[e.fullName] = e.values;
+    } else if (e.nestedArray !== undefined) {
+      Object.assign(enumTypes, getProtoEnumTypes(e));
+    }
   });
+
+  return enumTypes;
+}
+/* eslint-disable */
+export function protoEnumsToInts(protoType, jsonObject, enumTypes) {
+  if (enumTypes === undefined) {
+    throw 'protoEnumsToInts needs defined enumTypes';
+  }
 
   const fields = protoType.fields;
 
@@ -46,19 +58,38 @@ export function protoEnumsToInts(protoType, jsonObject) {
       const field = fields[fieldName];
       const fieldValue = jsonObject[fieldName];
 
-      const values = enumTypes[field.type];
+      const values = lookUpEnumValues(protoType, field.type, enumTypes);
+      // console.log(
+      //   `${protoType.fullName} ${field.fullName}: ${field.type} values: ${JSON.stringify(values)}`
+      // );
 
       if (values !== undefined) {
         enumToIntField(values, fieldName, jsonObject);
       } else if (field.map) {
-        enumToIntMapField(field, jsonObject[fieldName]);
+        enumToIntMapField(field, jsonObject[fieldName], enumTypes);
       } else if (field.repeated) {
-        enumToIntRepeatedField(field, jsonObject[fieldName]);
+        enumToIntRepeatedField(field, jsonObject[fieldName], enumTypes);
       } else if (typeof fieldValue === 'object') {
-        enumToIntMessageField(field, fieldValue);
+        enumToIntMessageField(field, fieldValue, enumTypes);
       }
     }
   }
+}
+
+/**
+ * protobuf.js does not use fully qualified type names in it's reflection
+ * information for enums.  So we have to replicate it's enum rules.
+ */
+function lookUpEnumValues(protoType, fieldType, enumTypes) {
+  // First tree class scope
+  let values = enumTypes[`${protoType.fullName}.${fieldType}`];
+
+  if (values === undefined) {
+    // Then package scope
+    values = enumTypes[`${protoType.parent.fullName}.${fieldType}`];
+  }
+
+  return values;
 }
 
 export function enumToIntField(values, fieldName, jsonObject) {
@@ -76,32 +107,32 @@ export function enumToIntField(values, fieldName, jsonObject) {
   }
 }
 
-function enumToIntMessageField(field, jsonObject) {
+function enumToIntMessageField(field, jsonObject, enumTypes) {
   if (!PRIMITIVE_PROTO_TYPES.has(field.type) && jsonObject !== undefined) {
     const subType = field.parent.lookupType(field.type);
-    protoEnumsToInts(subType, jsonObject);
+    protoEnumsToInts(subType, jsonObject, enumTypes);
   }
 }
 
-function enumToIntMapField(field, jsonObject) {
+function enumToIntMapField(field, jsonObject, enumTypes) {
   if (!PRIMITIVE_PROTO_TYPES.has(field.type) && jsonObject !== undefined) {
     const subType = field.parent.lookupType(field.type);
 
     for (const propertyName in jsonObject) {
       if (jsonObject.hasOwnProperty(propertyName)) {
         const propertyValue = jsonObject[propertyName];
-        protoEnumsToInts(subType, propertyValue);
+        protoEnumsToInts(subType, propertyValue, enumTypes);
       }
     }
   }
 }
 
-function enumToIntRepeatedField(field, jsonArray) {
+function enumToIntRepeatedField(field, jsonArray, enumTypes) {
   if (!PRIMITIVE_PROTO_TYPES.has(field.type) && jsonArray !== undefined) {
     const subType = field.parent.lookupType(field.type);
 
     for (let i = 0; i < jsonArray.length; i++) {
-      protoEnumsToInts(subType, jsonArray[i]);
+      protoEnumsToInts(subType, jsonArray[i], enumTypes);
     }
   }
 }

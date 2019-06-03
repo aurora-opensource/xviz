@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {protoEnumsToInts, enumToIntField} from '@xviz/schema';
+import {getProtoEnumTypes, protoEnumsToInts, enumToIntField} from '@xviz/schema';
 import {parse} from 'protobufjs';
 
 import test from 'tape-catch';
@@ -66,11 +66,42 @@ message Nested {
   repeated Test list = 5;
   repeated string primList = 6;
   repeated Test emptyList = 7;
-}`;
+}
+
+
+enum PackageEnum {
+  fail  = 0;
+  cpp   = 1;
+}
+
+message TestPackage {
+  PackageEnum foo = 1;
+  uint32 other = 2;
+}
+`;
 
 const TEST_PROTO_ROOT = parse(TEST_PROTO_IDL).root;
 
 const TEST_PROTO_TYPE = TEST_PROTO_ROOT.lookupType('Test');
+
+const ENUM_TYPES = getProtoEnumTypes(TEST_PROTO_ROOT);
+
+test('getProtoEnumTypes', t => {
+  const exp = {};
+  exp['.PackageEnum'] = {
+    fail: 0,
+    cpp: 1
+  };
+  exp['.Test.Enum'] = {
+    zip: 0,
+    zap: 1,
+    sog: 2
+  };
+
+  t.deepEquals(exp, ENUM_TYPES, 'Can lookup enum types');
+
+  t.end();
+});
 
 test('protoEnumsToInts#Simple', t => {
   const goodObj = {
@@ -83,7 +114,7 @@ test('protoEnumsToInts#Simple', t => {
     other: 42
   };
 
-  protoEnumsToInts(TEST_PROTO_TYPE, goodObj);
+  protoEnumsToInts(TEST_PROTO_TYPE, goodObj, ENUM_TYPES);
   t.ok(JSON.stringify(goodObj) === JSON.stringify(expObj), 'Converted enum');
 
   t.end();
@@ -95,7 +126,11 @@ test('protoEnumsToInts#InvalidEnumType', t => {
     other: 42
   };
 
-  t.throws(() => protoEnumsToInts(TEST_PROTO_TYPE, badObj), /Error/, 'Should throw error');
+  t.throws(
+    () => protoEnumsToInts(TEST_PROTO_TYPE, badObj, ENUM_TYPES),
+    /Error/,
+    'Should throw error'
+  );
 
   t.end();
 });
@@ -141,8 +176,27 @@ test('protoEnumsToInts#Nested', t => {
     primList: ['a', 'b']
   };
 
-  protoEnumsToInts(nestedType, nestedObj);
+  protoEnumsToInts(nestedType, nestedObj, ENUM_TYPES);
   t.deepEqual(nestedObj, expectedObj, 'Converted nested and mapped enums');
+
+  t.end();
+});
+
+test('protoEnumsToInts#PackageScopeEnum', t => {
+  const goodObj = {
+    foo: 'cpp',
+    other: 42
+  };
+
+  const expObj = {
+    foo: 1,
+    other: 42
+  };
+
+  const testPackageType = TEST_PROTO_ROOT.lookupType('TestPackage');
+
+  protoEnumsToInts(testPackageType, goodObj, ENUM_TYPES);
+  t.ok(JSON.stringify(goodObj) === JSON.stringify(expObj), 'Converted enum');
 
   t.end();
 });
