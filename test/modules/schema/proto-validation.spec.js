@@ -16,6 +16,7 @@
 import {loadProtos} from '@xviz/schema';
 import {XVIZValidator, protoEnumsToInts, getXVIZProtoTypes, EXTENSION_PROPERTY} from '@xviz/schema';
 
+import {diffDeepEquals} from '../../util/diff-deep-equals';
 import {loadJSON} from '../../../scripts/file-utils';
 import EXAMPLES from './examples.json';
 
@@ -138,7 +139,7 @@ function validateAgainstExample(t, validator, protoType, examplePath, jsonExampl
 
   // Now lets make sure we handled all fields
   if (!exampleHasExtraFields(examplePath)) {
-    t.deepEquals(originalJsonExample, fromProtoObject, `Full round trip equivalent`);
+    diffDeepEquals(t, originalJsonExample, fromProtoObject, `Full round trip equivalent`);
   }
 }
 
