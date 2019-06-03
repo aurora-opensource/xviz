@@ -20,6 +20,6 @@ export {XVIZSessionValidator, MessageTypes} from './session-validator';
 
 export {loadProtos, getXVIZProtoTypes, EXTENSION_PROPERTY} from './proto-validation';
 
-export {protoEnumsToInts, enumToIntField} from './proto-utils';
+export {getProtoEnumTypes, protoEnumsToInts, enumToIntField} from './proto-utils';
 
 export {StructEncode} from './proto-struct-wrapper';

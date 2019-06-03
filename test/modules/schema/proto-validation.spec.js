@@ -14,7 +14,13 @@
 
 /* eslint no-multi-str: off */
 import {loadProtos} from '@xviz/schema';
-import {XVIZValidator, protoEnumsToInts, getXVIZProtoTypes, EXTENSION_PROPERTY} from '@xviz/schema';
+import {
+  XVIZValidator,
+  getProtoEnumTypes,
+  protoEnumsToInts,
+  getXVIZProtoTypes,
+  EXTENSION_PROPERTY
+} from '@xviz/schema';
 
 import {diffDeepEquals} from '../../util/diff-deep-equals';
 import {loadJSON} from '../../../scripts/file-utils';
@@ -71,6 +77,9 @@ test('protosCorrect', t => {
   const protoTypes = getXVIZProtoTypes(protoRoot);
   t.ok(protoTypes.length > 5, 'Have protos connected to schemas');
 
+  const protoEnumTypes = getProtoEnumTypes(protoRoot);
+  t.ok(Object.keys(protoEnumTypes).length > 5, 'Found enum types');
+
   const tests = [];
 
   for (let i = 0; i < protoTypes.length; i++) {
@@ -98,7 +107,7 @@ test('protosCorrect', t => {
         tests.push(
           loadJSON(examplePath).then(json => {
             t.comment(`Checking: Proto ${type} (Schema: ${schemaName}) Example: ${examplePath}`);
-            validateAgainstExample(t, validator, type, examplePath, json);
+            validateAgainstExample(t, validator, type, protoEnumTypes, examplePath, json);
           })
         );
       }
@@ -108,18 +117,18 @@ test('protosCorrect', t => {
   Promise.all(tests).then(() => t.end());
 });
 
-function validateAgainstExample(t, validator, protoType, examplePath, jsonExample) {
+/* eslint-disable-next-line max-params */
+function validateAgainstExample(t, validator, protoType, protoEnumTypes, examplePath, jsonExample) {
   const originalJsonExample = clone(jsonExample);
 
-  protoEnumsToInts(protoType, jsonExample);
+  protoEnumsToInts(protoType, jsonExample, protoEnumTypes);
 
   // Sanity check out input data
   const schemaName = protoType.options[EXTENSION_PROPERTY];
   validateXVIZJSON(t, validator, schemaName, originalJsonExample, 'Example JSON');
 
   // Verify content "works" as protobuf
-  const err = protoType.verify(jsonExample);
-  t.notOk(err, `Protobuf verified`);
+  verifyProto(t, protoType, jsonExample, `Protobuf verified`);
 
   // Populate proto object with content, we do "fromObject" first
   // so that the well known types will be handled
@@ -143,6 +152,14 @@ function validateAgainstExample(t, validator, protoType, examplePath, jsonExampl
   }
 }
 
+function verifyProto(t, protoType, jsonExample, msg) {
+  const err = protoType.verify(jsonExample);
+  if (err) {
+    t.fail(`${msg}: ${err}, example: ${JSON.stringify(jsonExample, '', 4)}`);
+  } else {
+    t.pass(msg);
+  }
+}
 function validateXVIZJSON(t, validator, schemaName, object, description) {
   t.doesNotThrow(
     () => validator.validate(schemaName, object),
