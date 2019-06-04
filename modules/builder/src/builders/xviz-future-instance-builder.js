@@ -21,7 +21,7 @@ export default class XVIZFutureInstanceBuilder extends XVIZPrimitiveBuilder {
   constructor(props) {
     super({
       ...props,
-      category: CATEGORY.future_instance
+      category: CATEGORY.FUTURE_INSTANCE
     });
 
     this.reset();

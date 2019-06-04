@@ -91,13 +91,13 @@ export default class XVIZMetadataBuilder {
 
   // Used for validation in XVIZBuilder
   category(category) {
-    this.tmp_stream.category = category;
+    this.tmp_stream.category = category.toUpperCase();
     return this;
   }
 
   // Used for validation in XVIZBuilder
   type(t) {
-    this.tmp_type = t;
+    this.tmp_type = t.toUpperCase();
     return this;
   }
 
@@ -178,13 +178,13 @@ export default class XVIZMetadataBuilder {
       }
 
       if (
-        streamData.category === CATEGORY.primitive ||
-        streamData.category === CATEGORY.future_instance
+        streamData.category === CATEGORY.PRIMITIVE ||
+        streamData.category === CATEGORY.FUTURE_INSTANCE
       ) {
         streamData.primitive_type = this.tmp_type;
       } else if (
-        streamData.category === CATEGORY.variable ||
-        streamData.category === CATEGORY.time_series
+        streamData.category === CATEGORY.VARIABLE ||
+        streamData.category === CATEGORY.TIME_SERIES
       ) {
         streamData.scalar_type = this.tmp_type;
       }

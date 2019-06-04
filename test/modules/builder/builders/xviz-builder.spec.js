@@ -51,7 +51,7 @@ test('XVIZBuilder#single-pose', t => {
   setupPose(builder);
 
   const expected = {
-    update_type: 'snapshot',
+    update_type: 'SNAPSHOT',
     updates: [
       {
         timestamp: 1.0,
@@ -80,7 +80,7 @@ test('XVIZBuilder#multiple-poses', t => {
     .orientation(0.44, 0.55, 0.66);
 
   const expected = {
-    update_type: 'snapshot',
+    update_type: 'SNAPSHOT',
     updates: [
       {
         timestamp: 1.0,
@@ -118,7 +118,7 @@ test('XVIZBuilder#polygon', t => {
     });
 
   const expected = {
-    update_type: 'snapshot',
+    update_type: 'SNAPSHOT',
     updates: [
       {
         timestamp: 1.0,
@@ -164,7 +164,7 @@ test('XVIZBuilder#points', t => {
     .colors(colors);
 
   const expected = {
-    update_type: 'snapshot',
+    update_type: 'SNAPSHOT',
     updates: [
       {
         timestamp: 1.0,
@@ -213,7 +213,7 @@ test('XVIZBuilder#single-stream-multiple-polygons', t => {
     });
 
   const expected = {
-    update_type: 'snapshot',
+    update_type: 'SNAPSHOT',
     updates: [
       {
         timestamp: 1.0,
@@ -261,7 +261,7 @@ test('XVIZBuilder#polyline', t => {
   builder.primitive('/test/polyline').polyline(verts);
 
   const expected = {
-    update_type: 'snapshot',
+    update_type: 'SNAPSHOT',
     updates: [
       {
         timestamp: 1.0,
@@ -295,7 +295,7 @@ test('XVIZBuilder#circle', t => {
   builder.primitive('/test/circle').circle(pos, 5);
 
   const expected = {
-    update_type: 'snapshot',
+    update_type: 'SNAPSHOT',
     updates: [
       {
         timestamp: 1.0,
@@ -333,7 +333,7 @@ test('XVIZBuilder#text', t => {
     .position(pos);
 
   const expected = {
-    update_type: 'snapshot',
+    update_type: 'SNAPSHOT',
     updates: [
       {
         timestamp: 1.0,
@@ -369,7 +369,7 @@ test('XVIZBuilder#stadium', t => {
   builder.primitive('/test/stadium').stadium(pos[0], pos[1], 5);
 
   const expected = {
-    update_type: 'snapshot',
+    update_type: 'SNAPSHOT',
     updates: [
       {
         timestamp: 1.0,
@@ -410,7 +410,7 @@ test('XVIZBuilder#image', t => {
     .position([10, 10, 0]);
 
   const expected = {
-    update_type: 'snapshot',
+    update_type: 'SNAPSHOT',
     updates: [
       {
         timestamp: 1.0,
@@ -446,7 +446,7 @@ test('XVIZBuilder#variable', t => {
   builder.variable('/test/variables').values([1.1, 2.0]);
 
   const expected = {
-    update_type: 'snapshot',
+    update_type: 'SNAPSHOT',
     updates: [
       {
         timestamp: 1.0,
@@ -481,7 +481,7 @@ test('XVIZBuilder#multiple-variables', t => {
   builder.variable('/test/variables_2').values([2.0, 1.1]);
 
   const expected = {
-    update_type: 'snapshot',
+    update_type: 'SNAPSHOT',
     updates: [
       {
         timestamp: 1.0,
@@ -532,7 +532,7 @@ test('XVIZBuilder#time_series', t => {
     .value(2.0);
 
   const expected = {
-    update_type: 'snapshot',
+    update_type: 'SNAPSHOT',
     updates: [
       {
         timestamp: 1.0,
@@ -569,7 +569,7 @@ test('XVIZBuilder#futures-single-primitive', t => {
   builder.futureInstance(streamId, ts).polygon(verts);
 
   const expected = {
-    update_type: 'snapshot',
+    update_type: 'SNAPSHOT',
     updates: [
       {
         timestamp: 1.0,
@@ -622,7 +622,7 @@ test('XVIZBuilder#futures-multiple-primitive reverse timestamp insert', t => {
   builder.futureInstance(streamId, ts2).polygon(verts2);
 
   const expected = {
-    update_type: 'snapshot',
+    update_type: 'SNAPSHOT',
     updates: [
       {
         timestamp: 1.0,
@@ -696,7 +696,7 @@ test('XVIZBuilder#futures-multiple-primitive-per-ts', t => {
     .polygon(verts2);
 
   const expected = {
-    update_type: 'snapshot',
+    update_type: 'SNAPSHOT',
     updates: [
       {
         timestamp: 1.0,

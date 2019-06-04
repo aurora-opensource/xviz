@@ -39,7 +39,7 @@ export default class XVIZTimeSeriesBuilder extends XVIZBaseBuilder {
   constructor(props) {
     super({
       ...props,
-      category: CATEGORY.time_series
+      category: CATEGORY.TIME_SERIES
     });
 
     // Stores time_series data by timestamp then id

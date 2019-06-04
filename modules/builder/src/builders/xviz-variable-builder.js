@@ -38,7 +38,7 @@ export default class XVIZVariableBuilder extends XVIZBaseBuilder {
   constructor(props) {
     super({
       ...props,
-      category: CATEGORY.variable
+      category: CATEGORY.VARIABLE
     });
 
     // Stores variable data by stream then id

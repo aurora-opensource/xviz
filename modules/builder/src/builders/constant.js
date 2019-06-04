@@ -14,13 +14,22 @@
 
 /* eslint-disable camelcase */
 export const CATEGORY = {
-  annotation: 'annotation',
-  future_instance: 'future_instance',
-  pose: 'pose',
-  primitive: 'primitive',
-  ui_primitive: 'ui_primitive',
-  time_series: 'time_series',
-  variable: 'variable'
+  // Deprecated lowercase beta enumeration values
+  annotation: 'ANNOTATION',
+  future_instance: 'FUTURE_INSTANCE',
+  pose: 'POSE',
+  primitive: 'PRIMITIVE',
+  ui_primitive: 'UI_PRIMITIVE',
+  time_series: 'TIME_SERIES',
+  variable: 'VARIABLE',
+
+  ANNOTATION: 'ANNOTATION',
+  FUTURE_INSTANCE: 'FUTURE_INSTANCE',
+  POSE: 'POSE',
+  PRIMITIVE: 'PRIMITIVE',
+  UI_PRIMITIVE: 'UI_PRIMITIVE',
+  TIME_SERIES: 'TIME_SERIES',
+  VARIABLE: 'VARIABLE'
 };
 
 export const PRIMITIVE_TYPES = {

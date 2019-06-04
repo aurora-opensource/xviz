@@ -46,8 +46,8 @@ test.skip('XVIZMetadataBuilder#build-with-transformMatrix-array', t => {
     version: '2.0.0',
     streams: {
       '/test/stream': {
-        category: 'primitive',
-        primitive_type: 'circle',
+        category: 'PRIMITIVE',
+        primitive_type: 'CIRCLE',
         coordinate: 'VEHICLE_RELATIVE',
         transform: new Matrix4([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]]),
         stream_style: {
@@ -97,8 +97,8 @@ test.skip('XVIZMetadataBuilder#build-with-transformMatrix-matrix4', t => {
     version: '2.0.0',
     streams: {
       '/test/stream': {
-        category: 'primitive',
-        primitive_type: 'circle',
+        category: 'PRIMITIVE',
+        primitive_type: 'CIRCLE',
         coordinate: 'VEHICLE_RELATIVE',
         transform: new Matrix4([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [1, 2, 3, 1]])
       }
@@ -138,13 +138,13 @@ test('XVIZMetadataBuilder#build-with-pose', t => {
     version: '2.0.0',
     streams: {
       '/test/stream': {
-        category: 'primitive',
-        primitive_type: 'polygon',
+        category: 'PRIMITIVE',
+        primitive_type: 'POLYGON',
         transform: new Matrix4([1, 0, -0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 2, 3, 1])
       },
       '/test/stream/future': {
-        category: 'future_instance',
-        primitive_type: 'polygon'
+        category: 'FUTURE_INSTANCE',
+        primitive_type: 'POLYGON'
       }
     },
     log_info: {
@@ -177,12 +177,12 @@ test('XVIZMetadataBuilder#multiple-streams', t => {
     version: '2.0.0',
     streams: {
       '/test-stream/1': {
-        category: 'primitive',
-        primitive_type: 'polygon'
+        category: 'PRIMITIVE',
+        primitive_type: 'POLYGON'
       },
       '/test-stream/2': {
-        category: 'variable',
-        scalar_type: 'float'
+        category: 'VARIABLE',
+        scalar_type: 'FLOAT'
       }
     },
     log_info: {
@@ -268,7 +268,7 @@ test('XVIZMetadataBuilder#ui', t => {
   const expected = {
     version: '2.0.0',
     streams: {},
-    ui_config: {Metrics: {type: 'panel', name: 'Metrics'}}
+    ui_config: {Metrics: {type: 'PANEL', name: 'Metrics'}}
   };
   t.deepEqual(metadata, expected, 'XVIZMetadataBuilder build matches expected output');
 

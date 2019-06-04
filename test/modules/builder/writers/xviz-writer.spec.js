@@ -115,7 +115,7 @@ test('XVIZWriter#writeMetadataEnvelope', t => {
   const data = SAMPLE_METADATA;
 
   const expected = {
-    type: 'xviz/metadata',
+    type: 'XVIZ/METADATA',
     data
   };
 
@@ -179,7 +179,7 @@ test('XVIZWriter#writeFrameEnveloped', t => {
 
   const data = SAMPLE_STATE_UPDATE;
   const expected = {
-    type: 'xviz/state_update',
+    type: 'XVIZ/STATE_UPDATE',
     data
   };
 

@@ -26,22 +26,22 @@ import XVIZTreeTableBuilder from './xviz-tree-table-builder';
 import XVIZVideoBuilder from './xviz-video-builder';
 
 import {snakeToCamel} from './utils';
-import {UI_TYPES} from './constants';
 
 const defaultValidateWarn = console.warn;
 const defaultValidateError = console.error;
 
+// Should be kept in sync with UI_TYPES in constants.js
 const UI_BUILDER_MAP = {
-  [UI_TYPES.PANEL]: XVIZPanelBuilder,
+  panel: XVIZPanelBuilder,
 
-  [UI_TYPES.CONTAINER]: XVIZContainerBuilder,
+  container: XVIZContainerBuilder,
 
-  [UI_TYPES.METRIC]: XVIZMetricBuilder,
-  [UI_TYPES.PLOT]: XVIZPlotBuilder,
-  [UI_TYPES.SELECT]: XVIZSelectBuilder,
-  [UI_TYPES.TABLE]: XVIZTableBuilder,
-  [UI_TYPES.TREETABLE]: XVIZTreeTableBuilder,
-  [UI_TYPES.VIDEO]: XVIZVideoBuilder
+  metric: XVIZMetricBuilder,
+  plot: XVIZPlotBuilder,
+  select: XVIZSelectBuilder,
+  table: XVIZTableBuilder,
+  treetable: XVIZTreeTableBuilder,
+  video: XVIZVideoBuilder
 };
 
 export default class XVIZUIBuilder {
@@ -51,7 +51,7 @@ export default class XVIZUIBuilder {
 
     this._children = [];
 
-    Object.values(UI_TYPES).map(type => {
+    Object.keys(UI_BUILDER_MAP).map(type => {
       // add UI builders, e.g.
       // type `panel`
       //  - this.panel = (props) => this._setChild('panel', props);
