@@ -21,10 +21,10 @@ message TreeTable {
 message TreeTableColumn {
   enum ColumnType {
     TREE_TABLE_COLUMN_COLUMN_TYPE_INVALID = 0;
-    int32 = 1;
-    double = 2;
-    string = 3;
-    boolean = 4;
+    INT32 = 1;
+    DOUBLE = 2;
+    STRING = 3;
+    BOOLEAN = 4;
   }
   string display_text = 1;
   ColumnType type = 2;
