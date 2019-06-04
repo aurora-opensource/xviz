@@ -51,7 +51,7 @@
         "category": "primitive",
         "primitive_type": "text",
         "stream_style": {
-          "text_anchor": "start"
+          "text_anchor": "START"
         }
       },
 
@@ -59,7 +59,7 @@
         "category": "primitive",
         "primitive_type": "text",
         "stream_style": {
-          "text_baseline": "top"
+          "text_baseline": "TOP"
         }
       },
 

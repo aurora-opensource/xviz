@@ -32,10 +32,10 @@ Each session is started by a client connecting to the server, in the WebSocket c
 HTTP GET request that is upgraded by the server to a persistent WebSocket connection. Termination of
 the connection terminates the session.
 
-After connection is established client starts by sending the [`start`](#start) message, which sets
+After connection is established client starts by sending the [`START`](#START) message, which sets
 the type of session and various other parameters. In the WebSocket case you can send the
-[`start`](#start) properties as URL parameters eliminating the need to send the message. The server
-responds with a [`metadata`](#metadata) message that contains various information about the XVIZ
+[`START`](#START) properties as URL parameters eliminating the need to send the message. The server
+responds with a [`METADATA`](#METADATA) message that contains various information about the XVIZ
 data the server can provide.
 
 ![Session Initialization Sequence](./images/session-init-sequence.png)
@@ -45,9 +45,9 @@ _UML Sequence diagram of an XVIZ session initialization_
 ### Data Transfer - Live
 
 Upon start of a live session the server will immediately, and continuously send the client
-[`state_update`](#state_update) messages at an undefined rate.
+[`STATE_UPDATE`](#STATE_UPDATE) messages at an undefined rate.
 
-Optionally the unstable [`reconfigure`](#reconfigure-warning-unstable-feature-) message can be sent
+Optionally the unstable [`RECONFIGURE`](#reconfigure-warning-unstable-feature-) message can be sent
 to the server to change future data send to the server.
 
 ![Session Log Sequence](./images/session-live-sequence.png)
@@ -58,10 +58,10 @@ _UML Sequence diagram of transforming a live session with XVIZ_
 
 To request log data the client starts with a [`transform_log`](#transform_log) request that
 specifies the time range of the log to send back along with a request id. The server then responds
-with an indeterminate number of [`state_update`](#state_update) messages. When complete it sends the
+with an indeterminate number of [`STATE_UPDATE`](#STATE_UPDATE) messages. When complete it sends the
 `done` message tagged with given request id.
 
-Optionally the unstable [`reconfigure`](#reconfigure-warning-unstable-feature-) message can be sent
+Optionally the unstable [`RECONFIGURE`](#reconfigure-warning-unstable-feature-) message can be sent
 to the server to change way data is transformed for future requests.
 
 ![Session Live Sequence](./images/session-log-sequence.png)
@@ -71,12 +71,12 @@ _UML Sequence diagram of viewing a log with XVIZ_
 ### Data Transfer - Point In Time
 
 To get a single picture of the world at a specific time the client sends a
-[`transform_point_in_time`](#transform_point_in_time-warning-unstable-feature-) message, and the
-server responds with a single [`state_update`](#state_update) containing a full world snapshot.
+[`TRANSFORM_POINT_IN_TIME`](#transform_point_in_time-warning-unstable-feature-) message, and the
+server responds with a single [`STATE_UPDATE`](#STATE_UPDATE) containing a full world snapshot.
 
 ### Reconfiguration
 
-Optionally the unstable [`reconfigure`](#reconfigure-warning-unstable-feature-) message can be sent
+Optionally the unstable [`RECONFIGURE`](#reconfigure-warning-unstable-feature-) message can be sent
 to the server to change way data is transformed for future requests. This can happen any time after
 the connection has been initialized.
 
@@ -84,7 +84,7 @@ the connection has been initialized.
 
 These describe client server communication to start and manage sessions.
 
-### start
+### START
 
 Sent by the client to the service or encoded as URL parameters. When the server gets this message it
 will start streaming data to the client as soon as it can.
@@ -95,9 +95,9 @@ Common Parameters:
 | ---------------- | ------------------ | --------------------------------------------------------------------------------------------- |
 | `version`        | `string`           | Protocol version, for example `2.0.0`                                                         |
 | `profile`        | `optional<string>` | The backend configuration, defines the content, type, and selections of streams you will get. |
-| `session_type`   | `optional<string>` | Type of session being opened up, default is `log`                                             |
-| `message_format` | `optional<string>` | Format the data will be represented in, default value is `json`.                              |
-| `log`            | `optional<string>` | When the `session_type` = `log`, this parameters identifies which log to open.                |
+| `session_type`   | `optional<string>` | Type of session being opened up, default is `LOG`                                             |
+| `message_format` | `optional<string>` | Format the data will be represented in, default value is `JSON`.                              |
+| `log`            | `optional<string>` | When the `session_type` = `LOG`, this parameters identifies which log to open.                |
 
 **errors** The follow fields do not accept all parameters,
 
@@ -111,15 +111,15 @@ Common Parameters:
 
 **session_type** - valid values:
 
-- `live` - send data in real time
-- `log` - show data from a log
+- `LIVE` - send data in real time
+- `LOG` - show data from a log
 
 **message_format** - valid values:
 
-- `json` - JSON types encoded as UT8 strings.
-- `binary` - Our GLB based binary container format.
+- `JSON` - JSON types encoded as UT8 strings.
+- `BINARY` - Our GLB based binary container format.
 
-### metadata
+### METADATA
 
 Sent by server to the client upon connection. Contains information about the XVIZ streams to expect
 in messages, the cameras, and the Declarative UI panels.
@@ -150,7 +150,7 @@ created.
 
 **vehicle_info** - currently unspecified
 
-### error
+### ERROR
 
 Sent to clients if there is any issue with the server system.
 
@@ -160,7 +160,7 @@ Sent to clients if there is any issue with the server system.
 
 ## Data Messages
 
-### state_update
+### STATE_UPDATE
 
 This is a collection of stream sets for all extractor output.
 
@@ -171,9 +171,9 @@ This is a collection of stream sets for all extractor output.
 
 **update_type** - valid values:
 
-- `complete_state` - the provided streams contain a complete view of the world. Any stream not
+- `COMPLETE_STATE` - the provided streams contain a complete view of the world. Any stream not
   included in is considered empty.
-- `incremental` - the provided streams replace replace the contents of existing streams
+- `INCREMENTAL` - the provided streams replace replace the contents of existing streams
 
 The differences between these update models are more subtle, so this table below clarifies. It shows
 what to do in either the `complete_state` or `incremental` state when you receive and update based
@@ -197,7 +197,7 @@ has just the single `/object/polygon` containing a
 
 ```
 {
-    "update_type": "incremental",
+    "update_type": "INCREMENTAL",
     "updates": [
         {
             "timestamp": 1001.3,
@@ -217,7 +217,7 @@ has just the single `/object/polygon` containing a
 
 ## Request Messages
 
-### transform_log
+### TRANSFORM_LOG
 
 Sent from the client to the server to request part of the given log. The time bounds are optional,
 and if not present entire log is sent. Using `requested_streams` you can have the server only send
@@ -230,16 +230,16 @@ streams you need, limiting data usage and potentially speeding up backend proces
 | `end_timestamp`     | `optional<timestamp>` | Where to end transformation, inclusive, if not present use end of log.    |
 | `requested_streams` | `list<string>`        | If non-empty, only send these streams.                                    |
 
-### transform_log_done
+### TRANSFORM_LOG_DONE
 
 Sent from the server to the client to indicate the completion of the
-[`transform_log`](#transform_log) request. This is the only indicate that the request has completed.
+[`TRANSFORM_LOG`](#transform_log) request. This is the only indicate that the request has completed.
 
 | Name | Type     | Description                                                 |
 | ---- | -------- | ----------------------------------------------------------- |
 | `id` | `string` | identifier passed with the original `transform_log` request |
 
-### transform_point_in_time (WARNING: unstable feature)
+### TRANSFORM_POINT_IN_TIME (WARNING: unstable feature)
 
 Sent from the client to the server to request a snapshot of a single point in time from a log. This
 will contain the latest version of all streams, or the requested subset up to the `query_timestamp`,
@@ -252,7 +252,7 @@ limiting data usage and potentially speeding up backend processing.
 | `query_timestamp`   | `timestamp`    | The point at time which to get the state of the desired streams. |
 | `requested_streams` | `list<string>` | If non-empty, only send these streams.                           |
 
-### reconfigure (WARNING: unstable feature)
+### RECONFIGURE (WARNING: unstable feature)
 
 Reconfigure messages allow for a client to change the configuration of an XVIZ server, affecting all
 future requests for data from the server. This in turn enables a client to enable or disable
@@ -264,7 +264,7 @@ Which would send a `delta` reconfigure message to the server.
 
 | Name            | Type                   | Description                                       |
 | --------------- | ---------------------- | ------------------------------------------------- |
-| `update_type`   | `enum { full, delta }` | Whether we have a complete or incremental update. |
+| `update_type`   | `enum { FULL, DELTA }` | Whether we have a complete or incremental update. |
 | `config_update` | `object`               | A JSON patch or full configuration update.        |
 
 ## Core Types
@@ -300,30 +300,30 @@ reconfiguration happens.
 
 #### Category:
 
-- `primitive`
-- `time_series`
-- `variable`
-- `annotation`
-- `future_instance`
-- `pose`
-- `ui_primitive`
+- `PRIMITIVE`
+- `TIME_SERIES`
+- `VARIABLE`
+- `ANNOTATION`
+- `FUTURE_INSTANCE`
+- `POSE`
+- `UI_PRIMITIVE`
 
 #### Scalar types:
 
-- `float`
-- `in32`
-- `string`
-- `bool`
+- `FLOAT`
+- `IN32`
+- `STRING`
+- `BOOL`
 
 #### Primitive types:
 
-- `circle`
-- `image`
-- `point`
-- `polygon`
-- `polyline`
-- `stadium`
-- `text`
+- `CIRCLE`
+- `IMAGE`
+- `POINT`
+- `POLYGON`
+- `POLYLINE`
+- `STADIUM`
+- `TEXT`
 
 ### camera_info
 

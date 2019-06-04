@@ -46,11 +46,11 @@ The start message sent from the server to the client:
 
 ```
 {
-    "type": "xviz/start",
+    "type": "XVIZ/START",
     "data": {
         "version": "2.0.0",
-        "session_type": "live",
-        "message_format": "json"
+        "session_type": "LIVE",
+        "message_format": "JSON"
     }
 }
 ```

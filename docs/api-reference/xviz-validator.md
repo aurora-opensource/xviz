@@ -14,7 +14,7 @@ All validation methods throw if the object fails to validate.
 
 ##### validateMetadata(data)
 
-Validate `metadata` information.
+Validate `METADATA` information.
 
 Parameters:
 
@@ -22,7 +22,7 @@ Parameters:
 
 ##### validateStateUpdate(data)
 
-Validate `state_update` message.
+Validate `STATE_UPDATE` message.
 
 Parameters:
 
@@ -32,13 +32,13 @@ Parameters:
 
 ##### validateStreamSet(data : Object)
 
-Validate `stream_set` type.
+Validate `STREAM_SET` type.
 
 ### Validate base types
 
 ##### validatePose(data)
 
-Validate `pose` object.
+Validate `POSE` object.
 
 Parameters:
 
@@ -77,7 +77,7 @@ Validation the different annotation types.
 
 Parameters:
 
-- `type` (String) - the type of the variable, only "visual" is currently valid
+- `type` (String) - the type of the variable, only "VISUAL" is currently valid
 - `data` (Object) - the object to validate
 
 ### Utility methods

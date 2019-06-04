@@ -81,28 +81,28 @@ Called when a connection is closed.
 
 ##### onStart(message)
 
-Called when a `xviz/start` message is inititiated
+Called when a `XVIZ/START` message is inititiated
 
 ##### onTransformLog(message)
 
-Called when a `xviz/tranform_log` message is inititiated
+Called when a `XVIZ/TRANFORM_LOG` message is inititiated
 
 ##### onError(message)
 
-Called when a `xviz/error` message is inititiated
+Called when a `XVIZ/ERROR` message is inititiated
 
 ##### onMetadata(message)
 
-Called when a `xviz/metadata` message is inititiated
+Called when a `XVIZ/METADATA` message is inititiated
 
 ##### onStateUpdate(message)
 
-Called when a `xviz/state_update` message is inititiated
+Called when a `XVIZ/STATE_UPDATE` message is inititiated
 
 ##### onTransformLogDone(message)
 
-Called when a `xviz/transform_log_done` message is inititiated
+Called when a `XVIZ/TRANSFORM_LOG_DONE` message is inititiated
 
 ##### onReconfigure(message)
 
-Called when a `xviz/transform_log_done` message is inititiated
+Called when a `XVIZ/TRANSFORM_LOG_DONE` message is inititiated

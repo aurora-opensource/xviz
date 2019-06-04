@@ -28,7 +28,7 @@ class ExampleSession {
     // Example calling XVIZMessageToMiddleware.callMiddleware()
     // to handle an explicit XVIZ message
     this.socket.onopen = () => {
-      this.handler.callMiddleware('start', params);
+      this.handler.callMiddleware('START', params);
     };
   }
 ```
