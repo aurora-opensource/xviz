@@ -1,5 +1,5 @@
 {
-  "update_type": "complete_state",
+  "update_type": "COMPLETE_STATE",
   "updates": [
     {
       "timestamp": 1001.3,

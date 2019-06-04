@@ -1,5 +1,5 @@
 {
-  "update_type": "delta",
+  "update_type": "DELTA",
   "config_update": {
     "base": {
       "subprop": "value"

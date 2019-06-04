@@ -1,5 +1,5 @@
 {
-  "type": "plot",
+  "type": "PLOT",
   "title": "Some Other Streams vs Some Stream",
   "description": "The change in some streams as a function of the other one",
   "independentVariable": "/some/stream",

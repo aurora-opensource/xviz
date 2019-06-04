@@ -1,5 +1,5 @@
 {
-  "type": "xviz/error",
+  "type": "XVIZ/ERROR",
   "data": {
     "message": "It's gone foobar"
   }

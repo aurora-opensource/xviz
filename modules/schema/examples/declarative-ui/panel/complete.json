@@ -1,25 +1,25 @@
 {
-  "type": "panel",
-  "layout": "vertical",
+  "type": "PANEL",
+  "layout": "VERTICAL",
   "name": "Example Panel",
-  "interactions": ["reorderable"],
+  "interactions": ["REORDERABLE"],
   "children": [
 
     {
-      "type": "container",
-      "layout": "horizontal",
+      "type": "CONTAINER",
+      "layout": "HORIZONTAL",
       "name": "Example Container #1",
-      "interactions": ["dragout"],
+      "interactions": ["DRAGOUT"],
       "children": [
         {
-          "type": "table",
+          "type": "TABLE",
           "title": "A nested table showing something",
           "description": "These are the details of this table",
           "stream": "/some/table_stream",
           "displayObjectId": false
         },
         {
-          "type": "plot",
+          "type": "PLOT",
           "title": "A nested plot!",
           "description": "The change in some streams as a function of the other one",
           "independentVariable": "/some/stream",
@@ -31,7 +31,7 @@
         {
           "title": "Additional Info Type",
           "description": "Which type of additional information you want sent",
-          "type": "select",
+          "type": "SELECT",
           "stream": "/system/additional_info/types",
           "onchange": {
             "target": "/system/info/type"
@@ -41,7 +41,7 @@
     },
 
     {
-      "type": "table",
+      "type": "TABLE",
       "title": "A table showing something",
       "description": "These are the details of this table",
       "displayObjectId": true,
@@ -49,7 +49,7 @@
     },
 
     {
-      "type": "metric",
+      "type": "METRIC",
       "title": "Some metric",
       "description": "The actual vs commanded value for some variable",
       "streams": [
@@ -59,7 +59,7 @@
     },
 
     {
-      "type": "plot",
+      "type": "PLOT",
       "title": "Important regions",
       "description": "See important regions.",
       "regions": [
@@ -72,7 +72,7 @@
     },
 
     {
-      "type": "video",
+      "type": "VIDEO",
       "cameras": [
         "front-center-roof-camera",
         "rear-starboard-roof-camera",
@@ -81,7 +81,7 @@
     },
 
     {
-      "type": "treetable",
+      "type": "TREETABLE",
       "title": "A TreeTable!",
       "description": "These are the details of the TreeTable",
       "displayObjectId": false,

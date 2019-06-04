@@ -1,5 +1,5 @@
 {
-  "type": "treetable",
+  "type": "TREETABLE",
   "title": "A Tree Table showing something",
   "description": "These are the details of this tree table",
   "displayObjectId": true,

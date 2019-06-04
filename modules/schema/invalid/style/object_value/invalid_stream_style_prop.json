@@ -5,8 +5,8 @@
   "radius": 3,
   "text_size": 12,
   "text_rotation": 45,
-  "text_anchor": "start",
-  "text_baseline": "top",
+  "text_anchor": "START",
+  "text_baseline": "TOP",
   "height": 2.0,
   "opacity": 0.4
 }

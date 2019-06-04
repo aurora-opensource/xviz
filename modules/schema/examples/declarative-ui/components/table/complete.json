@@ -1,5 +1,5 @@
 {
-  "type": "table",
+  "type": "TABLE",
   "title": "A table showing something",
   "description": "These are the details of this table",
   "displayObjectId": true,

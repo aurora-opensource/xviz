@@ -1,7 +1,7 @@
 {
-  "type": "xviz/state_update",
+  "type": "XVIZ/STATE_UPDATE",
   "data": {
-    "update_type": "incremental",
+    "update_type": "INCREMENTAL",
     "updates": [
       {
         "timestamp": 1001.3,

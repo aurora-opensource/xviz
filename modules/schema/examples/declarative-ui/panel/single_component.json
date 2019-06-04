@@ -1,9 +1,9 @@
 {
-  "type": "panel",
+  "type": "PANEL",
   "name": "One",
   "children": [
     {
-      "type": "metric",
+      "type": "METRIC",
       "streams": ["/vehicle/velocity"],
       "title": "Velocity"
     }

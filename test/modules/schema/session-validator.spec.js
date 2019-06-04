@@ -17,7 +17,7 @@ import {XVIZSessionValidator, MessageTypes} from '@xviz/schema';
 import test from 'tape-catch';
 
 const MINIMAL_STATE_UPDATE = {
-  update_type: 'incremental', // eslint-disable-line camelcase
+  update_type: 'INCREMENTAL', // eslint-disable-line camelcase
   updates: [
     {
       timestamp: 1001.3,
@@ -183,7 +183,7 @@ test('sessionValidator#connect-metadata-live-data', t => {
   validator.onConnect();
   validator.onStart({
     version: '2.0.0',
-    session_type: 'live' // eslint-disable-line camelcase
+    session_type: 'LIVE' // eslint-disable-line camelcase
   });
   validator.onMetadata({version: '2.0.0'});
   validator.onStateUpdate(MINIMAL_STATE_UPDATE);

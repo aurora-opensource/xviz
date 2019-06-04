@@ -1,5 +1,5 @@
 {
-  "type": "metric",
+  "type": "METRIC",
   "title": "Test test",
   "streams": []
 }
