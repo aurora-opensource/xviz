@@ -64,7 +64,7 @@ export class XVIZServerMiddlewareStack {
   }
 
   onReconfigure(msg) {
-    this.middlewareDispatch('reconfigure', msg);
+    this.middlewareDispatch('onReconfigure', msg);
   }
 
   middlewareDispatch(name, msg) {

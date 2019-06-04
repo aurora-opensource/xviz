@@ -87,12 +87,12 @@ export class TestSession {
 
   // Called by handler
   onConnect() {
-    this.handler.callMiddleware('connect');
+    this.handler.callMiddleware('CONNECT');
   }
 
   // Socket events
   onClose() {
-    this.handler.callMiddleware('close');
+    this.handler.callMiddleware('CLOSE');
   }
 
   onMessage(msg) {

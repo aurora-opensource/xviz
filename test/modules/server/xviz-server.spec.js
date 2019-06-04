@@ -79,7 +79,7 @@ tape('XVIZServer#simple flow', t => {
       {
         expect: null,
         response: {
-          type: 'xviz/start',
+          type: 'XVIZ/START',
           data: {
             version: '2.0.0',
             log: 'foo'
@@ -88,10 +88,10 @@ tape('XVIZServer#simple flow', t => {
       },
       {
         expect: msg => {
-          t.equal(msg.type, 'metadata', 'received metadata');
+          t.equal(msg.type, 'METADATA', 'received metadata');
         },
         response: {
-          type: 'xviz/transform_log',
+          type: 'XVIZ/TRANSFORM_LOG',
           data: {
             id: '1',
             start_timestamp: 100,
@@ -101,19 +101,19 @@ tape('XVIZServer#simple flow', t => {
       },
       {
         expect: msg => {
-          t.equal(msg.type, 'state_update', 'received state_update');
+          t.equal(msg.type, 'STATE_UPDATE', 'received state_update');
           t.equal(msg.message().data.updates[0].timestamp, 100, 'received correct timestamp');
         }
       },
       {
         expect: msg => {
-          t.equal(msg.type, 'state_update', 'received state_update');
+          t.equal(msg.type, 'STATE_UPDATE', 'received state_update');
           t.equal(msg.message().data.updates[0].timestamp, 101, 'received correct timestamp');
         }
       },
       {
         expect: msg => {
-          t.equal(msg.type, 'transform_log_done', 'received done');
+          t.equal(msg.type, 'TRANSFORM_LOG_DONE', 'received done');
         }
       }
     ];
@@ -147,7 +147,7 @@ tape('XVIZServer#scenario-circle', t => {
           t.equal(msg, undefined, 'onOpen sends no message');
         },
         response: {
-          type: 'xviz/transform_log',
+          type: 'XVIZ/TRANSFORM_LOG',
           data: {
             id: '1',
             start_timestamp: start,
@@ -157,17 +157,17 @@ tape('XVIZServer#scenario-circle', t => {
       },
       {
         expect: msg => {
-          t.equal(msg.type, 'metadata', 'received metadata');
+          t.equal(msg.type, 'METADATA', 'received metadata');
         }
       },
       {
         expect: msg => {
-          t.equal(msg.type, 'state_update', 'received state_update');
+          t.equal(msg.type, 'STATE_UPDATE', 'received state_update');
         }
       },
       {
         expect: msg => {
-          t.equal(msg.type, 'transform_log_done', 'received done');
+          t.equal(msg.type, 'TRANSFORM_LOG_DONE', 'received done');
         }
       }
     ];
@@ -201,7 +201,7 @@ tape('XVIZServer#scenario-straight', t => {
           t.equal(msg, undefined, 'onOpen sends no message');
         },
         response: {
-          type: 'xviz/transform_log',
+          type: 'XVIZ/TRANSFORM_LOG',
           data: {
             id: '1',
             start_timestamp: start,
@@ -211,17 +211,17 @@ tape('XVIZServer#scenario-straight', t => {
       },
       {
         expect: msg => {
-          t.equal(msg.type, 'metadata', 'received metadata');
+          t.equal(msg.type, 'METADATA', 'received metadata');
         }
       },
       {
         expect: msg => {
-          t.equal(msg.type, 'state_update', 'received state_update');
+          t.equal(msg.type, 'STATE_UPDATE', 'received state_update');
         }
       },
       {
         expect: msg => {
-          t.equal(msg.type, 'transform_log_done', 'received done');
+          t.equal(msg.type, 'TRANSFORM_LOG_DONE', 'received done');
         }
       }
     ];

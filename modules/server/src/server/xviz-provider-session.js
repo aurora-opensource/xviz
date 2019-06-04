@@ -115,11 +115,11 @@ export class XVIZProviderSession {
     // Providers have already decided via the URL Path
     // that this is a valid source, so we can
     // treat connection as 'start' and send metadata
-    this.handler.callMiddleware('start', params);
+    this.handler.callMiddleware('START', params);
 
     if (params.session_type === 'live') {
       // If 'live' we start sending data immediately
-      this.handler.callMiddleware('transform_log', {id: 'live', ...params});
+      this.handler.callMiddleware('TRANSFORM_LOG', {id: 'live', ...params});
     }
   }
 }
