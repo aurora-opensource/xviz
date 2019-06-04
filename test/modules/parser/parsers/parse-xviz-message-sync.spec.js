@@ -91,7 +91,7 @@ const TestTimesliceMessageV1 = {
 };
 
 const TestTimesliceMessageV2 = {
-  update_type: 'complete_state',
+  update_type: 'COMPLETE_STATE',
   updates: [
     {
       timestamp: 1001.0,
@@ -135,20 +135,20 @@ tape('isEnvelope', t => {
 
 tape('unpackEnvelope name parsing', t => {
   const notype = unpackEnvelope({type: 'foo', data: {a: 42}});
-  t.equals('foo', notype.namespace);
-  t.equals('', notype.type);
+  t.equals(notype.namespace, 'FOO');
+  t.equals(notype.type, '');
 
   const empty = unpackEnvelope({type: '', data: {a: 42}});
-  t.equals('', empty.namespace);
-  t.equals('', empty.type);
+  t.equals(empty.namespace, '');
+  t.equals(empty.type, '');
 
   const nonXVIZ = unpackEnvelope({type: 'foo/bar', data: {a: 42}});
-  t.equals('foo', nonXVIZ.namespace);
-  t.equals('bar', nonXVIZ.type);
+  t.equals(nonXVIZ.namespace, 'FOO');
+  t.equals(nonXVIZ.type, 'BAR');
 
   const leadingSlash = unpackEnvelope({type: '/foo/bar', data: {a: 42}});
-  t.equals('', leadingSlash.namespace);
-  t.equals('foo/bar', leadingSlash.type);
+  t.equals(leadingSlash.namespace, '');
+  t.equals(leadingSlash.type, 'FOO/BAR');
 
   t.end();
 });
@@ -159,11 +159,11 @@ tape('unpackEnvelope xviz', t => {
     data: {a: 42}
   };
   const expected = {
-    namespace: 'xviz',
-    type: 'state_update',
+    namespace: 'XVIZ',
+    type: 'STATE_UPDATE',
     data: enveloped.data
   };
-  t.deepEquals(expected, unpackEnvelope(enveloped));
+  t.deepEquals(unpackEnvelope(enveloped), expected);
 
   t.end();
 });
@@ -968,7 +968,7 @@ tape('isXVIZMessage & getXVIZMessageType', t => {
   const validateMessageType = (tt, testcase, msg) => {
     if (testcase.isValid) {
       const type = testcase.isBinary ? testcase.expectedType : testcase.message.type;
-      tt.is(getXVIZMessageType(msg), type, 'XVIZ type matches');
+      tt.is(getXVIZMessageType(msg), type.toUpperCase(), 'XVIZ type matches');
     } else {
       tt.is(getXVIZMessageType(msg), null, 'XVIZ type correctly null');
     }
@@ -998,13 +998,13 @@ tape('isXVIZMessage & getXVIZMessageType with Binary XVIZ', t => {
     {
       title: 'binary metadata',
       isValid: true,
-      expectedType: 'xviz/metadata',
+      expectedType: 'XVIZ/METADATA',
       message: MinimalBinaryMetadata
     },
     {
       title: 'binary state_update',
       isValid: true,
-      expectedType: 'xviz/state_update',
+      expectedType: 'XVIZ/STATE_UPDATE',
       message: MinimalBinaryStateUpdate
     }
     // TODO: add non XVIZ test cases

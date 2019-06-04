@@ -354,8 +354,9 @@ function getVariableData(valuesObject) {
   const keys = Object.keys(valuesObject);
 
   for (const type of keys) {
-    if (ValueTypes.includes(type)) {
-      return {type, values: valuesObject[type]};
+    const varType = type;
+    if (ValueTypes.includes(varType)) {
+      return {type, values: valuesObject[varType]};
     }
   }
 

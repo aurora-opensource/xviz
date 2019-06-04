@@ -46,8 +46,8 @@ function isJSONString(str) {
   return (firstChar === '{' && lastChar === '}') || (firstChar === '[' && lastChar === ']');
 }
 
-const XVIZ_TYPE_PATTERN = /"type":\s*"(xviz\/\w*)"/;
-const XVIZ_TYPE_VALUE_PATTERN = /xviz\/\w*/;
+const XVIZ_TYPE_PATTERN = /"type":\s*"(XVIZ\/\w*)"/i;
+const XVIZ_TYPE_VALUE_PATTERN = /XVIZ\/\w*/i;
 
 // Returns the XVIZ message 'type' from the input strings
 // else null if not found.
@@ -59,7 +59,8 @@ function getXVIZType(firstChunk, lastChunk) {
 
   if (result) {
     // return the first match group which contains the type
-    return result[1];
+    // Normalize enum `type` to be uppercase
+    return result[1].toUpperCase();
   }
 
   return null;
@@ -70,7 +71,8 @@ function getXVIZType(firstChunk, lastChunk) {
 function getObjectXVIZType(type) {
   const match = type.match(XVIZ_TYPE_VALUE_PATTERN);
   if (match) {
-    return match[0];
+    // Normalize enum `type` to be uppercase
+    return match[0].toUpperCase();
   }
 
   return null;
@@ -81,13 +83,13 @@ function getObjectXVIZType(type) {
 // 'str' can be either string or Uint8Array
 function getJSONXVIZType(str) {
   // We are trying to capture
-  // "type"\s*:\s*"xviz/transform_point_in_time"
+  // "type"\s*:\s*"XVIZ/TRANSFORM_POINT_IN_TIME"
   // which the smallest is 37 bytes. Grab 50
   // to provide room for spacing
 
-  // {"type":"xviz/*"
+  // {"type":"XVIZ/*"
   let firstChunk = str.slice(0, 50);
-  // "type":"xviz/*"}
+  // "type":"XVIZ/*"}
   let lastChunk = str.slice(-50);
 
   if (Number.isFinite(firstChunk[0])) {
@@ -184,7 +186,7 @@ export function isXVIZMessage(data) {
       return getJSONXVIZType(data) !== null;
 
     case 'object':
-      return data.type ? data.type.startsWith('xviz/') : false;
+      return data.type ? getObjectXVIZType(data.type) !== null : false;
 
     default:
   }
@@ -224,7 +226,8 @@ export function getXVIZMessageType(data) {
 
 // Parse apart the namespace and type for the enveloped data
 export function unpackEnvelope(data) {
-  const parts = data.type.split('/');
+  // Normalize enum `type` to be uppercase
+  const parts = data.type.toUpperCase().split('/');
   return {
     namespace: parts[0],
     type: parts.slice(1).join('/'),
@@ -253,7 +256,7 @@ export function parseXVIZMessageSync(message, onResult, onError, opts) {
     let parseData = true;
     if (isEnvelope(data)) {
       const unpacked = unpackEnvelope(data);
-      if (unpacked.namespace === 'xviz') {
+      if (unpacked.namespace === 'XVIZ') {
         v2Type = unpacked.type;
         data = unpacked.data;
       } else {
@@ -273,24 +276,28 @@ export function parseXVIZMessageSync(message, onResult, onError, opts) {
 export function parseXVIZData(data, opts = {}) {
   // TODO(twojtasz): this data.message is due an
   // uncoordinated change on the XVIZ server, temporary.
-  const typeKey = opts.v2Type || data.type || data.message || data.update_type;
+  let typeKey = opts.v2Type || data.type || data.message || data.update_type;
+  if (typeKey) {
+    // Normalize enum `type` to be uppercase
+    typeKey = typeKey.toUpperCase();
+  }
 
   switch (typeKey) {
-    case 'state_update':
+    case 'STATE_UPDATE':
       return parseTimesliceData(data, opts.convertPrimitive);
-    case 'metadata':
+    case 'METADATA':
       return {
         ...parseLogMetadata(data),
         // ensure application sees the metadata type set to the uppercase version
         type: XVIZ_MESSAGE_TYPE.METADATA
       };
-    case 'transform_log_done':
+    case 'TRANSFORM_LOG_DONE':
       return {...data, type: XVIZ_MESSAGE_TYPE.DONE};
-    case 'error':
+    case 'ERROR':
       return {...data, message: 'Stream server error', type: XVIZ_MESSAGE_TYPE.ERROR};
 
     // v1 types
-    case 'done':
+    case 'DONE':
       return {...data, type: XVIZ_MESSAGE_TYPE.DONE};
     default:
       //  TODO(twojtasz): XVIZ should be tagging this with a type

@@ -29,7 +29,8 @@ import log from '../utils/log';
 
 export default function parseStreamSet(data, convertPrimitive) {
   const {update_type, updates} = data;
-  const updateType = STATE_UPDATE_TYPE[update_type];
+  // Normalize enum `update_type` to be uppercase
+  const updateType = STATE_UPDATE_TYPE[update_type.toUpperCase()];
 
   if (!updateType) {
     log.error(`update_type of "${update_type}" is not supported.`)();
