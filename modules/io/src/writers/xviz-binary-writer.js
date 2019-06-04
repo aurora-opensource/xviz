@@ -18,6 +18,7 @@ import {GLTFBuilder} from '@loaders.gl/gltf';
 import {DracoWriter, DracoLoader} from '@loaders.gl/draco';
 import {_packBinaryJson as packBinaryJson} from '@xviz/builder';
 import {XVIZ_GLTF_EXTENSION} from '@xviz/parser';
+import {XVIZEnvelope} from '@xviz/io';
 
 // Convert (copy) ArrayBuffer to Buffer
 // This is from @loaders.gl/core/src/node/utils/to-buffer.node.js
@@ -90,7 +91,7 @@ export class XVIZBinaryWriter extends XVIZBaseWriter {
     this._saveTimestamp(xvizMetadata);
 
     if (this.options.envelope) {
-      xvizMetadata = {type: 'xviz/metadata', data: xvizMetadata};
+      xvizMetadata = XVIZEnvelope.Metadata(xvizMetadata);
     }
 
     const glbFileBuffer = encodeBinaryXVIZ(xvizMetadata, this.encodingOptions);
@@ -102,7 +103,7 @@ export class XVIZBinaryWriter extends XVIZBaseWriter {
     this._saveTimestamp(xvizMessage, messageIndex);
 
     if (this.options.envelope) {
-      xvizMessage = {type: 'xviz/state_update', data: xvizMessage};
+      xvizMessage = XVIZEnvelope.StateUpdate(xvizMessage);
     }
 
     const glbFileBuffer = encodeBinaryXVIZ(xvizMessage, this.encodingOptions);

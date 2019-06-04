@@ -11,15 +11,17 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-export const XVIZFormat = Object.freeze({
-  // Binary GLB enocded in Buffer/ArrayBuffer
-  BINARY_GLB: 'BINARY_GLB',
-  // JSON encoded in a Buffer/ArrayBuffer
-  JSON_BUFFER: 'JSON_BUFFER',
-  // JSON encoded in a String
-  JSON_STRING: 'JSON_STRING',
-  // XVIZ Object
-  OBJECT: 'OBJECT'
-});
 
-export const XVIZMessageNamespace = 'XVIZ';
+import {XVIZMessageNamespace} from './constants';
+import {XVIZMessageType} from './xviz-message-type';
+
+function makeMessage(messageType, data) {
+  return {type: `${XVIZMessageNamespace}/${messageType}`, data};
+}
+
+export const XVIZEnvelope = {
+  Metadata: data => makeMessage(XVIZMessageType.METADATA, data),
+  StateUpdate: data => makeMessage(XVIZMessageType.STATE_UPDATE, data),
+  Error: data => makeMessage(XVIZMessageType.ERROR, data),
+  TransformLogDone: data => makeMessage(XVIZMessageType.TRANSFORM_LOG_DONE, data)
+};

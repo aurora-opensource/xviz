@@ -93,7 +93,7 @@ tape('XVIZData#constructor', t => {
     );
 
     const msg = xvizObj.message();
-    t.equal(msg.type, 'state_update', `${test.description} has expected XVIZ type`);
+    t.equal(msg.type, 'STATE_UPDATE', `${test.description} has expected XVIZ type`);
     t.ok(msg.data.updates[0].timestamp, `${test.description} has expected timestamp present`);
   }
 
@@ -106,13 +106,13 @@ tape('XVIZData#type', t => {
       description: 'Binary Metadata',
       data: MinimalBinaryMetadata,
       format: XVIZFormat.BINARY_GLB,
-      type: 'metadata'
+      type: 'METADATA'
     },
     {
       description: 'Binary StateUpdate',
       data: MinimalBinaryStateUpdate,
       format: XVIZFormat.BINARY_GLB,
-      type: 'state_update'
+      type: 'STATE_UPDATE'
     }
   ];
 
