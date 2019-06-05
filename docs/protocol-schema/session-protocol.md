@@ -311,7 +311,7 @@ reconfiguration happens.
 #### Scalar types:
 
 - `FLOAT`
-- `IN32`
+- `INT32`
 - `STRING`
 - `BOOL`
 
