@@ -55,13 +55,17 @@ const yargs = require('yargs')
         type: 'boolean',
         description: 'Show start and end time of the bag'
       },
-      dumpAllTopics: {
+      dumpTopics: {
         type: 'boolean',
         description: 'Show start and end time of the bag'
       },
       dumpMessages: {
         type: 'boolean',
         description: 'Will dump messages, if a topic is provided only those will be dumped'
+      },
+      dumpDefs: {
+        type: 'boolean',
+        description: 'Will dump message definitions'
       }
     },
     BagDump

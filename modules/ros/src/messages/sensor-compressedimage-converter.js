@@ -11,13 +11,18 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-export class SensorCompressedImage {
-  constructor(topic, xvizStream) {
-    this.topic = topic;
-    this.xvizStream = xvizStream || topic;
+import Converter from './converter';
+
+export class SensorCompressedImage extends Converter {
+  constructor(config) {
+    super(config);
   }
 
-  static get topicType() {
+  static get name() {
+    return 'SensorCompressedImage';
+  }
+
+  static get messageType() {
     return 'sensor_msgs/CompressedImage';
   }
 

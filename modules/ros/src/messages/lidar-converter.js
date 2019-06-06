@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 /* eslint-disable camelcase */
+import Converter from './converter';
 import _ from 'lodash';
 import {loadProcessedLidarData} from './lib/parse-lidar-points';
 
@@ -45,14 +46,19 @@ function downSamplePoints(points, maxPointsCount) {
 }
 */
 
-export class LidarConverter {
-  constructor(topic, xvizStream) {
-    this.topic = topic;
-    this.LIDAR_POINTS = xvizStream || topic;
+// TODO: rename to match messageType
+// TODO: change downsampling to options
+export class LidarConverter extends Converter {
+  constructor(config) {
+    super(config);
     this.previousData = {};
   }
 
-  static get topicType() {
+  static get name() {
+    return 'LidarConverter';
+  }
+
+  static get messageType() {
     return 'sensor_msgs/PointCloud2';
   }
 
@@ -78,16 +84,18 @@ export class LidarConverter {
       const {positions} = loadProcessedLidarData(message.data, pointsSize);
 
       xvizBuilder
-        .primitive(this.LIDAR_POINTS)
+        .primitive(this.xvizStream)
         // .points(downSamplePoints(positions, MAX_POINTS))
         .points(positions)
         .style({fill_color: color});
     }
   }
 
-  getMetadata(xvizMetaBuilder, frameIdToPoseMap) {
+  getMetadata(xvizMetaBuilder, context) {
+    const {frameIdToPoseMap} = context;
+
     const streamMetadata = xvizMetaBuilder
-      .stream(this.LIDAR_POINTS)
+      .stream(this.xvizStream)
       .category('primitive')
       .type('point')
       .streamStyle({

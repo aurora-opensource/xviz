@@ -15,53 +15,8 @@
 /* eslint-disable camelcase */
 import {open, TimeUtil} from 'rosbag';
 import {quaternionToEuler} from '../common/quaternion';
-import {topicMapper} from '../messages';
 
-import {XVIZMetadataBuilder, XVIZBuilder} from '@xviz/builder';
-
-export const CURRENT_POSE = '/current_pose';
-export const PLANNER_PATH = '/planner/path';
-export const CONFIGURATION = '/commander/configuration';
-export const FOREGROUND_POINTS = '/commander/points_fore';
-export const BACKGROUND_POINTS = '/commander/points_back';
-export const TRACKS_LIST = '/commander/perception_dct/track_list';
-export const TRACKS_MARKERS = '/commander/perception_dct/marker_array';
-export const TRAJECTORY_CIRCLE_MARKER = '/closest_waypoint_marker';
-export const ROUTE = '/commander/route_viz/route';
-export const MP_PLAN = '/commander/dm/motion_planning/plan_viz';
-export const CENTER_FRONT = '/vehicle/camera/center_front'; // example
-export const FORWARD_CENTER = '/vehicle/camera/forward_center/image_raw/compressed'; // dc golf
-export const MA1 = '/commander/dm/behavior_planning/behavior_state_viz';
-export const MA3 = '/commander/route_viz/astar_closed';
-export const MA4 = '/commander/route_viz/route';
-export const MA5 = '/debug/gps_cov_marker';
-export const MA6 = '/commander/map_annotations/markers';
-export const MA7 = '/commander/next_target_mark visualization_msgs/Marker';
-export const MA8 = '/commander/trajectory_circle_mark visualization_msgs/Marker';
-export const MA9 = '/behavior_planning visualization_msgs/MarkerArray';
-
-export const ALL = [
-  CURRENT_POSE,
-  PLANNER_PATH,
-  CONFIGURATION,
-  FOREGROUND_POINTS,
-  BACKGROUND_POINTS,
-  TRACKS_LIST,
-  TRACKS_MARKERS,
-  TRAJECTORY_CIRCLE_MARKER,
-  ROUTE,
-  MP_PLAN,
-  CENTER_FRONT,
-  FORWARD_CENTER,
-  MA1,
-  MA3,
-  MA4,
-  MA5,
-  MA6,
-  MA7,
-  MA8,
-  MA9
-];
+import {XVIZMetadataBuilder} from '@xviz/builder';
 
 /* subclass Bag?
  *
@@ -102,106 +57,37 @@ export const ALL = [
  *
  */
 export class Bag {
-  // TODO i changed from objecdt to 3 separate parameters
-  constructor(bagPath, keyTopic, topics) {
+  constructor(bagPath, topicConfig) {
     this.bagPath = bagPath;
-    this.keyTopic = keyTopic;
-    this.topics = topics || ALL;
-  }
-
-  async open() {
-    if (!this.bag) {
-      this.bag = await open(this.bagPath);
-    }
-
-    return this.bag;
-  }
-
-  async init() {
-    await this.open();
-
-    this.metadata = await this.collectMetadata();
-
-    const topicType = {};
-    for (const conn in this.bag.connections) {
-      const {topic, type} = this.bag.connections[conn];
-      if (this.topics.includes(topic)) {
-        if (topicType[topic] && topicType[topic].type !== type) {
-          throw new Error(
-            `Unexpected change in topic type ${topic} has ${
-              topicType[topic].type
-            } with new type ${type}`
-          );
-        } else {
-          topicType[topic] = {type};
-        }
-      }
-    }
-
-    this.topicType = topicType;
-
-    const {origin, frameIdToPoseMap} = this.metadata;
-    // console.log('~!~ frameIdToPoseMap', JSON.stringify(frameIdToPoseMap, null, 2));
-    topicMapper(this.topicType, {keyTopic: this.keyTopic}, origin);
-
-    const xvizMetadataBuilder = new XVIZMetadataBuilder();
-    for (const topicName in this.topicType) {
-      if (this.topicType[topicName].converter) {
-        this.topicType[topicName].converter.getMetadata(xvizMetadataBuilder, frameIdToPoseMap);
-      }
-    }
-    this.metadata2 = xvizMetadataBuilder.getMetadata();
-    // console.log(JSON.stringify(this.metadata2, null, 2));
-
-    const {start_time, end_time} = this.metadata;
-    this.metadata2.start_time = start_time;
-    this.metadata2.end_time = end_time;
-    this.metadata2.log_info = {
-      start_time,
-      end_time
-    };
-
-    this.metadata2.ui_config = {
-      Camera: {
-        type: 'panel',
-        children: [
-          {
-            type: 'video',
-            cameras: [FORWARD_CENTER, CENTER_FRONT]
-          }
-        ],
-        name: 'Camera'
-      }
-    };
-
-    this.xvizMetadata = {
-      type: 'xviz/metadata',
-      data: this.metadata2
-    };
-
-    return this.xvizMetadata;
+    this.keyTopic = topicConfig.keyTopic;
+    this.topics = topicConfig.topics;
   }
 
   /**
-   * Calculate all metadata needed by converters. Currently lumped into a single function
+   * Clients should subclass and override this method
+   * in order to support any special processing for their specific
+   * topics.
    * call to ensure we only need to make a single bag read.
    *
    * Extracts:
-   *   origin: map origin
    *   frameIdToPoseMap: ROS /tf transform tree
+   *   start_time,
+   *   end_time,
+   *   origin: map origin
    */
-  async collectMetadata() {
+  async _initBag(context, bag) {
     const TF = '/tf';
+    // TODO: this needs to be fixed in a general fashion
+    // by letting a subclass method provide this data
+    const CONFIGURATION = '/commander/configuration';
 
     let origin = {latitude: 0, longitude: 0, altitude: 0};
     const frameIdToPoseMap = {};
 
-    await this.open();
+    const start_time = TimeUtil.toDate(bag.startTime).getTime() / 1e3;
+    const end_time = TimeUtil.toDate(bag.endTime).getTime() / 1e3;
 
-    const start_time = TimeUtil.toDate(this.bag.startTime).getTime() / 1e3;
-    const end_time = TimeUtil.toDate(this.bag.endTime).getTime() / 1e3;
-
-    await this.bag.readMessages({topics: [CONFIGURATION, TF]}, ({topic, message}) => {
+    await bag.readMessages({topics: [CONFIGURATION, TF]}, ({topic, message}) => {
       if (topic === CONFIGURATION) {
         const config = message.keyvalues.reduce((memo, kv) => {
           memo[kv.key] = kv.value;
@@ -225,12 +111,92 @@ export class Bag {
       }
     });
 
-    return {
-      start_time,
-      end_time,
-      origin,
-      frameIdToPoseMap
+    context.start_time = start_time;
+    context.end_time = end_time;
+    context.origin = origin;
+    context.frameIdToPoseMap = frameIdToPoseMap;
+  }
+
+  _initTopics(context, topicMessageTypes, ros2xviz) {
+    // context { frameIdToPoseMap, origin }
+    ros2xviz.initializeConverters(topicMessageTypes, context);
+  }
+
+  /* Open the ROS Bag and collect information
+   *
+   * TODO: option to not process topics if we have a configuration already mapped
+   *       as that takes time
+   */
+  async init(ros2xviz) {
+    const bag = await open(this.bagPath);
+
+    const context = {};
+    await this._initBag(context, bag);
+
+    // TODO: Add option to not collect topic message types
+    //      ... but how will converters be created then?
+    //      The provider has the mapping, and it can decide if it wants
+    //      to collect all topicTypes or not
+    //      ... it is possible to save the message Types in the config
+    //      ... is it possible to "create" them upon first sight?
+    //           but then we have to keep track of which topics are being tracked
+    const topicType = {};
+    const topicMessageTypes = [];
+    for (const conn in bag.connections) {
+      const {topic, type} = bag.connections[conn];
+      if (!this.topics || this.topics.includes(topic)) {
+        // Validate that the message type does not change
+        if (topicType[topic] && topicType[topic].type !== type) {
+          throw new Error(
+            `Unexpected change in topic type ${topic} has ${
+              topicType[topic].type
+            } with new type ${type}`
+          );
+        } else if (!topicType[topic]) {
+          // track we have seen it and add to list
+          topicType[topic] = {type};
+          topicMessageTypes.push({topic, type});
+        }
+      }
+    }
+    this.topicMessageTypes = topicMessageTypes;
+
+    this._initTopics(context, this.topicMessageTypes, ros2xviz);
+
+    const xvizMetadataBuilder = new XVIZMetadataBuilder();
+    await ros2xviz.buildMetadata(xvizMetadataBuilder, context);
+    // Note: this does not have the envelope
+    this.metadata = xvizMetadataBuilder.getMetadata();
+
+    this.metadata.log_info = {
+      start_time: context.start_time,
+      end_time: context.end_time
     };
+
+    // TODO: this would be client augmented metadata
+    // this.metadata = this._initMetadata(this.metadata);
+    const FORWARD_CENTER = '/vehicle/camera/center_front'; // example
+    const CENTER_FRONT = '/vehicle/camera/forward_center/image_raw/compressed'; // dc golf
+
+    this.metadata.ui_config = {
+      Camera: {
+        type: 'panel',
+        children: [
+          {
+            type: 'video',
+            cameras: [FORWARD_CENTER, CENTER_FRONT]
+          }
+        ],
+        name: 'Camera'
+      }
+    };
+
+    this.xvizMetadata = {
+      type: 'xviz/metadata',
+      data: this.metadata
+    };
+
+    return this.xvizMetadata;
   }
 
   // We synchronize xviz messages along messages in the `keyTopic`.
@@ -255,6 +221,7 @@ export class Bag {
     await bag.readMessages(options, async result => {
       // rosbag.js reuses the data buffer for subsequent messages, so we need to make a copy
       if (result.message.data) {
+        // TODO(this needs to work in the browser)
         result.message.data = Buffer.from(result.message.data);
       }
 
@@ -266,26 +233,10 @@ export class Bag {
       frame[result.topic].push(result);
     });
 
-    return await this.buildMessage(frame);
+    return frame;
   }
 
-  async buildMessage(frame) {
-    const xvizBuilder = new XVIZBuilder(this.xvizMetadata.data, this.disableStreams, {});
-
-    for (const topicName in this.topicType) {
-      if (this.topicType[topicName].converter) {
-        await this.topicType[topicName].converter.convertMessage(frame, xvizBuilder);
-      }
-    }
-
-    try {
-      const frm = xvizBuilder.getMessage();
-      return frm;
-    } catch (err) {
-      return null;
-    }
-  }
-
+  // TODO: move this to a differrent BagClass
   // We synchronize messages along messages in the `keyTopic`.
   async readMessageByKeyTopic(start, end) {
     const bag = await open(this.bagPath);

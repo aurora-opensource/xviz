@@ -28,10 +28,7 @@ async function createXVIZProvider(ProviderClass, args) {
 
 export class XVIZProviderFactoryClass {
   constructor() {
-    this.providerClasses = [
-      {className: XVIZJSONProvider},
-      {className: XVIZBinaryProvider}
-    ];
+    this.providerClasses = [{className: XVIZJSONProvider}, {className: XVIZBinaryProvider}];
   }
 
   addProviderClass(className, args) {
@@ -48,7 +45,6 @@ export class XVIZProviderFactoryClass {
    */
   async open(args) {
     for (const providerEntry of this.providerClasses) {
-
       const options = {...args.options, ...providerEntry.args};
       const loader = await createXVIZProvider(providerEntry.className, {...args, options});
 

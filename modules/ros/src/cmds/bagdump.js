@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 /* global console  */
-/* eslint-disable no-console */
+/* eslint-disable no-console, max-depth */
 import {open, TimeUtil} from 'rosbag';
 
 export async function BagDump(args) {
@@ -25,10 +25,18 @@ export async function BagDump(args) {
     console.log(`end_time: ${TimeUtil.toDate(bag.endTime).getTime() / 1e3}`);
   }
 
-  if (args.dumpAllTopics) {
+  if (args.dumpTopics) {
+    const seen = [];
     for (const conn in bag.connections) {
-      const {topic, type} = bag.connections[conn];
-      console.log(topic, type);
+      const {messageDefinition, topic, type} = bag.connections[conn];
+
+      if (!seen[topic]) {
+        seen[topic] = true;
+        console.log(topic, type);
+        if (args.dumpDefs) {
+          console.log(messageDefinition);
+        }
+      }
     }
   }
 
