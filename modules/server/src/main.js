@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 const setupArgs = require('./args').setupArgs;
+import fs from 'fs';
 
 import {Log} from 'probe.gl';
 
@@ -23,8 +24,30 @@ import {XVIZProviderFactory} from '@xviz/io';
 import {ScenarioProvider} from './scenarios';
 XVIZProviderFactory.addProviderClass(ScenarioProvider);
 
-import {ROSBAGProvider} from '@xviz/ros';
-XVIZProviderFactory.addProviderClass(ROSBAGProvider);
+import {ROSBAGProvider, ROS2XVIZFactory, defaultConverters} from '@xviz/ros';
+
+function configureROSBAGSupport(options) {
+  const {rosConfig} = options;
+
+  let config = null;
+  if (rosConfig) {
+    // topicConfig: { keyTopic, topics }
+    // mapping: [ { topic, name, config: {xvizStream, field} }, ... ]
+    const data = fs.readFileSync(rosConfig);
+    if (data) {
+      config = JSON.parse(data);
+    }
+  }
+
+  // Setup ROS support based on arguments
+  const ros2xvizFactory = new ROS2XVIZFactory(defaultConverters);
+
+  const rosbagProviderConfig = {
+    ros2xvizFactory,
+    ...config
+  };
+  XVIZProviderFactory.addProviderClass(ROSBAGProvider, rosbagProviderConfig);
+}
 
 export function main() {
   const args = setupArgs();
@@ -50,6 +73,8 @@ export function main() {
   if (Number.isFinite(args.argv.delay)) {
     options.delay = args.argv.delay;
   }
+
+  configureROSBAGSupport(options);
 
   const handler = new XVIZProviderHandler(XVIZProviderFactory, options);
   const wss = new XVIZServer([handler], options, () => {
