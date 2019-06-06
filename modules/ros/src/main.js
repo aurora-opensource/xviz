@@ -38,6 +38,10 @@ const yargs = require('yargs')
         alias: 'd',
         describe: 'Directory to save XVIZ data',
         demandOption: true
+      },
+      rosConfig: {
+        describe: 'Path to ROS Bag configuration',
+        type: 'string'
       }
     },
     Convert

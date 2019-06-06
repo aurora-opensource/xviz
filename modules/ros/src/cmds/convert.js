@@ -13,8 +13,11 @@
 // limitations under the License.
 /* global console */
 /* eslint-disable no-console, complexity, max-statements */
-import {FileSink, XVIZFormat, XVIZFormatWriter} from '@xviz/io';
+import {XVIZFormat, XVIZFormatWriter} from '@xviz/io';
+import {FileSink} from '@xviz/io/node';
+import {ROS2XVIZFactory} from '../core/ros-2-xviz-factory';
 import {ROSBAGProvider} from '../providers/rosbag-provider';
+import {defaultConverters} from '../messages';
 
 import process from 'process';
 import fs from 'fs';
@@ -60,10 +63,23 @@ async function createProvider(args) {
 }
 
 export async function Convert(args) {
-  const {bag: bagPath, dir: outputDir, start, end} = args;
+  const {bag: bagPath, dir: outputDir, start, end, rosConfig} = args;
 
   console.log(`Converting data at ${bagPath}`); // eslint-disable-line
+  if (rosConfig) {
+    console.log(`Using config ${rosConfig}`); // eslint-disable-line
+  }
   console.log(`Saving to ${outputDir}`); // eslint-disable-line
+
+  let config = null;
+  if (rosConfig) {
+    // topicConfig: { keyTopic, topics }
+    // mapping: [ { topic, name, config: {xvizStream, field} }, ... ]
+    const data = fs.readFileSync(rosConfig);
+    if (data) {
+      config = JSON.parse(data);
+    }
+  }
 
   try {
     deleteDirRecursive(outputDir);
@@ -74,7 +90,11 @@ export async function Convert(args) {
 
   // TODO: fix that key topic is fixed
   // TODO: fix that topics is baked into the 'bag'
-  const options = {};
+  const ros2xvizFactory = new ROS2XVIZFactory(defaultConverters);
+  const options = {
+    ros2xvizFactory,
+    ...config
+  };
   const provider = await createProvider({root: bagPath, options});
   if (!provider) {
     throw new Error('Failed to create ROSBAGProvider');
@@ -88,7 +108,7 @@ export async function Convert(args) {
     throw new Error('Error creating and iterator');
   }
 
-  const writer = new XVIZFormatWriter(sink, {format: XVIZFormat.BINARY});
+  const writer = new XVIZFormatWriter(sink, {format: XVIZFormat.BINARY_GLB});
 
   const md = provider.xvizMetadata();
   setMetadataTimes(md.message().data, start, end);
