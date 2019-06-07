@@ -54,7 +54,7 @@ export class WebSocketInterface {
     this.middleware.onConnect();
 
     if (this.start) {
-      this.sendMessage('START', this.start);
+      this.sendMessage('start', this.start);
     } else {
       // Start is inline so with no message
       this.middleware.onStart(null);
@@ -90,7 +90,7 @@ export class WebSocketInterface {
     if (isEnvelope(parsed)) {
       const unpacked = unpackEnvelope(parsed);
 
-      if (unpacked.namespace === 'XVIZ') {
+      if (unpacked.namespace === 'xviz') {
         this.callMiddleware(unpacked.type, unpacked.data);
       } else if (!this.unknownMessageTypes.has(parsed.type)) {
         // Report each unknown type just once
@@ -106,7 +106,7 @@ export class WebSocketInterface {
 
     // TODO: use XVIZEnvelope
     const enveloped = {
-      type: `XVIZ/${msgType}`,
+      type: `xviz/${msgType}`,
       data
     };
     this.socket.send(JSON.stringify(enveloped));
@@ -114,22 +114,22 @@ export class WebSocketInterface {
 
   callMiddleware(xvizType, data) {
     switch (xvizType) {
-      case 'START':
+      case 'start':
         this.middleware.onStart(data);
         break;
-      case 'ERROR':
+      case 'error':
         this.middleware.onError(data);
         break;
-      case 'METADATA':
+      case 'metadata':
         this.middleware.onMetadata(data);
         break;
-      case 'TRANSFORM_LOG':
+      case 'transform_log':
         this.middleware.onTransformLog(data);
         break;
-      case 'STATE_UPDATE':
+      case 'state_update':
         this.middleware.onStateUpdate(data);
         break;
-      case 'TRANSFORM_LOG_DONE':
+      case 'transform_log_done':
         this.middleware.onTransformLogDone(data);
         break;
       default:

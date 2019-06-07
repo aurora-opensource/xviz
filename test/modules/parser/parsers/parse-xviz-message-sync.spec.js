@@ -135,7 +135,7 @@ tape('isEnvelope', t => {
 
 tape('unpackEnvelope name parsing', t => {
   const notype = unpackEnvelope({type: 'foo', data: {a: 42}});
-  t.equals(notype.namespace, 'FOO');
+  t.equals(notype.namespace, 'foo');
   t.equals(notype.type, '');
 
   const empty = unpackEnvelope({type: '', data: {a: 42}});
@@ -143,12 +143,12 @@ tape('unpackEnvelope name parsing', t => {
   t.equals(empty.type, '');
 
   const nonXVIZ = unpackEnvelope({type: 'foo/bar', data: {a: 42}});
-  t.equals(nonXVIZ.namespace, 'FOO');
-  t.equals(nonXVIZ.type, 'BAR');
+  t.equals(nonXVIZ.namespace, 'foo');
+  t.equals(nonXVIZ.type, 'bar');
 
   const leadingSlash = unpackEnvelope({type: '/foo/bar', data: {a: 42}});
   t.equals(leadingSlash.namespace, '');
-  t.equals(leadingSlash.type, 'FOO/BAR');
+  t.equals(leadingSlash.type, 'foo/bar');
 
   t.end();
 });
@@ -159,8 +159,8 @@ tape('unpackEnvelope xviz', t => {
     data: {a: 42}
   };
   const expected = {
-    namespace: 'XVIZ',
-    type: 'STATE_UPDATE',
+    namespace: 'xviz',
+    type: 'state_update',
     data: enveloped.data
   };
   t.deepEquals(unpackEnvelope(enveloped), expected);
@@ -295,7 +295,7 @@ tape('parseXVIZData validate result when missing updates', t => {
 
   const metaMessage = parseXVIZData(
     {
-      update_type: 'complete_state'
+      update_type: 'COMPLETE_STATE'
     },
     {v2Type: 'state_update'}
   );
@@ -312,13 +312,14 @@ tape('parseXVIZData validate result when updates is empty', t => {
 
   const metaMessage = parseXVIZData(
     {
-      update_type: 'complete_state',
+      update_type: 'COMPLETE_STATE',
       updates: []
     },
     {v2Type: 'state_update'}
   );
 
   t.equals(metaMessage.type, XVIZ_MESSAGE_TYPE.INCOMPLETE, 'Type after parse set to error');
+  t.comment(metaMessage.message);
   t.ok(/"updates" has length of 0/.test(metaMessage.message), 'Message details length is 0');
 
   t.end();
@@ -330,7 +331,7 @@ tape('parseXVIZData validate result when missing timestamp in updates', t => {
 
   const metaMessage = parseXVIZData(
     {
-      update_type: 'complete_state',
+      update_type: 'COMPLETE_STATE',
       updates: [{}]
     },
     {v2Type: 'state_update'}
@@ -427,7 +428,7 @@ tape('parseXVIZData timeslice', t => {
 
   // Incremental update
   result = parseXVIZData(
-    {...TestTimesliceMessageV2, update_type: 'incremental'},
+    {...TestTimesliceMessageV2, update_type: 'INCREMENTAL'},
     {v2Type: 'state_update'}
   );
   t.equals(result.type, XVIZ_MESSAGE_TYPE.TIMESLICE, 'Message type set for timeslice');
@@ -435,7 +436,7 @@ tape('parseXVIZData timeslice', t => {
 
   // Deprecated 'snapshot' update type
   result = parseXVIZData(
-    {...TestTimesliceMessageV2, update_type: 'snapshot'},
+    {...TestTimesliceMessageV2, update_type: 'SNAPSHOT'},
     {v2Type: 'state_update'}
   );
   t.equals(result.type, XVIZ_MESSAGE_TYPE.TIMESLICE, 'Message type set for timeslice');
@@ -707,7 +708,7 @@ tape('parseXVIZData variable timeslice', t => {
   resetXVIZConfigAndSettings();
   setXVIZConfig({currentMajorVersion: 2});
   const VariableTestTimesliceMessage = {
-    update_type: 'complete_state',
+    update_type: 'COMPLETE_STATE',
     updates: [
       {
         timestamp: 1001.0,
@@ -968,7 +969,7 @@ tape('isXVIZMessage & getXVIZMessageType', t => {
   const validateMessageType = (tt, testcase, msg) => {
     if (testcase.isValid) {
       const type = testcase.isBinary ? testcase.expectedType : testcase.message.type;
-      tt.is(getXVIZMessageType(msg), type.toUpperCase(), 'XVIZ type matches');
+      tt.is(getXVIZMessageType(msg), type, 'XVIZ type matches');
     } else {
       tt.is(getXVIZMessageType(msg), null, 'XVIZ type correctly null');
     }
@@ -998,13 +999,13 @@ tape('isXVIZMessage & getXVIZMessageType with Binary XVIZ', t => {
     {
       title: 'binary metadata',
       isValid: true,
-      expectedType: 'XVIZ/METADATA',
+      expectedType: 'xviz/metadata',
       message: MinimalBinaryMetadata
     },
     {
       title: 'binary state_update',
       isValid: true,
-      expectedType: 'XVIZ/STATE_UPDATE',
+      expectedType: 'xviz/state_update',
       message: MinimalBinaryStateUpdate
     }
     // TODO: add non XVIZ test cases

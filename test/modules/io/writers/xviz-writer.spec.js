@@ -88,11 +88,11 @@ function testWriter(t, testCase, Writer, suffix) {
   let resultType = null;
   if (testCase.type === 'm') {
     lookup = '1-frame';
-    resultType = 'METADATA';
+    resultType = 'metadata';
     writer.writeMetadata(testCase.data);
   } else if (testCase.type === 'f') {
     lookup = '2-frame';
-    resultType = 'STATE_UPDATE';
+    resultType = 'state_update';
     writer.writeMessage(0, testCase.data);
   } else {
     t.fail('Unknown testCase type');

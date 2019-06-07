@@ -264,7 +264,7 @@
             "name": "XVIZData",
             "markdown": "api-reference/io/xviz-data.md"
           },
-          { "name": "XVIZFormat",
+          { "name": "XVIZ_FORMAT",
             "markdown": "api-reference/io/xviz-format.md"
           },
           {

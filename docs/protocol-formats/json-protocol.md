@@ -46,7 +46,7 @@ The start message sent from the server to the client:
 
 ```
 {
-    "type": "XVIZ/START",
+    "type": "xviz/start",
     "data": {
         "version": "2.0.0",
         "session_type": "LIVE",

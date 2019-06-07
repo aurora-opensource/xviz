@@ -13,7 +13,7 @@
 // limitations under the License.
 import {XVIZBinaryWriter} from '../writers/xviz-binary-writer';
 import {XVIZJSONWriter} from '../writers/xviz-json-writer';
-import {XVIZFormat} from '../common/constants';
+import {XVIZ_FORMAT} from '../common/constants';
 
 // Convenience class for Formatting JSON String vs ArrayBuffer
 class XVIZJSONBufferWriter extends XVIZJSONWriter {
@@ -25,13 +25,13 @@ class XVIZJSONBufferWriter extends XVIZJSONWriter {
 function determineWriter(sink, format, options) {
   let writer = null;
   switch (format) {
-    case XVIZFormat.BINARY_GLB:
+    case XVIZ_FORMAT.BINARY_GLB:
       writer = new XVIZBinaryWriter(sink, options);
       break;
-    case XVIZFormat.JSON_BUFFER:
+    case XVIZ_FORMAT.JSON_BUFFER:
       writer = new XVIZJSONBufferWriter(sink, options);
       break;
-    case XVIZFormat.JSON_STRING:
+    case XVIZ_FORMAT.JSON_STRING:
       writer = new XVIZJSONWriter(sink, options);
       break;
     default:
@@ -41,13 +41,13 @@ function determineWriter(sink, format, options) {
   return writer;
 }
 
-// Convert XVIZData to a different XVIZFormat
+// Convert XVIZData to a different XVIZ_FORMAT
 export class XVIZFormatWriter {
   constructor(sink, {format, ...options}) {
     this.format = format;
     this.options = {flattenArrays: true, ...options};
 
-    if (!format || format === XVIZFormat.OBJECT) {
+    if (!format || format === XVIZ_FORMAT.OBJECT) {
       throw new Error(`Format ${format} is not supported by XVIZFormatter.`);
     }
 

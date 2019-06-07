@@ -14,7 +14,7 @@ All validation methods throw if the object fails to validate.
 
 ##### validateMetadata(data)
 
-Validate `METADATA` information.
+Validate `metadata` information.
 
 Parameters:
 
@@ -22,7 +22,7 @@ Parameters:
 
 ##### validateStateUpdate(data)
 
-Validate `STATE_UPDATE` message.
+Validate `state_update` message.
 
 Parameters:
 
@@ -32,13 +32,13 @@ Parameters:
 
 ##### validateStreamSet(data : Object)
 
-Validate `STREAM_SET` type.
+Validate `stream_set` type.
 
 ### Validate base types
 
 ##### validatePose(data)
 
-Validate `POSE` object.
+Validate `pose` object.
 
 Parameters:
 

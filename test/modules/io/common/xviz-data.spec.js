@@ -14,7 +14,7 @@
 /* global Buffer */
 import tape from 'tape-catch';
 
-import {XVIZData, XVIZBinaryWriter, XVIZFormat, TextEncoder} from '@xviz/io';
+import {XVIZData, XVIZBinaryWriter, XVIZ_FORMAT, TextEncoder} from '@xviz/io';
 
 // Enveloped glb as ArrayBuffer
 import MinimalBinaryMetadata from 'test-data/minimal-metadata';
@@ -41,32 +41,32 @@ const TestCases = [
   {
     data: TestXVIZSnapshot,
     description: 'XVIZ Object',
-    format: XVIZFormat.OBJECT
+    format: XVIZ_FORMAT.OBJECT
   },
   {
     data: TestXVIZSnapshotString,
     description: 'XVIZ String',
-    format: XVIZFormat.JSON_STRING
+    format: XVIZ_FORMAT.JSON_STRING
   },
   {
     data: `   ${TestXVIZSnapshotString}   `,
     description: 'XVIZ String with whitespace head and tail',
-    format: XVIZFormat.JSON_STRING
+    format: XVIZ_FORMAT.JSON_STRING
   },
   {
     data: TestXVIZSnapshotBuffer,
     description: 'XVIZ String Buffer',
-    format: XVIZFormat.JSON_BUFFER
+    format: XVIZ_FORMAT.JSON_BUFFER
   },
   {
     data: TestXVIZSnapshotGLB,
     description: 'XVIZ Binary Buffer',
-    format: XVIZFormat.BINARY_GLB
+    format: XVIZ_FORMAT.BINARY_GLB
   },
   {
     data: Buffer.from(TestXVIZSnapshotBuffer),
     description: 'XVIZ String NodeBuffer',
-    format: XVIZFormat.JSON_BUFFER,
+    format: XVIZ_FORMAT.JSON_BUFFER,
     nodeOnly: true
   },
   {
@@ -93,7 +93,7 @@ tape('XVIZData#constructor', t => {
     );
 
     const msg = xvizObj.message();
-    t.equal(msg.type, 'STATE_UPDATE', `${test.description} has expected XVIZ type`);
+    t.equal(msg.type, 'state_update', `${test.description} has expected XVIZ type`);
     t.ok(msg.data.updates[0].timestamp, `${test.description} has expected timestamp present`);
   }
 
@@ -105,14 +105,14 @@ tape('XVIZData#type', t => {
     {
       description: 'Binary Metadata',
       data: MinimalBinaryMetadata,
-      format: XVIZFormat.BINARY_GLB,
-      type: 'METADATA'
+      format: XVIZ_FORMAT.BINARY_GLB,
+      type: 'metadata'
     },
     {
       description: 'Binary StateUpdate',
       data: MinimalBinaryStateUpdate,
-      format: XVIZFormat.BINARY_GLB,
-      type: 'STATE_UPDATE'
+      format: XVIZ_FORMAT.BINARY_GLB,
+      type: 'state_update'
     }
   ];
 

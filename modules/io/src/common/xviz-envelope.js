@@ -12,16 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {XVIZMessageNamespace} from './constants';
-import {XVIZMessageType} from './xviz-message-type';
+import {XVIZ_MESSAGE_NAMESPACE} from './constants';
+import {XVIZ_MESSAGE_TYPE} from './xviz-message-type';
 
 function makeMessage(messageType, data) {
-  return {type: `${XVIZMessageNamespace}/${messageType}`, data};
+  return {type: `${XVIZ_MESSAGE_NAMESPACE}/${messageType}`, data};
 }
 
+// A helper create XVIZ Messages
 export const XVIZEnvelope = {
-  Metadata: data => makeMessage(XVIZMessageType.METADATA, data),
-  StateUpdate: data => makeMessage(XVIZMessageType.STATE_UPDATE, data),
-  Error: data => makeMessage(XVIZMessageType.ERROR, data),
-  TransformLogDone: data => makeMessage(XVIZMessageType.TRANSFORM_LOG_DONE, data)
+  Metadata: data => makeMessage(XVIZ_MESSAGE_TYPE.METADATA, data),
+  StateUpdate: data => makeMessage(XVIZ_MESSAGE_TYPE.STATE_UPDATE, data),
+  Error: data => makeMessage(XVIZ_MESSAGE_TYPE.ERROR, data),
+  TransformLogDone: data => makeMessage(XVIZ_MESSAGE_TYPE.TRANSFORM_LOG_DONE, data)
 };

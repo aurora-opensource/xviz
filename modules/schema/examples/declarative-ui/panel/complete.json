@@ -9,7 +9,7 @@
       "type": "CONTAINER",
       "layout": "HORIZONTAL",
       "name": "Example Container #1",
-      "interactions": ["DRAGOUT"],
+      "interactions": ["DRAG_OUT"],
       "children": [
         {
           "type": "TABLE",

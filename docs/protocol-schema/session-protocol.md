@@ -32,10 +32,10 @@ Each session is started by a client connecting to the server, in the WebSocket c
 HTTP GET request that is upgraded by the server to a persistent WebSocket connection. Termination of
 the connection terminates the session.
 
-After connection is established client starts by sending the [`START`](#START) message, which sets
+After connection is established client starts by sending the [`start`](#start) message, which sets
 the type of session and various other parameters. In the WebSocket case you can send the
-[`START`](#START) properties as URL parameters eliminating the need to send the message. The server
-responds with a [`METADATA`](#METADATA) message that contains various information about the XVIZ
+[`start`](#start) properties as URL parameters eliminating the need to send the message. The server
+responds with a [`metadata`](#metadata) message that contains various information about the XVIZ
 data the server can provide.
 
 ![Session Initialization Sequence](./images/session-init-sequence.png)
@@ -45,9 +45,9 @@ _UML Sequence diagram of an XVIZ session initialization_
 ### Data Transfer - Live
 
 Upon start of a live session the server will immediately, and continuously send the client
-[`STATE_UPDATE`](#STATE_UPDATE) messages at an undefined rate.
+[`state_update`](#state_update) messages at an undefined rate.
 
-Optionally the unstable [`RECONFIGURE`](#reconfigure-warning-unstable-feature-) message can be sent
+Optionally the unstable [`reconfigure`](#reconfigure-warning-unstable-feature-) message can be sent
 to the server to change future data send to the server.
 
 ![Session Log Sequence](./images/session-live-sequence.png)
@@ -58,10 +58,10 @@ _UML Sequence diagram of transforming a live session with XVIZ_
 
 To request log data the client starts with a [`transform_log`](#transform_log) request that
 specifies the time range of the log to send back along with a request id. The server then responds
-with an indeterminate number of [`STATE_UPDATE`](#STATE_UPDATE) messages. When complete it sends the
+with an indeterminate number of [`state_update`](#state_update) messages. When complete it sends the
 `done` message tagged with given request id.
 
-Optionally the unstable [`RECONFIGURE`](#reconfigure-warning-unstable-feature-) message can be sent
+Optionally the unstable [`reconfigure`](#reconfigure-warning-unstable-feature-) message can be sent
 to the server to change way data is transformed for future requests.
 
 ![Session Live Sequence](./images/session-log-sequence.png)
@@ -71,12 +71,12 @@ _UML Sequence diagram of viewing a log with XVIZ_
 ### Data Transfer - Point In Time
 
 To get a single picture of the world at a specific time the client sends a
-[`TRANSFORM_POINT_IN_TIME`](#transform_point_in_time-warning-unstable-feature-) message, and the
-server responds with a single [`STATE_UPDATE`](#STATE_UPDATE) containing a full world snapshot.
+[`transform_point_in_time`](#transform_point_in_time-warning-unstable-feature-) message, and the
+server responds with a single [`state_update`](#state_update) containing a full world snapshot.
 
 ### Reconfiguration
 
-Optionally the unstable [`RECONFIGURE`](#reconfigure-warning-unstable-feature-) message can be sent
+Optionally the unstable [`reconfigure`](#reconfigure-warning-unstable-feature-) message can be sent
 to the server to change way data is transformed for future requests. This can happen any time after
 the connection has been initialized.
 
@@ -84,7 +84,7 @@ the connection has been initialized.
 
 These describe client server communication to start and manage sessions.
 
-### START
+### start
 
 Sent by the client to the service or encoded as URL parameters. When the server gets this message it
 will start streaming data to the client as soon as it can.
@@ -119,7 +119,7 @@ Common Parameters:
 - `JSON` - JSON types encoded as UT8 strings.
 - `BINARY` - Our GLB based binary container format.
 
-### METADATA
+### metadata
 
 Sent by server to the client upon connection. Contains information about the XVIZ streams to expect
 in messages, the cameras, and the Declarative UI panels.
@@ -150,7 +150,7 @@ created.
 
 **vehicle_info** - currently unspecified
 
-### ERROR
+### error
 
 Sent to clients if there is any issue with the server system.
 
@@ -160,7 +160,7 @@ Sent to clients if there is any issue with the server system.
 
 ## Data Messages
 
-### STATE_UPDATE
+### state_update
 
 This is a collection of stream sets for all extractor output.
 
@@ -217,7 +217,7 @@ has just the single `/object/polygon` containing a
 
 ## Request Messages
 
-### TRANSFORM_LOG
+### transform_log
 
 Sent from the client to the server to request part of the given log. The time bounds are optional,
 and if not present entire log is sent. Using `requested_streams` you can have the server only send
@@ -230,16 +230,16 @@ streams you need, limiting data usage and potentially speeding up backend proces
 | `end_timestamp`     | `optional<timestamp>` | Where to end transformation, inclusive, if not present use end of log.    |
 | `requested_streams` | `list<string>`        | If non-empty, only send these streams.                                    |
 
-### TRANSFORM_LOG_DONE
+### transform_log_done
 
 Sent from the server to the client to indicate the completion of the
-[`TRANSFORM_LOG`](#transform_log) request. This is the only indicate that the request has completed.
+[`transform_log`](#transform_log) request. This is the only indicate that the request has completed.
 
 | Name | Type     | Description                                                 |
 | ---- | -------- | ----------------------------------------------------------- |
 | `id` | `string` | identifier passed with the original `transform_log` request |
 
-### TRANSFORM_POINT_IN_TIME (WARNING: unstable feature)
+### transform_point_in_time (WARNING: unstable feature)
 
 Sent from the client to the server to request a snapshot of a single point in time from a log. This
 will contain the latest version of all streams, or the requested subset up to the `query_timestamp`,
@@ -252,7 +252,7 @@ limiting data usage and potentially speeding up backend processing.
 | `query_timestamp`   | `timestamp`    | The point at time which to get the state of the desired streams. |
 | `requested_streams` | `list<string>` | If non-empty, only send these streams.                           |
 
-### RECONFIGURE (WARNING: unstable feature)
+### reconfigure (WARNING: unstable feature)
 
 Reconfigure messages allow for a client to change the configuration of an XVIZ server, affecting all
 future requests for data from the server. This in turn enables a client to enable or disable

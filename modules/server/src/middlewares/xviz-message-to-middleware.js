@@ -52,42 +52,42 @@ export class XVIZMessageToMiddleware {
     this.info(`[> ${xvizType.toUpperCase()}]`);
     switch (xvizType) {
       // Connection events
-      case 'CONNECT':
+      case 'connect':
         this.middleware.onConnect();
         break;
-      case 'CLOSE':
+      case 'close':
         this.middleware.onClose();
         break;
 
       // XVIZ Message Types
-      case 'START':
+      case 'start':
         this.middleware.onStart(msg);
         break;
-      case 'METADATA':
+      case 'metadata':
         this.middleware.onMetadata(msg);
         break;
-      case 'STATE_UPDATE':
+      case 'state_update':
         this.middleware.onStateUpdate(msg);
         break;
-      case 'TRANSFORM_LOG':
+      case 'transform_log':
         this.middleware.onTransformLog(msg);
         break;
-      case 'TRANSFORM_DONE':
+      case 'transform_done':
         this.middleware.onTransformLogDone(msg);
         break;
-      case 'TRANSFORM_POINT_IN_TIME':
+      case 'transform_point_in_time':
         this.middleware.onTransformPointInTime(msg);
         break;
-      case 'RECONFIGURE':
+      case 'reconfigure':
         this.middleware.onReconfigure(msg);
         break;
-      case 'ERROR':
+      case 'error':
         this.middleware.onError(msg);
         break;
 
       default:
         const message = `Error: unknown XVIZ message type ${xvizType}`;
-        this.middleware.onError({type: 'XVIZ/ERROR', data: {message}});
+        this.middleware.onError({type: 'xviz/error', data: {message}});
         break;
     }
   }

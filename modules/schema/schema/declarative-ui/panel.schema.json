@@ -33,7 +33,7 @@
             "type": "string",
             "enum": [
               "REORDERABLE",
-              "DRAGOUT"
+              "DRAG_OUT"
             ]
           },
           "additionalItems": false

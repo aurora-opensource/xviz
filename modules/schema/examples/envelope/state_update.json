@@ -1,5 +1,5 @@
 {
-  "type": "XVIZ/STATE_UPDATE",
+  "type": "xviz/state_update",
   "data": {
     "update_type": "INCREMENTAL",
     "updates": [

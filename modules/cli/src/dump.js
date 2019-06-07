@@ -46,7 +46,7 @@ export class DumpXVIZ {
       return '';
     };
 
-    this._dumpSent('START', msg, oneline);
+    this._dumpSent('start', msg, oneline);
   }
 
   onError(msg) {
@@ -54,7 +54,7 @@ export class DumpXVIZ {
       return `msg: ${msg.message}`;
     };
 
-    this._dumpReceived('ERROR', msg, oneline);
+    this._dumpReceived('error', msg, oneline);
   }
 
   onMetadata(msg) {
@@ -63,7 +63,7 @@ export class DumpXVIZ {
       return `version: ${verStr}`;
     };
 
-    this._dumpReceived('METADATA', msg, oneline);
+    this._dumpReceived('metadata', msg, oneline);
   }
 
   onTransformLog(msg) {
@@ -74,7 +74,7 @@ export class DumpXVIZ {
       return `${startStr} - ${endStr} (tid: ${msg.id})`;
     };
 
-    this._dumpSent('TRANSFORM_LOG', msg, oneline);
+    this._dumpSent('transform_log', msg, oneline);
   }
 
   onStateUpdate(msg) {
@@ -91,14 +91,14 @@ export class DumpXVIZ {
       return 'empty';
     };
 
-    this._dumpReceived('STATE_UPDATE', msg, oneline);
+    this._dumpReceived('state_update', msg, oneline);
   }
 
   onTransformLogDone(msg) {
     const oneline = () => {
       return `tid: ${msg.id}`;
     };
-    this._dumpReceived('TRANSFORM_LOG_DONE', msg, oneline);
+    this._dumpReceived('transform_log_done', msg, oneline);
   }
 
   onClose() {

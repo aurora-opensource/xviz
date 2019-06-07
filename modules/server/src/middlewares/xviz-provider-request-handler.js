@@ -132,12 +132,12 @@ export class XVIZProviderRequestHandler {
 
   onTransformPointInTime(msg) {
     this.middleware.onError(
-      XVIZEnvelope.Error({message: 'Error: TRANSFORM_POINT_IN_TIME is not supported.'})
+      XVIZEnvelope.Error({message: 'Error: transform_point_in_time is not supported.'})
     );
   }
 
   onReconfigure(msg) {
-    this.middleware.onError(XVIZEnvelope.Error({message: 'Error: RECONFIGURE is not supported.'}));
+    this.middleware.onError(XVIZEnvelope.Error({message: 'Error: reconfigure is not supported.'}));
   }
 
   log(...msg) {

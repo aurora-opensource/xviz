@@ -1,4 +1,4 @@
-# XVIZFormat
+# XVIZ_FORMAT
 
 Describes the format of the XVIZ data.
 

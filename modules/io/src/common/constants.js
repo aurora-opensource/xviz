@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-export const XVIZFormat = Object.freeze({
+export const XVIZ_FORMAT = Object.freeze({
   // Binary GLB enocded in Buffer/ArrayBuffer
   BINARY_GLB: 'BINARY_GLB',
   // JSON encoded in a Buffer/ArrayBuffer
@@ -22,4 +22,4 @@ export const XVIZFormat = Object.freeze({
   OBJECT: 'OBJECT'
 });
 
-export const XVIZMessageNamespace = 'XVIZ';
+export const XVIZ_MESSAGE_NAMESPACE = 'xviz';
