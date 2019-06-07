@@ -3,8 +3,8 @@
 Layout types describe the different ways the contents of a layout element can be arranged, for
 example vertically or horizontally. Currently supported arrangement types are:
 
-- Vertical (`vertical`)
-- Horizontal (`horizontal`)
+- Vertical (`VERTICAL`)
+- Horizontal (`HORIZONTAL`)
 
 ## Vertical Layout
 

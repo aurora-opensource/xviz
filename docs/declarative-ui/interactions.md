@@ -6,14 +6,14 @@ Layout interactions describe the ways that a layout element can be manipulated b
 interactions are completely optional, so each layout element can have zero, one, or more layout
 interactions applied to it. Currently supported layout interactions include:
 
-- Drag to Reorder (`reorderable`)
-- Drag out (`dragout`)
+- Drag to Reorder (`REORDERABLE`)
+- Drag out (`DRAG_OUT`)
 
 ### Drag to Reorder
 
 When a layout element supports the drag to reorder interaction, it means that the elements inside of
 the layout element can be rearranged by clicking and dragging them. The formal type for drag to
-reorder is `reorderable`.
+reorder is `REORDERABLE`.
 
 ### Drag Out
 
@@ -21,7 +21,7 @@ When a layout element supports the drag out interaction, it means that the compo
 components) can be moved outside of their layout element. A table, for example, could be clicked and
 dragged to free float inside the application outside of the panel that originally contained it.
 Components previously dragged out can be dragged back into the layout element that originally
-contained them. The formal type for drag out is `dragout`.
+contained them. The formal type for drag out is `DRAG_OUT`.
 
 ## Component Interaction Types
 

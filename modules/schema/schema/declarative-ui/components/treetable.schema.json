@@ -4,7 +4,7 @@
   "allOf": [{ "$ref": "https://xviz.org/schema/declarative-ui/components/_tabular.json" }],
   "properties": {
     "type": {
-      "enum": ["treetable"]
+      "enum": ["TREETABLE"]
     },
     "title": {},
     "description": {},

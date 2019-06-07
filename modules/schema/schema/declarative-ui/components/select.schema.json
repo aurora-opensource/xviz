@@ -4,7 +4,7 @@
   "allOf": [{ "$ref": "https://xviz.org/schema/declarative-ui/component_base.json" }],
   "properties": {
     "type": {
-      "enum": ["select"]
+      "enum": ["SELECT"]
     },
     "title": {},
     "description": {},

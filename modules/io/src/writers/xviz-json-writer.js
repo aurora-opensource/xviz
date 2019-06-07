@@ -15,6 +15,7 @@
 import {XVIZBaseWriter} from './xviz-base-writer';
 import {xvizConvertJson} from './xviz-json-encoder';
 import {TextEncoder} from '../common/text-encoding';
+import {XVIZEnvelope} from '@xviz/io';
 
 // 0-frame is an index file for timestamp metadata
 // 1-frame is the metadata file for the log
@@ -40,7 +41,7 @@ export class XVIZJSONWriter extends XVIZBaseWriter {
     this._saveTimestamp(xvizMetadata);
 
     if (this.options.envelope) {
-      xvizMetadata = {type: 'xviz/metadata', data: xvizMetadata};
+      xvizMetadata = XVIZEnvelope.Metadata(xvizMetadata);
     }
 
     const msg = JSON.stringify(xvizMetadata);
@@ -52,7 +53,7 @@ export class XVIZJSONWriter extends XVIZBaseWriter {
     this._saveTimestamp(xvizMessage, messageIndex);
 
     if (this.options.envelope) {
-      xvizMessage = {type: 'xviz/state_update', data: xvizMessage};
+      xvizMessage = XVIZEnvelope.StateUpdate(xvizMessage);
     }
 
     // Limit precision to save space

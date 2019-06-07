@@ -13,6 +13,8 @@
 // limitations under the License.
 // TODO: move these to @xviz/io
 import {isEnvelope, unpackEnvelope} from '@xviz/parser';
+import {XVIZ_MESSAGE_TYPE} from './xviz-message-type';
+import {XVIZ_MESSAGE_NAMESPACE} from './constants';
 
 // Represents an actual XVIZ Message
 //
@@ -53,14 +55,14 @@ export class XVIZMessage {
     // Raw data, detect by parsing
     if (this.message.version) {
       this._message = {
-        namespace: 'xviz',
-        type: 'metadata',
+        namespace: XVIZ_MESSAGE_NAMESPACE,
+        type: XVIZ_MESSAGE_TYPE.METADATA,
         data: this.message
       };
     } else if (this.message.update_type && this.message.updates) {
       this._message = {
-        namespace: 'xviz',
-        type: 'state_update',
+        namespace: XVIZ_MESSAGE_NAMESPACE,
+        type: XVIZ_MESSAGE_TYPE.STATE_UPDATE,
         data: this.message
       };
     } else {

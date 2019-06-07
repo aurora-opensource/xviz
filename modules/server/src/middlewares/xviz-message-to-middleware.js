@@ -50,7 +50,6 @@ export class XVIZMessageToMiddleware {
 
   callMiddleware(xvizType, msg = {}) {
     this.info(`[> ${xvizType.toUpperCase()}]`);
-
     switch (xvizType) {
       // Connection events
       case 'connect':

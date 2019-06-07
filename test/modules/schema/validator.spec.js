@@ -47,7 +47,7 @@ test('validateStateUpdate', t => {
   validator.validateStateUpdate(
     JSON.parse(`
 {
-  "update_type": "incremental",
+  "update_type": "INCREMENTAL",
   "updates": [{
     "timestamp": 1,
     "primitives": {}

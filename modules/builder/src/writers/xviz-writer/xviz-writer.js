@@ -15,6 +15,7 @@
 import {writeBinaryXVIZtoFile} from './xviz-binary-writer';
 import {xvizConvertJson} from './xviz-json-encoder.js';
 import {DracoWriter, DracoLoader} from '@loaders.gl/draco';
+import {XVIZEnvelope} from '@xviz/io';
 
 // 0-frame is an index file for timestamp metadata
 // 1-frame is the metadata file for the log
@@ -62,7 +63,7 @@ export default class XVIZWriter {
     this._saveTimestamp(xvizMetadata);
 
     if (this.options.envelope) {
-      xvizMetadata = {type: 'xviz/metadata', data: xvizMetadata};
+      xvizMetadata = XVIZEnvelope.Metadata(xvizMetadata);
     }
 
     if (this.options.binary) {
@@ -90,7 +91,7 @@ export default class XVIZWriter {
     this._saveTimestamp(xvizFrame, frameIndex);
 
     if (this.options.envelope) {
-      xvizFrame = {type: 'xviz/state_update', data: xvizFrame};
+      xvizFrame = XVIZEnvelope.StateUpdate(xvizFrame);
     }
 
     if (this.options.binary) {

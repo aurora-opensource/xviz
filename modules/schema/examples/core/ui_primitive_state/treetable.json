@@ -3,12 +3,12 @@
     "columns": [
       {
         "display_text": "Age",
-        "type": "int32",
+        "type": "INT32",
         "unit": "Years"
       },
       {
         "display_text": "Name",
-        "type": "string"
+        "type": "STRING"
       }
     ],
     "nodes": [

@@ -46,18 +46,18 @@ test('XVIZBaseUIBuilder', t => {
 
   const expected = {
     'Metrics Panel': {
-      type: 'panel',
+      type: 'PANEL',
       children: [
         {
-          type: 'container',
+          type: 'CONTAINER',
           children: [
             {
-              type: 'metric',
+              type: 'METRIC',
               streams: ['/vehicle/velocity'],
               title: 'Velocity'
             },
             {
-              type: 'metric',
+              type: 'METRIC',
               streams: ['/vehicle/acceleration'],
               title: 'Acceleration'
             }
@@ -91,10 +91,10 @@ test('XVIZUIBuilder#plot standard', t => {
   const expected = {
     Plots: {
       name: 'Plots',
-      type: 'panel',
+      type: 'PANEL',
       children: [
         {
-          type: 'plot',
+          type: 'PLOT',
           title: 'Standard Plot',
           independentVariable: '/plan/distance',
           dependentVariables: ['/plan/cost']
@@ -129,10 +129,10 @@ test('XVIZUIBuilder#plot region', t => {
   const expected = {
     Plots: {
       name: 'Plots',
-      type: 'panel',
+      type: 'PANEL',
       children: [
         {
-          type: 'plot',
+          type: 'PLOT',
           title: 'Region Plot',
           regions: [
             {
@@ -169,10 +169,10 @@ test('XVIZUIBuilder#select', t => {
   const expected = {
     Controls: {
       name: 'Controls',
-      type: 'panel',
+      type: 'PANEL',
       children: [
         {
-          type: 'select',
+          type: 'SELECT',
           title: 'Choose options value',
           stream: '/options/value',
           onchange: {

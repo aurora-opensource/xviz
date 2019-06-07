@@ -3,8 +3,8 @@
     "opacity": 1.0,
     "fill_color": [25, 25, 25, 255]
   },
-  "category": "primitive",
-  "primitive_type": "polygon",
+  "category": "PRIMITIVE",
+  "primitive_type": "POLYGON",
   "style_classes": [
     {
       "name": "fancy",

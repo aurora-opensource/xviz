@@ -23,17 +23,17 @@ import "xviz/v2/style.proto";
 // with "log" field and "log" type
 enum SessionType {
   SESSION_TYPE_INVALID = 0;
-  live = 1;
-  log = 2;
-  unbuffered_log = 3;
+  LIVE = 1;
+  LOG = 2;
+  UNBUFFERED_LOG = 3;
 }
 
 message Start {
   option (xviz_json_schema) = "session/start";
   enum MessageFormat {
     START_MESSAGE_FORMAT_INVALID = 0;
-    json = 1;
-    binary = 2;
+    JSON = 1;
+    BINARY = 2;
   }
   // XVIZ protocol version, currently 2.0.0
   string version = 1;
@@ -55,9 +55,9 @@ message StateUpdate {
   option (xviz_json_schema) = "session/state_update";
   enum UpdateType {
     STATE_UPDATE_UPDATE_TYPE_INVALID = 0;
-    snapshot = 1; // DO NOT USE - same as incremental
-    incremental = 2;
-    complete_state = 3;
+    SNAPSHOT = 1; // DO NOT USE - same as incremental
+    INCREMENTAL = 2;
+    COMPLETE_STATE = 3;
   }
   UpdateType update_type = 1;
   repeated StreamSet updates = 2;
@@ -79,8 +79,8 @@ message Reconfigure {
   option (xviz_json_schema) = "session/reconfigure";
   enum UpdateType {
     RECONFIGURE_UPDATE_TYPE_INVALID = 0;
-    delta = 1;
-    full = 2;
+    DELTA = 1;
+    FULL = 2;
   }
   UpdateType update_type = 1;
   google.protobuf.Struct config_update = 2;
@@ -105,42 +105,42 @@ message StreamMetadata {
   // Separate broad types of XVIZ data
   enum Category {
     STREAM_METADATA_CATEGORY_INVALID = 0;
-    primitive = 1;
-    time_series = 2;
-    variable = 3;
-    annotation = 4;
-    future_instance = 5;
-    pose = 6;
-    ui_primitive = 7;
+    PRIMITIVE = 1;
+    TIME_SERIES = 2;
+    VARIABLE = 3;
+    ANNOTATION = 4;
+    FUTURE_INSTANCE = 5;
+    POSE = 6;
+    UI_PRIMITIVE = 7;
   }
   // The specific data type for time_series and varialbe categories
   enum ScalarType {
     STREAM_METADATA_SCALAR_TYPE_INVALID = 0;
-    float = 1;
-    int32 = 2;
-    string = 3;
-    bool = 4;
+    FLOAT = 1;
+    INT32 = 2;
+    STRING = 3;
+    BOOL = 4;
   }
   // The specific data type for the primitive category
   enum PrimitiveType {
     STREAM_METADATA_PRIMITIVE_TYPE_INVALID = 0;
-    circle = 1;
-    image = 2;
-    point = 3;
-    polygon = 4;
-    polyline = 5;
-    stadium = 6;
-    text = 7;
+    CIRCLE = 1;
+    IMAGE = 2;
+    POINT = 3;
+    POLYGON = 4;
+    POLYLINE = 5;
+    STADIUM = 6;
+    TEXT = 7;
   }
   // The specific type for the ui primitive category
   enum UIPrimitiveType {
     STREAM_METADATA_UI_PRIMITIVE_TYPE_INVALID = 0;
-    treetable = 1;
+    TREETABLE = 1;
   }
   // The specific type for annotation category
   enum AnnotationType {
     STREAM_METADATA_ANNOTATION_TYPE_INVALID = 0;
-    visual = 1;
+    VISUAL = 1;
   }
   enum CoordinateType {
     STREAM_METADATA_COORDINATE_TYPE_INVALID = 0;

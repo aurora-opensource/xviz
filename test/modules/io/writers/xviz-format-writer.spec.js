@@ -19,7 +19,7 @@ import {
   XVIZBinaryWriter,
   XVIZData,
   XVIZFormatWriter,
-  XVIZFormat
+  XVIZ_FORMAT
 } from '@xviz/io';
 
 // Source test data
@@ -48,7 +48,11 @@ tape('XVIZFormatWriter#full matrix', t => {
   for (const source of dataSources) {
     const xvizObj = new XVIZData(source);
 
-    for (const format of [XVIZFormat.BINARY_GLB, XVIZFormat.JSON_BUFFER, XVIZFormat.JSON_STRING]) {
+    for (const format of [
+      XVIZ_FORMAT.BINARY_GLB,
+      XVIZ_FORMAT.JSON_BUFFER,
+      XVIZ_FORMAT.JSON_STRING
+    ]) {
       const sink = new MemorySourceSink();
 
       t.comment(`-- TestCase ${xvizObj.format} to ${format}`);
@@ -77,7 +81,7 @@ tape('XVIZFormatWriter#message writing', t => {
   const xvizObj = new XVIZData(TestXVIZSnapshot);
   const sink = new MemorySourceSink();
 
-  const formatWriter = new XVIZFormatWriter(sink, {format: XVIZFormat.BINARY_GLB});
+  const formatWriter = new XVIZFormatWriter(sink, {format: XVIZ_FORMAT.BINARY_GLB});
 
   formatWriter.writeMessage(0, xvizObj);
   formatWriter.writeMessage(1, xvizObj);

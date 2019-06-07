@@ -1,5 +1,5 @@
 {
-  "update_type": "incremental",
+  "update_type": "INCREMENTAL",
   "updates": [
     {
       "timestamp": 1001.3,

@@ -13,15 +13,15 @@
 // limitations under the License.
 
 export const UI_TYPES = {
-  PANEL: 'panel',
+  PANEL: 'PANEL',
 
-  CONTAINER: 'container',
+  CONTAINER: 'CONTAINER',
 
   // components
-  METRIC: 'metric',
-  PLOT: 'plot',
-  SELECT: 'select',
-  TABLE: 'table',
-  TREETABLE: 'treetable',
-  VIDEO: 'video'
+  METRIC: 'METRIC',
+  PLOT: 'PLOT',
+  SELECT: 'SELECT',
+  TABLE: 'TABLE',
+  TREETABLE: 'TREETABLE',
+  VIDEO: 'VIDEO'
 };

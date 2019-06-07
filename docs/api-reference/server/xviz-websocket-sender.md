@@ -30,8 +30,8 @@ Parameters:
 - `socket` (Object) - Websocket for the session
 - `options` (Object) - options object
   - `compress` (Boolean) - Choice to apply perMessageDeflate if the message wire format is TEXT
-  - `format` ([XVIZFormat](/docs/api-reference/io/xviz-format.md)) - Format of the XVIZ data to send
-    to the client
+  - `format` ([XVIZ_FORMAT](/docs/api-reference/io/xviz-format.md)) - Format of the XVIZ data to
+    send to the client
   - `logger` (Object) - Logger object passed through the system
     - `log` (Function) - Function that will always display the message
     - `error` (Function) - Function for error level messages

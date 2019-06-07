@@ -14,7 +14,7 @@
 import {parseBinaryXVIZ, isBinaryXVIZ, getXVIZMessageType} from '@xviz/parser';
 import {XVIZMessage} from './xviz-message';
 import {TextDecoder} from './text-encoding';
-import {XVIZFormat} from './constants';
+import {XVIZ_FORMAT} from './constants';
 
 /* global Buffer */
 
@@ -92,7 +92,7 @@ export class XVIZData {
   constructor(data) {
     this._data = data;
 
-    // _dataFormat is an XVIZFormat for 'data'
+    // _dataFormat is an XVIZ_FORMAT for 'data'
     this._dataFormat = undefined;
 
     // _xvizType is the XVIZ Envelope 'type'
@@ -144,13 +144,13 @@ export class XVIZData {
 
     let data = this._data;
     switch (this._dataFormat) {
-      case XVIZFormat.BINARY_GLB:
+      case XVIZ_FORMAT.BINARY_GLB:
         if (data instanceof Buffer) {
           data = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
         }
         msg = parseBinaryXVIZ(data);
         break;
-      case XVIZFormat.JSON_BUFFER:
+      case XVIZ_FORMAT.JSON_BUFFER:
         let jsonString = null;
         if (data instanceof Buffer) {
           // Default to utf8 encoding
@@ -164,10 +164,10 @@ export class XVIZData {
 
         msg = JSON.parse(jsonString);
         break;
-      case XVIZFormat.JSON_STRING:
+      case XVIZ_FORMAT.JSON_STRING:
         msg = JSON.parse(data);
         break;
-      case XVIZFormat.OBJECT:
+      case XVIZ_FORMAT.OBJECT:
         // TODO: what is the recursive case?
         // see parse-stream-data-message.js
         msg = data;
@@ -189,7 +189,7 @@ export class XVIZData {
         }
 
         if (isBinaryXVIZ(data)) {
-          this._dataFormat = XVIZFormat.BINARY_GLB;
+          this._dataFormat = XVIZ_FORMAT.BINARY_GLB;
         }
 
         if (data instanceof ArrayBuffer) {
@@ -197,16 +197,16 @@ export class XVIZData {
         }
 
         if (isJSONString(data)) {
-          this._dataFormat = XVIZFormat.JSON_BUFFER;
+          this._dataFormat = XVIZ_FORMAT.JSON_BUFFER;
         }
         break;
       case 'string':
         if (isJSONString(data)) {
-          this._dataFormat = XVIZFormat.JSON_STRING;
+          this._dataFormat = XVIZ_FORMAT.JSON_STRING;
         }
         break;
       case 'object':
-        this._dataFormat = XVIZFormat.OBJECT;
+        this._dataFormat = XVIZ_FORMAT.OBJECT;
         break;
 
       default:

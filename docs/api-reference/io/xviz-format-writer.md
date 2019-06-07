@@ -9,11 +9,11 @@ The XVIZFormatWriter currently expects XVIZData and not a raw object.
 
 ```js
 import {XVIZMetadataBuilder, XVIZBuilder} from '@xviz/builder';
-import {XVIZFormatWriter, XVIZFormat} from '@xviz/io';
+import {XVIZFormatWriter, XVIZ_FORMAT} from '@xviz/io';
 import {FileSink} from '@xviz/io/node';
 
 const sink = new FileSink('output-dir');
-const xvizWriter = new XVIZFormatWriter(sink, {format: XVIZFormat.BINARY_GLB});
+const xvizWriter = new XVIZFormatWriter(sink, {format: XVIZ_FORMAT.BINARY_GLB});
 
 const metadataBuilder = new XVIZMetadataBuilder();
 // build metadata
@@ -31,18 +31,18 @@ xvizWriter.close();
 ### Constructor
 
 ```js
-import {XVIZFormatWriter, XVIZFormat} from '@xviz/io';
+import {XVIZFormatWriter, XVIZ_FORMAT} from '@xviz/io';
 import {FileSink} from '@xviz/io/node';
 
 const sink = new FileSink('output-dir');
-const xvizWriter = new XVIZBinaryWriter(sink, {format: XVIZFormat.BINARY_GLB});
+const xvizWriter = new XVIZBinaryWriter(sink, {format: XVIZ_FORMAT.BINARY_GLB});
 ```
 
 Parameters:
 
 - `sink` (Object) Object that manages writing data
 - `options` (Object) - Set of options that will be passed through to underlying Writer
-- `options.format` ([XVIZFormat](/docs/api-reference/io/xviz-format.md)) - Required XVIZ format to
+- `options.format` ([XVIZ_FORMAT](/docs/api-reference/io/xviz-format.md)) - Required XVIZ format to
   write out
 
 ### Methods

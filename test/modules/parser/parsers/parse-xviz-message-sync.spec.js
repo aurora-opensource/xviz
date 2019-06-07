@@ -91,7 +91,7 @@ const TestTimesliceMessageV1 = {
 };
 
 const TestTimesliceMessageV2 = {
-  update_type: 'complete_state',
+  update_type: 'COMPLETE_STATE',
   updates: [
     {
       timestamp: 1001.0,
@@ -135,20 +135,20 @@ tape('isEnvelope', t => {
 
 tape('unpackEnvelope name parsing', t => {
   const notype = unpackEnvelope({type: 'foo', data: {a: 42}});
-  t.equals('foo', notype.namespace);
-  t.equals('', notype.type);
+  t.equals(notype.namespace, 'foo');
+  t.equals(notype.type, '');
 
   const empty = unpackEnvelope({type: '', data: {a: 42}});
-  t.equals('', empty.namespace);
-  t.equals('', empty.type);
+  t.equals(empty.namespace, '');
+  t.equals(empty.type, '');
 
   const nonXVIZ = unpackEnvelope({type: 'foo/bar', data: {a: 42}});
-  t.equals('foo', nonXVIZ.namespace);
-  t.equals('bar', nonXVIZ.type);
+  t.equals(nonXVIZ.namespace, 'foo');
+  t.equals(nonXVIZ.type, 'bar');
 
   const leadingSlash = unpackEnvelope({type: '/foo/bar', data: {a: 42}});
-  t.equals('', leadingSlash.namespace);
-  t.equals('foo/bar', leadingSlash.type);
+  t.equals(leadingSlash.namespace, '');
+  t.equals(leadingSlash.type, 'foo/bar');
 
   t.end();
 });
@@ -163,7 +163,7 @@ tape('unpackEnvelope xviz', t => {
     type: 'state_update',
     data: enveloped.data
   };
-  t.deepEquals(expected, unpackEnvelope(enveloped));
+  t.deepEquals(unpackEnvelope(enveloped), expected);
 
   t.end();
 });
@@ -295,7 +295,7 @@ tape('parseXVIZData validate result when missing updates', t => {
 
   const metaMessage = parseXVIZData(
     {
-      update_type: 'complete_state'
+      update_type: 'COMPLETE_STATE'
     },
     {v2Type: 'state_update'}
   );
@@ -312,13 +312,14 @@ tape('parseXVIZData validate result when updates is empty', t => {
 
   const metaMessage = parseXVIZData(
     {
-      update_type: 'complete_state',
+      update_type: 'COMPLETE_STATE',
       updates: []
     },
     {v2Type: 'state_update'}
   );
 
   t.equals(metaMessage.type, XVIZ_MESSAGE_TYPE.INCOMPLETE, 'Type after parse set to error');
+  t.comment(metaMessage.message);
   t.ok(/"updates" has length of 0/.test(metaMessage.message), 'Message details length is 0');
 
   t.end();
@@ -330,7 +331,7 @@ tape('parseXVIZData validate result when missing timestamp in updates', t => {
 
   const metaMessage = parseXVIZData(
     {
-      update_type: 'complete_state',
+      update_type: 'COMPLETE_STATE',
       updates: [{}]
     },
     {v2Type: 'state_update'}
@@ -427,7 +428,7 @@ tape('parseXVIZData timeslice', t => {
 
   // Incremental update
   result = parseXVIZData(
-    {...TestTimesliceMessageV2, update_type: 'incremental'},
+    {...TestTimesliceMessageV2, update_type: 'INCREMENTAL'},
     {v2Type: 'state_update'}
   );
   t.equals(result.type, XVIZ_MESSAGE_TYPE.TIMESLICE, 'Message type set for timeslice');
@@ -435,7 +436,7 @@ tape('parseXVIZData timeslice', t => {
 
   // Deprecated 'snapshot' update type
   result = parseXVIZData(
-    {...TestTimesliceMessageV2, update_type: 'snapshot'},
+    {...TestTimesliceMessageV2, update_type: 'SNAPSHOT'},
     {v2Type: 'state_update'}
   );
   t.equals(result.type, XVIZ_MESSAGE_TYPE.TIMESLICE, 'Message type set for timeslice');
@@ -707,7 +708,7 @@ tape('parseXVIZData variable timeslice', t => {
   resetXVIZConfigAndSettings();
   setXVIZConfig({currentMajorVersion: 2});
   const VariableTestTimesliceMessage = {
-    update_type: 'complete_state',
+    update_type: 'COMPLETE_STATE',
     updates: [
       {
         timestamp: 1001.0,

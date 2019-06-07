@@ -1,7 +1,7 @@
 {
   "type": "xviz/reconfigure",
   "data": {
-    "update_type": "full",
+    "update_type": "FULL",
     "config_update": {
       "base": {
         "subprop": "value",

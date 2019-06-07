@@ -89,8 +89,8 @@ const panelBuilder = xvizUIBuilder.panel(options);
 Parameters:
 
 - `options.name` (String)
-- `options.layout` (String) - `vertical` or `horizontal`.
-- `options.interactions` (String) - `reorderable` or `drag_out`
+- `options.layout` (String) - `VERTICAL` or `HORIZONTAL`.
+- `options.interactions` (String) - `REORDERABLE` or `DRAG_OUT`
 
 ##### container(options)
 
@@ -103,8 +103,8 @@ const containerBuilder = xvizUIBuilder.container(options);
 Parameters:
 
 - `options.name` (String)
-- `options.layout` (String) - `vertical` or `horizontal`.
-- `options.interactions` (String) - `reorderable` or `drag_out`
+- `options.layout` (String) - `VERTICAL` or `HORIZONTAL`.
+- `options.interactions` (String) - `REORDERABLE` or `DRAG_OUT`
 
 ##### metric(options)
 

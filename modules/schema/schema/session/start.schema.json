@@ -15,8 +15,8 @@
     "message_format": {
       "type": "string",
       "enum": [
-        "json",
-        "binary"
+        "JSON",
+        "BINARY"
       ]
     },
     "log": {
@@ -31,7 +31,7 @@
         "session_type": {
           "type": "string",
           "enum": [
-            "log"
+            "LOG"
           ]
         },
         "log": {
@@ -48,7 +48,7 @@
         "session_type": {
           "type": "string",
           "enum": [
-            "live"
+            "LIVE"
           ]
         }
       },

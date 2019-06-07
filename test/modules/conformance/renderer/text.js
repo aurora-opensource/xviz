@@ -34,8 +34,8 @@ export default function renderText({context, feature, stylesheet, project}) {
 
   // Render to canvas
   context.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
-  context.textAlign = textAnchor === 'middle' ? 'center' : textAnchor;
-  context.textBaseline = textBaseline === 'center' ? 'middle' : textBaseline;
+  context.textAlign = textAnchor === 'MIDDLE' ? 'center' : textAnchor.toLowerCase();
+  context.textBaseline = textBaseline === 'CENTER' ? 'middle' : textBaseline.toLowerCase();
   context.fillStyle = fillColor;
 
   context.save();

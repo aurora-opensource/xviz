@@ -20,7 +20,7 @@ export default class XVIZPoseBuilder extends XVIZBaseBuilder {
   constructor(props) {
     super({
       ...props,
-      category: CATEGORY.pose
+      category: CATEGORY.POSE
     });
 
     this._poses = null;

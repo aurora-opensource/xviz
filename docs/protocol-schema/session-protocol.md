@@ -95,9 +95,9 @@ Common Parameters:
 | ---------------- | ------------------ | --------------------------------------------------------------------------------------------- |
 | `version`        | `string`           | Protocol version, for example `2.0.0`                                                         |
 | `profile`        | `optional<string>` | The backend configuration, defines the content, type, and selections of streams you will get. |
-| `session_type`   | `optional<string>` | Type of session being opened up, default is `log`                                             |
-| `message_format` | `optional<string>` | Format the data will be represented in, default value is `json`.                              |
-| `log`            | `optional<string>` | When the `session_type` = `log`, this parameters identifies which log to open.                |
+| `session_type`   | `optional<string>` | Type of session being opened up, default is `LOG`                                             |
+| `message_format` | `optional<string>` | Format the data will be represented in, default value is `JSON`.                              |
+| `log`            | `optional<string>` | When the `session_type` = `LOG`, this parameters identifies which log to open.                |
 
 **errors** The follow fields do not accept all parameters,
 
@@ -111,13 +111,13 @@ Common Parameters:
 
 **session_type** - valid values:
 
-- `live` - send data in real time
-- `log` - show data from a log
+- `LIVE` - send data in real time
+- `LOG` - show data from a log
 
 **message_format** - valid values:
 
-- `json` - JSON types encoded as UT8 strings.
-- `binary` - Our GLB based binary container format.
+- `JSON` - JSON types encoded as UT8 strings.
+- `BINARY` - Our GLB based binary container format.
 
 ### metadata
 
@@ -171,9 +171,9 @@ This is a collection of stream sets for all extractor output.
 
 **update_type** - valid values:
 
-- `complete_state` - the provided streams contain a complete view of the world. Any stream not
+- `COMPLETE_STATE` - the provided streams contain a complete view of the world. Any stream not
   included in is considered empty.
-- `incremental` - the provided streams replace replace the contents of existing streams
+- `INCREMENTAL` - the provided streams replace replace the contents of existing streams
 
 The differences between these update models are more subtle, so this table below clarifies. It shows
 what to do in either the `complete_state` or `incremental` state when you receive and update based
@@ -197,7 +197,7 @@ has just the single `/object/polygon` containing a
 
 ```
 {
-    "update_type": "incremental",
+    "update_type": "INCREMENTAL",
     "updates": [
         {
             "timestamp": 1001.3,
@@ -264,7 +264,7 @@ Which would send a `delta` reconfigure message to the server.
 
 | Name            | Type                   | Description                                       |
 | --------------- | ---------------------- | ------------------------------------------------- |
-| `update_type`   | `enum { full, delta }` | Whether we have a complete or incremental update. |
+| `update_type`   | `enum { FULL, DELTA }` | Whether we have a complete or incremental update. |
 | `config_update` | `object`               | A JSON patch or full configuration update.        |
 
 ## Core Types
@@ -300,30 +300,30 @@ reconfiguration happens.
 
 #### Category:
 
-- `primitive`
-- `time_series`
-- `variable`
-- `annotation`
-- `future_instance`
-- `pose`
-- `ui_primitive`
+- `PRIMITIVE`
+- `TIME_SERIES`
+- `VARIABLE`
+- `ANNOTATION`
+- `FUTURE_INSTANCE`
+- `POSE`
+- `UI_PRIMITIVE`
 
 #### Scalar types:
 
-- `float`
-- `in32`
-- `string`
-- `bool`
+- `FLOAT`
+- `INT32`
+- `STRING`
+- `BOOL`
 
 #### Primitive types:
 
-- `circle`
-- `image`
-- `point`
-- `polygon`
-- `polyline`
-- `stadium`
-- `text`
+- `CIRCLE`
+- `IMAGE`
+- `POINT`
+- `POLYGON`
+- `POLYLINE`
+- `STADIUM`
+- `TEXT`
 
 ### camera_info
 

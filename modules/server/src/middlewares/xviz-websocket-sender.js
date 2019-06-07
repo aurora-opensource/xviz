@@ -11,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import {XVIZFormat, XVIZFormatWriter} from '@xviz/io';
+import {XVIZ_FORMAT, XVIZFormatWriter} from '@xviz/io';
 
 export class WebsocketSink {
   constructor(socket, options) {
@@ -51,9 +51,9 @@ export class XVIZWebsocketSender {
     // based on the message.
     this.format = options.format;
 
-    if (this.format === XVIZFormat.OBJECT) {
+    if (this.format === XVIZ_FORMAT.OBJECT) {
       // We can not output OBJECT on a websocket
-      this.format = XVIZFormat.BINARY_GLB;
+      this.format = XVIZ_FORMAT.BINARY_GLB;
     }
 
     this.writer = null;
@@ -102,10 +102,10 @@ export class XVIZWebsocketSender {
 
       // Test to determine if msg is either string or arraybuffer
       if (
-        msg.format === XVIZFormat.OBJECT ||
+        msg.format === XVIZ_FORMAT.OBJECT ||
         (!msg.hasMessage() && typeof msg.buffer !== 'string' && !msg.buffer.byteLength)
       ) {
-        return XVIZFormat.BINARY;
+        return XVIZ_FORMAT.BINARY_GLB;
       }
 
       // return the format set to the current data format

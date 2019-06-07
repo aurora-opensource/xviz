@@ -184,7 +184,7 @@ export function isXVIZMessage(data) {
       return getJSONXVIZType(data) !== null;
 
     case 'object':
-      return data.type ? data.type.startsWith('xviz/') : false;
+      return data.type ? getObjectXVIZType(data.type) !== null : false;
 
     default:
   }

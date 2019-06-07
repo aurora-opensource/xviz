@@ -77,7 +77,7 @@ Validation the different annotation types.
 
 Parameters:
 
-- `type` (String) - the type of the variable, only "visual" is currently valid
+- `type` (String) - the type of the variable, only "VISUAL" is currently valid
 - `data` (Object) - the object to validate
 
 ### Utility methods

@@ -6,7 +6,7 @@
         "columns": [
           {
             "display_text": "Name",
-            "type": "string"
+            "type": "STRING"
           }
         ],
         "nodes": [

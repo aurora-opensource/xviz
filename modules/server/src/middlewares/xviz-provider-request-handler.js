@@ -14,19 +14,11 @@
 /* global setTimeout, clearTimeout */
 /* eslint-disable camelcase, no-unused-expressions */
 import {Stats} from 'probe.gl';
+import {XVIZEnvelope} from '@xviz/io';
 
 const DEFAULT_OPTIONS = {
   delay: 0 // time in milliseconds
 };
-
-// TODO: move to @xviz/io
-function ErrorMsg(message) {
-  return {type: 'xviz/error', data: {message}};
-}
-
-function TransformLogDoneMsg(msg) {
-  return {type: 'xviz/transform_log_done', data: msg};
-}
 
 // Server middleware that handles the logic of responding
 // to a request with data from a provider, processing
@@ -65,7 +57,7 @@ export class XVIZProviderRequestHandler {
     // TODO; validation
     const error = null;
     if (error) {
-      this.middleware.onError(ErrorMsg(error));
+      this.middleware.onError(XVIZEnvelope.Error({message: error}));
     } else {
       // fill in profile, format, session_type
       // make context specific configuration fields
@@ -73,7 +65,7 @@ export class XVIZProviderRequestHandler {
       if (message.data.message_format) {
         this.context.set('message_format', message.data.message_format);
       } else {
-        this.context.set('message_format', 'binary');
+        this.context.set('message_format', 'BINARY');
       }
 
       if (message.data.profile) {
@@ -85,7 +77,7 @@ export class XVIZProviderRequestHandler {
       if (message.data.session_type) {
         this.context.set('session_type', message.data.session_type);
       } else {
-        this.context.set('session_type', 'log');
+        this.context.set('session_type', 'LOG');
       }
     }
 
@@ -106,7 +98,7 @@ export class XVIZProviderRequestHandler {
     // TODO: validation
     const error = null;
     if (error) {
-      this.middleware.onError(ErrorMsg(error));
+      this.middleware.onError(XVIZEnvelope.Error({message: error}));
     } else {
       //  store id, start_timestamp, end_timestamp, desired_streams
       const message = msg.message();
@@ -139,11 +131,13 @@ export class XVIZProviderRequestHandler {
   }
 
   onTransformPointInTime(msg) {
-    this.middleware.onError(ErrorMsg('Error: transform_point_in_time is not supported.'));
+    this.middleware.onError(
+      XVIZEnvelope.Error({message: 'Error: transform_point_in_time is not supported.'})
+    );
   }
 
   onReconfigure(msg) {
-    this.middleware.onError(ErrorMsg('Error: reconfigure is not supported.'));
+    this.middleware.onError(XVIZEnvelope.Error({message: 'Error: reconfigure is not supported.'}));
   }
 
   log(...msg) {
@@ -182,7 +176,7 @@ export class XVIZProviderRequestHandler {
 
       transformState.interval = setTimeout(() => this._sendStateUpdate(id, transformState), delay);
     } else {
-      this.middleware.onTransformLogDone(TransformLogDoneMsg({id}));
+      this.middleware.onTransformLogDone(XVIZEnvelope.TransformLogDone({id}));
       totalTimer && totalTimer.timeEnd();
       this.logDone(id, loadTimer, sendTimer, totalTimer);
       this.context.endTransform(id);
@@ -209,7 +203,7 @@ export class XVIZProviderRequestHandler {
       }
     }
 
-    this.middleware.onTransformLogDone(TransformLogDoneMsg({id}));
+    this.middleware.onTransformLogDone(XVIZEnvelope.TransformLogDone({id}));
     totalTimer && totalTimer.timeEnd();
     this.logDone(id, loadTimer, sendTimer, totalTimer);
     this.context.endTransform(id);

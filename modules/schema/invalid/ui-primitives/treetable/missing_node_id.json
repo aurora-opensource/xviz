@@ -2,7 +2,7 @@
   "columns": [
     {
       "display_text": "Age",
-      "type": "int32"
+      "type": "INT32"
     }
   ],
   "nodes": [

@@ -1,5 +1,5 @@
 {
-  "update_type": "snapshot",
+  "update_type": "SNAPSHOT",
   "updates": [
     {
       "timestamp": 1001.3,

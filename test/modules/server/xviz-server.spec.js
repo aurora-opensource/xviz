@@ -35,7 +35,7 @@ import {
   XVIZWebsocketSender
 } from '@xviz/server';
 
-import {XVIZFormat} from '@xviz/io';
+import {XVIZ_FORMAT} from '@xviz/io';
 
 XVIZProviderFactory.addProviderClass(ScenarioProvider);
 
@@ -62,7 +62,7 @@ tape('XVIZServer#simple flow', t => {
     const middleware = new XVIZServerMiddlewareStack();
     const stack = [
       new XVIZProviderRequestHandler(context, provider, middleware, {logger}),
-      new XVIZWebsocketSender(context, socket, {format: XVIZFormat.JSON_STRING})
+      new XVIZWebsocketSender(context, socket, {format: XVIZ_FORMAT.JSON_STRING})
     ];
     middleware.set(stack);
 

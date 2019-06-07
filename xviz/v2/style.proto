@@ -67,14 +67,14 @@ message Color {
 
 enum TextAnchor {
   TEXT_ANCHOR_INVALID = 0;
-  start = 1;
-  middle = 2;
-  end = 3;
+  START = 1;
+  MIDDLE = 2;
+  END = 3;
 }
 
 enum TextAlignmentBaseline {
   TEXT_ALIGNMENT_BASELINE_INVALID = 0;
-  top = 1;
-  center = 2;
-  bottom = 3;
+  TOP = 1;
+  CENTER = 2;
+  BOTTOM = 3;
 }

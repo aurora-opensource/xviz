@@ -47,7 +47,7 @@ export default class XVIZUIPrimitiveBuilder extends XVIZBaseBuilder {
   constructor(props) {
     super({
       ...props,
-      category: CATEGORY.ui_primitive
+      category: CATEGORY.UI_PRIMITIVE
     });
 
     this.reset();

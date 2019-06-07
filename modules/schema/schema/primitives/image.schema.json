@@ -8,7 +8,7 @@
       "$ref": "https://xviz.org/schema/core/primitive_base.json"
     },
     "type": {
-      "enum": ["image"]
+      "enum": ["IMAGE"]
     },
     "position": {
       "$ref": "https://xviz.org/schema/math/vector3x1.json"

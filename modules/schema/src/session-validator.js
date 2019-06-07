@@ -53,7 +53,7 @@ const TransitionTable = Object.freeze({
   CONNECTED: {
     START: msg => {
       if (msg) {
-        if (msg.session_type === 'live') {
+        if (msg.session_type === 'LIVE') {
           return SessionState.LIVE_SESSION_INITIALIZING;
         }
       }

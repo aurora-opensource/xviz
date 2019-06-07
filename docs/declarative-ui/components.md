@@ -10,12 +10,12 @@ Component is the base type for all visual elements.
 
 The valid values of `component_type`:
 
-- [`table`](#Table)
-- [`metric`](#Metric)
-- [`plot`](#Plot)
-- [`treetable`](#treetable)
-- [`video`](#video)
-- [`select`](#select-warning-unstable-feature-) (WARNING: Unstable feature)
+- [`TABLE`](#Table)
+- [`METRIC`](#Metric)
+- [`PLOT`](#Plot)
+- [`TREETABLE`](#treetable)
+- [`VIDEO`](#video)
+- [`SELECT`](#select-warning-unstable-feature-) (WARNING: Unstable feature)
 
 ## Table
 
@@ -45,7 +45,7 @@ _TODO: screentshot: panel with table from streetscape.gl demo app_
 {
   "components": [
     {
-      "type": "table",
+      "type": "TABLE",
       "title": "A table showing something"
       "description": "These are the details of this table",
       "displayObjectId": true,
@@ -63,7 +63,7 @@ components:
     display_object_id: true
     stream: /prediction/some_table
     title: A table showing something
-    type: table
+    type: TABLE
 ```
 
 ## Metric
@@ -92,7 +92,7 @@ _TODO: screenshot: streetscape.gl demo app showing drag-able sub-panels_
   "components": [
     {
       "title": "Some metric",
-      "type": "metric",
+      "type": "METRIC",
       "description": "The actual vs commanded value for some variable",
       "streams": ["/some_value/actual", "/some_value/commanded"]
     }
@@ -104,7 +104,7 @@ _TODO: screenshot: streetscape.gl demo app showing drag-able sub-panels_
 
 ```
 components:
-  - type: metric
+  - type: METRIC
     title: Some metric
     description: The actual vs commanded value for some variable
     streams:
@@ -162,7 +162,7 @@ style these regions apply style information to the `x` stream.
 {
   "components": [
     {
-      "type": "plot",
+      "type": "PLOT",
       "title": "Some Other Streams vs Some Stream",
       "description": "The change in some streams as a function of the other one",
       "independentVariable": "/some/stream",
@@ -176,7 +176,7 @@ style these regions apply style information to the `x` stream.
 
 ```
 components:
-  - type: plot
+  - type: PLOT
     title: Some Other Streams vs Some Stream
     description: The change in some streams as a function of the other one
     independentVariable: /some/stream
@@ -210,7 +210,7 @@ _TODO: screenshot: streetscape.gl demo app showing the video element_
 {
   "components": [
     {
-      "type": "video",
+      "type": "VIDEO",
       "cameras": [
         "front-center-roof-camera",
         "rear-starboard-roof-camera",
@@ -225,7 +225,7 @@ _TODO: screenshot: streetscape.gl demo app showing the video element_
 
 ```
 components:
-  - type: video
+  - type: VIDEO
     cameras:
       - front-center-roof-camera
       - rear-starboard-roof-camera
@@ -267,7 +267,7 @@ _TODO: screenshot: streetscape.gl demo app showing treetable data_
   "components": [
     {
       "display_object_id": false,
-      "type": "treetable",
+      "type": "TREETABLE",
       "description": "These are the details of the TreeTable",
       "stream": "/some/stream/of/treetable/primmatives",
       "title": "A TreeTable!"
@@ -284,7 +284,7 @@ components:
     display_object_id: false
     stream: /some/stream/of/treetable/primmatives
     title: A TreeTable!
-    type: treetable
+    type: TREETABLE
 ```
 
 ## Select (WARNING: Unstable feature)
@@ -327,7 +327,7 @@ So for the examples below we would get a `reconfigure` message of the form:
 
 ```
 {
-    "update_type": "delta",
+    "update_type": "DELTA",
     "config_update": {
         "system": {
             "info": {
@@ -346,7 +346,7 @@ So for the examples below we would get a `reconfigure` message of the form:
     {
       "title": "Additional Info Type",
       "description": "Which type of additional information you want sent",
-      "type": "select",
+      "type": "SELECT",
       "stream": "/system/additional_info/types",
       "onchange": {
         "target": "/system/info/type"
@@ -360,7 +360,7 @@ So for the examples below we would get a `reconfigure` message of the form:
 
 ```
 components:
-  - type: select
+  - type: SELECT
     title: Additional Info Type
     description: Which type of additional information you want sent
     streams: /system/additional_info/types
@@ -376,26 +376,26 @@ Below is a complete example of what a panel definition would look like
 
 ```js
 {
-  "type": "panel",
-  "layout": "vertical",
+  "type": "PANEL",
+  "layout": "VERTICAL",
   "name": "Example Panel",
-  "interactions": ["reorderable"],
+  "interactions": ["REORDERABLE"],
   "children": [
     {
-      "type": "container",
-      "layout": "horizontal",
+      "type": "CONTAINER",
+      "layout": "HORIZONTAL",
       "name": "Example Container #1",
-      "interactions": ["dragout"],
+      "interactions": ["DRAG_OUT"],
       "children": [
         {
-          "type": "table",
+          "type": "TABLE",
           "title": "A nested table showing something",
           "description": "These are the details of this table",
           "stream": "/some/table_stream",
           "displayObjectId": false
         },
         {
-          "type": "plot",
+          "type": "PLOT",
           "title": "A nested plot!",
           "description": "The change in some streams as a function of the other one",
           "independentVariable": "/some/stream",
@@ -407,14 +407,14 @@ Below is a complete example of what a panel definition would look like
       ]
     },
     {
-      "type": "table",
+      "type": "TABLE",
       "title": "A table showing something",
       "description": "These are the details of this table",
       "displayObjectId": true,
       "stream": "/prediction/some_table"
     },
     {
-      "type": "metric",
+      "type": "METRIC",
       "title": "Some metric",
       "description": "The actual vs commanded value for some variable",
       "streams": [
@@ -423,7 +423,7 @@ Below is a complete example of what a panel definition would look like
       ]
     },
     {
-      "type": "plot",
+      "type": "PLOT",
       "title": "Some Other Streams vs Some Stream",
       "description": "The change in some streams as a function of the other one",
       "independentVariable": "/some/stream",
@@ -433,7 +433,7 @@ Below is a complete example of what a panel definition would look like
       ]
     },
     {
-      "type": "video",
+      "type": "VIDEO",
       "cameras": [
         "front-center-roof-camera",
         "rear-starboard-roof-camera",
@@ -441,7 +441,7 @@ Below is a complete example of what a panel definition would look like
       ]
     },
     {
-      "type": "treetable",
+      "type": "TREETABLE",
       "title": "A TreeTable!",
       "description": "These are the details of the TreeTable",
       "displayObjectId": false,
@@ -459,51 +459,51 @@ components:
     display_object_id: true
     stream: /prediction/some_table
     title: A table showing something
-    type: table
+    type: TABLE
   - description: The actual vs commanded value for some variable
     streams:
       - /some_value/actual
       - /some_value/commanded
     title: Some metric
-    type: metric
+    type: METRIC
   - dependent_variables:
       - /some/other_stream
       - /some/second_other_stream
     description: The change in some streams as a function of the other one
     independent_variable: /some/stream
     title: Some Other Streams vs Some Stream
-    type: plot
+    type: PLOT
   - cameras:
       - front-center-roof-camera
       - rear-starboard-roof-camera
       - rear-port-roof-camera
-    type: video
+    type: VIDEO
   - description: These are the details of the TreeTable
     display_object_id: false
     stream: /some/stream/of/treetable/primmatives
     title: A TreeTable!
-    type: treetable
+    type: TREETABLE
 containers:
   - components:
       - description: These are the details of this table
         display_object_id: false
         stream: /some/table_stream
         title: A nested table showing something
-        type: table
+        type: TABLE
       - dependent_variables:
           - /some/other_stream
           - /some/second_other_stream
         description: The change in some streams as a function of the other one
         independent_variable: /some/stream
         title: A nested plot!
-        type: plot
+        type: PLOT
     containers: []
     interactions:
-      - drag_out
-    layout: horizontal
+      - DRAG_OUT
+    layout: HORIZONTAL
     name: 'Example Container #1'
 interactions:
-  - reorderable
-layout: vertical
+  - REORDERABLE
+layout: VERTICAL
 name: Example Panel
 ```

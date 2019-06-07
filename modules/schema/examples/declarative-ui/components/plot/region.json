@@ -1,5 +1,5 @@
 {
-  "type": "plot",
+  "type": "PLOT",
   "title": "Important regions",
   "description": "See important regions.",
   "regions": [

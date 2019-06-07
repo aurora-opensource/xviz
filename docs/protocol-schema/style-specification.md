@@ -25,8 +25,8 @@ Stream styles are defined as part of the stream's metadata.
   'version': '2.0.0',
   'streams': {
     '/object/shape': {
-      "category": "primitive",
-      "primitive_type": "polygon",
+      "category": "PRIMITIVE",
+      "primitive_type": "POLYGON",
       "stream_style": {
         "stroked": false,
         "fill_color": "#9D9DA3"
@@ -53,8 +53,8 @@ objects in that stream based on their classes.
   "version": "2.0.0",
   "streams": {
     '/object/shape': {
-      "category": "primitive",
-      "primitive_type": "polygon",
+      "category": "PRIMITIVE",
+      "primitive_type": "POLYGON",
       "stream_style": {
         "stroked": false,
         "fill_color": "#9D9DA3"
@@ -217,8 +217,8 @@ Supported style properties by primitive types:
 | `fill_color`    | Color of the texts                                                                                       | [Color](#color) | `'#fff'`  | X          | X          |
 | `text_size`     | Size of the text in pixels                                                                               | Number          | `12`      | X          | X          |
 | `text_rotation` | Counter-clockwise rotation of the text in degrees                                                        | Number          | `0`       | X          | X          |
-| `text_anchor`   | The horizontal alignment of a `text` primitive relative to its position. One of `start`, `middle`, `end` | String          | `middle`  | X          | X          |
-| `text_baseline` | The vertical alignment of a `text` primitive relative to its position. One of `top`, `center`, `bottom`  | String          | `center`  | X          | X          |
+| `text_anchor`   | The horizontal alignment of a `text` primitive relative to its position. One of `START`, `MIDDLE`, `END` | String          | `MIDDLE`  | X          | X          |
+| `text_baseline` | The vertical alignment of a `text` primitive relative to its position. One of `TOP`, `CENTER`, `BOTTOM`  | String          | `CENTER`  | X          | X          |
 | `opacity`       | Opacity of the object                                                                                    | Number          | `1`       | X          |            |
 
 ## Property Types

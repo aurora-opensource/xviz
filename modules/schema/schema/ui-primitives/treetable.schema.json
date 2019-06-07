@@ -15,10 +15,10 @@
           "type": {
             "type": "string",
             "enum": [
-              "int32",
-              "double",
-              "string",
-              "boolean"
+              "INT32",
+              "DOUBLE",
+              "STRING",
+              "BOOLEAN"
             ]
           },
           "unit": {

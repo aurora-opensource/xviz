@@ -24,11 +24,11 @@ export const XVIZ_MESSAGE_TYPE = {
 };
 
 export const STATE_UPDATE_TYPE = {
-  complete_state: 'COMPLETE',
-  incremental: 'INCREMENTAL',
+  COMPLETE_STATE: 'COMPLETE',
+  INCREMENTAL: 'INCREMENTAL',
 
   // Deprecated
-  snapshot: 'INCREMENTAL'
+  SNAPSHOT: 'INCREMENTAL'
 };
 
 export const XVIZ_GLTF_EXTENSION = 'AVS_xviz';

@@ -109,7 +109,7 @@ export default class XVIZBuilder {
   /*
   message data:
   {
-    update_type: 'snapshot',
+    update_type: 'SNAPSHOT',
     updates: [{
       timestamp,
       poses: {'/vehicle-pose': {}, ...},
@@ -154,7 +154,7 @@ export default class XVIZBuilder {
     }
 
     const message = {
-      update_type: 'snapshot',
+      update_type: 'SNAPSHOT',
       updates: [data]
     };
 

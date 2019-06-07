@@ -104,6 +104,7 @@ export class WebSocketInterface {
   sendMessage(msgType, data) {
     this.callMiddleware(msgType, data);
 
+    // TODO: use XVIZEnvelope
     const enveloped = {
       type: `xviz/${msgType}`,
       data

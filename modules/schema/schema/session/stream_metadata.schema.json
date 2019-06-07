@@ -19,42 +19,42 @@
     },
     "category": {
       "enum": [
-        "annotation",
-        "future_instance",
-        "pose",
-        "primitive",
-        "ui_primitive",
-        "time_series",
-        "variable"
+        "ANNOTATION",
+        "FUTURE_INSTANCE",
+        "POSE",
+        "PRIMITIVE",
+        "UI_PRIMITIVE",
+        "TIME_SERIES",
+        "VARIABLE"
       ]
     },
     "scalar_type": {
       "enum": [
-        "float",
-        "int32",
-        "bool",
-        "string"
+        "FLOAT",
+        "INT32",
+        "BOOL",
+        "STRING"
       ]
     },
     "primitive_type": {
       "enum": [
-        "circle",
-        "image",
-        "point",
-        "polygon",
-        "polyline",
-        "stadium",
-        "text"
+        "CIRCLE",
+        "IMAGE",
+        "POINT",
+        "POLYGON",
+        "POLYLINE",
+        "STADIUM",
+        "TEXT"
       ]
     },
     "ui_primitive_type": {
       "enum": [
-        "treetable"
+        "TREETABLE"
       ]
     },
     "annotation_type": {
       "enum": [
-        "visual"
+        "VISUAL"
       ]
     },
     "stream_style": {
@@ -100,8 +100,8 @@
           "properties": {
             "category": {
               "enum": [
-                "time_series",
-                "variable"
+                "TIME_SERIES",
+                "VARIABLE"
               ]
             }
           },
@@ -111,8 +111,8 @@
           "properties": {
             "category": {
               "enum": [
-                "future_instance",
-                "primitive"
+                "FUTURE_INSTANCE",
+                "PRIMITIVE"
               ]
             }
           },
@@ -122,7 +122,7 @@
           "properties": {
             "category": {
               "enum": [
-                "ui_primitive"
+                "UI_PRIMITIVE"
               ]
             }
           },
@@ -132,7 +132,7 @@
           "properties": {
             "category": {
               "enum": [
-                "annotation"
+                "ANNOTATION"
               ]
             }
           },
@@ -142,7 +142,7 @@
           "properties": {
             "category": {
               "enum": [
-                "pose"
+                "POSE"
               ]
             }
           }

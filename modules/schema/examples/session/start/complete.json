@@ -1,7 +1,7 @@
 {
   "version": "2.0.0",
   "profile": "basic",
-  "session_type": "log",
-  "message_format": "json",
+  "session_type": "LOG",
+  "message_format": "JSON",
   "log": "64ab5d78-8e95-424a-a5f3-24a535f1d441"
 }

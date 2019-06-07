@@ -143,7 +143,7 @@
                 "text": "AVS",
                 "base": {
                   "style": {
-                    "text_anchor": "end"
+                    "text_anchor": "END"
                   }
                 }
               },
@@ -152,7 +152,7 @@
                 "text": "AVS",
                 "base": {
                   "style": {
-                    "text_baseline": "bottom"
+                    "text_baseline": "BOTTOM"
                   }
                 }
               },

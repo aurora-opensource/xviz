@@ -6,8 +6,8 @@
   "properties": {
     "update_type": {
       "enum": [
-        "delta",
-        "full"
+        "DELTA",
+        "FULL"
       ]
     },
     "config_update": {

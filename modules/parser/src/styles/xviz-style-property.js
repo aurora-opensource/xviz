@@ -108,8 +108,8 @@ const DEFAULT_STYLES = {
   font_weight: 'normal',
   text_size: 12,
   text_rotation: 0,
-  text_anchor: 'middle',
-  text_baseline: 'center',
+  text_anchor: 'MIDDLE',
+  text_baseline: 'CENTER',
 
   radius: 1,
   radius_pixels: 1,
