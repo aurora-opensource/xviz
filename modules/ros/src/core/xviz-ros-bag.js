@@ -18,7 +18,7 @@ import {quaternionToEuler} from '../common/quaternion';
 
 import {XVIZMetadataBuilder} from '@xviz/builder';
 
-/* subclass Bag?
+/* subclass XVIZROSBag?
  *
  * keyTopic, topic filter
  *
@@ -56,7 +56,7 @@ import {XVIZMetadataBuilder} from '@xviz/builder';
  * @xviz topic to converter
  *
  */
-export class Bag {
+export class XVIZROSBag {
   constructor(bagPath, topicConfig) {
     this.bagPath = bagPath;
     this.keyTopic = topicConfig.keyTopic;

@@ -14,7 +14,7 @@
 /* global console */
 /* eslint-disable no-console */
 import {XVIZData} from '@xviz/io';
-import {Bag} from '@xviz/ros';
+import {XVIZROSBag} from '@xviz/ros';
 
 // Generic iterator that stores context for an iterator
 class MessageIterator {
@@ -53,7 +53,7 @@ class MessageIterator {
 }
 
 // People will need to create their own ROSBAGDataProvider
-// and use their subclassed 'Bag' instance
+// and use their subclassed 'XVIZROSBag' instance
 // ... could take the type as a parameter
 //
 // keyTopic is required
@@ -62,7 +62,7 @@ class MessageIterator {
 export class ROSBAGProvider {
   constructor({root, options}) {
     this.bagPath = root.endsWith('.bag') ? root : `${root}.bag`;
-    this.BagClass = (options && options.BagClass) || Bag;
+    this.BagClass = (options && options.BagClass) || XVIZROSBag;
 
     // These likely come from ROSBagProvider arguments passed
     // when added to the XVIZProviderFactory

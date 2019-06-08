@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 /**
- * Abstract Converter class that all converts must implement
+ * Abstract Converter class that all converters must implement
  */
 export default class Converter {
   constructor(config) {
