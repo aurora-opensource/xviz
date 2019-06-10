@@ -19,7 +19,7 @@ export class VoyagerBag extends XVIZROSBag {
     super(bagPath, topicConfig);
   }
 
-  async initBag(context, bag) {
+  async _initBag(context, bag) {
     await super.initBag(context, bag);
 
     const CONFIGURATION = '/commander/configuration';
@@ -46,7 +46,7 @@ export class VoyagerBag extends XVIZROSBag {
   }
 
   // could override and skip this entirely
-  async initMetadata(context, ros2xviz) {
+  async _initMetadata(context, ros2xviz) {
     const metadata = await super.initMetadata(context, ros2xviz);
 
     const FORWARD_CENTER = '/vehicle/camera/center_front'; // example

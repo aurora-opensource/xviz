@@ -21,24 +21,34 @@ import {VoyagerBag} from './voyager-bag';
 import {
   GeometryPoseStamped,
   NavPath,
-  LidarConverter,
+  SensorPointCloud2,
   SensorCompressedImage,
   SensorImage,
+  VisualizationMarker,
   VisualizationMarkerArray
 } from '@xviz/ros';
+import {MotionPlanOutput} from '../messages/motion-plan-output-converter';
+import {Route} from '../messages/route-converter';
+import {TrackList} from '../messages/tracklist-converter';
 
 export function setupCustomProvider(options) {
   // Setup ROS support based on arguments
   //
   // Custom Converters should be added here
-  const ros2xvizFactory = new ROS2XVIZFactory([
+  const converters = [
     GeometryPoseStamped,
     NavPath,
-    LidarConverter,
+    SensorPointCloud2,
     SensorCompressedImage,
     SensorImage,
-    VisualizationMarkerArray
-  ]);
+    VisualizationMarker,
+    VisualizationMarkerArray,
+    MotionPlanOutput,
+    Route,
+    TrackList
+  ];
+  console.log(converters);
+  const ros2xvizFactory = new ROS2XVIZFactory(converters);
 
   const {rosConfig} = options;
   let config = null;
