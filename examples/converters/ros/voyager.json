@@ -1,0 +1,35 @@
+{
+  "topicConfig": {
+    "keyTopic": "/current_pose",
+    "topics": [
+      "/current_pose",
+      "/planner/path",
+      "/commander/configuration",
+      "/commander/points_fore",
+      "/commander/points_back",
+      "/commander/perception_dct/track_list",
+      "/commander/perception_dct/marker_array",
+      "/closest_waypoint_marker",
+      "/commander/route_viz/route",
+      "/commander/dm/motion_planning/plan_viz",
+      "/vehicle/camera/center_front",
+      "/vehicle/camera/forward_center/image_raw/compressed",
+      "/commander/dm/behavior_planning/behavior_state_viz",
+      "/commander/route_viz/astar_closed",
+      "/commander/route_viz/route",
+      "/debug/gps_cov_marker",
+      "/commander/map_annotations/markers",
+      "/commander/next_target_mark visualization_msgs/Marker",
+      "/commander/trajectory_circle_mark visualization_msgs/Marker",
+      "/behavior_planning visualization_msgs/MarkerArray"
+    ]
+  },
+  "mapping": [
+    { 
+      "topic": "/current_pose",
+      "config": {
+        "xvizStream": "/vehicle_pose"
+      }
+    }
+  ]
+}
