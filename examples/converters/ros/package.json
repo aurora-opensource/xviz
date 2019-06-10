@@ -1,0 +1,18 @@
+{
+  "name": "rosxviz-example",
+  "version": "1.0.0",
+  "description": "Example of using the @xviz/ros module to convert server ROS Bags",
+  "scripts": {
+    "convert": "node ./cli-main.js",
+    "server": "node ./server-main.js"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@babel/cli": "^7.0.0",
+    "@babel/core": "^7.0.0",
+    "@babel/plugin-proposal-class-properties": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "@babel/register": "^7.0.0",
+    "babel-polyfill": "^6.26.0"
+  }
+}
