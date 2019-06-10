@@ -1,0 +1,24 @@
+{
+  "topicConfig": {
+    "keyTopic": "/fix",
+    "topics": [
+      "/fix",
+      "/csi_cam/front_center/image_raw",
+      "/vehicle_state"
+    ]
+  },
+  "mapping": [
+    { 
+      "topic": "/fix",
+      "config": {
+        "xvizStream": "/vehicle_pose"
+      }
+    },
+    {
+      "topic": "/csi_cam/front_center/image_raw",
+      "config": {
+        "xvizStream": "/vehicle/camera/center_front"
+      }
+    }
+  ]
+}

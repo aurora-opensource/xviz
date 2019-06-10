@@ -6,28 +6,25 @@ import {
 } from '@xviz/ros';
 
 import {XVIZProviderFactory} from '@xviz/io';
-import {CustomBag} from './custom-bag';
+import {PaccarBag} from './paccar-bag';
 
 import {
   GeometryPoseStamped,
   NavPath,
   LidarConverter,
-  SensorImage,
   SensorCompressedImage,
   VisualizationMarkerArray
 } from '@xviz/ros';
+import {SensorNavSatFix} from '../messages/sensor-navsatfix-converter'; 
+import {SensorImage} from '../messages/sensor-image-converter'; 
 
 export function setupCustomProvider(options) {
   // Setup ROS support based on arguments
   //
   // Custom Converters should be added here
   const ros2xvizFactory = new ROS2XVIZFactory([
-    GeometryPoseStamped,
-    NavPath,
-    LidarConverter,
-    SensorCompressedImage,
     SensorImage,
-    VisualizationMarkerArray
+    SensorNavSatFix
   ]);
 
   const {rosConfig} = options;
@@ -48,7 +45,7 @@ export function setupCustomProvider(options) {
 
     // logger
 
-    BagClass: CustomBag,
+    BagClass: PaccarBag,
     ros2xvizFactory,
   };
   XVIZProviderFactory.addProviderClass(ROSBAGProvider, rosbagProviderConfig);
