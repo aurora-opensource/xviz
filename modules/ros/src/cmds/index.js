@@ -12,4 +12,5 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 export {BagDump} from './bagdump';
-export {Convert} from './convert';
+export {Convert, ROSXVIZConverter} from './convert';
+export {Config} from './config';

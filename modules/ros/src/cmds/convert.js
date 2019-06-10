@@ -13,8 +13,10 @@
 // limitations under the License.
 /* global console */
 /* eslint-disable no-console, complexity, max-statements */
-import {XVIZFormat, XVIZFormatWriter} from '@xviz/io';
-import {FileSink} from '@xviz/io/node';
+import {XVIZ_FORMAT, XVIZFormatWriter} from '@xviz/io';
+import {FileSource, FileSink} from '@xviz/io/node';
+import {XVIZProviderFactory} from '@xviz/io';
+
 import {ROS2XVIZFactory} from '../core/ros-2-xviz-factory';
 import {ROSBAGProvider} from '../providers/rosbag-provider';
 import {defaultConverters} from '../messages';
@@ -49,87 +51,67 @@ function deleteDirRecursive(parentDir) {
   fs.rmdirSync(parentDir);
 }
 
-async function createProvider(args) {
-  let provider = null;
-  // root, dataProvider, options
-  provider = new ROSBAGProvider(args);
-  await provider.init();
+export class ROSXVIZConverter {
+  async execute(args, providerFactory = XVIZProviderFactory) {
+    const {bag: bagPath, dir: outputDir, start, end} = args;
 
-  if (provider.valid()) {
-    return provider;
-  }
-
-  return null;
-}
-
-export async function Convert(args) {
-  const {bag: bagPath, dir: outputDir, start, end, rosConfig} = args;
-
-  console.log(`Converting data at ${bagPath}`); // eslint-disable-line
-  if (rosConfig) {
-    console.log(`Using config ${rosConfig}`); // eslint-disable-line
-  }
-  console.log(`Saving to ${outputDir}`); // eslint-disable-line
-
-  let config = null;
-  if (rosConfig) {
-    // topicConfig: { keyTopic, topics }
-    // mapping: [ { topic, name, config: {xvizStream, field} }, ... ]
-    const data = fs.readFileSync(rosConfig);
-    if (data) {
-      config = JSON.parse(data);
+    try {
+      deleteDirRecursive(outputDir);
+    } catch (err) {
+      // ignore
     }
-  }
+    createDir(outputDir);
 
-  try {
-    deleteDirRecursive(outputDir);
-  } catch (err) {
-    // ignore
-  }
-  createDir(outputDir);
+    const root = bagPath;
+    const source = new FileSource(root);
+    // TODO: dump args
+    console.log(root);
+    console.log(JSON.stringify(args, null, 2));
+    console.log(JSON.stringify(providerFactory, null, 2)); // eslint-disable-line
 
-  // TODO: fix that key topic is fixed
-  // TODO: fix that topics is baked into the 'bag'
-  const ros2xvizFactory = new ROS2XVIZFactory(defaultConverters);
-  const options = {
-    ros2xvizFactory,
-    ...config
-  };
-  const provider = await createProvider({root: bagPath, options});
-  if (!provider) {
-    throw new Error('Failed to create ROSBAGProvider');
-  }
+    const provider = await providerFactory.open({
+      options: {...args},
+      source,
+      root
+    });
 
-  // This abstracts the details of the filenames expected by our server
-  const sink = new FileSink(outputDir);
-
-  const iterator = provider.getMessageIterator(start, end);
-  if (!iterator.valid()) {
-    throw new Error('Error creating and iterator');
-  }
-
-  const writer = new XVIZFormatWriter(sink, {format: XVIZFormat.BINARY_GLB});
-
-  const md = provider.xvizMetadata();
-  setMetadataTimes(md.message().data, start, end);
-  writer.writeMetadata(md);
-
-  // If we get interrupted make sure the index is written out
-  signalWriteIndexOnInterrupt(writer);
-
-  let frameSequence = 0;
-  while (iterator.valid()) {
-    const data = await provider.xvizMessage(iterator);
-    if (!data) {
-      throw new Error(`No data for frame ${frameSequence}`);
+    if (!provider) {
+      throw new Error('Failed to create ROSBAGProvider');
     }
 
-    process.stdout.write(`Writing frame ${frameSequence}\r`);
-    writer.writeMessage(frameSequence, data);
-    frameSequence += 1;
-  }
+    // This abstracts the details of the filenames expected by our server
+    const sink = new FileSink(outputDir);
 
-  writer.close();
+    const iterator = provider.getMessageIterator(start, end);
+    if (!iterator.valid()) {
+      throw new Error('Error creating and iterator');
+    }
+
+    // TODO: format as options
+    const writer = new XVIZFormatWriter(sink, {format: XVIZ_FORMAT.BINARY_GLB});
+
+    const md = provider.xvizMetadata();
+    setMetadataTimes(md.message().data, start, end);
+    writer.writeMetadata(md);
+
+    // If we get interrupted make sure the index is written out
+    signalWriteIndexOnInterrupt(writer);
+
+    let frameSequence = 0;
+    while (iterator.valid()) {
+      const data = await provider.xvizMessage(iterator);
+      if (data) {
+        process.stdout.write(`Writing frame ${frameSequence}\r`);
+        writer.writeMessage(frameSequence, data);
+        frameSequence += 1;
+      } else {
+        console.log(`No data for frame ${frameSequence}`);
+      }
+
+    }
+
+    writer.close();
+  }
 }
 
 /* eslint-disable camelcase */
@@ -154,4 +136,39 @@ function signalWriteIndexOnInterrupt(writer) {
     writer.close();
     process.exit(0); // eslint-disable-line no-process-exit
   });
+}
+
+async function registerROSBAGProvider(bagPath, rosConfig, args) {
+  console.log(`Converting data at ${bagPath}`); // eslint-disable-line
+  if (rosConfig) {
+    console.log(`Using config ${rosConfig}`); // eslint-disable-line
+  }
+  console.log(`Saving to ${args.dir}`); // eslint-disable-line
+
+  let config = null;
+  if (rosConfig) {
+    // topicConfig: { keyTopic, topics }
+    // mapping: [ { topic, name, config: {xvizStream, field} }, ... ]
+    const data = fs.readFileSync(rosConfig);
+    if (data) {
+      config = JSON.parse(data);
+    }
+  }
+
+  const ros2xvizFactory = new ROS2XVIZFactory(defaultConverters);
+  const rosbagProviderConfig = {
+    ...config,
+    ros2xvizFactory
+  };
+
+  // root, dataProvider, options
+  console.log('Adding ROSBAG');
+  XVIZProviderFactory.addProviderClass(ROSBAGProvider, rosbagProviderConfig);
+}
+
+export async function Convert(args) {
+  await registerROSBAGProvider(args.bag, args.rosConfig, args);
+
+  const converter = new ROSXVIZConverter();  
+  await converter.execute(args);
 }

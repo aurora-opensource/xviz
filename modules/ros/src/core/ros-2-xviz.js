@@ -156,7 +156,7 @@ export class ROS2XVIZ {
 
     // const hrstart = process.hrtime();
     for (const instance of this.instances) {
-      instance.convertMessage(frame, xvizBuilder);
+      await instance.convertMessage(frame, xvizBuilder);
     }
     // const hrend = process.hrtime(hrstart);
     // this.log(`Building message time (hr): ${hrend[0]}s ${hrend[1] / 1e6}ms`);

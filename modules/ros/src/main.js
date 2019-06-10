@@ -14,7 +14,7 @@
 require('@babel/register');
 require('babel-polyfill');
 
-import {BagDump, Convert} from './cmds';
+import {BagDump, Config, Convert} from './cmds';
 
 const StartEndOptions = {
   start: {
@@ -73,6 +73,12 @@ const yargs = require('yargs')
       }
     },
     BagDump
+  )
+  .command(
+    'config <bag>',
+    'Extracts basic information and outputs a configuration for the XVIZROSProvider',
+    {},
+    Config
   );
 
 export function main() {

@@ -14,7 +14,7 @@
 /* global console */
 /* eslint-disable no-console */
 import {XVIZData} from '@xviz/io';
-import {XVIZROSBag} from '@xviz/ros';
+import {XVIZROSBag} from '../core/xviz-ros-bag';
 
 // Generic iterator that stores context for an iterator
 class MessageIterator {
@@ -91,7 +91,7 @@ export class ROSBAGProvider {
       // options: {logger}
       this.ros2xviz = this.ros2xvizFactory.create(this.mapping, this.options);
 
-      this.bag = new this.BagClass(this.bagPath, this.topicConfig);
+      this.bag = new this.BagClass(this.bagPath, this.topicConfig, this.options);
 
       if (this.bag) {
         // TODO: need to separate out init from metadata gathering
