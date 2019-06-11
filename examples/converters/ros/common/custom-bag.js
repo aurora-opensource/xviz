@@ -5,11 +5,13 @@ export class CustomBag extends XVIZROSBag {
     super(bagPath, topicConfig);
   }
 
-  // Augment the initialization to ensure
-  // the bag contains the data is supported
-  // or add necessary data for extraction
-  // async initBag(context, bag)
+  /* Augment the initialization to ensure
+   * the bag contains the data is supported
+   * or add necessary data for extraction
+   */
+  // async _initBag(context, bag)
 
-  // Augment metadata for custom entries and UI
-  // async initMetadata()
+  /* Augment metadata for custom entries and UI
+   */
+  // async _initMetadata()
 }

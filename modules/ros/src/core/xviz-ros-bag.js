@@ -15,58 +15,11 @@
 /* eslint-disable camelcase */
 import {open, TimeUtil} from 'rosbag';
 import {quaternionToEuler} from '../common/quaternion';
-import process from 'process';
 
 import {XVIZBuilder, XVIZMetadataBuilder} from '@xviz/builder';
 
-class Timer {
-  start(name) {
-    this.name = name;
-    this.begin = process.hrtime();
-  }
-
-  end() {
-    const end = process.hrtime(this.begin);
-    console.log(`${this.name} ${end[0]}s ${end[1]/1000000}ms`);
-  }
-}
-
-/* subclass XVIZROSBag?
+/* XVIZROSBag provides 
  *
- * keyTopic, topic filter
- *
- * init underlying data source
- * manage "configuration"
- *
- * reconfigure
- * critical topics and building messages
- * - message by topic
- * - message by time
- *
- * // tool to create this automagically
- *
- * -- rosbag xviz mapping
- * keyTopic: '',
- * // identity, unless frame_id
- * // confused by frame_id & child_frame_id
- * topicToXVIZ: /topic: {
- *  stream: '/foo',
- *  frame:
- *    frame_id: velodyne
- *    xviz_coordinate: VEHICLE_RELATIVE
- *
- *  streamStyle:
- *  styleClasses:
- *    name
- *    style
- *
- *  marker
- *    polyline
- *    polygon
- *    circle
- *    text
- *
- * @xviz topic to converter
  *
  */
 export class XVIZROSBag {
@@ -81,27 +34,16 @@ export class XVIZROSBag {
 
   // Open the ROS Bag and collect information
   async init(ros2xviz) {
-    const tmr = new Timer();
-    tmr.start('bag open');
     const bag = await open(this.bagPath);
-    tmr.end();
 
     const context = {};
-    tmr.start('init');
-    await this.initBag(context, bag);
-    tmr.end();
+    await this._initBag(context, bag);
 
-    tmr.start('gatherTopics');
-    this.topicMessageTypes = this.gatherTopics(bag);
-    tmr.end();
+    this._topicMessageTypes = this.gatherTopics(bag);
 
-    tmr.start('initTopics');
-    this.initTopics(context, this.topicMessageTypes, ros2xviz);
-    tmr.end();
+    this._initTopics(context, this.topicMessageTypes, ros2xviz);
 
-    tmr.start('initTopics');
-    const metadata = await this.initMetadata(context, ros2xviz);
-    tmr.end();
+    const metadata = await this._initMetadata(context, ros2xviz);
 
     return metadata;
   }
@@ -118,7 +60,7 @@ export class XVIZROSBag {
    *   end_time,
    *   origin: map origin
    */
-  async initBag(context, bag) {
+  async _initBag(context, bag) {
     const TF = '/tf';
 
     context.start_time = TimeUtil.toDate(bag.startTime).getTime() / 1e3;
@@ -137,7 +79,7 @@ export class XVIZROSBag {
     context.frameIdToPoseMap = frameIdToPoseMap;
   }
 
-  gatherTopics(bag) {
+  _gatherTopics(bag) {
     // TODO: Add option to not collect topic message types
     //      ... but how will converters be created then?
     //      The provider has the mapping, and it can decide if it wants
@@ -168,13 +110,13 @@ export class XVIZROSBag {
     return topicMessageTypes;
   }
 
-  initTopics(context, topicMessageTypes, ros2xviz) {
+  _initTopics(context, topicMessageTypes, ros2xviz) {
     // context { frameIdToPoseMap, origin }
     ros2xviz.initializeConverters(topicMessageTypes, context);
   }
 
   // could override and skip this entirely
-  async initMetadata(context, ros2xviz) {
+  async _initMetadata(context, ros2xviz) {
     const xvizMetadataBuilder = new XVIZMetadataBuilder();
     await ros2xviz.buildMetadata(xvizMetadataBuilder, context);
     // TODO: should this just return the builder?

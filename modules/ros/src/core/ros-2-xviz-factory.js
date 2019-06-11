@@ -13,9 +13,8 @@
 // limitations under the License.
 import {ROS2XVIZ} from './ros-2-xviz';
 
-// Provided a list of all converters
-// can create an instance of the ROS2XVIZ
-// along with the mapping config for a provider instance
+// Provided a list of converters the factory can create an instance of
+// a ROS2XVIZ object along with the mapping config.
 export class ROS2XVIZFactory {
   constructor(converters) {
     this.converters = converters;
