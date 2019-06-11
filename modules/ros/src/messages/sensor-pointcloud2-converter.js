@@ -46,16 +46,15 @@ function downSamplePoints(points, maxPointsCount) {
 }
 */
 
-// TODO: rename to match messageType
 // TODO: change downsampling to options
-export class LidarConverter extends Converter {
+export class SensorPointCloud2 extends Converter {
   constructor(config) {
     super(config);
     this.previousData = {};
   }
 
   static get name() {
-    return 'LidarConverter';
+    return 'SensorPointCloud2';
   }
 
   static get messageType() {

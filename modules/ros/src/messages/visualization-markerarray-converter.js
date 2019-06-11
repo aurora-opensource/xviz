@@ -11,8 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-/* global console */
-/* eslint-disable no-console, camelcase, no-invalid-this */
+/* eslint-disable camelcase, no-invalid-this */
 import Converter from './converter';
 import _ from 'lodash';
 import {Vector3} from 'math.gl';
@@ -32,8 +31,6 @@ export class VisualizationMarkerArray extends Converter {
     super(config);
     this.acceptMarker = this.config.acceptMarker || (() => true);
 
-    console.log('~~~ Marker CTOR:', this.topic, this.xvizStream);
-
     this.markersMap = {};
 
     this.ARROW_STREAM = [this.xvizStream, 'arrow'].join(NAMESPACE_SEPARATOR);
@@ -42,6 +39,7 @@ export class VisualizationMarkerArray extends Converter {
     this.LINELIST_STREAM = [this.xvizStream, 'linelist'].join(NAMESPACE_SEPARATOR);
     this.TEXT_STREAM = [this.xvizStream, 'text'].join(NAMESPACE_SEPARATOR);
   }
+
   static get name() {
     return 'VisualizationMarkerArray';
   }
@@ -155,7 +153,6 @@ export class VisualizationMarkerArray extends Converter {
     _.forOwn(this.markersMap, marker => {
       const writer = WRITERS[marker.type];
       if (writer) {
-        // console.log('~~~ Writing Marker', writerName[marker.type]);
         writer(marker, xvizBuilder);
       }
     });
@@ -169,7 +166,6 @@ export class VisualizationMarkerArray extends Converter {
       new Vector3(...points[1]).rotateZ({radians: Math.PI / 24, origin: points[0]}).toArray()
     );
     */
-    // console.log('~~ARROW:', JSON.stringify(points));
     xvizBuilder
       .primitive(this.ARROW_STREAM)
       .polyline(points)

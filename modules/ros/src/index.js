@@ -22,10 +22,12 @@ export {
   // Individual converter
   GeometryPoseStamped,
   NavPath,
-  LidarConverter,
+  SensorPointCloud2,
   SensorImage,
   SensorCompressedImage,
+  VisualizationMarker,
   VisualizationMarkerArray,
+
   // All the above converters in an array
   defaultConverters
 } from './messages';
