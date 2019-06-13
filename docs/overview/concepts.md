@@ -56,7 +56,7 @@ identifier enables linking information across streams and time slices.
 ## Variable
 
 A sequences of values the occur at a one time. Like the speed of travel over a planned path for a
-vehicle. Each time time you get an update to a variable stream, the full list of values changes.
+vehicle. Each time you get an update to a variable stream, the full list of values changes.
 
 ## Time Series
 
