@@ -1,6 +1,6 @@
 # Structure of XVIZ-encoded data
 
-This is a brief summary of [XVIZ concepts](./docs/overview/concepts.md),
+This is a brief summary of [XVIZ concepts](../docs/overview/concepts.md),
 
 ## File Structure
 
