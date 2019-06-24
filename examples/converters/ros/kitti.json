@@ -1,0 +1,36 @@
+{
+  "topicConfig": [
+    {
+      "topic": "/kitti/oxts/gps/fix",
+      "type": "sensor_msgs/NavSatFix",
+      "config": {
+        "xvizStream": "/vehicle_pose",
+        "imuTopic": "/kitti/oxts/imu"
+      }
+    },
+    {
+      "topic": "/kitti/oxts/imu",
+      "config": {
+        "xvizStream": "/vehicle/acceleration"
+      }
+    },
+    {
+      "topic": "/kitti/camera_color_left/image_raw",
+      "config": {
+        "xvizStream": "/vehicle/camera/center_front"
+      }
+    },
+    {
+      "topic": "/kitti/camera_color_right/image_raw",
+      "config": {
+        "xvizStream": "/vehicle/camera/center_right"
+      }
+    },
+    {
+      "topic": "/kitti/velo/pointcloud",
+      "config": {
+        "altFrameId": "velo_link"
+      }
+    }
+  ]
+}
