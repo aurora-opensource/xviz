@@ -30,12 +30,20 @@ export class XVIZBaseReader {
   }
 
   readMetadata() {
-    return this.source.readSync(this._xvizMessage(1));
+    if (this.source) {
+      return this.source.readSync(this._xvizMessage(1));
+    }
+
+    return undefined;
   }
 
   readMessage(messageIndex) {
-    // Data messages begin at the filename 2-frame.*
-    return this.source.readSync(this._xvizMessage(2 + messageIndex));
+    if (this.source) {
+      // Data messages begin at the filename 2-frame.*
+      return this.source.readSync(this._xvizMessage(2 + messageIndex));
+    }
+
+    return undefined;
   }
 
   timeRange() {
@@ -114,12 +122,14 @@ export class XVIZBaseReader {
   }
 
   _readIndex() {
-    const indexData = this.source.readSync(this._xvizMessage(0));
-    if (indexData) {
-      if (isJSONString(indexData)) {
-        return JSON.parse(indexData);
-      } else if (typeof indexData === 'object') {
-        return indexData;
+    if (this.source) {
+      const indexData = this.source.readSync(this._xvizMessage(0));
+      if (indexData) {
+        if (isJSONString(indexData)) {
+          return JSON.parse(indexData);
+        } else if (typeof indexData === 'object') {
+          return indexData;
+        }
       }
     }
 
