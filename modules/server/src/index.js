@@ -25,4 +25,4 @@ export {XVIZProviderSession} from './server/xviz-provider-session';
 
 export {ScenarioProvider} from './scenarios';
 
-export {main} from './main';
+export {main, XVIZServerMain} from './main';

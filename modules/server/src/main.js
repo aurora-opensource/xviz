@@ -21,35 +21,57 @@ import {XVIZProviderFactory} from '@xviz/io';
 
 // For default command automatically support scenarios
 import {ScenarioProvider} from './scenarios';
-XVIZProviderFactory.addProviderClass(ScenarioProvider);
 
-export function main() {
-  const args = setupArgs();
-
-  const log = new Log({id: 'xvizserver-log'});
-
-  // Enable logging and set the level to the verbose count
-  log.enable(true).setLevel(args.argv.v);
-
-  const logger = {
-    log: (...msg) => log.log(...msg)(),
-    error: (...msg) => log.log(0, ...msg)(),
-    warn: (...msg) => log.log(1, ...msg)(),
-    info: (...msg) => log.log(1, ...msg)(),
-    verbose: (...msg) => log.log(2, ...msg)()
-  };
-
-  const options = {
-    ...args.argv,
-    logger
-  };
-
-  if (Number.isFinite(args.argv.delay)) {
-    options.delay = args.argv.delay;
+// Class to make it easier to create a server with a custom provider
+export class XVIZServerMain {
+  setupArguments() {
+    return setupArgs();
   }
 
-  const handler = new XVIZProviderHandler(XVIZProviderFactory, options);
-  const wss = new XVIZServer([handler], options, () => {
-    logger.log(`Listening on port ${wss.server.address().port}`);
-  });
+  setup() {
+    this.args = this.setupArguments();
+
+    this.log = new Log({id: 'xvizserver-log'});
+
+    // Enable logging and set the level to the verbose count
+    this.log.enable(true).setLevel(this.args.argv.v);
+
+    this.logger = {
+      log: (...msg) => this.log.log(...msg)(),
+      error: (...msg) => this.log(0, ...msg)(),
+      warn: (...msg) => this.log.log(1, ...msg)(),
+      info: (...msg) => this.log.log(1, ...msg)(),
+      verbose: (...msg) => this.log.log(2, ...msg)()
+    };
+
+    this.options = {
+      ...this.args.argv,
+      logger: this.logger
+    };
+
+    if (Number.isFinite(this.args.argv.delay)) {
+      this.options.delay = this.args.argv.delay;
+    }
+
+    this.setupProviders();
+  }
+
+  // Default server will add Scenarios
+  setupProviders() {
+    XVIZProviderFactory.addProviderClass(ScenarioProvider);
+  }
+
+  execute() {
+    this.setup();
+
+    const handler = new XVIZProviderHandler(XVIZProviderFactory, this.options);
+    const wss = new XVIZServer([handler], this.options, () => {
+      this.logger.log(`Listening on port ${wss.server.address().port}`);
+    });
+  }
+}
+
+export function main() {
+  const server = new XVIZServerMain();
+  server.execute();
 }

@@ -39,7 +39,7 @@ export class XVIZProviderHandler {
       // TODO: reconsile cli options with request options
       provider = await this.factory.open({
         source,
-        options: req.params,
+        options: {...req.params, logger: this.options.logger},
         root
       });
 
