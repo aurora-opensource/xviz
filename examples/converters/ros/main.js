@@ -12,18 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 /* eslint-disable camelcase */
-import {ROSBag} from '@xviz/ros';
 import {XVIZUIBuilder} from '@xviz/builder';
+import {serverArgs} from '@xviz/server';
+import {
+  convertArgs,
+  ROSBag,
+  registerROSBagProvider,
 
-// We subclass from the ROSBag
-// and override the `getMetadata` to add our own
-// entries for UI elements.
+  // Converters
+  SensorImage,
+  SensorNavSatFix,
+  SensorPointCloud2
+} from '@xviz/ros';
+
+import {SensorImu} from './messages/imu-converter';
+
+// We subclass from the ROSBag and override the `getMetadata`
+// to add our own entries for UI elements.
 export class KittiBag extends ROSBag {
   constructor(bagPath, rosConfig) {
     super(bagPath, rosConfig);
   }
 
-  // could override and skip this entirely
   getMetadata(builder, ros2xviz) {
     super.getMetadata(builder, ros2xviz);
 
@@ -45,3 +55,26 @@ export class KittiBag extends ROSBag {
     builder.ui(ui);
   }
 }
+
+// Setup ROS Provider
+function setupROSProvider(args) {
+  if (args.rosConfig) {
+    const converters = [SensorImage, SensorNavSatFix, SensorPointCloud2, SensorImu];
+
+    registerROSBagProvider(args.rosConfig, {converters, BagClass: KittiBag});
+  }
+}
+
+function main() {
+  const yargs = require('yargs');
+
+  let args = yargs.alias('h', 'help');
+
+  args = convertArgs(args);
+  args = serverArgs(args);
+
+  // This will parse and execute the server command
+  args.middleware(setupROSProvider).parse();
+}
+
+main();
