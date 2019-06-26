@@ -12,15 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 export {ROSBag} from './core/ros-bag';
+export {registerROSBagProvider} from './providers/register';
 export {ROSBagProvider} from './providers/rosbag-provider';
 export {ROSConfig} from './core/ros-config';
 export {quaternionToEuler} from './common/quaternion';
-// TODO: move this to common or core
-export {ConvertMain} from './cmds';
+
+export {convertCmd, convertArgs} from './cmds';
 
 export {
   Converter,
-  // Individual converter
+  // Individual converters
   GeometryPoseStamped,
   NavPath,
   SensorPointCloud2,
@@ -29,8 +30,10 @@ export {
   SensorCompressedImage,
   VisualizationMarker,
   VisualizationMarkerArray,
+  XVIZFakePose,
   // All the above converters in an array
   DEFAULT_CONVERTERS
 } from './messages';
+
 export {ROS2XVIZFactory} from './core/ros-2-xviz-factory';
 export {ROS2XVIZConverter} from './core/ros-2-xviz';

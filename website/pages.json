@@ -523,6 +523,10 @@
               {
                 "name": "VisualizationMarkerArray",
                 "markdown": "api-reference/ros/messages/visualization-marker-array.md"
+              },
+              {
+                "name": "XVIZFakePose",
+                "markdown": "api-reference/ros/messages/xviz-fake-pose.md"
               }
             ]
           },
@@ -544,6 +548,10 @@
           {
             "name": "ROSBagProvider",
             "markdown": "api-reference/ros/ros-bag-provider.md"
+          },
+          {
+            "name": "registerROSBagProvider",
+            "markdown": "api-reference/ros/register-ros-bag-provider.md"
           }
         ]
       }

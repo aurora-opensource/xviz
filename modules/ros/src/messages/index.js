@@ -20,6 +20,7 @@ import {SensorImage} from './sensor-image-converter';
 import {SensorCompressedImage} from './sensor-compressedimage-converter';
 import {VisualizationMarker} from './visualization-marker-converter';
 import {VisualizationMarkerArray} from './visualization-markerarray-converter';
+import {XVIZFakePose} from './xviz-fake-pose-converter';
 
 export {
   Converter,
@@ -30,7 +31,8 @@ export {
   SensorImage,
   SensorCompressedImage,
   VisualizationMarker,
-  VisualizationMarkerArray
+  VisualizationMarkerArray,
+  XVIZFakePose
 };
 
 export const DEFAULT_CONVERTERS = [
@@ -41,5 +43,6 @@ export const DEFAULT_CONVERTERS = [
   SensorImage,
   SensorCompressedImage,
   VisualizationMarker,
-  VisualizationMarkerArray
+  VisualizationMarkerArray,
+  XVIZFakePose
 ];

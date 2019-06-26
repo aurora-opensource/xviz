@@ -15,14 +15,20 @@
 /* eslint-disable no-console, max-depth */
 import {open} from 'rosbag';
 
-export async function Config(args) {
-  const {bag: bagPath} = args;
-  /*
-   * topicsConfig[]
-   *
-   * {topic, type, converter, config: {xvizStream}}
-   */
-  const bag = await open(bagPath);
+export function configArgs(inArgs) {
+  const cmd = 'config <bag>';
+
+  return inArgs.command(
+    cmd,
+    'Extracts basic information and outputs a configuration for the XVIZROSProvider',
+    {},
+    configCmd
+  );
+}
+
+export async function configCmd(args) {
+  const {bag: source} = args;
+  const bag = await open(source);
 
   const seen = [];
   const topics = [];

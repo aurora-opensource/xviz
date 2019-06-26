@@ -11,6 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-export {BagDump} from './bagdump';
-export {Convert, ConvertMain} from './convert';
-export {Config} from './config';
+export {bagdumpArgs, bagdumpCmd} from './bagdump';
+export {convertArgs, convertCmd} from './convert';
+export {configArgs, configCmd} from './config';

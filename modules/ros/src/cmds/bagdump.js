@@ -14,11 +14,45 @@
 /* global console */
 /* eslint-disable no-console, max-depth */
 import {open, TimeUtil} from 'rosbag';
+import {StartEndOptions} from './common';
 
-export async function BagDump(args) {
-  const {bag: bagPath, topic: mainTopic} = args;
+export function bagdumpArgs(inArgs) {
+  const cmd = 'bagdump <bag>';
 
-  const bag = await open(bagPath);
+  return inArgs.command(
+    cmd,
+    'Display information about a ROS bag',
+    {
+      ...StartEndOptions,
+      topic: {
+        alias: 't',
+        description: 'The topic to inspect'
+      },
+      dumpTime: {
+        type: 'boolean',
+        description: 'Show start and end time of the bag'
+      },
+      dumpTopics: {
+        type: 'boolean',
+        description: 'Show start and end time of the bag'
+      },
+      dumpMessages: {
+        type: 'boolean',
+        description: 'Will dump messages, if a topic is provided only those will be dumped'
+      },
+      dumpDefs: {
+        type: 'boolean',
+        description: 'Will dump message definitions'
+      }
+    },
+    bagdumpCmd
+  );
+}
+
+export async function bagdumpCmd(args) {
+  const {bag: source, topic: mainTopic} = args;
+
+  const bag = await open(source);
 
   if (args.dumpTime) {
     console.log(`start_time: ${TimeUtil.toDate(bag.startTime).getTime() / 1e3}`);
@@ -32,6 +66,7 @@ export async function BagDump(args) {
 
       if (!seen[topic]) {
         seen[topic] = true;
+
         console.log(topic, type);
         if (args.dumpDefs) {
           console.log(messageDefinition);

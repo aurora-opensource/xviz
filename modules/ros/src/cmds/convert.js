@@ -17,94 +17,98 @@ import {XVIZFormatWriter} from '@xviz/io';
 import {FileSource, FileSink} from '@xviz/io/node';
 import {XVIZProviderFactory} from '@xviz/io';
 
-import {ROS2XVIZFactory} from '../core/ros-2-xviz-factory';
-import {ROSBagProvider} from '../providers/rosbag-provider';
-import {DEFAULT_CONVERTERS} from '../messages';
+import {StartEndOptions} from './common';
 
 import process from 'process';
 import fs from 'fs';
 import path from 'path';
 
-function createDir(dirPath) {
-  if (!fs.existsSync(dirPath)) {
-    // make sure parent exists
-    const parent = path.dirname(dirPath);
-    createDir(parent);
+export function convertArgs(inArgs) {
+  const cmd = 'convert [-d output] <bag>';
 
-    fs.mkdirSync(dirPath);
-  }
+  return inArgs.command(
+    cmd,
+    'Convert a rosbag to xviz',
+    {
+      ...StartEndOptions,
+      directory: {
+        alias: 'd',
+        describe: 'Directory to save XVIZ data',
+        type: 'string',
+        required: true
+      },
+      rosConfig: {
+        describe: 'Path to ROS Bag JSON configuration',
+        type: 'string',
+        required: true
+      },
+      format: {
+        describe: 'Output data format',
+        default: 'BINARY_GLB',
+        choices: ['JSON_STRING', 'BINARY_GLB'],
+        nargs: 1
+      }
+    },
+    convertCmd
+  );
 }
 
-function deleteDirRecursive(parentDir) {
-  const files = fs.readdirSync(parentDir);
-  files.forEach(file => {
-    const currPath = path.join(parentDir, file);
-    if (fs.lstatSync(currPath).isDirectory()) {
-      // recurse
-      deleteDirRecursive(currPath);
-    } else {
-      // delete file
-      fs.unlinkSync(currPath);
-    }
+export async function convertCmd(args) {
+  const {bag, directory, start, end, format} = args;
+
+  // Setup output directory
+  try {
+    deleteDirRecursive(directory);
+  } catch (err) {
+    // ignore
+  }
+  createDir(directory);
+
+  const source = new FileSource(bag);
+  const provider = await XVIZProviderFactory.open({
+    options: {...args},
+    source,
+    root: bag
   });
 
-  fs.rmdirSync(parentDir);
-}
-
-export class ConvertMain {
-  async execute(args, providerFactory = XVIZProviderFactory) {
-    const {bag: root, dir: outputDir, start, end, format} = args;
-
-    try {
-      deleteDirRecursive(outputDir);
-    } catch (err) {
-      // ignore
-    }
-    createDir(outputDir);
-
-    const source = new FileSource(root);
-
-    const provider = await providerFactory.open({
-      options: {...args},
-      source,
-      root
-    });
-
-    if (!provider) {
-      throw new Error('Failed to create ROSBagProvider');
-    }
-
-    // This abstracts the details of the filenames expected by our server
-    const sink = new FileSink(outputDir);
-
-    const iterator = provider.getMessageIterator(start, end);
-    if (!iterator.valid()) {
-      throw new Error('Error creating and iterator');
-    }
-
-    const writer = new XVIZFormatWriter(sink, {format});
-
-    const md = provider.xvizMetadata();
-    setMetadataTimes(md.message().data, start, end);
-    writer.writeMetadata(md);
-
-    // If we get interrupted make sure the index is written out
-    signalWriteIndexOnInterrupt(writer);
-
-    let frameSequence = 0;
-    while (iterator.valid()) {
-      const data = await provider.xvizMessage(iterator);
-      if (data) {
-        process.stdout.write(`Writing frame ${frameSequence}\r`);
-        writer.writeMessage(frameSequence, data);
-        frameSequence += 1;
-      } else {
-        console.log(`No data for frame ${frameSequence}`);
-      }
-    }
-
-    writer.close();
+  if (!provider) {
+    throw new Error('Failed to create ROSBagProvider');
   }
+
+  // This abstracts the details of the filenames expected by our server
+  const sink = new FileSink(directory);
+
+  const iterator = provider.getMessageIterator(start, end);
+  if (!iterator.valid()) {
+    throw new Error('Error creating and iterator');
+  }
+
+  const writer = new XVIZFormatWriter(sink, {format});
+
+  const md = provider.xvizMetadata();
+
+  // Augment metadata with timing information
+  // if provided
+  setMetadataTimes(md.message().data, start, end);
+  writer.writeMetadata(md);
+
+  // If we get interrupted make sure the index is written out
+  signalWriteIndexOnInterrupt(writer);
+
+  // Process data
+  let frameSequence = 0;
+  while (iterator.valid()) {
+    const data = await provider.xvizMessage(iterator);
+    if (data) {
+      process.stdout.write(`Writing frame ${frameSequence}\r`);
+      writer.writeMessage(frameSequence, data);
+      frameSequence += 1;
+    } else {
+      console.log(`No data for frame ${frameSequence}`);
+    }
+  }
+
+  writer.close();
 }
 
 /* eslint-disable camelcase */
@@ -131,37 +135,28 @@ function signalWriteIndexOnInterrupt(writer) {
   });
 }
 
-async function registerROSBagProvider(bagPath, rosConfig, args) {
-  console.log(`Converting data at ${bagPath}`); // eslint-disable-line
-  if (rosConfig) {
-    console.log(`Using config ${rosConfig}`); // eslint-disable-line
+function createDir(dirPath) {
+  if (!fs.existsSync(dirPath)) {
+    // make sure parent exists
+    const parent = path.dirname(dirPath);
+    createDir(parent);
+
+    fs.mkdirSync(dirPath);
   }
-  console.log(`Saving to ${args.dir}`); // eslint-disable-line
-
-  let config = null;
-  if (rosConfig) {
-    // topicConfig: { keyTopic, topics }
-    // mapping: [ { topic, name, config: {xvizStream, field} }, ... ]
-    const data = fs.readFileSync(rosConfig);
-    if (data) {
-      config = JSON.parse(data);
-    }
-  }
-
-  const ros2xvizFactory = new ROS2XVIZFactory(DEFAULT_CONVERTERS);
-  const rosbagProviderConfig = {
-    rosConfig: config,
-    ros2xvizFactory
-  };
-
-  // root, dataProvider, options
-  console.log('Adding ROSBag');
-  XVIZProviderFactory.addProviderClass(ROSBagProvider, rosbagProviderConfig);
 }
 
-export async function Convert(args) {
-  await registerROSBagProvider(args.bag, args.rosConfig, args);
+function deleteDirRecursive(parentDir) {
+  const files = fs.readdirSync(parentDir);
+  files.forEach(file => {
+    const currPath = path.join(parentDir, file);
+    if (fs.lstatSync(currPath).isDirectory()) {
+      // recurse
+      deleteDirRecursive(currPath);
+    } else {
+      // delete file
+      fs.unlinkSync(currPath);
+    }
+  });
 
-  const converter = new ConvertMain();
-  await converter.execute(args);
+  fs.rmdirSync(parentDir);
 }
