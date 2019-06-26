@@ -11,67 +11,14 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-const setupArgs = require('./args').setupArgs;
 
-import {Log} from 'probe.gl';
-
-import {XVIZServer} from './server/xviz-server';
-import {XVIZProviderHandler} from './server/xviz-provider-handler';
-import {XVIZProviderFactory} from '@xviz/io';
-
-// For default command automatically support scenarios
-import {ScenarioProvider} from './scenarios';
-
-// Class to make it easier to create a server with a custom provider
-export class XVIZServerMain {
-  setupArguments() {
-    return setupArgs();
-  }
-
-  setup() {
-    this.args = this.setupArguments();
-
-    this.log = new Log({id: 'xvizserver-log'});
-
-    // Enable logging and set the level to the verbose count
-    this.log.enable(true).setLevel(this.args.argv.v);
-
-    this.logger = {
-      log: (...msg) => this.log.log(...msg)(),
-      error: (...msg) => this.log(0, ...msg)(),
-      warn: (...msg) => this.log.log(1, ...msg)(),
-      info: (...msg) => this.log.log(1, ...msg)(),
-      verbose: (...msg) => this.log.log(2, ...msg)()
-    };
-
-    this.options = {
-      ...this.args.argv,
-      logger: this.logger
-    };
-
-    if (Number.isFinite(this.args.argv.delay)) {
-      this.options.delay = this.args.argv.delay;
-    }
-
-    this.setupProviders();
-  }
-
-  // Default server will add Scenarios
-  setupProviders() {
-    XVIZProviderFactory.addProviderClass(ScenarioProvider);
-  }
-
-  execute() {
-    this.setup();
-
-    const handler = new XVIZProviderHandler(XVIZProviderFactory, this.options);
-    const wss = new XVIZServer([handler], this.options, () => {
-      this.logger.log(`Listening on port ${wss.server.address().port}`);
-    });
-  }
-}
+const yargs = require('yargs');
+import {serverArgs} from './cmds/server';
 
 export function main() {
-  const server = new XVIZServerMain();
-  server.execute();
+  let args = yargs.alias('h', 'help');
+  args = serverArgs(args, {defaultCommand: true});
+
+  // This will parse and execute the server command
+  args.parse();
 }

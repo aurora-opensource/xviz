@@ -395,6 +395,24 @@
             "markdown": "api-reference/server/overview.md"
           },
           {
+            "name": "User Guide",
+            "children": [
+              {
+                "name": "Tools",
+                "children": [
+                  {
+                    "name": "xvizserver ",
+                    "markdown": "api-reference/server/tools/xvizserver-tool.md"
+                  },
+                  {
+                    "name": "CLI Command Support",
+                    "markdown": "api-reference/server/tools/server-cmds.md"
+                  }
+                ]
+              }
+            ]
+          },
+          {
             "name": "XVIZServer",
             "markdown": "api-reference/server/xviz-server.md"
           },
@@ -463,10 +481,6 @@
               {
                 "name": "User Tool Classes",
                 "children": [
-                  {
-                    "name": "ServerMain",
-                    "markdown": "api-reference/ros/xviz-server-main.md"
-                  },
                   {
                     "name": "ConvertMain",
                     "markdown": "api-reference/ros/convert-main.md"
