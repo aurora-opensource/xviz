@@ -18,16 +18,16 @@ import base64js from 'base64-js';
 // - primitives with typed array fields are turned into arrays
 // - primtives of type image have the data turned into a base64 string
 /* eslint-disable complexity */
-export function xvizConvertJson(object, keyName) {
+export function xvizConvertJson(object, keyName, nestedDepth = 0) {
   if (Array.isArray(object)) {
-    return object.map(element => xvizConvertJson(element, keyName));
+    return object.map(element => xvizConvertJson(element, keyName, nestedDepth + 1));
   }
 
   // Typed arrays become normal arrays
   // TODO: no way to know if this should be 3 or 4
   if (ArrayBuffer.isView(object)) {
     // Return normal arrays
-    if (!(keyName === 'vertices' || keyName === 'points')) {
+    if (!(keyName === 'vertices' || keyName === 'points') || nestedDepth > 0) {
       return Array.from(object);
     }
 
@@ -60,7 +60,7 @@ export function xvizConvertJson(object, keyName) {
     // Handle all other objects
     const newObject = {};
     for (const key in object) {
-      newObject[key] = xvizConvertJson(object[key], key, keyName);
+      newObject[key] = xvizConvertJson(object[key], key);
     }
     return newObject;
   }
