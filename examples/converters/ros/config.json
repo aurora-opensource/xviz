@@ -1,0 +1,15 @@
+{
+  "topicConfig": [
+    {
+      "topic": "/points_raw",
+      "converter": "XVIZFakePose",
+      "config": {
+        "xvizStream": "/vehicle_pose"
+      }
+    },
+    {
+      "topic": "/points_raw",
+      "type": "sensor_msgs/PointCloud2"
+    }
+  ]
+}
