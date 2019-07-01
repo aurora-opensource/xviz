@@ -2,9 +2,27 @@
 
 The **@xviz/server** module provides a framework for serving XVIZ data over a Websocket.
 
+The [XVIZServer](/docs/api-reference/server/xviz-server.md) will delegate a request to the array of
+[XVIZHandlers](/docs/api-reference/server/overview-handler.md) that have been passed into when it is
+constructed. The XVIZHandlers will attempt to handle the request and if it can will return an
+instance of an [XVIZSession](/docs/api-reference/server/overview-session.md). The rest of the client
+communication is then handled by the XVIZSession, specifically the
+[XVIZ Protocol](/docs/protocol-schema/session-protocol.md).
+
 ![@xviz/server diagram](./images/xviz-server-block-diagram.svg)
 
 _Diagram of the @xviz/server class relationships and data flow_
+
+## Usage
+
+To use the XVIZServer we provide a command-line tool
+[xvizserver](/docs/api-reference/server/tools/xvizserver-tool.md). This tool provides the ability to
+host XVIZ data from multiple directories at once.
+
+## Extending the XVIZServer
+
+The design of the XVIZServer and XVIZHandler allow anyone to connect customized Handlers for their
+use-case in a simple manner following the existing implementation of the handler as a guide.
 
 # Module Classes
 
