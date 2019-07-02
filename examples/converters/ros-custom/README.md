@@ -186,7 +186,7 @@ The code excerpts below are from [main.js](./main.js)
 #### Registering converters
 
 Registering is facilitated by the
-[registerROSBagProvider](../../../docs/api-reference/register-ros-bag-provider.md) function. As
+[registerROSBagProvider](../../../docs/api-reference/ros/register-ros-bag-provider.md) function. As
 Javascript is a dynamic language, we are able to pass the classes by name to a factory singleton and
 they will be constructed as necessary at a later time.
 
