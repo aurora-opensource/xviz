@@ -15,6 +15,8 @@
 /* eslint-disable camelcase */
 import fs from 'fs';
 import path from 'path';
+import process from 'process';
+
 import {_getPoseTrajectory} from '@xviz/builder';
 
 import BaseConverter from './base-converter';
@@ -57,7 +59,7 @@ export default class GPSConverter extends BaseConverter {
     const entry = this.poses[messageNumber];
 
     const {pose, velocity, acceleration} = entry;
-    console.log(`processing gps data message ${messageNumber}/${this.timestamps.length}`); // eslint-disable-line
+    process.stdout.write(`processing message ${messageNumber}/${this.timestamps.length}\r`); // eslint-disable-line
 
     // Every message *MUST* have a pose. The pose can be considered
     // the core reference point for other data and usually drives the timing
