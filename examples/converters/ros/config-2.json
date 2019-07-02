@@ -1,0 +1,23 @@
+{
+  "topicConfig": [
+    {
+      "topic": "/kitti/oxts/gps/fix",
+      "type": "sensor_msgs/NavSatFix",
+      "config": {
+        "xvizStream": "/vehicle_pose",
+        "imuTopic": "/kitti/oxts/imu"
+      }
+    },
+    {
+      "topic": "/kitti/oxts/imu",
+      "type": "sensor_msgs/Imu"
+    },
+    {
+      "topic": "/kitti/velo/pointcloud",
+      "type": "sensor_msgs/PointCloud2",
+      "config": {
+        "frameId": "velo_link"
+      }
+    }
+  ]
+}

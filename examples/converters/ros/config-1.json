@@ -1,0 +1,15 @@
+{
+  "topicConfig": [
+    {
+      "topic": "/kitti/velo/pointcloud",
+      "converter": "XVIZFakePose",
+      "config": {
+        "xvizStream": "/vehicle_pose"
+      }
+    },
+    {
+      "topic": "/kitti/velo/pointcloud",
+      "type": "sensor_msgs/PointCloud2"
+    }
+  ]
+}

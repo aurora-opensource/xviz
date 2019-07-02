@@ -1,0 +1,51 @@
+#! /usr/bin/env node
+
+// Copyright (c) 2019 Uber Technologies, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+/* eslint-env node */
+/* eslint no-var:0, no-process-env: 0 */
+
+// Production path
+var requirePath = '../dist/es5/main';
+
+// When building allow for running tool without build step, not expected to work
+// when published.  Use `babel-xvizserver` to run with this environment variable
+// automatically set.
+if (
+  process.env.XVIZ_DEV !== undefined &&
+  (process.env.XVIZ_DEV === '1' || process.env.XVIZ_DEV.toLowerCase() === 'true')
+) {
+  var path = require('path');
+  var resolve = path.resolve;
+
+  // global process
+  require('@babel/register')({
+    configFile: resolve(__dirname, '../../../babel.config.js'),
+    // ignore all except modules that begin with @xviz
+    ignore: [/node_modules\/(?!@xviz)/]
+  });
+
+  require('source-map-support').install();
+  const ALIASES = require('ocular-dev-tools/config/ocular.config')({
+      root: resolve(__dirname, '../../..')
+  }).aliases;
+  const moduleAlias = require('module-alias');
+  moduleAlias.addAliases(ALIASES);
+
+  requirePath = '../src/main';
+}
+
+// Run
+require(requirePath).main();

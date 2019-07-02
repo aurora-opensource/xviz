@@ -395,6 +395,24 @@
             "markdown": "api-reference/server/overview.md"
           },
           {
+            "name": "User Guide",
+            "children": [
+              {
+                "name": "Tools",
+                "children": [
+                  {
+                    "name": "xvizserver ",
+                    "markdown": "api-reference/server/tools/xvizserver-tool.md"
+                  },
+                  {
+                    "name": "CLI Command Support",
+                    "markdown": "api-reference/server/tools/server-cmds.md"
+                  }
+                ]
+              }
+            ]
+          },
+          {
             "name": "XVIZServer",
             "markdown": "api-reference/server/xviz-server.md"
           },
@@ -434,6 +452,101 @@
                 "markdown": "api-reference/server/xviz-websocket-sender.md"
               }
             ]
+          }
+        ]
+      },
+      {
+        "name": "@xviz/ros",
+        "children": [
+          {
+            "name": "Overview",
+            "markdown": "api-reference/ros/overview.md"
+          },
+          {
+            "name": "User Guide",
+            "children": [
+              {
+              "name": "Overview",
+              "markdown": "api-reference/ros/overview-user-guide.md"
+              },
+              {
+                "name": "Tools",
+                "children": [
+                  {
+                    "name": "xvizros",
+                    "markdown": "api-reference/ros/tools/xvizros-tool.md"
+                  },
+                  {
+                    "name": "ConvertMain",
+                    "markdown": "api-reference/ros/convert-main.md"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "Converters",
+            "children": [
+              {
+                "name": "Overview",
+                "markdown": "api-reference/ros/overview-converters.md"
+              },
+              {
+                "name": "GeometryPoseStamped",
+                "markdown": "api-reference/ros/messages/geometry-posestamped.md"
+              },
+              {
+                "name": "NavPath",
+                "markdown": "api-reference/ros/messages/nav-path.md"
+              },
+              {
+                "name": "SensorImage",
+                "markdown": "api-reference/ros/messages/sensor-image.md"
+              },
+              {
+                "name": "SensorCompressedImage",
+                "markdown": "api-reference/ros/messages/sensor-compressed-image.md"
+              },
+              {
+                "name": "SensorPointCloud2",
+                "markdown": "api-reference/ros/messages/sensor-point-cloud-2.md"
+              },
+              {
+                "name": "VisualizationMarker",
+                "markdown": "api-reference/ros/messages/visualization-marker.md"
+              },
+              {
+                "name": "VisualizationMarkerArray",
+                "markdown": "api-reference/ros/messages/visualization-marker-array.md"
+              },
+              {
+                "name": "XVIZFakePose",
+                "markdown": "api-reference/ros/messages/xviz-fake-pose.md"
+              }
+            ]
+          },
+          { "name": "ROS2XVIZConverter",
+            "markdown": "api-reference/ros/ros-2-xviz-converter.md"
+          },
+          {
+            "name": "ROS2XVIZFactory",
+            "markdown": "api-reference/ros/ros-2-xviz-factory.md"
+          },
+          {
+            "name": "ROSConfig",
+            "markdown": "api-reference/ros/ros-config.md"
+          },
+          {
+            "name": "ROSBag",
+            "markdown": "api-reference/ros/ros-bag.md"
+          },
+          {
+            "name": "ROSBagProvider",
+            "markdown": "api-reference/ros/ros-bag-provider.md"
+          },
+          {
+            "name": "registerROSBagProvider",
+            "markdown": "api-reference/ros/register-ros-bag-provider.md"
           }
         ]
       }

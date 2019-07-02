@@ -50,16 +50,15 @@ function makeFrame(points, colors) {
   };
 }
 
-test('XVIZBinaryWriter#points not made binary because too few elements', t => {
-  // Must have minimum of 20 elements to be converted to binary
-  const points_flat = [0, 0, 0, 4, 0, 0, 4, 3, 0];
-  const colors_flat = [255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255];
+test('XVIZBinaryWriter#points', t => {
+  const points_flat = [1, 1, 1, 2, 2, 2, 3, 3, 3];
+  const colors_flat = [10, 10, 10, 20, 20, 20, 30, 30, 30];
 
-  const points_nested = [[0, 0, 0], [4, 0, 0], [4, 3, 0]];
-  const colors_nested = [[255, 0, 0, 255], [0, 255, 0, 255], [0, 0, 255, 255]];
+  const points_nested = [[1, 1, 1], [2, 2, 2], [3, 3, 3]];
+  const colors_nested = [[10, 10, 10, 255], [20, 20, 20, 255], [30, 30, 30, 255]];
 
-  const points_typed = Float32Array.from([0, 0, 0, 4, 0, 0, 4, 3, 0]);
-  const colors_typed = Uint8Array.from([255, 0, 0, 255, 0, 255, 0, 255, 0, 0, 255, 255]);
+  const points_typed = Float32Array.from([1, 1, 1, 2, 2, 2, 3, 3, 3]);
+  const colors_typed = Uint8Array.from([10, 10, 10, 255, 20, 20, 20, 255, 30, 30, 30, 255]);
 
   const points_typed_nested = [
     Float32Array.from([1, 1, 1]),
@@ -87,11 +86,20 @@ test('XVIZBinaryWriter#points not made binary because too few elements', t => {
 
     t.ok(sink.has('2-frame.glb'), 'wrote binary frame');
 
-    // TODO: once this is merged into @xviz/io replace this with actual
-    // parsing and validation of the structure.
     const data = sink.readSync('2-frame.glb');
-    t.ok(data.toString().includes('#/accessors/0'), 'data has accessor 0');
-    t.ok(data.toString().includes('#/accessors/1'), 'data has accessor 1');
+    const msg = new XVIZData(data).message();
+    const writtenPoints = msg.data.updates[0].primitives['/test/points'].points[0];
+
+    t.ok(writtenPoints.points, 'Has points');
+    t.ok(writtenPoints.colors, 'Has colors');
+
+    t.equals(writtenPoints.points[0], 1, 'point 1 matches input data');
+    t.equals(writtenPoints.points[3], 2, 'point 2 matches input data');
+    t.equals(writtenPoints.points[6], 3, 'point 3  matches input data');
+
+    t.equals(writtenPoints.colors[0], 10, 'color 1 matches input data');
+    t.equals(writtenPoints.colors[4], 20, 'color 2 matches input data');
+    t.equals(writtenPoints.colors[8], 30, 'color 3 matches input data');
   });
   t.end();
 });

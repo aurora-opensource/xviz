@@ -25,4 +25,5 @@ export {XVIZProviderSession} from './server/xviz-provider-session';
 
 export {ScenarioProvider} from './scenarios';
 
+export {serverArgs, serverCmd} from './cmds/server';
 export {main} from './main';

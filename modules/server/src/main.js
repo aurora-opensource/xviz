@@ -11,45 +11,14 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-const setupArgs = require('./args').setupArgs;
 
-import {Log} from 'probe.gl';
-
-import {XVIZServer} from './server/xviz-server';
-import {XVIZProviderHandler} from './server/xviz-provider-handler';
-import {XVIZProviderFactory} from '@xviz/io';
-
-// For default command automatically support scenarios
-import {ScenarioProvider} from './scenarios';
-XVIZProviderFactory.addProviderClass(ScenarioProvider);
+const yargs = require('yargs');
+import {serverArgs} from './cmds/server';
 
 export function main() {
-  const args = setupArgs();
+  let args = yargs.alias('h', 'help');
+  args = serverArgs(args, {defaultCommand: true});
 
-  const log = new Log({id: 'xvizserver-log'});
-
-  // Enable logging and set the level to the verbose count
-  log.enable(true).setLevel(args.argv.v);
-
-  const logger = {
-    log: (...msg) => log.log(...msg)(),
-    error: (...msg) => log.log(0, ...msg)(),
-    warn: (...msg) => log.log(1, ...msg)(),
-    info: (...msg) => log.log(1, ...msg)(),
-    verbose: (...msg) => log.log(2, ...msg)()
-  };
-
-  const options = {
-    ...args.argv,
-    logger
-  };
-
-  if (Number.isFinite(args.argv.delay)) {
-    options.delay = args.argv.delay;
-  }
-
-  const handler = new XVIZProviderHandler(XVIZProviderFactory, options);
-  const wss = new XVIZServer([handler], options, () => {
-    logger.log(`Listening on port ${wss.server.address().port}`);
-  });
+  // This will parse and execute the server command
+  args.parse();
 }

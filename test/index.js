@@ -17,6 +17,7 @@ require('./modules/update-test-cases');
 require('./modules/builder');
 require('./modules/parser');
 require('./modules/io');
+require('./modules/ros');
 require('./modules/schema');
 require('./modules/server');
 require('./modules/cli');

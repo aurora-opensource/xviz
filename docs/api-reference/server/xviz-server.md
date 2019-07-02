@@ -4,6 +4,10 @@ The XVIZServer will listen on a port for connections. Upon a connection the serv
 find a handler that can satisfy the request. If a handler is found it will be called to manage the
 request else the socket will be closed.
 
+![@xviz/server diagram](./images/xviz-server-block-diagram.svg)
+
+_Diagram of the @xviz/server class relationships and data flow_
+
 ## Example
 
 ```js
