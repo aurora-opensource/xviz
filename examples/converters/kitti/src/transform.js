@@ -18,6 +18,8 @@ import {XVIZJSONWriter, XVIZBinaryWriter} from '@xviz/io';
 
 import {KittiConverter} from './converters';
 
+import process from 'process';
+
 module.exports = async function main(args) {
   const {
     inputDir,
@@ -54,6 +56,9 @@ module.exports = async function main(args) {
   const xvizMetadata = converter.getMetadata();
   xvizWriter.writeMetadata(xvizMetadata);
 
+  // If we get interrupted make sure the index is written out
+  signalWriteIndexOnInterrupt(xvizWriter);
+
   const start = Date.now();
 
   const limit = Math.min(messageLimit, converter.messageCount());
@@ -77,3 +82,11 @@ module.exports = async function main(args) {
   const end = Date.now();
   console.log(`Generate ${limit} messages in ${end - start}s`); // eslint-disable-line
 };
+
+function signalWriteIndexOnInterrupt(writer) {
+  process.on('SIGINT', () => {
+    console.log('Aborting, writing index file.'); // eslint-disable-line
+    writer.close();
+    process.exit(0); // eslint-disable-line no-process-exit
+  });
+}

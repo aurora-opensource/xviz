@@ -14,6 +14,9 @@ We will cover the following:
 
 ## Setup
 
+All the commands expect to ran from the **root** directory of the repo. When you are expected to
+change directories the commands for that will be included.
+
 #### Start the Streetscape viewer
 
 [Start the streetscape.gl viewer](https://github.com/uber/streetscape.gl/tree/master/test/apps/viewer#running-the-viewer-app)
@@ -28,6 +31,12 @@ Run `yarn bootstrap` in the repository root.
 We take advanage of the same KITTI data set used in other examples and use the tool
 [kitti2bag](https://github.com/tomas789/kitti2bag) to convert the KITTI data into a ROS Bag for use
 with this example.
+
+You should rerun the KITTI download script to make sure you have all the files required.
+
+```
+$ ./scripts/download-kitti-data.sh
+```
 
 If you have support for docker, the following should work with the KITTI data used in our default
 example.
@@ -146,11 +155,11 @@ We can inspect message from the topic to see the frame_id setting using the
 This will dump the message data to stdout
 
 ```
-$ ./modules/ros/bin/xvizros bagdump --dumpMessages -t /kitti/velo/pointcloud data/kitti/kitti_2011_09_26_drive_0005_synced.bag
+$ ./modules/ros/bin/xvizros bagdump --dumpMessages -t /kitti/velo/pointcloud data/kitti/kitti_2011_09_26_drive_0005_synced.bag | grep frame_id
 ```
 
 By running that command we can see that the frameId is **velo_link**, so we can add this to the
-point cloud configuration.
+point cloud configuration. Use Control+C to terminate the command.
 
 This is what the config for example 2 looks like.
 
