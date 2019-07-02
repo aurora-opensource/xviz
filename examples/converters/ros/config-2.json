@@ -10,18 +10,7 @@
     },
     {
       "topic": "/kitti/oxts/imu",
-      "type": "sensor_msgs/Imu",
-      "config": {
-        "xvizStream": "/vehicle/acceleration"
-      }
-    },
-    {
-      "topic": "/kitti/camera_color_left/image_raw",
-      "type": "sensor_msgs/Image"
-    },
-    {
-      "topic": "/kitti/camera_color_right/image_raw",
-      "type": "sensor_msgs/Image"
+      "type": "sensor_msgs/Imu"
     },
     {
       "topic": "/kitti/velo/pointcloud",

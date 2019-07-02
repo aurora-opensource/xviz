@@ -22,9 +22,11 @@ message definitions.
 
 Options:
 
-`--dumpTime` - Show the start and end time of the Bag `--dumpTopics` - List all the topics in the
-Bag `--dumpDefs` - Show the message definition of each topic `--dumpMessages` - Dump the messages
-`--topic, -t <topicName>` - limit
+- `--dumpTime` - Show the start and end time of the Bag
+- `--dumpTopics` - List all the topics in the Bag
+- `--dumpDefs` - Show the message definition of each topic
+- `--dumpMessages` - Dump the messages
+- `--topic, -t <topicName>` - limit
 
 Example:
 
@@ -38,9 +40,10 @@ Converts the ROS bag and writes the XVIZ files to the provided output directory.
 
 Options:
 
-`--rosConfig <filename.json>` - Show the start and end time of the Bag `--start, -s <time>` -
-Starting timestamp to begin conversion `--end, -e <time>` - Ending timestamp to stop conversion
-`--dir, -d <path>` - Directory where to save XVIZ data
+- `--rosConfig <filename.json>` - Show the start and end time of the Bag
+- `--start, -s <time>` - Starting timestamp to begin conversion
+- `--end, -e <time>` - Ending timestamp to stop conversion
+- `--dir, -d <path>` - Directory where to save XVIZ data
 
 Example:
 

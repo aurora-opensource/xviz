@@ -37,7 +37,8 @@ export class KittiBag extends ROSBag {
   getMetadata(builder, ros2xviz) {
     super.getMetadata(builder, ros2xviz);
 
-    const FORWARD_CENTER = '/vehicle/camera/center_front';
+    const LEFT = '/kitti/camera_color_left/image_raw';
+    const RIGHT = '/kitti/camera_color_right/image_raw';
 
     const ui = new XVIZUIBuilder({});
 
@@ -46,11 +47,25 @@ export class KittiBag extends ROSBag {
     });
 
     const video = ui.video({
-      cameras: [FORWARD_CENTER]
+      cameras: [LEFT, RIGHT]
     });
 
     cam_panel.child(video);
+
+    const chart_panel = ui.panel({
+      name: 'Charts'
+    });
+
+    const metric = ui.metric({
+      streams: ['/vehicle/acceleration'],
+      title: 'Acceleration',
+      description: 'The acceleration of the vehicle'
+    });
+
+    chart_panel.child(metric);
+
     ui.child(cam_panel);
+    ui.child(chart_panel);
 
     builder.ui(ui);
   }

@@ -475,12 +475,7 @@
                   {
                     "name": "xvizros",
                     "markdown": "api-reference/ros/tools/xvizros-tool.md"
-                  }
-                ]
-              },
-              {
-                "name": "User Tool Classes",
-                "children": [
+                  },
                   {
                     "name": "ConvertMain",
                     "markdown": "api-reference/ros/convert-main.md"
@@ -498,7 +493,7 @@
               },
               {
                 "name": "GeometryPoseStamped",
-                "markdown": "api-reference/ros/messages/geometry-poststamped.md"
+                "markdown": "api-reference/ros/messages/geometry-posestamped.md"
               },
               {
                 "name": "NavPath",

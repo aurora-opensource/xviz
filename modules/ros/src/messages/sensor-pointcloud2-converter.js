@@ -71,7 +71,7 @@ export class SensorPointCloud2 extends Converter {
       });
 
     // By convention velodyne is common, but it others may be used.
-    const frameId = this.config.altFrameId || 'velodyne';
+    const frameId = this.config.frameId || 'velodyne';
     const pose = (frameIdToPoseMap || {})[frameId];
 
     if (pose) {

@@ -14,6 +14,13 @@ The focus is on ROS 1, but most if not all of this translates to ROS 2 as well.
 
 ![@xviz/ros diagram](./images/xviz-ros-block-diagram.svg)
 
+### Examples
+
+See our code examples:
+
+- [Basic ROS Bag](https://github.com/uber/xviz/tree/master/examples/converters/ros)
+- [Custom ROS Bag Message Types](https://github.com/uber/xviz/tree/master/examples/converters/ros-custom)
+
 ### Access to ROS data
 
 At the lowest level we need to read ROS Bag files and covert the messages to XVIZ. This is achieved
@@ -22,6 +29,8 @@ with the [ROSBag](/docs/api-reference/ros/ros-bag.md) class to read ROS bags, an
 XVIZ.
 
 ### Convertering ROS messages to XVIZ
+
+![@xviz/ros data mapping](./images/xviz-ros-2-xviz-block-diagram.svg)
 
 In order to provide control for how this mapping happens and conversion support for ROS messages we
 may not support, we provide the classes [ROSConfig](/docs/api-reference/ros/ros-config.md) and
