@@ -48,6 +48,11 @@ message Point {
   repeated double points = 2;
   // Flattened list of (R, G, B) or (R, G, B, A)
   repeated uint32 colors = 3;
+
+  // 3, 32 bit floats per point
+  bytes points_buffer = 4;
+  // 4, 8 bit values per value
+  bytes colors_buffer = 5;
 }
 
 message Polygon {
