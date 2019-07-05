@@ -49,6 +49,7 @@ message MapOrigin {
 
 message PrimitiveState {
   option (xviz_json_schema) = "core/primitive_state";
+  // only set oneof these at once
   repeated Polygon polygons = 1;
   repeated Polyline polylines = 2;
   repeated Text texts = 3;
@@ -56,6 +57,9 @@ message PrimitiveState {
   repeated Point points = 5;
   repeated Stadium stadiums = 6;
   repeated Image images = 7;
+
+  // Groups
+  PolylineGroup polyline_group = 8;
 }
 
 message UIPrimitiveState {

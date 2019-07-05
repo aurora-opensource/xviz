@@ -71,6 +71,17 @@ message Polyline {
   repeated uint32 colors = 3;
 }
 
+message PolylineGroup {
+  // Totally un-optimized style and ID information
+  // TODO(jlisee): have a columnized version of this
+  repeated PrimitiveBase bases = 1;
+
+  // 1, 16 bits unsigned int per polyline
+  bytes vertex_counts_buffer = 2;
+  // 3, 32 bit floats per point (X, Y, Z)
+  repeated float vertices = 3;
+}
+
 message Stadium {
   option (xviz_json_schema) = "primitives/stadium";
   PrimitiveBase base = 1;
