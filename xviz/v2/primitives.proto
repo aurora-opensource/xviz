@@ -45,7 +45,7 @@ message Point {
   option (xviz_json_schema) = "primitives/point";
   PrimitiveBase base = 1;
   // Flattened X, Y, Z list
-  repeated double points = 2;
+  repeated float points = 2;
   // Flattened list of (R, G, B) or (R, G, B, A)
   repeated uint32 colors = 3;
 
@@ -59,14 +59,14 @@ message Polygon {
   option (xviz_json_schema) = "primitives/polygon";
   PrimitiveBase base = 1;
   // Flattened X, Y, Z list
-  repeated double vertices = 2;
+  repeated float vertices = 2;
 }
 
 message Polyline {
   option (xviz_json_schema) = "primitives/polyline";
   PrimitiveBase base = 1;
   // Flattened X, Y, Z list
-  repeated double vertices = 2;
+  repeated float vertices = 2;
   // Flattened (R, G, B) or (R, G, B, A) list
   repeated uint32 colors = 3;
 }
