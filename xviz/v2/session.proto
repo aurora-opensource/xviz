@@ -93,6 +93,7 @@ message Metadata {
   map<string, CameraInfo> cameras = 3;
   map<string, string> stream_aliases = 4;
   map<string, UIPanelInfo> ui_config = 5;
+  LogInfo log_info = 6;
 }
 
 message Error {
@@ -185,4 +186,11 @@ message UIPanelInfo {
   string name = 1;
   repeated string needed_streams = 2;
   string config = 3;
+}
+
+message LogInfo
+{
+    option (xviz_json_schema) = "session/log_info";
+    double start_time = 1;
+    double end_time = 2;
 }
