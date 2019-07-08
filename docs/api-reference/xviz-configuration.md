@@ -12,7 +12,8 @@ Constants:
 - `ALLOW_MISSING_PRIMARY_POSE` (Boolean) - Whether to render logs where there is no `/vehicle_pose`
   stream. If `true`, `VEHICLE_RELATIVE` coordinates are treated as `IDENTITY`. Using this may break
   certain functionalities in the `LogViewer` and `PlaybackControl`. Default `false`.
-- `DYNAMIC_STREAM_METADATA` (Boolean) - Whether to automatically create metadata from streams that are not present in `metadata.streams`
+- `DYNAMIC_STREAM_METADATA` (Boolean) - Whether to automatically create metadata from streams that
+  are not present in `metadata.streams`
 
 Parser hooks:
 
