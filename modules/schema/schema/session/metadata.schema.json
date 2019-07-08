@@ -32,7 +32,7 @@
       }
     },
     "log_info": {
-      "type": "object"
+      "$ref": "https://xviz.org/schema/session/log_info.json"
     },
     "map_info": {
       "type": "object"
