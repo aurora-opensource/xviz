@@ -90,8 +90,13 @@ tape('parseStreamTimeSeries#simple', t => {
 
   testData.forEach(d => schemaValidator.validate('core/timeseries_state', d));
 
-  const result = parseStreamTimeSeries(testData, new Map());
+  let result = parseStreamTimeSeries(testData, new Map());
   t.deepEquals(result, expected, 'time_series parsed properly');
+
+  setXVIZConfig({DYNAMIC_STREAM_METADATA: true});
+  result = parseStreamTimeSeries(testData, new Map());
+  t.is(result['/test/doubles'].__metadata.category, 'TIME_SERIES', 'metadata generated');
+  t.is(result['/test/doubles'].__metadata.scalar_type, 'FLOAT', 'metadata generated');
 
   t.end();
 });
@@ -133,15 +138,19 @@ tape('parseStreamVariable#simple v2', t => {
     time: 1001,
     variable: [
       {
+        type: 'FLOAT',
         values: [10, 11, 12]
       },
       {
+        type: 'INT32',
         values: [10, 11, 12]
       },
       {
+        type: 'BOOL',
         values: [true, false, true]
       },
       {
+        type: 'STRING',
         values: ['one', 'two', 'three'],
         id: '123'
       }
@@ -152,6 +161,10 @@ tape('parseStreamVariable#simple v2', t => {
 
   const result = parseStreamVariable(testData, '/test', time);
   t.deepEquals(result, expected, 'variables parsed properly');
+
+  setXVIZConfig({DYNAMIC_STREAM_METADATA: true});
+  const {__metadata} = parseStreamVariable(testData, '/test', time);
+  t.is(__metadata.category, 'VARIABLE', 'metadata generated');
 
   t.end();
 });
@@ -180,6 +193,10 @@ tape('parseStreamUIPrimitives#simple v2', t => {
 
   const result = parseStreamUIPrimitives(testData, '/test', time);
   t.deepEquals(result, expected, 'variables parsed properly');
+
+  setXVIZConfig({DYNAMIC_STREAM_METADATA: true});
+  const {__metadata} = parseStreamUIPrimitives(testData, '/test', time);
+  t.is(__metadata.category, 'UI_PRIMITIVE', 'metadata generated');
 
   t.end();
 });
@@ -233,6 +250,10 @@ tape('parseStreamVariable#simple v1', t => {
     t.deepEquals(result, testCase.expected, `variables type ${testCase.name} parsed properly`);
   });
 
+  setXVIZConfig({DYNAMIC_STREAM_METADATA: true});
+  const {__metadata} = parseStreamVariable(testSet[0].xviz, '/test', time);
+  t.is(__metadata.category, 'VARIABLE', 'metadata generated');
+
   t.end();
 });
 
@@ -278,7 +299,7 @@ tape('parseXVIZStream#variable no-data entries', t => {
 
 tape('parseXVIZStream#primitive no-data entries', t => {
   resetXVIZConfigAndSettings();
-  setXVIZConfig({currentMajorVersion: 1});
+  setXVIZConfig({currentMajorVersion: 1, DYNAMIC_STREAM_METADATA: true});
 
   const data = [
     {
@@ -314,7 +335,8 @@ tape('parseXVIZStream#primitive no-data entries', t => {
       pointCloud: null,
       images: [],
       components: [],
-      time: 100.5425
+      time: 100.5425,
+      __metadata: {category: 'PRIMITIVE', primitive_type: 'polygon2d'}
     },
     {
       lookAheads: [],
@@ -324,7 +346,8 @@ tape('parseXVIZStream#primitive no-data entries', t => {
       pointCloud: null,
       images: [],
       components: [],
-      time: 101.84
+      time: 101.84,
+      __metadata: {category: 'PRIMITIVE', primitive_type: null}
     }
   ];
 

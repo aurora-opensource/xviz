@@ -30,6 +30,13 @@ function createPrimitiveMap() {
   return result;
 }
 
+const SCALAR_TYPE = {
+  doubles: 'FLOAT',
+  int32s: 'INT32',
+  bools: 'BOOL',
+  strings: 'STRING'
+};
+
 /* eslint-disable max-depth, max-statements, complexity, camelcase */
 // Handle stream-sliced data, via the ETL flow.
 export function parseXVIZStream(data, convertPrimitive) {
@@ -82,7 +89,7 @@ export function parseXVIZStream(data, convertPrimitive) {
  * data to UI elements.
  */
 export function parseStreamPrimitive(primitives, streamName, time, convertPrimitive) {
-  const {OBJECT_STREAM, preProcessPrimitive} = getXVIZConfig();
+  const {OBJECT_STREAM, preProcessPrimitive, DYNAMIC_STREAM_METADATA} = getXVIZConfig();
   const PRIMITIVE_SETTINGS =
     getXVIZConfig().currentMajorVersion === 1 ? XVIZPrimitiveSettingsV1 : XVIZPrimitiveSettingsV2;
 
@@ -172,6 +179,13 @@ export function parseStreamPrimitive(primitives, streamName, time, convertPrimit
   primitiveMap.pointCloud = pointCloud;
   primitiveMap.time = time;
 
+  if (DYNAMIC_STREAM_METADATA) {
+    primitiveMap.__metadata = {
+      category: 'PRIMITIVE',
+      primitive_type: primType
+    };
+  }
+
   return primitiveMap;
 }
 
@@ -179,11 +193,21 @@ export function parseStreamPrimitive(primitives, streamName, time, convertPrimit
  * data to UI elements.
  */
 export function parseStreamFutures(objects, streamName, time, convertPrimitive) {
-  const {currentMajorVersion} = getXVIZConfig();
+  const {currentMajorVersion, DYNAMIC_STREAM_METADATA} = getXVIZConfig();
 
-  return currentMajorVersion === 1
-    ? parseStreamFuturesV1(objects, streamName, time, convertPrimitive)
-    : parseStreamFuturesV2(objects, streamName, time, convertPrimitive);
+  const result =
+    currentMajorVersion === 1
+      ? parseStreamFuturesV1(objects, streamName, time, convertPrimitive)
+      : parseStreamFuturesV2(objects, streamName, time, convertPrimitive);
+
+  if (DYNAMIC_STREAM_METADATA) {
+    result.__metadata = {
+      category: 'FUTURE_INSTANCE',
+      primitive_type: result.lookAheads[0] && result.lookAheads[0].type
+    };
+  }
+
+  return result;
 }
 
 export function parseStreamFuturesV1(objects, streamName, time, convertPrimitive) {
@@ -267,11 +291,21 @@ export function parseStreamFuturesV2(objects, streamName, time, convertPrimitive
  * data to UI elements.
  */
 export function parseStreamVariable(objects, streamName, time) {
-  const {currentMajorVersion} = getXVIZConfig();
+  const {currentMajorVersion, DYNAMIC_STREAM_METADATA} = getXVIZConfig();
 
-  return currentMajorVersion === 1
-    ? parseStreamVariableV1(objects, streamName, time)
-    : parseStreamVariableV2(objects, streamName, time);
+  const result =
+    currentMajorVersion === 1
+      ? parseStreamVariableV1(objects, streamName, time)
+      : parseStreamVariableV2(objects, streamName, time);
+
+  if (DYNAMIC_STREAM_METADATA) {
+    result.__metadata = {
+      category: 'VARIABLE',
+      scalar_type: Array.isArray(result.variable) && result.variable[0] && result.variable[0].type
+    };
+  }
+
+  return result;
 }
 
 export function parseStreamVariableV1(objects, streamName, time) {
@@ -318,15 +352,11 @@ export function parseStreamVariableV2(objects, streamName, time) {
         return null;
       }
 
-      const datum = {
-        values: valueData.values
-      };
-
       if (base && base.object_id) {
-        datum.id = base.object_id;
+        valueData.id = base.object_id;
       }
 
-      return datum;
+      return valueData;
     })
     .filter(Boolean);
 
@@ -347,26 +377,23 @@ export function parseStreamTimeSeries(seriesArray, streamBlackList) {
   return null;
 }
 
-const ValueTypes = ['doubles', 'int32s', 'bools', 'strings'];
-
 function getVariableData(valuesObject) {
   // Primitives have the type as the first key
-  const keys = Object.keys(valuesObject);
-
-  for (const type of keys) {
-    if (ValueTypes.includes(type)) {
-      return {type, values: valuesObject[type]};
+  for (const key in valuesObject) {
+    if (key in SCALAR_TYPE) {
+      return {type: SCALAR_TYPE[key], values: valuesObject[key]};
     }
   }
 
   // TODO(twojtasz): a more informative error path that doesn't abort processing
-  return {};
+  return null;
 }
 
 function parseStreamTimeSeriesV2(seriesArray, streamBlackList) {
   if (!Array.isArray(seriesArray)) {
     return {};
   }
+  const {DYNAMIC_STREAM_METADATA} = getXVIZConfig();
 
   const timeSeriesStreams = {};
   seriesArray.forEach(timeSeriesEntry => {
@@ -393,6 +420,13 @@ function parseStreamTimeSeriesV2(seriesArray, streamBlackList) {
           log.warn(`Unexpected time_series duplicate: ${streamName}`)();
         } else {
           timeSeriesStreams[streamName] = entry;
+        }
+
+        if (DYNAMIC_STREAM_METADATA) {
+          entry.__metadata = {
+            category: 'TIME_SERIES',
+            scalar_type: valueData.type
+          };
         }
       }
     });
@@ -561,5 +595,13 @@ function joinObjectPointCloudsToTypedArrays(objects) {
 }
 
 export function parseStreamUIPrimitives(components, streamName, time) {
-  return Object.assign({time}, components);
+  const result = Object.assign({time}, components);
+
+  if (getXVIZConfig().DYNAMIC_STREAM_METADATA) {
+    result.__metadata = {
+      category: 'UI_PRIMITIVE'
+    };
+  }
+
+  return result;
 }

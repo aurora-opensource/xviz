@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+import {getXVIZConfig} from '../config/xviz-config';
 
 /* eslint-disable camelcase */
 export function parseXVIZPose(pose) {
@@ -48,6 +49,12 @@ export function parseXVIZPose(pose) {
       pitch,
       yaw
     });
+  }
+
+  if (getXVIZConfig().DYNAMIC_STREAM_METADATA) {
+    result.__metadata = {
+      category: 'POSE'
+    };
   }
 
   return {...pose, ...result};
