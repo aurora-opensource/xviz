@@ -203,7 +203,7 @@ export function parseStreamFutures(objects, streamName, time, convertPrimitive) 
   if (DYNAMIC_STREAM_METADATA) {
     result.__metadata = {
       category: 'FUTURE_INSTANCE',
-      primitive_type: result.lookAheads[0] && result.lookAheads[0].type
+      primitive_type: result.lookAheads[0][0] && result.lookAheads[0][0].type
     };
   }
 
