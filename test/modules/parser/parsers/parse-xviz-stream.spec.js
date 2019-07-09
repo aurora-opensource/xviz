@@ -165,6 +165,7 @@ tape('parseStreamVariable#simple v2', t => {
   setXVIZConfig({DYNAMIC_STREAM_METADATA: true});
   const {__metadata} = parseStreamVariable(testData, '/test', time);
   t.is(__metadata.category, 'VARIABLE', 'metadata generated');
+  t.is(__metadata.scalar_type, 'FLOAT', 'metadata generated');
 
   t.end();
 });
