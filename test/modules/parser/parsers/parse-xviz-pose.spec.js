@@ -13,7 +13,9 @@
 // limitations under the License.
 
 /* eslint-disable camelcase */
+import {setXVIZConfig} from '@xviz/parser';
 import {parseXVIZPose} from '@xviz/parser/parsers/parse-xviz-pose';
+import {resetXVIZConfigAndSettings} from '../config/config-utils';
 
 import tape from 'tape-catch';
 
@@ -43,8 +45,14 @@ function parsedPoseCheck(t, parsedPose, xvizPose) {
 }
 
 tape('parseXVIZPose#simple', t => {
+  resetXVIZConfigAndSettings();
+  setXVIZConfig({DYNAMIC_STREAM_METADATA: true});
+
   const result = parseXVIZPose(testXVIZPose);
   parsedPoseCheck(t, result, testXVIZPose);
+
+  t.is(result.__metadata.category, 'POSE', 'metadata generated');
+
   t.end();
 });
 

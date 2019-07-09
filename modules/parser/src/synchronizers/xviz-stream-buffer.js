@@ -58,6 +58,8 @@ export default class XVIZStreamBuffer {
     this.videos = {};
     /* Update counter */
     this.lastUpdate = 0;
+    /* Track the number of unique streams */
+    this.streamCount = 0;
 
     this.hasBuffer = this.hasBuffer.bind(this);
   }
@@ -217,6 +219,7 @@ export default class XVIZStreamBuffer {
     for (const streamName in timeslice.streams) {
       if (!streams[streamName]) {
         streams[streamName] = new Array(timeslices.length);
+        this.streamCount++;
       }
     }
     for (const streamName in timeslice.videos) {

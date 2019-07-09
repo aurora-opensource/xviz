@@ -35,6 +35,8 @@ const DEFAULT_XVIZ_CONFIG = {
   preProcessPrimitive: primitive => primitive,
   // Allow scenarios where there is no /vehicle_pose stream
   ALLOW_MISSING_PRIMARY_POSE: false,
+  // Auto backfill missing stream metadata
+  DYNAMIC_STREAM_METADATA: false,
 
   /* Deprecated configs, do not use */
 
