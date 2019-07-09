@@ -278,3 +278,56 @@ test('XVIZStreamBuffer#updateFixedBuffer large backwards jumps', t => {
   t.is(end, 920, 'buffer end newly set');
   t.end();
 });
+
+test('XVIZStreamBuffer#insert#PERSISTENT', t => {
+  const testCases = [
+    {
+      message: {
+        updateType: 'PERSISTENT',
+        streams: {X: 10, Y: 20}
+      },
+      expect: {A: 5, X: 10, Y: 20}
+    },
+    {
+      message: {
+        updateType: 'PERSISTENT',
+        streams: {X: 20, Y: null, Z: 0}
+      },
+      expect: {A: 5, X: 20, Z: 0}
+    },
+    {
+      message: {
+        updateType: 'PERSISTENT',
+        streams: {A: 3}
+      },
+      error: true
+    }
+  ];
+
+  const xvizStreamBuffer = new XVIZStreamBuffer();
+  xvizStreamBuffer.insert({
+    timestamp: 1000,
+    streams: {A: 5}
+  });
+
+  for (const testCase of testCases) {
+    const {lastUpdate} = xvizStreamBuffer;
+    if (testCase.error) {
+      t.throws(() => xvizStreamBuffer.insert(testCase.message), 'insertion should throw');
+    } else {
+      t.ok(xvizStreamBuffer.insert(testCase.message), 'persistent timeslice inserted');
+      t.ok(xvizStreamBuffer.lastUpdate > lastUpdate, 'update counter updated');
+
+      const timeslices = xvizStreamBuffer.getTimeslices({start: 1000, end: 1001});
+      const streams = {};
+      timeslices.forEach(timeslice => {
+        for (const streamName in timeslice.streams) {
+          streams[streamName] = timeslice.streams[streamName];
+        }
+      });
+      t.deepEqual(streams, testCase.expect, 'returns correct streams');
+    }
+  }
+
+  t.end();
+});

@@ -56,6 +56,7 @@ export default class XVIZStreamBuffer {
     /* Sorted values by stream */
     this.streams = {};
     this.videos = {};
+    this.persistent = null; // a "timeslice" that's always included
     /* Update counter */
     this.lastUpdate = 0;
     /* Track the number of unique streams */
@@ -160,7 +161,12 @@ export default class XVIZStreamBuffer {
     const {timeslices} = this;
     const startIndex = Number.isFinite(start) ? this._indexOf(start, LEFT) : 0;
     const endIndex = Number.isFinite(end) ? this._indexOf(end, RIGHT) : timeslices.length;
-    return timeslices.slice(startIndex, endIndex);
+
+    const result = timeslices.slice(startIndex, endIndex);
+    if (this.persistent) {
+      result.push(this.persistent);
+    }
+    return result;
   }
 
   /**
@@ -199,6 +205,7 @@ export default class XVIZStreamBuffer {
    * Add a new timeslice object into the timeline
    * @params {object} timeslice - timeslice object from XVIZ stream
    */
+  // eslint-disable-next-line complexity, max-statements
   insert(timeslice) {
     const {timestamp, updateType} = timeslice;
 
@@ -211,6 +218,12 @@ export default class XVIZStreamBuffer {
     timeslice.videos = timeslice.videos || {};
 
     const {timeslices, streams, videos} = this;
+
+    if (updateType === 'PERSISTENT') {
+      this._mergePersistentSlice(timeslice);
+      this.lastUpdate++;
+      return true;
+    }
 
     // Note: if stream is not present in a timeslice, that index in the list holds undefined
     // This avoids repeatedly allocating new arrays for each stream, and lowers the cost of
@@ -334,6 +347,31 @@ export default class XVIZStreamBuffer {
     }
   }
   /* eslint-enable complexity, no-unused-expressions */
+
+  _mergePersistentSlice({streams}) {
+    const oldStreams = (this.persistent && this.persistent.streams) || {};
+    const newStreams = Object.assign({}, oldStreams);
+
+    for (const streamName in streams) {
+      assert(
+        !(streamName in this.streams),
+        `${streamName} found in both persistent and non-persistent updates`
+      );
+      if (!(streamName in oldStreams)) {
+        this.streamCount++;
+      }
+
+      const value = streams[streamName];
+      if (value === null) {
+        // Explicitly delete a stream
+        delete newStreams[streamName];
+      } else {
+        newStreams[streamName] = value;
+      }
+    }
+    this.persistent = this.persistent || {};
+    this.persistent.streams = newStreams;
+  }
 
   _mergeTimesliceAt(index, timeslice) {
     const {timeslices, streams, videos} = this;
