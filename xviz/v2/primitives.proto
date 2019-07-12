@@ -28,14 +28,14 @@ message PrimitiveBase {
 message Circle {
   option (xviz_json_schema) = "primitives/circle";
   PrimitiveBase base = 1;
-  repeated double center = 2;
-  double radius = 3;
+  repeated float center = 2;
+  float radius = 3;
 }
 
 message Image {
   option (xviz_json_schema) = "primitives/image";
   PrimitiveBase base = 1;
-  repeated double position = 2;
+  repeated float position = 2;
   bytes data = 3;
   uint32 width_px = 4;
   uint32 height_px = 5;
@@ -45,7 +45,7 @@ message Point {
   option (xviz_json_schema) = "primitives/point";
   PrimitiveBase base = 1;
   // Flattened X, Y, Z list
-  repeated double points = 2;
+  repeated float points = 2;
   // Flattened list of (R, G, B) or (R, G, B, A)
   repeated uint32 colors = 3;
 }
@@ -54,14 +54,14 @@ message Polygon {
   option (xviz_json_schema) = "primitives/polygon";
   PrimitiveBase base = 1;
   // Flattened X, Y, Z list
-  repeated double vertices = 2;
+  repeated float vertices = 2;
 }
 
 message Polyline {
   option (xviz_json_schema) = "primitives/polyline";
   PrimitiveBase base = 1;
   // Flattened X, Y, Z list
-  repeated double vertices = 2;
+  repeated float vertices = 2;
   // Flattened (R, G, B) or (R, G, B, A) list
   repeated uint32 colors = 3;
 }
@@ -69,14 +69,14 @@ message Polyline {
 message Stadium {
   option (xviz_json_schema) = "primitives/stadium";
   PrimitiveBase base = 1;
-  repeated double start = 2;
-  repeated double end = 3;
-  double radius = 4;
+  repeated float start = 2;
+  repeated float end = 3;
+  float radius = 4;
 }
 
 message Text {
   option (xviz_json_schema) = "primitives/text";
   PrimitiveBase base = 1;
-  repeated double position = 2;
+  repeated float position = 2;
   string text = 3;
 }
