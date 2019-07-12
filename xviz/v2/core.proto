@@ -107,8 +107,12 @@ message Values {
   option (xviz_json_schema) = "core/values";
   // ONLY SET ONE OF THESE (protobuf does not allow oneof with
   // repeated fields)
+  repeated float floats = 1;
   repeated double doubles = 2;
-  repeated int32 int32s = 3;
-  repeated bool bools = 4;
-  repeated string strings = 5;
+  repeated fixed32 uint32s = 3;
+  repeated fixed64 uint64s = 4;
+  repeated sfixed32 int32s = 5;
+  repeated sfixed64 int64s = 6;
+  repeated bool bools = 7;
+  repeated string strings = 8;
 }
