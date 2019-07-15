@@ -26,32 +26,32 @@ message StyleObjectValue {
   option (xviz_json_schema) = "style/object_value";
   repeated uint32 fill_color = 1;
   repeated uint32 stroke_color = 2;
-  double stroke_width = 3;
-  double radius = 4;
-  double text_size = 5;
+  float stroke_width = 3;
+  float radius = 4;
+  float text_size = 5;
   // Angle in degrees
-  double text_rotation = 6;
+  float text_rotation = 6;
   TextAnchor text_anchor = 7;
   TextAlignmentBaseline text_baseline = 8;
-  double height = 9;
+  float height = 9;
 }
 
 message StyleStreamValue {
   option (xviz_json_schema) = "style/stream_value";
   repeated uint32 fill_color = 1;
   repeated uint32 stroke_color = 2;
-  double stroke_width = 3;
-  double radius = 4;
-  double text_size = 5;
-  double text_rotation = 6;
+  float stroke_width = 3;
+  float radius = 4;
+  float text_size = 5;
+  float text_rotation = 6;
   TextAnchor text_anchor = 7;
   TextAlignmentBaseline text_baseline = 8;
-  double height = 9;
+  float height = 9;
   uint32 radius_min_pixels = 10;
   uint32 radius_max_pixels = 11;
   uint32 stroke_width_min_pixels = 12;
   uint32 stroke_width_max_pixels = 13;
-  double opacity = 14;
+  float opacity = 14;
   bool stroked = 15;
   bool filled = 16;
   bool extruded = 17;

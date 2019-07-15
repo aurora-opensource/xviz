@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {default as deepEquals} from 'deep-equal';
+import {default as deepEqualsTolerance} from './deep-equals-tolerance';
 import {diffString} from 'json-diff';
 
 /**
@@ -24,7 +24,7 @@ import {diffString} from 'json-diff';
  * @param  {Object} b  Second object, compared to the first
  */
 export function diffDeepEquals(t, a, b, msg) {
-  if (deepEquals(a, b, msg)) {
+  if (deepEqualsTolerance(a, b, msg)) {
     t.pass(msg);
   } else {
     const diff = diffString(a, b);
