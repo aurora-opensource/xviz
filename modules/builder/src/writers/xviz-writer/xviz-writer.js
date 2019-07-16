@@ -14,7 +14,6 @@
 
 import {writeBinaryXVIZtoFile} from './xviz-binary-writer';
 import {xvizConvertJson} from './xviz-json-encoder.js';
-import {DracoWriter, DracoLoader} from '@loaders.gl/draco';
 import {XVIZEnvelope} from '@xviz/io';
 
 // 0-frame is an index file for timestamp metadata
@@ -47,14 +46,15 @@ export default class XVIZWriter {
       envelope = true,
       binary = true,
       json = false,
-      draco = false
+      DracoWriter,
+      DracoLoader
     } = options;
     this.sink = dataSink;
     this.frameTimings = {
       frames: new Map()
     };
     this.wroteFrameIndex = null;
-    this.options = {envelope, binary, json, draco};
+    this.options = {envelope, binary, json, DracoWriter, DracoLoader};
   }
 
   // xvizMetadata is the object returned
@@ -99,9 +99,11 @@ export default class XVIZWriter {
         flattenArrays: true
       };
 
-      if (this.options.draco) {
-        options.DracoWriter = DracoWriter;
-        options.DracoLoader = DracoLoader;
+      if (this.options.DracoWriter) {
+        options.DracoWriter = this.options.DracoWriter;
+      }
+      if (this.options.DracoLoader) {
+        options.DracoLoader = this.options.DracoLoader;
       }
 
       writeBinaryXVIZtoFile(this.sink, xvizDirectory, frameName(frameIndex), xvizFrame, options);
