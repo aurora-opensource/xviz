@@ -31,7 +31,12 @@ parser.addArgument(['-o', '--output'], {
 
 parser.addArgument('--json', {
   action: 'storeTrue',
-  help: 'Generate JSON XVIZ output instead of the binary file format'
+  help: 'Generate JSON XVIZ output instead of the GLB file format'
+});
+
+parser.addArgument('--protobuf', {
+  action: 'storeTrue',
+  help: 'Generate Protobuf XVIZ output instead of the GLB file file format'
 });
 
 parser.addArgument(['--disable-streams'], {
@@ -75,6 +80,7 @@ module.exports = function getArgs() {
     imageMaxWidth: Number(args.image_max_width),
     imageMaxHeight: Number(args.image_max_height),
     messageLimit: Number(args.message_limit),
-    writeJson: Number(args.json)
+    writeJson: Number(args.json),
+    writeProtobuf: Number(args.protobuf)
   };
 };
