@@ -15,7 +15,8 @@
   "scripts": {
     "bootstrap": "yarn && ocular-bootstrap",
     "bench": "ocular-test bench",
-    "build": "ocular-clean && lerna run pre-build && ocular-build",
+    "build": "ocular-clean && yarn build-schema && lerna run pre-build && ocular-build",
+    "build-schema": "cd modules/schema && yarn build",
     "check-copyright-header": "./scripts/check-copyright-header.sh",
     "flow": "flow check",
     "lint": "ocular-lint",

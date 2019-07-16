@@ -33,7 +33,13 @@ module.exports = {
     path: path.resolve(__dirname, '../dist/workers'),
     filename: '[name].worker.js'
   },
-
+  resolve: {
+    alias: {
+      '@xviz/io': path.resolve(__dirname, '../../io/src'),
+      '@xviz/schema/dist': path.resolve(__dirname, '../../schema/dist'),
+      '@xviz/schema': path.resolve(__dirname, '../../schema/src')
+    }
+  },
   module: {
     rules: [
       {
