@@ -31,4 +31,5 @@ export const STATE_UPDATE_TYPE = {
   SNAPSHOT: 'INCREMENTAL'
 };
 
-export const XVIZ_GLTF_EXTENSION = 'AVS_xviz';
+// Deprecated
+export {XVIZ_GLTF_EXTENSION} from '@xviz/io';

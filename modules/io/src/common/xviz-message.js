@@ -11,8 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// TODO: move these to @xviz/io
-import {isEnvelope, unpackEnvelope} from '@xviz/parser';
+import {isEnvelope, unpackEnvelope} from './loaders';
 import {XVIZ_MESSAGE_TYPE} from './xviz-message-type';
 import {XVIZ_MESSAGE_NAMESPACE} from './constants';
 
@@ -38,21 +37,31 @@ export class XVIZMessage {
   }
 
   get type() {
-    return this._message.type;
+    if (this._message) {
+      return this._message.type;
+    }
+    return null;
   }
 
   get data() {
-    return this._message.data;
+    if (this._message) {
+      return this._message.data;
+    }
+    return null;
   }
 
   _setupTypeData() {
     if (isEnvelope(this.message)) {
-      this._message = unpackEnvelope(this.message);
+      const msg = unpackEnvelope(this.message);
+
+      // If the message is not an XVIZ message, ignore
+      if (msg.namespace === 'xviz') {
+        this._message = msg;
+      }
       return;
     }
 
-    // TODO: We should not support data w/o and envelope
-    // Raw data, detect by parsing
+    // XVIZv1 Support: Raw data, detect by inspection
     if (this.message.version) {
       this._message = {
         namespace: XVIZ_MESSAGE_NAMESPACE,

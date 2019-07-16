@@ -13,8 +13,7 @@
 // limitations under the License.
 /* eslint-disable camelcase */
 
-import {isXVIZMessage} from '@xviz/parser';
-import {XVIZData} from '@xviz/io';
+import {isXVIZMessage, XVIZData} from '@xviz/io';
 
 // Map XVIZ messages to the middleware
 export class XVIZMessageToMiddleware {
