@@ -18,6 +18,7 @@ import {
   parseBinaryXVIZ,
   isGLBXVIZ,
   isJSONString,
+  isPBEXVIZ,
   getXVIZMessageType
 } from './loaders';
 import {XVIZMessage} from './xviz-message';
@@ -100,6 +101,12 @@ export class XVIZData {
         }
         msg = parseBinaryXVIZ(data);
         break;
+      case XVIZ_FORMAT.BINARY_PBE:
+        if (data instanceof Buffer) {
+          data = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
+        }
+        msg = parseBinaryXVIZ(data);
+        break;
       case XVIZ_FORMAT.JSON_BUFFER:
         let jsonString = null;
         if (data instanceof Buffer) {
@@ -141,7 +148,9 @@ export class XVIZData {
           data = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
         }
 
-        if (isGLBXVIZ(data)) {
+        if (isPBEXVIZ(data)) {
+          this._dataFormat = XVIZ_FORMAT.BINARY_PBE;
+        } else if (isGLBXVIZ(data)) {
           this._dataFormat = XVIZ_FORMAT.BINARY_GLB;
         } else {
           if (data instanceof ArrayBuffer) {

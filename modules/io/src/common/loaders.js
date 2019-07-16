@@ -16,6 +16,7 @@ import {GLTFParser} from '@loaders.gl/gltf';
 
 import {XVIZ_GLTF_EXTENSION} from './constants';
 import {TextDecoder} from './text-encoding';
+import {MAGIC_PBE1, XVIZ_PROTOBUF_MESSAGE} from './protobuf-support';
 
 // XVIZ Type constants
 const XVIZ_TYPE_PATTERN = /"type":\s*"(xviz\/\w*)"/;
@@ -93,14 +94,23 @@ function checkMagic(glbArrayBuffer, options = {}) {
   return magic1 === magic || (magicAlt && magicAlt === magic1);
 }
 
-// Supports GLB format
+// Supports GLB and Protobuf formats
 export function isBinaryXVIZ(arrayBuffer) {
   const isArrayBuffer = arrayBuffer instanceof ArrayBuffer;
-  return isArrayBuffer && checkMagic(arrayBuffer, {magic: MAGIC_XVIZ, magicAlt: MAGIC_GLTF});
+  return (
+    isArrayBuffer &&
+    (checkMagic(arrayBuffer, {magic: MAGIC_XVIZ, magicAlt: MAGIC_GLTF}) ||
+      checkMagic(arrayBuffer, {magic: MAGIC_PBE1}))
+  );
 }
 
-// Supports GLB format
+// Supports GLB and Protobuf formats
 export function parseBinaryXVIZ(arrayBuffer) {
+  if (checkMagic(arrayBuffer, {magic: MAGIC_PBE1})) {
+    const data = parsePBEXVIZ(arrayBuffer);
+    return data;
+  }
+
   const gltfParser = new GLTFParser();
   gltfParser.parse(arrayBuffer, {createImages: false});
 
@@ -168,6 +178,60 @@ function getGLBXVIZJSONBuffer(arrayBuffer, byteOffset = 0) {
 
   glb.jsonChunkByteOffset = GLB_FILE_HEADER_SIZE + GLB_CHUNK_HEADER_SIZE; // First headers: 20 bytes
   return new Uint8Array(arrayBuffer, byteOffset + glb.jsonChunkByteOffset, glb.jsonChunkLength);
+}
+
+/* Protobuf Support */
+
+export function isPBEXVIZ(arrayBuffer) {
+  const isArrayBuffer = arrayBuffer instanceof ArrayBuffer;
+  return isArrayBuffer && checkMagic(arrayBuffer, {magic: MAGIC_PBE1});
+}
+
+function getPBEXVIZType(arrayBuffer) {
+  const strippedBuffer = new Uint8Array(arrayBuffer, 4);
+  // TODO: this toObject is too expensive, we can do
+  // this with decode only
+  const envelope = XVIZ_PROTOBUF_MESSAGE.Envelope.toObject(strippedBuffer, {
+    enum: String
+  });
+
+  return envelope.type;
+}
+
+// TODO: unpackEnvelop produces namespace, type data
+export function parsePBEXVIZ(arrayBuffer) {
+  const strippedBuffer = new Uint8Array(arrayBuffer, 4);
+  const envelope = XVIZ_PROTOBUF_MESSAGE.Envelope.decode(strippedBuffer);
+
+  const xviz = {
+    type: envelope.type,
+    data: null
+  };
+
+  switch (envelope.type) {
+    case 'xviz/metadata':
+      // TODO: support enum integers when parsing to avoid costly toObject() call
+      // xviz.data = XVIZ_PROTOBUF_MESSAGE.Metadata.decode(envelope.data.value);
+      const tmpMeta = XVIZ_PROTOBUF_MESSAGE.Metadata.decode(envelope.data.value);
+      // This toObject is required to change enums to strings for now
+      xviz.data = XVIZ_PROTOBUF_MESSAGE.Metadata.toObject(tmpMeta, {
+        enums: String
+      });
+      break;
+    case 'xviz/state_update':
+      // TODO: support enum integers when parsing to avoid costly toObject() call
+      // xviz.data = XVIZ_PROTOBUF_MESSAGE.StateUpdate.decode(envelope.data.value);
+      const tmpState = XVIZ_PROTOBUF_MESSAGE.StateUpdate.decode(envelope.data.value);
+      // This toObject is required to change enums to strings for now
+      xviz.data = XVIZ_PROTOBUF_MESSAGE.StateUpdate.toObject(tmpState, {
+        enums: String
+      });
+      break;
+    default:
+      throw new Error(`Unknown Message type ${envelope.type}`);
+  }
+
+  return xviz;
 }
 
 /* JSON Support */
@@ -268,6 +332,8 @@ export function getXVIZMessageType(data) {
     case 'binary':
       if (isGLBXVIZ(data)) {
         return getGLBXVIZType(data);
+      } else if (isPBEXVIZ(data)) {
+        return getPBEXVIZType(data);
       }
       if (data instanceof ArrayBuffer) {
         data = new Uint8Array(data);
