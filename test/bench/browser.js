@@ -18,4 +18,4 @@ const {_enableDOMLogging: enableDOMLogging} = require('@probe.gl/test-utils');
 // tap-browser-color alternative
 enableDOMLogging(true);
 
-require('./index').default.then(window.browserTestDriver_finish);
+require('./index').then(window.browserTestDriver_finish);

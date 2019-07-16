@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Bench} from '@probe.gl/bench';
-import xvizParserBench from './parse-stream-message.bench';
-import streamBufferBench from './xviz-stream-buffer.bench';
+require('reify');
+
+const {Bench} = require('@probe.gl/bench');
 
 const suite = new Bench({
   time: 100
 });
 
-xvizParserBench(suite);
-streamBufferBench(suite);
+require('./parse-stream-message.bench').default(suite);
+require('./xviz-stream-buffer.bench').default(suite);
 
-export default suite.run();
+module.exports = suite.run();
