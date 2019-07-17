@@ -15,10 +15,8 @@
 import '@loaders.gl/polyfills';
 import {XVIZBaseWriter} from './xviz-base-writer';
 import {GLTFBuilder} from '@loaders.gl/gltf';
-import {DracoWriter, DracoLoader} from '@loaders.gl/draco';
-import {_packBinaryJson as packBinaryJson} from '@xviz/builder';
-import {XVIZ_GLTF_EXTENSION} from '@xviz/parser';
-import {XVIZEnvelope} from '@xviz/io';
+import {packBinaryJson} from './xviz-pack-binary';
+import {XVIZEnvelope, XVIZ_GLTF_EXTENSION} from '@xviz/io';
 
 // Convert (copy) ArrayBuffer to Buffer
 // This is from @loaders.gl/core/src/node/utils/to-buffer.node.js
@@ -67,19 +65,22 @@ export class XVIZBinaryWriter extends XVIZBaseWriter {
   constructor(sink, options = {}) {
     super(sink);
 
-    const {envelope = true, flattenArrays = true, draco = false} = options;
+    const {envelope = true, flattenArrays = true, DracoWriter, DracoLoader} = options;
     this.messageTimings = {
       messages: new Map()
     };
     this.wroteMessageIndex = null;
-    this.options = {envelope, flattenArrays, draco};
+    this.options = {envelope, flattenArrays, DracoWriter, DracoLoader};
 
     this.encodingOptions = {
       flattenArrays: this.options.flattenArrays
     };
 
-    if (this.options.draco) {
+    if (this.options.DracoWriter) {
       this.encodingOptions.DracoWriter = DracoWriter;
+    }
+
+    if (this.options.DracoLoader) {
       this.encodingOptions.DracoLoader = DracoLoader;
     }
   }

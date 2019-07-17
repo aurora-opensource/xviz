@@ -25,7 +25,21 @@ export {XVIZData} from './common/xviz-data';
 export {XVIZMessage} from './common/xviz-message';
 export {XVIZ_MESSAGE_TYPE} from './common/xviz-message-type';
 export {XVIZEnvelope} from './common/xviz-envelope';
-export {XVIZ_FORMAT, XVIZ_MESSAGE_NAMESPACE} from './common/constants';
+export {XVIZ_FORMAT, XVIZ_GLTF_EXTENSION, XVIZ_MESSAGE_NAMESPACE} from './common/constants';
+
+export {
+  getDataContainer as getDataFormat,
+  getDataContainer,
+  isEnvelope,
+  unpackEnvelope,
+  isBinaryXVIZ,
+  parseBinaryXVIZ,
+  isGLBXVIZ,
+  isJSONString,
+  getObjectXVIZType,
+  getXVIZMessageType,
+  isXVIZMessage
+} from './common/loaders';
 
 export {XVIZProviderFactory} from './providers/index';
 export {XVIZJSONProvider} from './providers/xviz-json-provider';

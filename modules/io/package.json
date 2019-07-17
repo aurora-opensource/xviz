@@ -15,7 +15,6 @@
     "node.js"
   ],
   "dependencies": {
-    "@loaders.gl/draco": "^1.1.4",
     "@loaders.gl/gltf": "^1.1.4",
     "@loaders.gl/polyfills": "^1.1.4",
     "@turf/turf": "^5.1.6",
@@ -26,7 +25,8 @@
   "scripts": {},
   "browser": {
     "./src/io/fs-sink.js": false,
-    "./src/io/fs-source.js": false
+    "./src/io/fs-source.js": false,
+    "text-encoding": false
   },
   "engines": {
     "node": ">= 8",

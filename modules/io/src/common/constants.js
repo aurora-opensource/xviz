@@ -23,3 +23,4 @@ export const XVIZ_FORMAT = Object.freeze({
 });
 
 export const XVIZ_MESSAGE_NAMESPACE = 'xviz';
+export const XVIZ_GLTF_EXTENSION = 'AVS_xviz';

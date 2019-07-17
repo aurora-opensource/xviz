@@ -1457,15 +1457,6 @@
   dependencies:
     "@babel/runtime" "^7.3.1"
 
-"@loaders.gl/draco@^1.1.4":
-  version "1.1.4"
-  resolved "https://registry.yarnpkg.com/@loaders.gl/draco/-/draco-1.1.4.tgz#e03a720209949b70f25a68e0e937f71e48d48b51"
-  integrity sha512-y01GKWHKpQOrEtspXfmEeGTkEvLNOw72FqiHQIU4Hy8MopjkPGCcYSTz89wG4UAQYTbELjEAfAju0uCFbSkzKA==
-  dependencies:
-    "@babel/runtime" "^7.3.1"
-    "@loaders.gl/loader-utils" "1.1.4"
-    draco3d "^1.3.4"
-
 "@loaders.gl/gltf@^1.1.4":
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/@loaders.gl/gltf/-/gltf-1.1.4.tgz#e3740d9e1223f4e2fad4eec07ce42ce3e019cdfc"
@@ -4917,11 +4908,6 @@ dot-prop@^4.2.0:
   integrity sha512-tUMXrxlExSW6U2EXiiKGSBVdYgtV8qlHL+C10TsW4PURY/ic+eaysnSkwB4kA/mBlCyy/IKDJ+Lc3wbWeaXtuQ==
   dependencies:
     is-obj "^1.0.0"
-
-draco3d@^1.3.4:
-  version "1.3.4"
-  resolved "https://registry.yarnpkg.com/draco3d/-/draco3d-1.3.4.tgz#b17e4fedd4b4b946c9eb8df2e1d2f470a953cdb8"
-  integrity sha512-I7kAKyiSIb++K5VdWGeIC9xXWkoQ1HZ8wSCQhaRMf41KKxYX5jYmy+rRna/o7o3CrunxvCGbZBl6d6bdWVcJXw==
 
 dreamopt@~0.6.0:
   version "0.6.0"

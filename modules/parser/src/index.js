@@ -43,21 +43,9 @@ export {parseLogMetadata} from './parsers/parse-log-metadata';
 export {parseVehiclePose} from './parsers/parse-vehicle-pose';
 export {parseEtlStream} from './parsers/parse-etl-stream';
 export {parseXVIZMessage, initializeWorkers} from './parsers/parse-xviz-message';
-export {
-  parseXVIZMessageSync,
-  parseXVIZData,
-  isXVIZMessage,
-  getXVIZMessageType,
-  getDataFormat,
-  isEnvelope,
-  unpackEnvelope
-} from './parsers/parse-xviz-message-sync';
-
+export {parseXVIZMessageSync, parseXVIZData} from './parsers/parse-xviz-message-sync';
 export {default as lidarPointCloudWorker} from './workers/lidar-point-cloud-worker';
 export {default as streamDataWorker} from './workers/stream-data-worker';
-
-// Loaders
-export {parseBinaryXVIZ, isBinaryXVIZ} from './loaders/xviz-loader/xviz-binary-loader';
 
 // Deprecated
 export {parseXVIZMessage as parseStreamMessage} from './parsers/parse-xviz-message';
@@ -68,3 +56,13 @@ export {
 export {parseVideoMessageV1 as parseStreamVideoMessage} from './parsers/parse-video-message-v1';
 export {XVIZ_MESSAGE_TYPE as LOG_STREAM_MESSAGE} from './constants';
 export {XVIZ_GLTF_EXTENSION} from './constants';
+
+export {
+  isXVIZMessage,
+  getXVIZMessageType,
+  getDataFormat,
+  isEnvelope,
+  unpackEnvelope,
+  parseBinaryXVIZ,
+  isBinaryXVIZ
+} from '@xviz/io';

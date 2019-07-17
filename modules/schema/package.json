@@ -25,6 +25,6 @@
   "scripts": {
     "build-schema": "node ./build-schema",
     "build-protos": "pbjs --keep-case --target json --proto-path ../.. --out dist/proto.v2.json ../../xviz/v2/*.proto",
-    "pre-build": "npm run build-schema && npm run build-protos"
+    "build": "npm run build-schema && npm run build-protos"
   }
 }

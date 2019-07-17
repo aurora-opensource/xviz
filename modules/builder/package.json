@@ -14,7 +14,6 @@
     "dist"
   ],
   "dependencies": {
-    "@loaders.gl/draco": "^1.1.4",
     "@loaders.gl/gltf": "^1.1.4",
     "@loaders.gl/polyfills": "^1.1.4",
     "@turf/turf": "^5.1.6",
