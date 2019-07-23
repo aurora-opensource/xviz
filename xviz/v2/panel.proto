@@ -1,0 +1,93 @@
+// --------------------------------------------------------
+// WARNING: XVIZ Protobuf files are unstable, do not use
+// --------------------------------------------------------
+
+syntax = "proto3";
+
+package xviz.v2;
+
+option csharp_namespace = "xviz.V2";
+option go_package = "v2pb";
+option java_multiple_files = true;
+option java_outer_classname = "PanelProto";
+option java_package = "com.xviz.v2";
+option objc_class_prefix = "XVIZ";
+option php_namespace = "Xviz\\V2";
+
+enum UIPanelType {
+  PANEL_TYPE_INVALID = 0;
+  PANEL = 1;
+}
+
+enum UIComponentType {
+  COMPONENT_TYPE_INVALID = 0;
+  CONTAINER = 1;
+  SELECT = 2;
+  METRIC = 3;
+  PLOT = 4;
+  TABLE = 5;
+  TREETABLE = 6;
+  VIDEO = 7;
+}
+
+enum LayoutType {
+  INTERACTION_TYPE_INVALID = 0;
+  VERTICAL = 1;
+  HORIZONTAL = 2;
+}
+
+enum InteractionType {
+  INTERACTION_TYPE_INVALID = 0;
+  REORDERABLE = 1;
+  DRAG_OUT = 2;
+}
+
+message OnChange {
+  string target = 1;
+}
+
+message PlotRegion {
+  string x = 1;
+  string yMin = 2;
+  string yMax = 3;
+}
+
+message UIComponent {
+  UIComponentType type = 1;
+
+  // Container
+  string name = 2;
+  LayoutType layout = 3;
+  repeated InteractionType interactions = 4;
+  repeated UIComponentType children = 5;
+
+  // Component Base
+  string title = 6;
+  string description = 7;
+
+  // Metric
+  repeated string streams = 8;
+
+  // Camera
+  repeated string cameras = 9;
+
+  // Table/TreeTable
+  string stream = 10;
+  bool displayObjectId = 11;
+
+  // Select
+  OnChange onchange = 12
+
+  // Plot
+  string independentVariable = 13;
+  repeated string dependentVariables = 14;
+  repeated PlotRegion regions = 15;
+}
+
+message Panel {
+  UIPanelType type = 1;
+  string name = 2;
+  LayoutType layout = 3;
+  repeated InteractionType interactions = 4;
+  repeated UIComponentType children = 5;
+}

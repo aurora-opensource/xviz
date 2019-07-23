@@ -353,6 +353,6 @@ UI configuration that comes with the data explaining how best to display it.
 | ---------------- | ------------------------ | ----------------------------------------------- |
 | `name`           | `string`                 | Unique name for the panel                       |
 | `needed_streams` | `list<stream_id>`        | What streams are needed to populate this panel. |
-| `config`         | `string, declarative ui` | Declarative UI panel configuration              |
+| `config`         | `object, declarative ui` | Declarative UI panel configuration              |
 
 See [declarative ui specification](/docs/declarative-ui/overview.md) to learn more.
