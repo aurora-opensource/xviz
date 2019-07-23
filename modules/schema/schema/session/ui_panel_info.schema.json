@@ -15,10 +15,10 @@
       "additionalItems": false
     },
     "config": {
-      "type": "object",
-      "additionalProperties": {
-        "$ref": "https://xviz.org/schema/declarative-ui/panel.json"
-      }
+      "oneOf": [
+        {"type": "object"},
+        {"type": "string"}
+      ]
     }
   },
   "required": [

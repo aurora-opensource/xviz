@@ -186,7 +186,7 @@ message UIPanelInfo {
   option (xviz_json_schema) = "session/ui_panel_info";
   string name = 1;
   repeated string needed_streams = 2;
-  Panel config = 3;
+  google.protobuf.Struct config = 3;
 }
 
 message LogInfo
