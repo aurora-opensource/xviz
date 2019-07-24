@@ -45,7 +45,7 @@ export class XVIZProtobufWriter extends XVIZBaseWriter {
     };
 
     if (this.options.envelope) {
-      pbInfo = this._applyEnvelope(pbInfo);
+      this._applyEnvelope(pbInfo);
     }
 
     const pbBuffer = pbInfo.type.encode(pbInfo.msg).finish();
@@ -66,7 +66,7 @@ export class XVIZProtobufWriter extends XVIZBaseWriter {
     };
 
     if (this.options.envelope) {
-      pbInfo = this._applyEnvelope(pbInfo);
+      this._applyEnvelope(pbInfo);
     }
 
     const pbBuffer = pbInfo.type.encode(pbInfo.msg).finish();

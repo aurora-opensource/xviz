@@ -13,7 +13,7 @@
 // limitations under the License.
 
 // Note: XVIZ data structures use snake_case
-/* eslint-disable camelcase*/
+/* eslint-disable camelcase */
 import {_Pose as Pose, Matrix4} from 'math.gl';
 import {CATEGORY} from './constant';
 
@@ -59,7 +59,16 @@ export default class XVIZMetadataBuilder {
       metadata.log_info = this.tmp_log_info;
     }
     if (this.tmp_ui_builder) {
-      metadata.ui_config = this.tmp_ui_builder.getUI();
+      const panels = this.tmp_ui_builder.getUI();
+      metadata.ui_config = {};
+
+      // Wrap the individual panels in the ui_panel_info structure
+      for (const panelKey of Object.keys(panels)) {
+        metadata.ui_config[panelKey] = {
+          name: panels[panelKey].name,
+          config: panels[panelKey]
+        };
+      }
     }
 
     return metadata;

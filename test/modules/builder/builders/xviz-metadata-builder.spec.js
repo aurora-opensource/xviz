@@ -268,7 +268,7 @@ test('XVIZMetadataBuilder#ui', t => {
   const expected = {
     version: '2.0.0',
     streams: {},
-    ui_config: {Metrics: {type: 'PANEL', name: 'Metrics'}}
+    ui_config: {Metrics: {name: 'Metrics', config: {type: 'PANEL', name: 'Metrics'}}}
   };
   t.deepEqual(metadata, expected, 'XVIZMetadataBuilder build matches expected output');
 

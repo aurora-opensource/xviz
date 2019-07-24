@@ -16,7 +16,7 @@ import {GLTFParser} from '@loaders.gl/gltf';
 
 import {XVIZ_GLTF_EXTENSION} from './constants';
 import {TextDecoder} from './text-encoding';
-import {MAGIC_PBE1, XVIZ_PROTOBUF_MESSAGE} from './protobuf-support';
+import {MAGIC_PBE1, XVIZ_PROTOBUF_MESSAGE, XVIZ_PROTOBUF_TYPE} from './protobuf-support';
 import {Enum, Type, MapField} from 'protobufjs';
 
 // XVIZ Type constants
@@ -199,6 +199,14 @@ function getPBEXVIZType(arrayBuffer) {
   return envelope.type;
 }
 
+function postProcessUIConfig(msg) {
+  if (msg && msg.ui_config) {
+    for (const entry of Object.keys(msg.ui_config)) {
+      msg.ui_config[entry] = XVIZ_PROTOBUF_TYPE.UIPanelInfo.toObject(msg.ui_config[entry]);
+    }
+  }
+}
+
 /* We need to modify the protobufjs objects to work closer to "normal"
  * Javascript objects. The protobuf type reflection is available as `msg.$type`
  * which is traversed in parallel to the `msg`.
@@ -285,6 +293,7 @@ export function parsePBEXVIZ(arrayBuffer) {
     case 'xviz/metadata':
       const tmpMeta = XVIZ_PROTOBUF_MESSAGE.Metadata.decode(envelope.data.value);
       xviz.data = postProcessProtobuf(tmpMeta);
+      postProcessUIConfig(xviz.data);
       break;
     case 'xviz/state_update':
       const tmpState = XVIZ_PROTOBUF_MESSAGE.StateUpdate.decode(envelope.data.value);
