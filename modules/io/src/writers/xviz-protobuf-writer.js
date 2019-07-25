@@ -39,19 +39,16 @@ export class XVIZProtobufWriter extends XVIZBaseWriter {
     this._saveTimestamp(xvizMetadata);
 
     const pbJSON = xvizConvertProtobuf(xvizMetadata);
-    let pbType = XVIZ_PROTOBUF_MESSAGE.Metadata;
-    let pbMsg = pbType.fromObject(pbJSON);
+    let pbInfo = {
+      type: XVIZ_PROTOBUF_MESSAGE.Metadata,
+      msg: XVIZ_PROTOBUF_MESSAGE.Metadata.fromObject(pbJSON)
+    };
 
     if (this.options.envelope) {
-      const value = pbType.encode(pbMsg).finish();
-      pbType = XVIZ_PROTOBUF_MESSAGE.Envelope;
-      pbMsg = pbType.fromObject({
-        type: 'xviz/metadata',
-        data: {type_url: 'xviz.v2.Metadata', value}
-      });
+      pbInfo = this._applyEnvelope(pbInfo);
     }
 
-    const pbBuffer = pbType.encode(pbMsg).finish();
+    const pbBuffer = pbInfo.type.encode(pbInfo.msg).finish();
     const buffer = new Uint8Array(pbBuffer.byteLength + 4);
     buffer.set(XVIZ_PROTOBUF_MAGIC, 0);
     buffer.set(pbBuffer, 4);
@@ -63,23 +60,39 @@ export class XVIZProtobufWriter extends XVIZBaseWriter {
     this._saveTimestamp(xvizMessage, messageIndex);
 
     const pbJSON = xvizConvertProtobuf(xvizMessage);
-    let pbType = XVIZ_PROTOBUF_MESSAGE.StateUpdate;
-    let pbMsg = pbType.fromObject(pbJSON);
+    let pbInfo = {
+      type: XVIZ_PROTOBUF_MESSAGE.StateUpdate,
+      msg: XVIZ_PROTOBUF_MESSAGE.StateUpdate.fromObject(pbJSON)
+    };
 
     if (this.options.envelope) {
-      const value = pbType.encode(pbMsg).finish();
-      pbType = XVIZ_PROTOBUF_MESSAGE.Envelope;
-      pbMsg = pbType.fromObject({
-        type: 'xviz/state_update',
-        data: {type_url: 'xviz.v2.StateUpdate', value}
-      });
+      pbInfo = this._applyEnvelope(pbInfo);
     }
 
-    const pbBuffer = pbType.encode(pbMsg).finish();
+    const pbBuffer = pbInfo.type.encode(pbInfo.msg).finish();
     const buffer = new Uint8Array(pbBuffer.byteLength + 4);
     buffer.set(XVIZ_PROTOBUF_MAGIC, 0);
     buffer.set(pbBuffer, 4);
     this.writeToSink(`${messageName(messageIndex)}.pbe`, buffer);
+  }
+
+  // Apply protobuf structure for the Any type used in the envelope
+  _applyEnvelope(info) {
+    if (info.type === XVIZ_PROTOBUF_MESSAGE.Metadata) {
+      const value = info.type.encode(info.msg).finish();
+      info.type = XVIZ_PROTOBUF_MESSAGE.Envelope;
+      info.msg = info.type.fromObject({
+        type: 'xviz/metadata',
+        data: {type_url: 'xviz.v2.Metadata', value}
+      });
+    } else if (info.type === XVIZ_PROTOBUF_MESSAGE.StateUpdate) {
+      const value = info.type.encode(info.msg).finish();
+      info.type = XVIZ_PROTOBUF_MESSAGE.Envelope;
+      info.msg = info.type.fromObject({
+        type: 'xviz/state_update',
+        data: {type_url: 'xviz.v2.StateUpdate', value}
+      });
+    }
   }
 
   _writeMessageIndex() {
@@ -184,6 +197,13 @@ function toColorArray(object) {
   return color;
 }
 
+// Protobuf messages do not allow variations on the field types, such
+// as a color field that supports both 'string' and 'array' data in JSON.
+//
+// This function will normalize the object, generally produced by an XVIZBuilder,
+// to allow it to be encoded per our protobuf message definitions. It will change
+// the variation of particular fields into a normalized format.
+//
 // Recursively walk object performing the following conversions
 // - primitives with typed array fields are turned into arrays
 // - primtives of type image have the data turned into a base64 string
