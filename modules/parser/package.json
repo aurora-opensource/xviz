@@ -2,7 +2,7 @@
   "name": "@xviz/parser",
   "description": "Utility library for converting XVIZ messages into JSON objects",
   "license": "Apache-2.0",
-  "version": "1.0.0-beta.18",
+  "version": "1.0.0-beta.19",
   "repository": {
     "type": "git",
     "url": "https://github.com/uber/xviz.git"
@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "@loaders.gl/gltf": "^1.1.4",
-    "@xviz/io": "^1.0.0-beta.18",
+    "@xviz/io": "1.0.0-beta.19",
     "base64-js": "^1.3.0",
     "color": "^3.0.0",
     "math.gl": "^2.3.1",
