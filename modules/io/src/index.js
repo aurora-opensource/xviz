@@ -13,10 +13,12 @@
 // limitations under the License.
 export {XVIZJSONWriter} from './writers/xviz-json-writer';
 export {XVIZBinaryWriter, encodeBinaryXVIZ} from './writers/xviz-binary-writer';
+export {XVIZProtobufWriter} from './writers/xviz-protobuf-writer';
 export {XVIZFormatWriter} from './writers/xviz-format-writer';
 
 export {XVIZJSONReader} from './readers/xviz-json-reader';
 export {XVIZBinaryReader} from './readers/xviz-binary-reader';
+export {XVIZProtobufReader} from './readers/xviz-protobuf-reader';
 
 export {MemorySourceSink} from './io/memory-source-sink';
 
@@ -35,12 +37,17 @@ export {
   isBinaryXVIZ,
   parseBinaryXVIZ,
   isGLBXVIZ,
+  isPBEXVIZ,
+  parsePBEXVIZ,
   isJSONString,
   getObjectXVIZType,
   getXVIZMessageType,
   isXVIZMessage
 } from './common/loaders';
 
+export {XVIZ_PROTOBUF_MESSAGE} from './common/protobuf-support';
+
 export {XVIZProviderFactory} from './providers/index';
 export {XVIZJSONProvider} from './providers/xviz-json-provider';
 export {XVIZBinaryProvider} from './providers/xviz-binary-provider';
+export {XVIZProtobufProvider} from './providers/xviz-protobuf-provider';

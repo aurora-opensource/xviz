@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 import {XVIZBinaryWriter} from '../writers/xviz-binary-writer';
+import {XVIZProtobufWriter} from '../writers/xviz-protobuf-writer';
 import {XVIZJSONWriter} from '../writers/xviz-json-writer';
 import {XVIZ_FORMAT} from '../common/constants';
 
@@ -27,6 +28,9 @@ function determineWriter(sink, format, options) {
   switch (format) {
     case XVIZ_FORMAT.BINARY_GLB:
       writer = new XVIZBinaryWriter(sink, options);
+      break;
+    case XVIZ_FORMAT.BINARY_PBE:
+      writer = new XVIZProtobufWriter(sink, options);
       break;
     case XVIZ_FORMAT.JSON_BUFFER:
       writer = new XVIZJSONBufferWriter(sink, options);

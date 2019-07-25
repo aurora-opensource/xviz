@@ -13,6 +13,7 @@
 // limitations under the License.
 import {XVIZJSONProvider} from './xviz-json-provider';
 import {XVIZBinaryProvider} from './xviz-binary-provider';
+import {XVIZProtobufProvider} from './xviz-protobuf-provider';
 
 async function createXVIZProvider(ProviderClass, args) {
   let provider = null;
@@ -28,7 +29,11 @@ async function createXVIZProvider(ProviderClass, args) {
 
 export class XVIZProviderFactoryClass {
   constructor() {
-    this.providerClasses = [{className: XVIZJSONProvider}, {className: XVIZBinaryProvider}];
+    this.providerClasses = [
+      {className: XVIZJSONProvider},
+      {className: XVIZBinaryProvider},
+      {className: XVIZProtobufProvider}
+    ];
   }
 
   addProviderClass(className, args) {
