@@ -1,13 +1,13 @@
 {
   "lerna": "2.9.1",
-  "version": "independent",
-  "commands": {
-    "publish": {},
-    "bootstrap": {}
-  },
+  "version": "1.0.0-beta.18",
   "npmClient": "yarn",
   "useWorkspaces": true,
   "packages": [
     "modules/*"
-  ]
+  ],
+  "command": {
+    "publish": {},
+    "bootstrap": {}
+  }
 }
