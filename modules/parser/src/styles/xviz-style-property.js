@@ -32,6 +32,10 @@ function getColor(value) {
   if (Array.isArray(value) && Number.isFinite(value[0])) {
     return value;
   }
+  if (ArrayBuffer.isView(value) && Number.isFinite(value[0])) {
+    return value;
+  }
+
   return null;
 }
 

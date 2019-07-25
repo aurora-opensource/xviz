@@ -65,7 +65,8 @@ tape('XVIZFormatWriter#full matrix', t => {
       // We don't really care about the key as each writer will have
       // different identifier, (eg: 1-frame.json vs 1.frame.glb)
       for (const [key, val] of sink.entries()) {
-        t.ok(val.length, `${key} has formatted data`);
+        // Cover Arrays, Strings, ArrayBuffers
+        t.ok(val.byteLength || val.length, `${key} has formatted data`);
 
         // Verify the data is parsed as the expected format
         const newObj = new XVIZData(val);

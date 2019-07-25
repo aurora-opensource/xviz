@@ -24,7 +24,14 @@ export class MemorySourceSink {
   }
 
   writeSync(name, data) {
-    this.data.set(name, data);
+    // Save the underlying arrayBuffer not the TypedArray
+    // because when reading we should have an ArrayBuffer
+    // and the consumer should make the Type decision
+    if (ArrayBuffer.isView(data) && data.length && data.buffer) {
+      this.data.set(name, data.buffer);
+    } else {
+      this.data.set(name, data);
+    }
   }
 
   close() {}

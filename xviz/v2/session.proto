@@ -18,7 +18,6 @@ import "google/protobuf/struct.proto";
 import "xviz/v2/core.proto";
 import "xviz/v2/options.proto";
 import "xviz/v2/style.proto";
-import "xviz/v2/panel.proto";
 
 // NOTE: this enum purposely not scoped inside Start to avoid naming conflict
 // with "log" field and "log" type

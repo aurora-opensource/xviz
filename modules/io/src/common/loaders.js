@@ -16,7 +16,8 @@ import {GLTFParser} from '@loaders.gl/gltf';
 
 import {XVIZ_GLTF_EXTENSION} from './constants';
 import {TextDecoder} from './text-encoding';
-import {MAGIC_PBE1, XVIZ_PROTOBUF_MESSAGE} from './protobuf-support';
+import {MAGIC_PBE1, XVIZ_PROTOBUF_MESSAGE, XVIZ_PROTOBUF_TYPE} from './protobuf-support';
+import {Enum, Type, MapField} from 'protobufjs';
 
 // XVIZ Type constants
 const XVIZ_TYPE_PATTERN = /"type":\s*"(xviz\/\w*)"/;
@@ -198,6 +199,86 @@ function getPBEXVIZType(arrayBuffer) {
   return envelope.type;
 }
 
+function postProcessUIConfig(msg) {
+  if (msg && msg.ui_config) {
+    for (const entry of Object.keys(msg.ui_config)) {
+      msg.ui_config[entry] = XVIZ_PROTOBUF_TYPE.UIPanelInfo.toObject(msg.ui_config[entry]);
+    }
+  }
+}
+
+/* We need to modify the protobufjs objects to work closer to "normal"
+ * Javascript objects. The protobuf type reflection is available as `msg.$type`
+ * which is traversed in parallel to the `msg`.
+ *
+ * The following mutations are made:
+ *
+ * - Remove empty Arrays from the instance, protobuf.js will set to the default value: [] (the empty array)
+ * - Enum => String
+ * - Handle arrays of enum
+ * - Recursive on objects
+ */
+/* eslint-disable max-depth, complexity */
+function postProcessProtobuf(msg, pbType) {
+  const type = pbType || msg.$type;
+
+  if (msg && type && type.fields) {
+    const fields = type.fields;
+
+    for (const fieldName in fields) {
+      const field = fields[fieldName];
+
+      if (field && msg[field.name]) {
+        if (!field.resolvedType && field.repeated && msg[field.name].length === 0) {
+          // Remove empty arrays that are likely the default value
+          msg[field.name] = undefined;
+          delete msg[field.name];
+        } else if (field.resolvedType) {
+          // Handle integer enum to string change
+          if (field.resolvedType instanceof Enum) {
+            if (field.repeated) {
+              if (msg[field.name].length === 0) {
+                // Remove empty arrays that are likely the default value
+                msg[field.name] = undefined;
+                delete msg[field.name];
+              } else {
+                // Map array of enums to strings using reflection information
+                msg[field.name] = msg[field.name].map(
+                  entry => field.resolvedType.valuesById[entry]
+                );
+              }
+            } else {
+              // Map enums to strings using reflection information
+              msg[field.name] = field.resolvedType.valuesById[msg[field.name]];
+            }
+          } else if (field instanceof MapField) {
+            // Recursive processing on key,value field
+            for (const key of Object.keys(msg[field.name])) {
+              msg[field.name][key] = postProcessProtobuf(msg[field.name][key], field.resolvedType);
+            }
+          } else if (field.resolvedType instanceof Type) {
+            // Recursive processing on fields of an object
+            if (field.repeated) {
+              if (msg[field.name].length === 0) {
+                msg[field.name] = undefined;
+                delete msg[field.name];
+              } else {
+                msg[field.name] = msg[field.name].map(entry =>
+                  postProcessProtobuf(entry, field.resolvedType)
+                );
+              }
+            } else {
+              msg[field.name] = postProcessProtobuf(msg[field.name], field.resolvedType);
+            }
+          }
+        }
+      }
+    }
+  }
+  return msg;
+}
+/* eslint-enable max-depth, complexity */
+
 // TODO: unpackEnvelop produces namespace, type data
 export function parsePBEXVIZ(arrayBuffer) {
   const strippedBuffer = new Uint8Array(arrayBuffer, 4);
@@ -210,22 +291,13 @@ export function parsePBEXVIZ(arrayBuffer) {
 
   switch (envelope.type) {
     case 'xviz/metadata':
-      // TODO: support enum integers when parsing to avoid costly toObject() call
-      // xviz.data = XVIZ_PROTOBUF_MESSAGE.Metadata.decode(envelope.data.value);
       const tmpMeta = XVIZ_PROTOBUF_MESSAGE.Metadata.decode(envelope.data.value);
-      // This toObject is required to change enums to strings for now
-      xviz.data = XVIZ_PROTOBUF_MESSAGE.Metadata.toObject(tmpMeta, {
-        enums: String
-      });
+      xviz.data = postProcessProtobuf(tmpMeta);
+      postProcessUIConfig(xviz.data);
       break;
     case 'xviz/state_update':
-      // TODO: support enum integers when parsing to avoid costly toObject() call
-      // xviz.data = XVIZ_PROTOBUF_MESSAGE.StateUpdate.decode(envelope.data.value);
       const tmpState = XVIZ_PROTOBUF_MESSAGE.StateUpdate.decode(envelope.data.value);
-      // This toObject is required to change enums to strings for now
-      xviz.data = XVIZ_PROTOBUF_MESSAGE.StateUpdate.toObject(tmpState, {
-        enums: String
-      });
+      xviz.data = postProcessProtobuf(tmpState);
       break;
     default:
       throw new Error(`Unknown Message type ${envelope.type}`);
