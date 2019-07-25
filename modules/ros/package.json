@@ -14,6 +14,8 @@
     "dist"
   ],
   "dependencies": {
+    "@xviz/builder": "^1.0.0-beta.18",
+    "@xviz/io": "^1.0.0-beta.18",
     "lodash": "^4.17.11",
     "rosbag": "^2.0.0",
     "sharp": "^0.20.7",
