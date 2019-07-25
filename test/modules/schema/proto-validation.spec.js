@@ -29,6 +29,7 @@ import EXAMPLES from './examples.json';
 import test from 'tape-catch';
 import path from 'path';
 import clone from 'clone';
+import base64js from 'base64-js';
 
 // Protobuf has a primitive type system, while it produces valid XVIZ JSON
 // it does not consume all the variations
@@ -117,6 +118,37 @@ test('protosCorrect', t => {
   Promise.all(tests).then(() => t.end());
 });
 
+// Convert an Array of XVIZ image data from protobufjs to a base64 encoding
+function convertImageToBase64(image) {
+  if (Array.isArray(image.data)) {
+    image.data = base64js.fromByteArray(Uint8Array.from(image.data));
+  }
+}
+
+// Convert XVIZ data for images from an Array to a base64 encoding.
+// The Array representation is due to the XVIZ Protobuf JS instance decoding.
+// While it is controllable how protobuf 'bytes' fields are decoded when using
+// 'toObject', we want to preserve the Array format for XVIZ 'color' types
+// therefore we must alter the other usage of bytes for our image data.
+function convertImagesToBase64(protoObject) {
+  if (protoObject.primitives) {
+    const prims = protoObject.primitives;
+    for (const stream of Object.keys(prims)) {
+      if (prims[stream].images) {
+        prims[stream].images.forEach(entry => {
+          convertImageToBase64(entry);
+        });
+      }
+    }
+  } else if (protoObject.images) {
+    protoObject.images.forEach(entry => {
+      convertImageToBase64(entry);
+    });
+  } else if (protoObject.data && protoObject.width_px) {
+    convertImageToBase64(protoObject);
+  }
+}
+
 /* eslint-disable-next-line max-params */
 function validateAgainstExample(t, validator, protoType, protoEnumTypes, examplePath, jsonExample) {
   const originalJsonExample = clone(jsonExample);
@@ -139,9 +171,10 @@ function validateAgainstExample(t, validator, protoType, protoEnumTypes, example
   // Dump to Object
   const options = {
     enums: String, // Use strings instead of numbers
-    bytes: String // Use base64 string instead of Uint8Array
+    bytes: Array // Explicitly use Array format for bytes
   };
   const fromProtoObject = protoType.toObject(protoData, options);
+  convertImagesToBase64(fromProtoObject);
 
   // Validate JSON with JSON schema
   validateXVIZJSON(t, validator, schemaName, fromProtoObject, 'Proto round trip JSON');

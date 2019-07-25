@@ -35,7 +35,19 @@
       "needed_streams": [
         "/velocity"
       ],
-      "config": ""
+      "config": {
+        "type": "PANEL",
+        "name": "Metrics",
+        "children": [
+          {
+            "type": "METRIC",
+            "title": "Velocity",
+            "streams": [
+              "/velocity"
+            ]
+          }
+        ]
+      }
     }
   },
   "log_info": {

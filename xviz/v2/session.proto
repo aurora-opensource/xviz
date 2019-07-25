@@ -18,6 +18,7 @@ import "google/protobuf/struct.proto";
 import "xviz/v2/core.proto";
 import "xviz/v2/options.proto";
 import "xviz/v2/style.proto";
+import "xviz/v2/panel.proto";
 
 // NOTE: this enum purposely not scoped inside Start to avoid naming conflict
 // with "log" field and "log" type
@@ -185,7 +186,7 @@ message UIPanelInfo {
   option (xviz_json_schema) = "session/ui_panel_info";
   string name = 1;
   repeated string needed_streams = 2;
-  string config = 3;
+  google.protobuf.Struct config = 3;
 }
 
 message LogInfo

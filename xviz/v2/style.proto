@@ -24,8 +24,8 @@ message StyleClass {
 
 message StyleObjectValue {
   option (xviz_json_schema) = "style/object_value";
-  repeated uint32 fill_color = 1;
-  repeated uint32 stroke_color = 2;
+  bytes fill_color = 1;
+  bytes stroke_color = 2;
   float stroke_width = 3;
   float radius = 4;
   float text_size = 5;
@@ -38,8 +38,8 @@ message StyleObjectValue {
 
 message StyleStreamValue {
   option (xviz_json_schema) = "style/stream_value";
-  repeated uint32 fill_color = 1;
-  repeated uint32 stroke_color = 2;
+  bytes fill_color = 1;
+  bytes stroke_color = 2;
   float stroke_width = 3;
   float radius = 4;
   float text_size = 5;
@@ -62,7 +62,7 @@ message StyleStreamValue {
 
 message Color {
   // Always 3 or 4 values, (r, g, b) or (r, g, b, a)
-  repeated uint32 values = 1;
+  bytes values = 1;
 }
 
 enum TextAnchor {

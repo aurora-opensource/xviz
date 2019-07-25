@@ -47,7 +47,7 @@ message Point {
   // Flattened X, Y, Z list
   repeated float points = 2;
   // Flattened list of (R, G, B) or (R, G, B, A)
-  repeated uint32 colors = 3;
+  bytes colors = 3;
 }
 
 message Polygon {
@@ -63,7 +63,7 @@ message Polyline {
   // Flattened X, Y, Z list
   repeated float vertices = 2;
   // Flattened (R, G, B) or (R, G, B, A) list
-  repeated uint32 colors = 3;
+  bytes colors = 3;
 }
 
 message Stadium {
