@@ -14,7 +14,7 @@
 
 /* eslint-disable camelcase */
 import {FileSink} from '@xviz/io/node';
-import {XVIZJSONWriter, XVIZBinaryWriter} from '@xviz/io';
+import {XVIZBinaryWriter, XVIZJSONWriter, XVIZProtobufWriter} from '@xviz/io';
 
 import {KittiConverter} from './converters';
 
@@ -30,7 +30,8 @@ module.exports = async function main(args) {
     cameraSources,
     imageMaxWidth,
     imageMaxHeight,
-    writeJson
+    writeJson,
+    writeProtobuf
   } = args;
 
   // This object orchestrates any data dependencies between the data sources
@@ -50,7 +51,14 @@ module.exports = async function main(args) {
 
   // This abstracts the details of the filenames expected by our server
   const sink = new FileSink(outputDir);
-  const xvizWriter = writeJson ? new XVIZJSONWriter(sink) : new XVIZBinaryWriter(sink);
+  let xvizWriter = null;
+  if (writeJson) {
+    xvizWriter = new XVIZJSONWriter(sink);
+  } else if (writeProtobuf) {
+    xvizWriter = new XVIZProtobufWriter(sink);
+  } else {
+    xvizWriter = new XVIZBinaryWriter(sink);
+  }
 
   // Write metadata file
   const xvizMetadata = converter.getMetadata();
