@@ -33,6 +33,8 @@
     "session/stream_metadata/stream_category_ui_primitive_type.json",
     "session/state_update/complete_state.json",
     "session/state_update/incremental.json",
+    "session/state_update/persistent.json",
+    "session/state_update/persistent_with_no_data.json",
     "session/state_update/snapshot_backward_compat_only.json",
     "session/start/complete.json",
     "session/start/just_version.json",
