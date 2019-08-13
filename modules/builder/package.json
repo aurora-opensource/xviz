@@ -14,8 +14,8 @@
     "dist"
   ],
   "dependencies": {
-    "@loaders.gl/gltf": "^1.1.4",
-    "@loaders.gl/polyfills": "^1.1.4",
+    "@loaders.gl/gltf": "~1.1.7",
+    "@loaders.gl/polyfills": "~1.1.7",
     "@turf/turf": "^5.1.6",
     "@xviz/io": "1.0.0-beta.19",
     "base64-js": "^1.3.0",
