@@ -17,7 +17,7 @@
     "text-encoding": false
   },
   "dependencies": {
-    "@loaders.gl/gltf": "^1.1.4",
+    "@loaders.gl/gltf": "~1.1.7",
     "@xviz/io": "1.0.0-beta.19",
     "base64-js": "^1.3.0",
     "color": "^3.0.0",
