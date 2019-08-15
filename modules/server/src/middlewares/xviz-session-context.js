@@ -20,7 +20,7 @@
 export class XVIZSessionContext {
   constructor(state = {}) {
     this.map = new Map(Object.entries(state));
-    this.transforms = new Map();
+    this.activeTransforms = new Map();
   }
 
   set(name, val) {
@@ -32,14 +32,18 @@ export class XVIZSessionContext {
   }
 
   startTransform(id, state) {
-    this.transforms.set(id, state);
+    this.activeTransforms.set(id, state);
+  }
+
+  transforms() {
+    return this.activeTransforms.keys();
   }
 
   transform(id) {
-    return this.transforms.get(id);
+    return this.activeTransforms.get(id);
   }
 
   endTransform(id) {
-    this.transforms.delete(id);
+    this.activeTransforms.delete(id);
   }
 }
