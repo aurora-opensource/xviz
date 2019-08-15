@@ -100,33 +100,8 @@ export class XVIZProviderRequestHandler {
     if (error) {
       this.middleware.onError(XVIZEnvelope.Error({message: error}));
     } else {
-      //  store id, start_timestamp, end_timestamp, desired_streams
-      const message = msg.message();
-      const id = message.data.id;
-      const transform = this.context.transform(id);
-      if (!transform) {
-        // track transform request
-        const tformState = {
-          request: message.data,
-          iterator: null,
-          interval: null,
-          delay: this.options.delay,
-          ...this._setupTransformMetrics()
-        };
-        this.context.startTransform(id, tformState);
-
-        tformState.iterator = this.provider.getMessageIterator(
-          message.data.start_timestamp,
-          message.data.end_timestamp
-        );
-
-        // send state_updates || error
-        if (tformState.delay < 1) {
-          this._sendAllStateUpdates(id, tformState);
-        } else {
-          this._sendStateUpdate(id, tformState);
-        }
-      }
+      this._clearActiveTransforms();
+      this._startTransform(msg);
     }
   }
 
@@ -147,6 +122,7 @@ export class XVIZProviderRequestHandler {
     }
   }
 
+  /* eslint-disable complexity */
   async _sendStateUpdate(id, transformState) {
     const {delay, interval, iterator} = transformState;
     const {loadTimer, sendTimer, totalTimer} = transformState;
@@ -161,7 +137,8 @@ export class XVIZProviderRequestHandler {
       transformState.interval = null;
     }
 
-    if (iterator.valid()) {
+    // End when finished iteration or transform has been removed.
+    if (iterator.valid() && this.context.transform(id)) {
       loadTimer && loadTimer.timeStart();
       const data = await this.provider.xvizMessage(iterator);
       loadTimer && loadTimer.timeEnd();
@@ -183,13 +160,51 @@ export class XVIZProviderRequestHandler {
       this.metrics.reset();
     }
   }
+  /* eslint-enable complexity */
+
+  _clearActiveTransforms() {
+    const transforms = this.context.transforms();
+    // Remove all current inflight transforms from list
+    for (const tKey of transforms) {
+      this.context.endTransform(tKey);
+    }
+  }
+
+  _startTransform(msg) {
+    //  store id, start_timestamp, end_timestamp, desired_streams
+    const message = msg.message();
+    const id = message.data.id;
+
+    // setup new transform request
+    const tformState = {
+      request: message.data,
+      iterator: null,
+      interval: null,
+      delay: this.options.delay,
+      ...this._setupTransformMetrics()
+    };
+    this.context.startTransform(id, tformState);
+
+    tformState.iterator = this.provider.getMessageIterator({
+      startTime: message.data.start_timestamp,
+      endTime: message.data.end_timestamp
+    });
+
+    // send state_updates || error
+    if (tformState.delay < 1) {
+      this._sendAllStateUpdates(id, tformState);
+    } else {
+      this._sendStateUpdate(id, tformState);
+    }
+  }
 
   async _sendAllStateUpdates(id, transformState) {
     const {iterator} = transformState;
     const {loadTimer, sendTimer, totalTimer} = transformState;
 
     totalTimer && totalTimer.timeStart();
-    while (iterator.valid()) {
+    // End when finished iteration or transform has been removed.
+    while (iterator.valid() && this.context.transform(id)) {
       loadTimer && loadTimer.timeStart();
       const data = await this.provider.xvizMessage(iterator);
       loadTimer && loadTimer.timeEnd();

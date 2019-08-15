@@ -78,7 +78,7 @@ export async function convertCmd(args) {
   // This abstracts the details of the filenames expected by our server
   const sink = new FileSink(directory);
 
-  const iterator = provider.getMessageIterator(start, end);
+  const iterator = provider.getMessageIterator({startTime: start, endTime: end});
   if (!iterator.valid()) {
     throw new Error('Error creating and iterator');
   }

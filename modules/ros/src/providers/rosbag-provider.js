@@ -124,7 +124,7 @@ export class ROSBagProvider {
     return null;
   }
 
-  getMessageIterator(startTime, endTime) {
+  getMessageIterator({startTime, endTime} = {}) {
     // metadata
     let {start_time: start, end_time: end} = this.metadata.data.log_info;
 
