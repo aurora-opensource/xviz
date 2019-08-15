@@ -57,8 +57,8 @@ export class TestProvider {
     return new XVIZData(this.metadata);
   }
 
-  getMessageIterator(s, e) {
-    return new TestIterator(s, e);
+  getMessageIterator({startTime, endTime} = {}) {
+    return new TestIterator(startTime, endTime);
   }
 
   xvizMessage(iter) {

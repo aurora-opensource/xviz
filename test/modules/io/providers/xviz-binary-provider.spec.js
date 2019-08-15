@@ -19,7 +19,7 @@ import {getBinaryTestDataSource} from './test-data';
 
 const source = getBinaryTestDataSource();
 
-test('XVIZJSONProvider#default-ctor init', async t => {
+test('XVIZBinaryProvider#default-ctor init', async t => {
   // Ensure no parameter ctor
   const provider = new XVIZBinaryProvider({source});
   await provider.init();
@@ -27,12 +27,12 @@ test('XVIZJSONProvider#default-ctor init', async t => {
   t.end();
 });
 
-test('XVIZJSONProvider#message iteration', async t => {
+test('XVIZBinaryProvider#message iteration', async t => {
   const provider = new XVIZBinaryProvider({source});
   await provider.init();
   t.ok(provider.valid(), 'Provider is valid');
 
-  const iterator = provider.getMessageIterator(1000.5, 1010.5);
+  const iterator = provider.getMessageIterator({startTime: 1000.5, endTime: 1010.5});
 
   const testMessage = async timestamp => {
     t.ok(iterator.valid());

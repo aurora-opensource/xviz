@@ -32,7 +32,7 @@ test('XVIZJSONProvider#message iteration', async t => {
   await provider.init();
   t.ok(provider.valid(), 'Provider is valid');
 
-  const iterator = provider.getMessageIterator(1000.5, 1010.5);
+  const iterator = provider.getMessageIterator({startTime: 1000.5, endTime: 1010.5});
 
   const testMessage = async timestamp => {
     t.ok(iterator.valid());
