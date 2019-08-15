@@ -165,7 +165,7 @@ test('XVIZStreamBuffer#insert, getStreams', t => {
 
   t.deepEquals(
     xvizStreamBuffer.getStreams(),
-    {A: [1.1, 2.2, 3, 4, 5], B: [-1], C: [1]},
+    {A: [1.1, 2.2, 3, 4, 5], B: [null, -1], C: [1]},
     'getStreams returns correct result'
   );
 

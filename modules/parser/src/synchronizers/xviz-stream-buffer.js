@@ -383,11 +383,10 @@ export default class XVIZStreamBuffer {
     });
 
     for (const streamName in timeslice.streams) {
-      let value = timeslice.streams[streamName];
+      const value = timeslice.streams[streamName];
       if (value === null) {
         // Explicitly delete a stream
         delete timesliceAtInsertPosition.streams[streamName];
-        value = undefined;
       }
       streams[streamName][index] = value;
     }

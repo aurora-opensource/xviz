@@ -97,6 +97,7 @@ function parseStreamSets(streamSets, timestamp, convertPrimitive) {
   const timeSeries = [];
   const futures = {};
   const uiPrimitives = {};
+  const noDataStreams = [];
 
   for (const streamSet of streamSets) {
     Object.assign(poses, streamSet.poses);
@@ -109,6 +110,10 @@ function parseStreamSets(streamSets, timestamp, convertPrimitive) {
       if (timeSeries) {
         timeSeries.push(...streamSet.time_series);
       }
+    }
+
+    if (streamSet.no_data_streams && noDataStreams) {
+      noDataStreams.push(...streamSet.no_data_streams);
     }
   }
 
@@ -155,6 +160,11 @@ function parseStreamSets(streamSets, timestamp, convertPrimitive) {
         timestamp
       );
     });
+
+  if (noDataStreams.length) {
+    // Explicitly set to null and the stream buffer will do the right thing
+    noDataStreams.forEach(stream => (newStreams[stream] = null));
+  }
 
   return newStreams;
 }

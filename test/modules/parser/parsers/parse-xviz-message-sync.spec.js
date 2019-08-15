@@ -766,6 +766,42 @@ tape('parseXVIZData futures timeslice v1', t => {
   t.end();
 });
 
+tape('parseXVIZData state_update, PERSISTENT', t => {
+  resetXVIZConfigAndSettings();
+  setXVIZConfig({currentMajorVersion: 2, ALLOW_MISSING_PRIMARY_POSE: true});
+
+  const persistentMsg = {...TestTimesliceMessageV2};
+  persistentMsg.update_type = 'PERSISTENT';
+
+  const result = parseXVIZData(persistentMsg, {v2Type: 'state_update'});
+  t.equals(result.type, XVIZ_MESSAGE_TYPE.TIMESLICE, 'Message type set for timeslice');
+  t.equal(result.updateType, 'PERSISTENT', 'XVIZ update type is parsed');
+  t.equals(result.timestamp, TestTimesliceMessageV2.updates[0].timestamp, 'Message timestamp set');
+
+  const feature = result.streams['/test/stream'].features[0];
+  t.equal(feature.type, 'point', 'feature has type point');
+  t.deepEquals(Array.from(feature.points), [1000, 1000, 200], 'feature has type point');
+
+  t.end();
+});
+
+tape('parseXVIZData state_update, no_data_streams', t => {
+  resetXVIZConfigAndSettings();
+  setXVIZConfig({currentMajorVersion: 2, ALLOW_MISSING_PRIMARY_POSE: true});
+
+  const noDataStreamMsg = {...TestTimesliceMessageV2};
+  noDataStreamMsg.updates[0].no_data_streams = ['/no-data-stream'];
+
+  const result = parseXVIZData(noDataStreamMsg, {v2Type: 'state_update'});
+  t.equals(result.type, XVIZ_MESSAGE_TYPE.TIMESLICE, 'Message type set for timeslice');
+  t.equal(result.updateType, 'COMPLETE', 'XVIZ update type is parsed');
+  t.equals(result.timestamp, TestTimesliceMessageV2.updates[0].timestamp, 'Message timestamp set');
+
+  t.equal(result.streams['/no-data-stream'], null, 'no_data_stream marked as null');
+
+  t.end();
+});
+
 tape('parseXVIZMessageSync', t => {
   resetXVIZConfigAndSettings();
   setXVIZConfig({currentMajorVersion: 2});
