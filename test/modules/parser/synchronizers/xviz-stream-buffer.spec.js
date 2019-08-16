@@ -64,7 +64,7 @@ const TEST_CASES = [
       timestamp: 1001,
       streams: {A: 1.1, B: null}
     },
-    snapshot: {A: 1.1, C: 1}
+    snapshot: {A: 1.1, B: null, C: 1}
   },
   {
     id: 'TS-8',
@@ -165,7 +165,7 @@ test('XVIZStreamBuffer#insert, getStreams', t => {
 
   t.deepEquals(
     xvizStreamBuffer.getStreams(),
-    {A: [1.1, 2.2, 3, 4, 5], B: [-1], C: [1]},
+    {A: [1.1, 2.2, 3, 4, 5], B: [null, -1], C: [1]},
     'getStreams returns correct result'
   );
 
@@ -276,5 +276,69 @@ test('XVIZStreamBuffer#updateFixedBuffer large backwards jumps', t => {
 
   t.is(start, 900, 'buffer start newly set');
   t.is(end, 920, 'buffer end newly set');
+  t.end();
+});
+
+test('XVIZStreamBuffer#insert#PERSISTENT', t => {
+  const testCases = [
+    {
+      title: 'insert - before time window',
+      message: {
+        updateType: 'PERSISTENT',
+        timestamp: 0,
+        streams: {X: 10, Y: 20}
+      },
+      expect: {A: 5, X: 10, Y: 20}
+    },
+    {
+      title: 'insert - after time window',
+      message: {
+        updateType: 'PERSISTENT',
+        timestamp: 1100,
+        streams: {X: 100}
+      },
+      expect: {A: 5, X: 10, Y: 20}
+    },
+    {
+      title: 'insert - before time window',
+      message: {
+        updateType: 'PERSISTENT',
+        timestamp: 900,
+        streams: {X: 20, Y: 30, Z: -1}
+      },
+      expect: {A: 5, X: 20, Y: 30, Z: -1}
+    },
+    {
+      title: 'merge',
+      message: {
+        updateType: 'PERSISTENT',
+        timestamp: 900,
+        streams: {Y: null}
+      },
+      expect: {A: 5, X: 20, Y: 20, Z: -1}
+    }
+  ];
+
+  const xvizStreamBuffer = new XVIZStreamBuffer();
+  xvizStreamBuffer.insert({
+    timestamp: 1000,
+    streams: {A: 5}
+  });
+
+  for (const testCase of testCases) {
+    const {lastUpdate} = xvizStreamBuffer;
+    t.ok(xvizStreamBuffer.insert(testCase.message), 'persistent timeslice inserted');
+    t.ok(xvizStreamBuffer.lastUpdate > lastUpdate, 'update counter updated');
+
+    const timeslices = xvizStreamBuffer.getTimeslices({start: 1000, end: 1001});
+    const streams = {};
+    timeslices.forEach(timeslice => {
+      for (const streamName in timeslice.streams) {
+        streams[streamName] = timeslice.streams[streamName] || streams[streamName];
+      }
+    });
+    t.deepEqual(streams, testCase.expect, `${testCase.title}: returns correct streams`);
+  }
+
   t.end();
 });

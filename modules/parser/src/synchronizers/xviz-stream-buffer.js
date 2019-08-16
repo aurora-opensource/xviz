@@ -53,9 +53,11 @@ export default class XVIZStreamBuffer {
     this.bufferEnd = null;
     /* Sorted timeslices */
     this.timeslices = [];
+    this.persistent = []; // like timeslices, but never pruned
     /* Sorted values by stream */
     this.streams = {};
     this.videos = {};
+    this.persistentStreams = {};
     /* Update counter */
     this.lastUpdate = 0;
     /* Track the number of unique streams */
@@ -157,10 +159,14 @@ export default class XVIZStreamBuffer {
    * @returns {array} - loaded timeslices within range
    */
   getTimeslices({start, end} = {}) {
-    const {timeslices} = this;
+    const {timeslices, persistent} = this;
     const startIndex = Number.isFinite(start) ? this._indexOf(start, LEFT) : 0;
     const endIndex = Number.isFinite(end) ? this._indexOf(end, RIGHT) : timeslices.length;
-    return timeslices.slice(startIndex, endIndex);
+    const persistentEndIndex = Number.isFinite(end)
+      ? findInsertPos(persistent, end, RIGHT)
+      : persistent.length;
+
+    return persistent.slice(0, persistentEndIndex).concat(timeslices.slice(startIndex, endIndex));
   }
 
   /**
@@ -199,6 +205,7 @@ export default class XVIZStreamBuffer {
    * Add a new timeslice object into the timeline
    * @params {object} timeslice - timeslice object from XVIZ stream
    */
+  // eslint-disable-next-line complexity, max-statements
   insert(timeslice) {
     const {timestamp, updateType} = timeslice;
 
@@ -211,6 +218,12 @@ export default class XVIZStreamBuffer {
     timeslice.videos = timeslice.videos || {};
 
     const {timeslices, streams, videos} = this;
+
+    if (updateType === 'PERSISTENT') {
+      this._insertPersistentSlice(timeslice);
+      this.lastUpdate++;
+      return true;
+    }
 
     // Note: if stream is not present in a timeslice, that index in the list holds undefined
     // This avoids repeatedly allocating new arrays for each stream, and lowers the cost of
@@ -335,6 +348,30 @@ export default class XVIZStreamBuffer {
   }
   /* eslint-enable complexity, no-unused-expressions */
 
+  _insertPersistentSlice(persistentSlice) {
+    const {persistent, persistentStreams} = this;
+    const {timestamp, streams} = persistentSlice;
+    const index = findInsertPos(persistent, timestamp, LEFT);
+    const timesliceAtInsertPosition = persistent[index];
+
+    if (timesliceAtInsertPosition && timesliceAtInsertPosition.timestamp === timestamp) {
+      // merge
+      Object.assign(timesliceAtInsertPosition, persistentSlice, {
+        streams: Object.assign(timesliceAtInsertPosition.streams, streams)
+      });
+    } else {
+      // insert
+      persistent.splice(index, 0, persistentSlice);
+    }
+
+    for (const streamName in streams) {
+      if (!(streamName in persistentStreams)) {
+        persistentStreams[streamName] = true;
+        this.streamCount++;
+      }
+    }
+  }
+
   _mergeTimesliceAt(index, timeslice) {
     const {timeslices, streams, videos} = this;
     const timesliceAtInsertPosition = timeslices[index];
@@ -345,12 +382,7 @@ export default class XVIZStreamBuffer {
     });
 
     for (const streamName in timeslice.streams) {
-      let value = timeslice.streams[streamName];
-      if (value === null) {
-        // Explicitly delete a stream
-        delete timesliceAtInsertPosition.streams[streamName];
-        value = undefined;
-      }
+      const value = timeslice.streams[streamName];
       streams[streamName][index] = value;
     }
     for (const streamName in timeslice.videos) {
