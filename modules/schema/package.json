@@ -17,7 +17,7 @@
   "dependencies": {
     "ajv": "^6.5.2",
     "is": "^3.2.1",
-    "protobufjs": "~6.8.8"
+    "protobufjs": "https://github.com/jlisee/protobuf.js#ed8e699671da6f9a169074aa0f2a160cefe0844a"
   },
   "devDependencies": {
     "ajv-cli": "^3.0.0"

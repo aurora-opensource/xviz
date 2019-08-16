@@ -40,20 +40,18 @@
     "jsonlint": "^1.6.3",
     "ocular-dev-tools": "0.0.27",
     "pre-commit": "^1.2.2",
+    "protobufjs": "https://github.com/jlisee/protobuf.js#ed8e699671da6f9a169074aa0f2a160cefe0844a",
     "reify": "^0.18.1",
     "walk": "^2.3.14"
   },
   "engines": {
-    "node": ">= 8",
-    "npm": ">= 5",
+    "node": ">= 10",
+    "npm": ">= 6",
     "yarn": ">= 1.10.0"
   },
   "pre-commit": [
     "check-copyright-header",
     "test-fast"
   ],
-  "private": true,
-  "dependencies": {
-    "protobufjs": "^6.8.8"
-  }
+  "private": true
 }
