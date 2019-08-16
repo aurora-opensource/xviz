@@ -64,7 +64,7 @@ const TEST_CASES = [
       timestamp: 1001,
       streams: {A: 1.1, B: null}
     },
-    snapshot: {A: 1.1, C: 1}
+    snapshot: {A: 1.1, B: null, C: 1}
   },
   {
     id: 'TS-8',

@@ -112,7 +112,7 @@ function parseStreamSets(streamSets, timestamp, convertPrimitive) {
       }
     }
 
-    if (streamSet.no_data_streams && noDataStreams) {
+    if (streamSet.no_data_streams) {
       noDataStreams.push(...streamSet.no_data_streams);
     }
   }
