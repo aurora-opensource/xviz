@@ -316,14 +316,6 @@ test('XVIZStreamBuffer#insert#PERSISTENT', t => {
         streams: {Y: null}
       },
       expect: {A: 5, X: 20, Y: 20, Z: -1}
-    },
-    {
-      title: 'conflict',
-      message: {
-        updateType: 'PERSISTENT',
-        streams: {A: 3}
-      },
-      error: true
     }
   ];
 
@@ -335,21 +327,17 @@ test('XVIZStreamBuffer#insert#PERSISTENT', t => {
 
   for (const testCase of testCases) {
     const {lastUpdate} = xvizStreamBuffer;
-    if (testCase.error) {
-      t.throws(() => xvizStreamBuffer.insert(testCase.message), 'insertion should throw');
-    } else {
-      t.ok(xvizStreamBuffer.insert(testCase.message), 'persistent timeslice inserted');
-      t.ok(xvizStreamBuffer.lastUpdate > lastUpdate, 'update counter updated');
+    t.ok(xvizStreamBuffer.insert(testCase.message), 'persistent timeslice inserted');
+    t.ok(xvizStreamBuffer.lastUpdate > lastUpdate, 'update counter updated');
 
-      const timeslices = xvizStreamBuffer.getTimeslices({start: 1000, end: 1001});
-      const streams = {};
-      timeslices.forEach(timeslice => {
-        for (const streamName in timeslice.streams) {
-          streams[streamName] = timeslice.streams[streamName] || streams[streamName];
-        }
-      });
-      t.deepEqual(streams, testCase.expect, `${testCase.title}: returns correct streams`);
-    }
+    const timeslices = xvizStreamBuffer.getTimeslices({start: 1000, end: 1001});
+    const streams = {};
+    timeslices.forEach(timeslice => {
+      for (const streamName in timeslice.streams) {
+        streams[streamName] = timeslice.streams[streamName] || streams[streamName];
+      }
+    });
+    t.deepEqual(streams, testCase.expect, `${testCase.title}: returns correct streams`);
   }
 
   t.end();

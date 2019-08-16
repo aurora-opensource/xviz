@@ -365,10 +365,6 @@ export default class XVIZStreamBuffer {
     }
 
     for (const streamName in streams) {
-      assert(
-        !(streamName in this.streams),
-        `${streamName} found in both persistent and non-persistent updates`
-      );
       if (!(streamName in persistentStreams)) {
         persistentStreams[streamName] = true;
         this.streamCount++;
