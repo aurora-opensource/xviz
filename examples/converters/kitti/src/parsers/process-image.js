@@ -54,7 +54,6 @@ export async function resizeImage(filePath, maxWidth, maxHeight) {
   } else {
     imageData = await sharp(filePath)
       .resize(resizeWidth, resizeHeight)
-      .max()
       .toBuffer()
       .then(data => data);
   }

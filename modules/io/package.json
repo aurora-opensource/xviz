@@ -31,7 +31,7 @@
     "text-encoding": false
   },
   "engines": {
-    "node": ">= 10",
+    "node": ">= 10.16",
     "npm": ">= 6",
     "yarn": ">= 1.10.0"
   }
