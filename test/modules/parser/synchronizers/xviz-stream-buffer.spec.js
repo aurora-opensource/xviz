@@ -282,20 +282,43 @@ test('XVIZStreamBuffer#updateFixedBuffer large backwards jumps', t => {
 test('XVIZStreamBuffer#insert#PERSISTENT', t => {
   const testCases = [
     {
+      title: 'insert - before time window',
       message: {
         updateType: 'PERSISTENT',
+        timestamp: 0,
         streams: {X: 10, Y: 20}
       },
       expect: {A: 5, X: 10, Y: 20}
     },
     {
+      title: 'insert - after time window',
       message: {
         updateType: 'PERSISTENT',
-        streams: {X: 20, Y: null, Z: 0}
+        timestamp: 1100,
+        streams: {X: 100}
       },
-      expect: {A: 5, X: 20, Z: 0}
+      expect: {A: 5, X: 10, Y: 20}
     },
     {
+      title: 'insert - before time window',
+      message: {
+        updateType: 'PERSISTENT',
+        timestamp: 900,
+        streams: {X: 20, Y: 30, Z: -1}
+      },
+      expect: {A: 5, X: 20, Y: 30, Z: -1}
+    },
+    {
+      title: 'merge',
+      message: {
+        updateType: 'PERSISTENT',
+        timestamp: 900,
+        streams: {Y: null}
+      },
+      expect: {A: 5, X: 20, Y: 20, Z: -1}
+    },
+    {
+      title: 'conflict',
       message: {
         updateType: 'PERSISTENT',
         streams: {A: 3}
@@ -322,10 +345,10 @@ test('XVIZStreamBuffer#insert#PERSISTENT', t => {
       const streams = {};
       timeslices.forEach(timeslice => {
         for (const streamName in timeslice.streams) {
-          streams[streamName] = timeslice.streams[streamName];
+          streams[streamName] = timeslice.streams[streamName] || streams[streamName];
         }
       });
-      t.deepEqual(streams, testCase.expect, 'returns correct streams');
+      t.deepEqual(streams, testCase.expect, `${testCase.title}: returns correct streams`);
     }
   }
 

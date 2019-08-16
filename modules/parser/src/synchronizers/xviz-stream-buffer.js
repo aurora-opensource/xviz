@@ -53,10 +53,11 @@ export default class XVIZStreamBuffer {
     this.bufferEnd = null;
     /* Sorted timeslices */
     this.timeslices = [];
+    this.persistent = []; // like timeslices, but never pruned
     /* Sorted values by stream */
     this.streams = {};
     this.videos = {};
-    this.persistent = null; // a "timeslice" that's always included
+    this.persistentStreams = {};
     /* Update counter */
     this.lastUpdate = 0;
     /* Track the number of unique streams */
@@ -158,15 +159,14 @@ export default class XVIZStreamBuffer {
    * @returns {array} - loaded timeslices within range
    */
   getTimeslices({start, end} = {}) {
-    const {timeslices} = this;
+    const {timeslices, persistent} = this;
     const startIndex = Number.isFinite(start) ? this._indexOf(start, LEFT) : 0;
     const endIndex = Number.isFinite(end) ? this._indexOf(end, RIGHT) : timeslices.length;
+    const persistentEndIndex = Number.isFinite(end)
+      ? findInsertPos(persistent, end, RIGHT)
+      : persistent.length;
 
-    const result = timeslices.slice(startIndex, endIndex);
-    if (this.persistent) {
-      result.push(this.persistent);
-    }
-    return result;
+    return persistent.slice(0, persistentEndIndex).concat(timeslices.slice(startIndex, endIndex));
   }
 
   /**
@@ -220,7 +220,7 @@ export default class XVIZStreamBuffer {
     const {timeslices, streams, videos} = this;
 
     if (updateType === 'PERSISTENT') {
-      this._mergePersistentSlice(timeslice);
+      this._insertPersistentSlice(timeslice);
       this.lastUpdate++;
       return true;
     }
@@ -348,29 +348,32 @@ export default class XVIZStreamBuffer {
   }
   /* eslint-enable complexity, no-unused-expressions */
 
-  _mergePersistentSlice({streams}) {
-    const oldStreams = (this.persistent && this.persistent.streams) || {};
-    const newStreams = Object.assign({}, oldStreams);
+  _insertPersistentSlice(persistentSlice) {
+    const {persistent, persistentStreams} = this;
+    const {timestamp, streams} = persistentSlice;
+    const index = findInsertPos(persistent, timestamp, LEFT);
+    const timesliceAtInsertPosition = persistent[index];
+
+    if (timesliceAtInsertPosition && timesliceAtInsertPosition.timestamp === timestamp) {
+      // merge
+      Object.assign(timesliceAtInsertPosition, persistentSlice, {
+        streams: Object.assign(timesliceAtInsertPosition.streams, streams)
+      });
+    } else {
+      // insert
+      persistent.splice(index, 0, persistentSlice);
+    }
 
     for (const streamName in streams) {
       assert(
         !(streamName in this.streams),
         `${streamName} found in both persistent and non-persistent updates`
       );
-      if (!(streamName in oldStreams)) {
+      if (!(streamName in persistentStreams)) {
+        persistentStreams[streamName] = true;
         this.streamCount++;
       }
-
-      const value = streams[streamName];
-      if (value === null) {
-        // Explicitly delete a stream
-        delete newStreams[streamName];
-      } else {
-        newStreams[streamName] = value;
-      }
     }
-    this.persistent = this.persistent || {};
-    this.persistent.streams = newStreams;
   }
 
   _mergeTimesliceAt(index, timeslice) {
