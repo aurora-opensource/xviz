@@ -64,7 +64,7 @@ const TEST_CASES = [
       timestamp: 1001,
       streams: {A: 1.1, B: null}
     },
-    snapshot: {A: 1.1, C: 1}
+    snapshot: {A: 1.1, B: null, C: 1}
   },
   {
     id: 'TS-8',
@@ -165,7 +165,7 @@ test('XVIZStreamBuffer#insert, getStreams', t => {
 
   t.deepEquals(
     xvizStreamBuffer.getStreams(),
-    {A: [1.1, 2.2, 3, 4, 5], B: [-1], C: [1]},
+    {A: [1.1, 2.2, 3, 4, 5], B: [null, -1], C: [1]},
     'getStreams returns correct result'
   );
 

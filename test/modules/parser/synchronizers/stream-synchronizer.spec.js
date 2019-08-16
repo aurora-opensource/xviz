@@ -168,8 +168,8 @@ tape('StreamSynchronizer#correct lookup with empty entries (explicit no-data)', 
       // start both with no-data entry
       timestamp: 90,
       streams: {
-        stream1: {},
-        stream2: {}
+        stream1: null,
+        stream2: null
       }
     },
     {
@@ -197,8 +197,8 @@ tape('StreamSynchronizer#correct lookup with empty entries (explicit no-data)', 
       // add no-data entry for both
       timestamp: 103,
       streams: {
-        stream1: {},
-        stream2: {}
+        stream1: null,
+        stream2: null
       }
     },
     {
@@ -213,8 +213,8 @@ tape('StreamSynchronizer#correct lookup with empty entries (explicit no-data)', 
       // no-data entry for both
       timestamp: 115,
       streams: {
-        stream1: {},
-        stream2: {}
+        stream1: null,
+        stream2: null
       }
     },
     {
@@ -235,14 +235,14 @@ tape('StreamSynchronizer#correct lookup with empty entries (explicit no-data)', 
       // empty entry for stream2
       timestamp: 122,
       streams: {
-        stream2: {}
+        stream2: null
       }
     }
   ];
 
   const streamSynchronizer = new StreamSynchronizer(STREAMS_WITH_NO_DATA_ENTRIES);
 
-  // Test a time before any valid entries
+  // Test a time before any valid entries and with no entries within TIME_WINDOW
   streamSynchronizer.setTime(99);
   let data = streamSynchronizer.getLogSlice();
   t.equals(data.streams.stream1, undefined, 'stream1 is undefined at time 99');
@@ -260,11 +260,11 @@ tape('StreamSynchronizer#correct lookup with empty entries (explicit no-data)', 
   t.equals(data.streams.stream1.value, 1.5, 'stream1 is 1.5 at time 102');
   t.equals(data.streams.stream2.value, 10, 'stream2 is 10 at time 102');
 
-  // Test a time that has no-data entry for both streams
+  // Test a time that has no-data entry for both streams within the time-window
   streamSynchronizer.setTime(103);
   data = streamSynchronizer.getLogSlice();
-  t.equals(data.streams.stream1.value, undefined, 'stream1 is undefined at time 103');
-  t.equals(data.streams.stream2.value, undefined, 'stream2 is undefined at time 103');
+  t.equals(data.streams.stream1, null, 'stream1 is explicitly no-data at time 103');
+  t.equals(data.streams.stream2, null, 'stream2 is explicitly no-data at time 103');
 
   // Test a both streams picked up from same entry
   streamSynchronizer.setTime(110);

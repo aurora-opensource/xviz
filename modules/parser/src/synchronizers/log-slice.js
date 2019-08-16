@@ -114,7 +114,11 @@ export default class LogSlice {
     // get data if we don't already have that stream && it is not filtered.
     streamsByReverseTime.forEach(streams => {
       for (const streamName in streams) {
-        if (!this.streams[streamName] && this._includeStream(filter, streamName)) {
+        if (
+          this.streams[streamName] !== null && // Explicit no data entry
+          !this.streams[streamName] && // undefined means it has not been seen so keep looking for valid entry
+          this._includeStream(filter, streamName)
+        ) {
           this.addStreamDatum(streams[streamName], streamName, lookAheadMs, this);
         }
       }
@@ -126,6 +130,11 @@ export default class LogSlice {
    */
   addStreamDatum(datum, streamName, lookAheadMs) {
     this.streams[streamName] = datum;
+
+    // Handle the no data case
+    if (!datum) {
+      return;
+    }
 
     this.setLabelsOnXVIZObjects(datum.labels);
 
