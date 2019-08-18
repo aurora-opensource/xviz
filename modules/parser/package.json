@@ -30,7 +30,7 @@
     "pre-build": "webpack --config webpack/webpack.config.js"
   },
   "engines": {
-    "node": ">= 10",
+    "node": ">= 10.16",
     "npm": ">= 6",
     "yarn": ">= 1.10.0"
   }
