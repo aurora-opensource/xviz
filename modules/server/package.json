@@ -2,7 +2,7 @@
   "name": "@xviz/server",
   "description": "XVIZ Server module",
   "license": "Apache-2.0",
-  "version": "1.0.0-beta.20",
+  "version": "1.0.0-beta.22",
   "repository": {
     "type": "git",
     "url": "https://github.com/uber/xviz.git"
@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@babel/register": "^7.4.4",
-    "@xviz/io": "1.0.0-beta.20",
+    "@xviz/io": "1.0.0-beta.22",
     "probe.gl": "^3.0.1",
     "text-encoding": "^0.6.4",
     "ws": "^6.2.0",
