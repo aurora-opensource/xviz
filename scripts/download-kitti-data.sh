@@ -42,8 +42,7 @@ if [ $subdircount -ne 2 ]; then
   files=( _tracklets.zip _sync.zip)
   for i in "${files[@]}"
   do
-    echo $i $subdircount
-    # unpack_kitti_file "${KITTI_DATA_SET}" "${KITTI_DATA_SET}${i}" "${KITTI_PATH}"
+    unpack_kitti_file "${KITTI_DATA_SET}" "${KITTI_DATA_SET}${i}" "${KITTI_PATH}"
   done
 else
   echo "KITTI data for ${KITTI_DATA_SET} found, not downloading."
