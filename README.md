@@ -63,8 +63,9 @@ $ ./scripts/run-kitti-example.sh
 - `publish beta` - publish beta release
 - `publish prod` - publish production release
 
-## Requirements for Contribution 
-The pre-commit hook `yarn test-fast` requires you to have `jq` installed: 
+## Requirements for Contribution
+
+The pre-commit hook `yarn test-fast` requires you to have `jq` installed:
 
 ```
 brew install jq
