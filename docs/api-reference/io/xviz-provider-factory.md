@@ -33,7 +33,7 @@ list of Providers. If a provider is successful it will be returned otherwise nul
 Parameters:
 
 - `root` (string) - the output directory
-- `source` ([XVIZ Source](/docs/api-reference/io/xviz-source-sink.md)) - the source of XVIZ data
+- `source` ([XVIZ Source](/docs/api-reference/io/overview-source-sink.md)) - the source of XVIZ data
 - `options` (Object) - options passed through to the underlying Providers
 
 Returns: ([XVIZ Provider](/docs/api-reference/io/overview-provider.md)) - Provider object
