@@ -8,7 +8,7 @@
       },
       {
         "name": "What's New",
-        "markdown": "CHANGELOG.md"
+        "markdown": "whats-new.md"
       },
       {
         "name": "Versioning",
