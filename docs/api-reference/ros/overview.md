@@ -12,7 +12,7 @@ This module will support the following:
 
 The focus is on ROS 1, but most if not all of this translates to ROS 2 as well.
 
-![@xviz/ros diagram](./images/xviz-ros-block-diagram.svg)
+![@xviz/ros diagram](./images/xviz-ros-block-diagram.png)
 
 ### Examples
 
@@ -30,7 +30,7 @@ XVIZ.
 
 ### Convertering ROS messages to XVIZ
 
-![@xviz/ros data mapping](./images/xviz-ros-2-xviz-block-diagram.svg)
+![@xviz/ros data mapping](./images/xviz-ros-2-xviz-block-diagram.png)
 
 In order to provide control for how this mapping happens and conversion support for ROS messages we
 may not support, we provide the classes [ROSConfig](/docs/api-reference/ros/ros-config.md) and

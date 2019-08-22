@@ -9,7 +9,7 @@ instance of an [XVIZSession](/docs/api-reference/server/overview-session.md). Th
 communication is then handled by the XVIZSession, specifically the
 [XVIZ Protocol](/docs/protocol-schema/session-protocol.md).
 
-![@xviz/server diagram](./images/xviz-server-block-diagram.svg)
+![@xviz/server diagram](./images/xviz-server-block-diagram.png)
 
 _Diagram of the @xviz/server class relationships and data flow_
 

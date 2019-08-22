@@ -28,6 +28,6 @@ Below we can see the flow where the XVIZProviderHandler uses an array of directo
 the [XVIZProviderFactory](/docs/api-reference/io/xviz-provider-factory.md) to attempt to satisfy the
 request and returns the XVIZProviderSession upon a successful find.
 
-![@xviz/server handler diagram](./images/xviz-server-handler-block-diagram.svg)
+![@xviz/server handler diagram](./images/xviz-server-handler-block-diagram.png)
 
 _Diagram of the flow for how the XVIZProviderHandler creates an XVIZProviderSession_

@@ -5,7 +5,7 @@ XVIZ.
 
 The module also provides classes to inspect and manipulate XVIZ data.
 
-![@xviz/io diagram](./images/xviz-io-block-diagram.svg)
+![@xviz/io diagram](./images/xviz-io-block-diagram.png)
 
 _Diagram of the @xviz/io class relationships and data flow_
 
