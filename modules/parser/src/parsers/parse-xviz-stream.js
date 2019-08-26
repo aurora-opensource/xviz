@@ -478,7 +478,7 @@ function joinFeatureVerticesToTypedArrays(features) {
     return null;
   }
 
-  const vertices = new Float32Array(vertexCount * 3);
+  const vertices = new Float64Array(vertexCount * 3);
   let i = 0;
 
   for (const feature of features) {
