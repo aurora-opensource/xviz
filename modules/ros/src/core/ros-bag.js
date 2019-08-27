@@ -14,13 +14,25 @@
 /* global Buffer */
 /* eslint-disable camelcase */
 import {open, TimeUtil} from 'rosbag';
-import {quaternionToEuler} from '../common/quaternion';
+import {ROSTransformHandler, ROSTransforms} from './ros-transforms';
+import {ROSMessageHandler, ROSMessages} from './ros-messages';
+
+const TF = '/tf';
+const TF_STATIC = '/tf_static';
 
 export class ROSBag {
   constructor(bagPath, rosConfig, options = {}) {
     this.bagPath = bagPath;
     this.rosConfig = rosConfig;
     this.options = options;
+
+    // These are reused since they are unchanging
+    this.staticTransforms = new ROSTransforms();
+
+    // This is used only for metadata, as readMessages
+    // will create a set of transforms for each range
+    // it covers.
+    this.transforms = new ROSTransforms({staticTransforms: this.staticTransforms});
 
     this.bagContext = {};
     this.topicMessageTypes = {};
@@ -53,29 +65,23 @@ export class ROSBag {
    * topics.
    *
    * Extracts:
-   *   frameIdToPoseMap: ROS /tf transform tree
+   *   transforms: ROS /tf & /tf_static transform tree
    *   start_time,
    *   end_time,
    *   origin: map origin
    */
   async _initBag(bag) {
-    const TF = '/tf';
-    const TF_STATIC = '/tf_static';
-
     this.bagContext.start_time = TimeUtil.toDate(bag.startTime).getTime() / 1e3;
     this.bagContext.end_time = TimeUtil.toDate(bag.endTime).getTime() / 1e3;
 
-    const frameIdToPoseMap = {};
+    /* Collect tranforms primarily used for metadata and conversion
+     * For conversion, the '/tf' topic will be updated but the '/tf_static'
+     * topic set can be reused.
+     */
     await bag.readMessages({topics: [TF, TF_STATIC]}, ({topic, message}) => {
-      message.transforms.forEach(t => {
-        frameIdToPoseMap[t.child_frame_id] = {
-          ...t.transform.translation,
-          ...quaternionToEuler(t.transform.rotation)
-        };
-      });
+      const transforms = topic === TF ? this.transforms : this.staticTransforms;
+      message.transforms.forEach(t => transforms.addTransformMsg(t));
     });
-
-    this.bagContext.frameIdToPoseMap = frameIdToPoseMap;
   }
 
   // Collecting the topic & types can be expensive, so we only
@@ -106,7 +112,9 @@ export class ROSBag {
   // Using topics and message type, ensure we create a converter
   // for each topic.
   _initTopics(ros2xviz) {
-    ros2xviz.initializeConverters(this.topicMessageTypes, this.bagContext);
+    const transforms = new ROSTransforms({staticTransforms: this.staticTransforms});
+    const frameIdToPoseMap = new Proxy(transforms, ROSTransformHandler);
+    ros2xviz.initializeConverters(this.topicMessageTypes, {...this.bagContext, frameIdToPoseMap});
   }
 
   getMetadata(metadataBuilder, ros2xviz) {
@@ -119,10 +127,18 @@ export class ROSBag {
   // Synchronize xviz messages by timestep
   async readMessages(start, end) {
     const bag = await this._openBag();
-    const frame = {};
+
+    // If 'topics' is undefined, then all topics are included
+    // so we don't need to add it.
+    const topics = this.rosConfig.topics;
+    if (topics && !topics.includes(TF)) {
+      // Always include the TF topic as it is a possible
+      // dependency for all messages
+      topics.push(TF);
+    }
 
     const options = {
-      topics: this.rosConfig.topics
+      topics
     };
 
     if (start) {
@@ -133,6 +149,9 @@ export class ROSBag {
       options.endTime = TimeUtil.fromDate(new Date(end * 1e3));
     }
 
+    const transforms = new ROSTransforms({staticTransforms: this.staticTransforms});
+    const messages = new ROSMessages({transforms});
+
     await bag.readMessages(options, async result => {
       // rosbag.js reuses the data buffer for subsequent messages, so we need to make a copy
       if (result.message.data) {
@@ -141,10 +160,14 @@ export class ROSBag {
         result.message.data = Buffer.from(result.message.data);
       }
 
-      frame[result.topic] = frame[result.topic] || [];
-      frame[result.topic].push(result);
+      if (result.topic === TF) {
+        transforms.addTransformMsg(result.message);
+      }
+
+      messages.add(result.topic, result);
     });
 
-    return frame;
+    // For backwards compatibility, expose topics as a property
+    return new Proxy(messages, ROSMessageHandler);
   }
 }

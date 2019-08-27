@@ -11,8 +11,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-import './ros-bag.spec';
-import './ros-messages.spec';
-import './ros-transforms.spec';
-import './rosbag-provider.spec';
-import './messages';
+import {quaternionToEuler} from './quaternion';
+
+export function tfToPose(transform) {
+  return {
+    ...transform.translation,
+    ...quaternionToEuler(transform.rotation)
+  };
+}

@@ -100,11 +100,9 @@ tape('ROSBag#empty rosConfig reads message types', async t => {
   t.equals(bag.bagContext.end_time, 1010, 'Bag was correctly inited');
 
   // Ensure we iterate /tf and /tf_static
-  t.deepEquals(
-    Object.keys(bag.bagContext.frameIdToPoseMap).sort(),
-    ['base_link', 'static_link'],
-    'Bag frameIdToPoseMap keys are correctly inited'
-  );
+  t.ok(bag.transforms.poseForTransformTo('base_link'), 'Has base_link transform');
+
+  t.ok(bag.staticTransforms.poseForTransformTo('static_link'), 'Has static_link transform');
 
   // Ensure we go through the connections to get the topic types
   t.deepEquals(
@@ -145,11 +143,9 @@ tape('ROSBag#populated rosConfig results in empty topicMessageTypes ', async t =
   t.equals(bag.bagContext.end_time, 1010, 'Bag was correctly inited');
 
   // Ensure we iterate /tf and /tf_static
-  t.deepEquals(
-    Object.keys(bag.bagContext.frameIdToPoseMap).sort(),
-    ['base_link', 'static_link'],
-    'Bag frameIdToPoseMap keys are correctly inited'
-  );
+  t.ok(bag.transforms.poseForTransformTo('base_link'), 'Has base_link transform');
+
+  t.ok(bag.staticTransforms.poseForTransformTo('static_link'), 'Has static_link transform');
 
   // Ensure topicMessageTypes was not populated
   t.deepEquals(Object.keys(bag.topicMessageTypes).length, 0, 'Gathered topics has length 0');
@@ -184,11 +180,9 @@ tape('ROSBag#rosConfig with explicit Converter names', async t => {
   t.equals(bag.bagContext.end_time, 1010, 'Bag was correctly inited');
 
   // Ensure we iterate /tf and /tf_static
-  t.deepEquals(
-    Object.keys(bag.bagContext.frameIdToPoseMap).sort(),
-    ['base_link', 'static_link'],
-    'Bag frameIdToPoseMap keys are correctly inited'
-  );
+  t.ok(bag.transforms.poseForTransformTo('base_link'), 'Has base_link transform');
+
+  t.ok(bag.staticTransforms.poseForTransformTo('static_link'), 'Has static_link transform');
 
   // Ensure topicMessageTypes was not populated
   t.deepEquals(Object.keys(bag.topicMessageTypes).length, 0, 'Gathered topics has length 0');
@@ -253,9 +247,10 @@ tape('ROSBag#readMessages w/ rosConfig has limited topics', async t => {
   t.equals(result, true, 'Bag was correctly inited');
 
   const frame = await bag.readMessages();
-  t.equals(Object.keys(frame).length, 2, 'frame has 2 keys');
+  t.equals(Object.keys(frame).length, 3, 'frame has 3 keys');
   t.ok(frame['/foo'], 'readMessages returned "/foo"');
   t.ok(frame['/bar'], 'readMessages returned "/bar"');
+  t.ok(frame['/tf'], 'readMessages returned added /tf');
 
   t.end();
 });
