@@ -1,0 +1,12 @@
+{
+  "topicConfig": [
+    {
+      "topic": "/kitti/oxts/imu",
+      "type": "CustomImu"
+    },
+    {
+      "topic": "/kitti/velo/pointcloud",
+      "type": "CustomPointCloud"
+    }
+  ]
+}
