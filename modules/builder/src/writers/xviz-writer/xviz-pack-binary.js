@@ -71,6 +71,7 @@ function flattenObject(key, object) {
 
   if (key === 'vertices' || key === 'points') {
     // Flatten nested vertices
+    // TODO - loss of precision for geographic coordinates
     typedArray = flattenToTypedArray(object, size, Float32Array);
   }
   if (key === 'colors') {
