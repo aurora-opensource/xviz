@@ -8,7 +8,7 @@ Propose the addition of a new state_update type **PERSISTENT** that will treat t
 persistent to allow send-once data to be preserved for the duration of a session.
 
 In addition to the new update type we are adding an additional field to the stream_set,
-`no_data_streams`, that will be an explicit statement that this listed streams contain no data.
+`no_data_streams`, that will be an explicit statement that the listed streams contain no data.
 
 # Motivation
 
@@ -23,11 +23,10 @@ set by the application to set the window of time that the viewer should inspect 
 datum. The first datum found should be the active datum for the current viewing time. This is an
 application wide mechanism so does not allow for individual stream control.
 
-This control is application wide and not stream specific, therefore we needed to add something at
-the data level to enable persistent data.
+The PERSISTENT message is applicable to all streams included in the message.
 
-In addition to adding persistent data, we want a way to invalidate persistent data in some way to
-provide some level of state management from the XVIZ data source.
+In addition to adding persistent data, we need a way to invalidate persistent data in order to
+remove data that is no longer valid.
 
 # Proposal
 
@@ -39,46 +38,41 @@ of a session I propose the following.
 Any primitive data included in this state update should remain visible outside the TIME_WINDOW
 setting.
 
-Only **primitives** are currently defined for the **PERSISTENT** message. Other XVIZ data types
+Only **primitives** are currently supported for the **PERSISTENT** message. Other XVIZ data types
 behavior is undefined with regard to this RFC. We will address them at a later date.
 
 Specific features for a state_update message with the update_type **PERSISTENT**:
 
-- A stream's data will be rendered regardless of the timestamp
-- If a new persistent message with the same stream name is seen it will replace the persistent state
-- If the stream name is present in the new `no_data_streams` entry, the persistent state will be
-  cleared
+- For each stream in a persistent message, the most recent stream datum relative to the current
+  timestamp will be displayed, regardless of the `TIME_WINDOW` configuration.
+- If the stream name is present in the `no_data_streams` field, the stream state will be marked as
+  empty
 
 For state_update messages with other update_types the behavior will be as follows:
 
-- If a new non-persistent message is seen with the same stream name that data will be ignored with
-  the persistent data taking precedence (and a warning should be logged)
+- If a non-persistent message is seen with the same stream name that data will be ignored with the
+  persistent data taking precedence (and a warning should be logged).
 
 ### 2. Add a new field **no_data_streams** to the **stream_set**
 
 The stream_set will have an additional field `no_data_streams` which will be an array of strings.
-Any stream name listed in this array will mark that stream as explicitly having no data.
+Any stream name listed in this array will mark that stream at the message timestamp as explicitly
+having no data.
 
-Below is the behavior expected for each update_type:
+When the synchronizer looks for the data to display for a given stream, upon hitting this explicit
+no data entry it shall return nothing and abort looking any further.
 
-| update_type | Behavior                                                                                                                                                        |
-| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| COMPLETE    | The stream will be marked at the message timestamp such that when searching within the `TIME_WINDOW` it would stop the search and register that stream as empty |
-| INCREMENTAL | The stream will be marked at the message timestamp such that when searching within the `TIME_WINDOW` it would stop the search and register that stream as empty |
-| PERSISTENT  | The persistent state associated with this stream name will be cleared                                                                                           |
-
-For the **COMPLETE** and **INCREMENTAL** update_types, the defined behavior is primarily to allow an
-XVIZ viewer to know that previous data is explicitly no longer valid and should not be displayed
-from this timestamp forward. Due to the way the `TIME_WINDOW` logic works data which is effectively
-no longer valid does not have a good way to signal that to the viewer. With this new field that can
-be reflected in the XVIZ message accruately.
+The defined behavior is primarily to allow an XVIZ viewer to know that previous data is explicitly
+no longer valid and should not be displayed from this timestamp forward. Due to the way the
+`TIME_WINDOW` logic works data which is effectively no longer valid does not have a good way to
+signal that to the viewer. With this new field that can be reflected in the XVIZ message accurately.
 
 For an example of when this would be useful lets take a vehicle trajectory path. One could imagine a
 vehicle trajectory path is know based on the current state of the vehicle. However, in an emergency
 the vehicle state may change invalidating that trajectory. If there is no trajectory what is data do
 you sent? We considered sending a primitive with an empty vertices array but due to the various
 formats we support empty arrays are not robust enought to define that there is no data. Instead we
-have an explicit message to signal this case to ensure when data is no longer valid.
+have an explicit message to signal when past data is no longer valid.
 
 # Out of scope
 
@@ -115,7 +109,7 @@ time.
 A model seen in other projects has been to tag objects with a retention time. Persistence could be
 modeled by giving a very large retention value. However semantically separating out persistence from
 a retention time seems clearer, and has the effect of not complicating the state management for
-streams within state update. This is because since the update types are distinct the treatement of
+streams within state update. This is because since the update types are distinct the treatment of
 the data happens at the message level rather than at the stream level.
 
 ### Stream Metadata Property
