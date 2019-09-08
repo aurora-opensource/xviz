@@ -102,9 +102,9 @@ vehicles.
 A new object would be added to the streamset specification.
 
 - The field name would be _links_
-- The keys of the _links_ object would represent the target stream the link affects
-  - The target could be a _primitive_ stream or a _pose_ stream
-- The value of a key would be an object that contains an entry _source_pose_ which is a string that
+- The keys of the _links_ object would represent the child stream the link affects
+  - The key could be a _primitive_ stream or a _pose_ stream
+- The value of a key would be an object that contains an entry _target_pose_ which is a string that
   names a _pose_ stream
 
 3. Deprecate the timestamp on the Pose

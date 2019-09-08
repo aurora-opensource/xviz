@@ -40,9 +40,6 @@
       "minItems": 3,
       "maxItems": 3,
       "additionalItems": false
-    },
-    "parent" : {
-      "type": "string"
     }
   },
   "required": [

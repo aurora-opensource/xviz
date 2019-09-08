@@ -4,11 +4,11 @@
   "description": "XVIZ Link State",
   "type": "object",
   "properties": {
-    "source_pose": {
+    "target_pose": {
       "type": "string"
     }
   },
   "required": [
-    "source_pose"
+    "target_pose"
   ]
 }

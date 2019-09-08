@@ -19,9 +19,6 @@
       },
       "minItems": 1,
       "additionalItems": false
-    },
-    "pose" {
-      "type": "string"  
     }
   }
 }
