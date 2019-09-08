@@ -9,7 +9,8 @@
       "enum": [
         "COMPLETE_STATE",
         "INCREMENTAL",
-        "SNAPSHOT"
+        "SNAPSHOT",
+        "PERSISTENT"
       ]
     },
     "updates": {

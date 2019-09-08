@@ -58,6 +58,7 @@ message StateUpdate {
     SNAPSHOT = 1; // DO NOT USE - same as incremental
     INCREMENTAL = 2;
     COMPLETE_STATE = 3;
+    PERSISTENT = 4;
   }
   UpdateType update_type = 1;
   repeated StreamSet updates = 2;
