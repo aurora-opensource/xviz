@@ -137,17 +137,32 @@ the viewing client can communicate the nature of the error to the users.
 
 ## Message combinations
 
-State update messages have COMPLETE, INCREMENTAL and PERSISTENT types.
+State update messages have PERSISTENT, COMPLETE, and INCREMENTAL types.
+
+### PERSISTENT
+
+PERSISTENT messages is where most _links_ should be defined as they setup a structure that changes
+very little if at all. Static poses for a link, like those from a platform to a sensor, should also
+be defined in this message type.
+
+PERSISTENT messages define state that is not subject to the XVIZ TIME_WINDOW configuration value
+and also less likely to be purged. The messages are still subject to a timestamp and therefore care
+must be taken to ensure this data does not grow unbounded in the application state.
+
+Having said that, an implementation can always replace the default state manager to handle data as
+necessary for the use-case.
 
 ### COMPLETE and INCREMENTAL
 
-These modes fundamentally deal with creating and adding data that is subject to the TIME_WINDOW
-configuration. The intention is that dynamic poses and links that are updated frequently, defined as
-being within the TIME_WINOW, would be sent in either of these messages.
+These modes fundamentally deal with creating and adding data that is subject to the **TIME_WINDOW**
+configuration. The TIME_WINDOW is the duration of time XVIZ state will consider relative to the current timestamp. The usage model for this setting is that data this is not updated frequently may be stale and should not be visualized. This can be defined by the application as necessary for the use-case, but covers all data not individual streams.
 
-The semantics of _INCREMENTAL_ are at the stream set level, so it is worth noting that transforms
-are not combined but an _INCREMENTAL_ message would simply replace the active pose at that
-timestamp.
+The intention is that dynamic poses and links that are updated frequently, defined as
+being within the TIME_WINOW, could be sent in either of these messages.
+
+The semantics of _INCREMENTAL_ are at the stream set level and not the objects within a stream. So
+it is worth noting that transforms are not combined, but an _INCREMENTAL_ message would simply
+replace the active pose at that timestamp.
 
 Links should be avoided in these messages as a situation where the link would be only shortly lived
 is unclear in the current use-cases. They can be defined but will only be present for the duration
@@ -155,16 +170,6 @@ of TIME_WINDOW.
 
 Keep in mind that these messages may also be purged as the assumption in an XVIZ client is that a
 minimal amount of state is necessary.
-
-### PERSISTENT
-
-PERSISTENT messages is where most links should be defined as they setup a structure that changes
-very little if at all. Static poses for a link, like those from a platform to a sensor, should also
-be defined in this message type.
-
-PERSISTENT messages define state that is not subject to the TIME_WINDOW and also less likely to be
-purged. The messages are still subject to a timestamp and therefore care must be taken to ensure
-this data does not grow unbounded in the application state.
 
 ## Streetscape.gl implementation details
 
@@ -181,8 +186,26 @@ The following are proposals that are related to this but are not required for th
 accepted. They are mentioned only to fully understand the scope, influence, and considerations that
 have helped contextualize and shape this proposal.
 
-- Making timestamps optional on the streamset
-- Support for linear interpolation on poses
+## Making timestamps optional on the streamset
+
+Supporting data without the need for timestamps can be done with XVIZ.
+
+Currently, timestamps are required by XVIZ as it models and supports time-based navigation. However there are cases where either data is unchanging, or the element of time is unimportant.
+
+For now this requirement can be worked around using the existing message types. To holistically remove this requirement on XVIZ would require context that would detract from the focus of this proposal but can be addressed independently at a later time.
+
+## Support for linear interpolation on poses
+
+A desired features is the ability for the client to interpolate between pose data samples. This requires a sequence of data with timestamps and an interpolation function. I have decided to avoid addressing this initial proposal; however, it is worth noting there are no known obstacles to supporting interpolation.
+
+The current proposal supports time-varying transforms. An approach to aleviate the need for interpolation would be to increasing the frequency of the definition of the Poses as necessary.
+
+To highlight how this would work today, we can describe the 2 categories of transforms and how they
+are represented in XVIZ messages. Details are also covered in the section **Message combinations**.
+
+  * **persistent** transforms - These use the most recent transform relative to the timestamp. These transforms do not expire. These would be sent in a PERSISTENT XVIZ state_update message.
+  
+  * **dynamic** transforms - These use the most recent transform relative to the timestamp, but due to the expected frequence of this data they may be purged as more data is sent.  These would come in a COMPLETE or INCREMENTAL message.
 
 # Other considerations
 
@@ -202,19 +225,25 @@ impossible.
 In deck.gl, used by streetscape.gl, the layers are separated by geometry type and we render all data
 in one call. If each instance in a stream had a different transform we would have 2 options
 
-1 Do a pass over each instance and group by transform, then render each group as a layer 2 Alter the
-layer shader code to accept a transform uniform
+1. Do a pass over each instance and group by transform, then render each group as a layer
+2. Alter the layer shader code to accept a transform uniform
+
+Option 1 would cause an additional pass to group the layers then render each.
 
 Option 2 would require augmenting the shaders for all primitive types plus the uniform addition. If
 every element was unique, then maybe it would be worth it, but most objects in our use case have a
 natural grouping.
 
+For this proposal the objects within a stream must share the same transform. If a unique transform per object is desired it must be defined with a unique stream.
+
 ### Generic transform as a Variable type
 
-support variable as a valid transform stream with 16 element array representing a 4x4 matrix
+Support variable as a valid transform stream with 16 element array representing a 4x4 matrix.
 
-- I don't know where to put the "parent_transform"
-- seems the valid variable would be very specific
+The problems with this are:
+
+- It is largerly redundant with the pose type
+- Only a specific value-type for variable would be valid, making it an overly special exception
 
 ### Special case for vehicle_relative "static" data
 
@@ -225,4 +254,4 @@ vehicle relative, we can deduce the transform from the "known" pose to the curre
 automatically.
 
 This avoids need to expose a transform mechanism. However, further discussion highlighted the need
-to encode arbitrary parent/child relationships.
+to encode arbitrary parent/child relationships invalidating this approach.
