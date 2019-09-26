@@ -16,10 +16,12 @@ import {ScenarioReader} from './scenario-reader';
 
 import ScenarioCircle from './scenario-circle';
 import ScenarioStraight from './scenario-straight';
+import ScenarioOrbit from './scenario-orbit';
 
 const Scenarios = {
   ...ScenarioCircle,
-  ...ScenarioStraight
+  ...ScenarioStraight,
+  ...ScenarioOrbit
 };
 
 // Normalize all the possible query parameters
