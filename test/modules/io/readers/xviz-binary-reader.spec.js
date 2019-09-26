@@ -58,6 +58,21 @@ test('XVIZBinaryReader#readMetadata', t => {
   t.end();
 });
 
+test('XVIZBinaryReader#readMetadata as json', t => {
+  const source = new MemorySourceSink();
+  const binBuilder = new XVIZBinaryReader(source);
+
+  const testData = {
+    version: '2.0.0'
+  };
+
+  source.writeSync('1-frame.json', testData);
+  const result = binBuilder.readMetadata();
+
+  t.deepEquals(result, testData, 'readMetadata works with json');
+  t.end();
+});
+
 test('XVIZBinaryReader#readMessage', t => {
   const source = new MemorySourceSink();
   const binBuilder = new XVIZBinaryReader(source);
