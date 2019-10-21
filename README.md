@@ -13,7 +13,7 @@ This repo contains the following submodules:
 
 - `@xviz/builder` - Node.js utilities for converting data to the XVIZ protocol.
 - `@xviz/cli` - CLI utilities for the XVIZ protocol.
-- `@xviz/io` - Library for loading, accessing, and manipiulating XVIZ data.
+- `@xviz/io` - Library for loading, accessing, and manipulating XVIZ data.
 - `@xviz/parser` - Client-side decoder and synchronizer for consuming XVIZ data.
 - `@xviz/schema` - Validation and schemas for the XVIZ protocol.
 - `@xviz/server` - A complete server module supporting the full XVIZ protocol.
