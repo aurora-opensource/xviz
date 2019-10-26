@@ -1,0 +1,14 @@
+{
+  "id": "https://xviz.org/schema/core/link_state.json",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "description": "XVIZ Link State",
+  "type": "object",
+  "properties": {
+    "target_pose": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "target_pose"
+  ]
+}

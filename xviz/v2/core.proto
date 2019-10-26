@@ -19,6 +19,10 @@ import "xviz/v2/options.proto";
 import "xviz/v2/primitives.proto";
 import "xviz/v2/uiprimitives.proto";
 
+message Link {
+  string target_pose = 1;
+}
+
 message StreamSet {
   option (xviz_json_schema) = "core/stream_set";
   double timestamp = 1;
@@ -30,6 +34,7 @@ message StreamSet {
   map<string, AnnotationState> annotations = 8;
   map<string, UIPrimitiveState> ui_primitives = 9;
   repeated string no_data_streams = 10;
+  map<string, Link> links = 11;
 }
 
 message Pose {

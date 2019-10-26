@@ -63,6 +63,12 @@
         "type": "string"
       },
       "additionalItems": false
+    },
+    "links": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "https://xviz.org/schema/core/link_state.json"
+      }
     }
   },
   "required": [
