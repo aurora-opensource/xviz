@@ -65,7 +65,7 @@ class StraightScenario {
     return {
       type: 'xviz/state_update',
       data: {
-        update_type: 'snapshot',
+        update_type: 'SNAPSHOT',
         updates: [
           {
             timestamp,

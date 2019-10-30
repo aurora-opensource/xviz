@@ -30,7 +30,7 @@ and options to bound it.
 
 host   URL to connect, supports only websocket
 path   file system path
-log    id or name of log, if not passed “live” mode is assumed
+log    id or name of log, if not passed “LIVE ” mode is assumed
 
 -s, --start     Get data after this starting point, inclusive.
 -e, --end       Get data up to this point, inclusive.

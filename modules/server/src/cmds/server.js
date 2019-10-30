@@ -15,6 +15,7 @@ import {Log} from 'probe.gl';
 
 import {XVIZServer} from '../server/xviz-server';
 import {XVIZProviderHandler} from '../server/xviz-provider-handler';
+import {XVIZFilesHandler} from '../server/xviz-files-handler';
 import {XVIZProviderFactory} from '@xviz/io';
 
 // For default command automatically support scenarios
@@ -105,7 +106,8 @@ export function serverCmd(args) {
   }
 
   const handler = new XVIZProviderHandler(XVIZProviderFactory, options);
-  const wss = new XVIZServer([handler], options, () => {
+  const fileHandler = new XVIZFilesHandler(options);
+  const wss = new XVIZServer([handler, fileHandler], options, () => {
     logger.log(`Listening on port ${wss.server.address().port}`);
   });
 }
