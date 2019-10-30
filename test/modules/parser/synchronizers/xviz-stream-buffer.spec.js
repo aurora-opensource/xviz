@@ -342,3 +342,93 @@ test('XVIZStreamBuffer#insert#PERSISTENT', t => {
 
   t.end();
 });
+
+/* eslint-disable camelcase */
+test('XVIZStreamBuffer#insert#links', t => {
+  const testCases = [
+    {
+      title: 'insert - before time window',
+      message: {
+        updateType: 'PERSISTENT',
+        timestamp: 0,
+        streams: {X: 10, Y: 20},
+        links: {Y: {target_pose: 'X'}}
+      },
+      expect: {
+        streams: {A: 5, X: 10, Y: 20},
+        links: {Y: {target_pose: 'X'}}
+      }
+    },
+    {
+      title: 'insert - after time window',
+      message: {
+        updateType: 'PERSISTENT',
+        timestamp: 1100,
+        streams: {X: 100},
+        links: {Y: {target_pose: 'A'}}
+      },
+      expect: {
+        streams: {A: 5, X: 10, Y: 20},
+        links: {Y: {target_pose: 'X'}}
+      }
+    },
+    {
+      title: 'insert - before time window',
+      message: {
+        updateType: 'PERSISTENT',
+        timestamp: 900,
+        streams: {X: 20, Y: 30, Z: -1},
+        links: {Y: {target_pose: 'Z'}}
+      },
+      expect: {
+        streams: {A: 5, X: 20, Y: 30, Z: -1},
+        links: {Y: {target_pose: 'Z'}}
+      }
+    },
+    {
+      title: 'merge',
+      message: {
+        updateType: 'PERSISTENT',
+        timestamp: 900,
+        streams: {Y: null},
+        links: {A: {target_pose: 'Z'}}
+      },
+      expect: {
+        streams: {A: 5, X: 20, Y: 20, Z: -1},
+        links: {
+          Y: {target_pose: 'Z'},
+          A: {target_pose: 'Z'}
+        }
+      }
+    }
+  ];
+
+  const xvizStreamBuffer = new XVIZStreamBuffer();
+  xvizStreamBuffer.insert({
+    timestamp: 1000,
+    streams: {A: 5}
+  });
+
+  for (const testCase of testCases) {
+    const {lastUpdate} = xvizStreamBuffer;
+    t.ok(xvizStreamBuffer.insert(testCase.message), 'persistent timeslice inserted');
+    t.ok(xvizStreamBuffer.lastUpdate > lastUpdate, 'update counter updated');
+
+    const timeslices = xvizStreamBuffer.getTimeslices({start: 1000, end: 1001});
+    const streams = {};
+    const links = {};
+    timeslices.forEach(timeslice => {
+      for (const streamName in timeslice.streams) {
+        streams[streamName] = timeslice.streams[streamName] || streams[streamName];
+      }
+      for (const streamName in timeslice.links) {
+        links[streamName] = timeslice.links[streamName] || links[streamName];
+      }
+    });
+    t.deepEqual(streams, testCase.expect.streams, `${testCase.title}: returns correct streams`);
+    t.deepEqual(links, testCase.expect.links, `${testCase.title}: returns correct links`);
+  }
+
+  t.end();
+});
+/* eslint-enable camelcase */

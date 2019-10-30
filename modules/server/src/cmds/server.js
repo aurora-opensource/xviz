@@ -30,7 +30,7 @@ export function serverArgs(inArgs, {defaultCommand = false} = {}) {
       // client can request, otherwise default to source data format
       format: {
         describe: 'Output data format',
-        choices: ['JSON_STRING', 'JSON_BUFFER', 'BINARY_GLB'],
+        choices: ['JSON_STRING', 'JSON_BUFFER', 'BINARY_GLB', 'BINARY_PBE'],
         nargs: 1
       },
       live: {

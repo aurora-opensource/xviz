@@ -274,3 +274,37 @@ tape('StreamSynchronizer#correct lookup with empty entries (explicit no-data)', 
 
   t.end();
 });
+
+/* eslint-disable camelcase */
+tape('StreamSynchronizer#getCurrentFrame links', t => {
+  resetXVIZConfigAndSettings();
+  setXVIZConfig({TIME_WINDOW: 3});
+
+  const testBuffer = new XVIZStreamBuffer();
+  testBuffer.timeslices = [
+    {
+      timestamp: 50,
+      streams: {
+        log1: {value: 1},
+        log2: {value: 10}
+      },
+      links: {
+        log2: {
+          target_pose: 'log1'
+        }
+      }
+    }
+  ];
+
+  const streamSynchronizer = new StreamSynchronizer(testBuffer);
+
+  streamSynchronizer.setTime(50);
+  setXVIZConfig({ALLOW_MISSING_PRIMARY_POSE: true});
+  const frame = streamSynchronizer.getCurrentFrame();
+
+  t.ok(frame, 'frame is generated without vehicle pose');
+  t.deepEquals(frame.links, {log2: {target_pose: 'log1'}}, 'frame contains correct links');
+
+  t.end();
+});
+/* eslint-enable camelcase */
