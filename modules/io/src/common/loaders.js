@@ -228,7 +228,7 @@ function postProcessProtobuf(msg, pbType) {
     for (const fieldName in fields) {
       const field = fields[fieldName];
 
-      if (field && msg[field.name]) {
+      if (field && msg[field.name] !== undefined) {
         if (!field.resolvedType && field.repeated && msg[field.name].length === 0) {
           // Remove empty arrays that are likely the default value
           msg[field.name] = undefined;

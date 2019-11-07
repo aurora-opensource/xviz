@@ -23,7 +23,8 @@ export const XVIZ_PROTOBUF_MESSAGE_NAME = {
   STATE_UPDATE: 'xviz.v2.StateUpdate',
   RECONFIGURE: 'xviz.v2.Reconfigure',
   METADATA: 'xviz.v2.Metadata',
-  ERROR: 'xviz.v2.Error'
+  ERROR: 'xviz.v2.Error',
+  STREAM_SET: 'xviz.v2.StreamSet'
 };
 
 export const XVIZ_PROTOBUF_TYPE_NAME = {
@@ -39,7 +40,8 @@ export const XVIZ_PROTOBUF_ROOT = loadProtos();
 export const XVIZ_PROTOBUF_MESSAGE = {
   Envelope: XVIZ_PROTOBUF_ROOT.lookupType(XVIZ_PROTOBUF_MESSAGE_NAME.ENVELOPE),
   Metadata: XVIZ_PROTOBUF_ROOT.lookupType(XVIZ_PROTOBUF_MESSAGE_NAME.METADATA),
-  StateUpdate: XVIZ_PROTOBUF_ROOT.lookupType(XVIZ_PROTOBUF_MESSAGE_NAME.STATE_UPDATE)
+  StateUpdate: XVIZ_PROTOBUF_ROOT.lookupType(XVIZ_PROTOBUF_MESSAGE_NAME.STATE_UPDATE),
+  StreamSet: XVIZ_PROTOBUF_ROOT.lookupType(XVIZ_PROTOBUF_MESSAGE_NAME.STREAM_SET)
 };
 
 export const XVIZ_PROTOBUF_TYPE = {

@@ -38,6 +38,9 @@ import {XVIZ_FORMAT} from './constants';
 export class XVIZData {
   constructor(data) {
     this._data = data;
+    if (data instanceof Buffer) {
+      this._data = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
+    }
 
     // _dataFormat is an XVIZ_FORMAT for 'data'
     this._dataFormat = undefined;
@@ -69,7 +72,8 @@ export class XVIZData {
     if (this._message) {
       return this._message.type;
     } else if (!this._xvizType) {
-      const rawType = getXVIZMessageType(this._data);
+      const data = this._data;
+      const rawType = getXVIZMessageType(data);
       if (rawType) {
         const parts = rawType.split('/');
         this._xvizType = {
@@ -79,7 +83,7 @@ export class XVIZData {
       }
     }
 
-    return this._xvizType.type;
+    return this._xvizType && this._xvizType.type;
   }
 
   hasMessage() {
@@ -96,23 +100,14 @@ export class XVIZData {
     let data = this._data;
     switch (this._dataFormat) {
       case XVIZ_FORMAT.BINARY_GLB:
-        if (data instanceof Buffer) {
-          data = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
-        }
         msg = parseBinaryXVIZ(data);
         break;
       case XVIZ_FORMAT.BINARY_PBE:
-        if (data instanceof Buffer) {
-          data = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
-        }
         msg = parseBinaryXVIZ(data);
         break;
       case XVIZ_FORMAT.JSON_BUFFER:
         let jsonString = null;
-        if (data instanceof Buffer) {
-          // Default to utf8 encoding
-          jsonString = data.toString();
-        } else if (data instanceof ArrayBuffer || ArrayBuffer.isView(data)) {
+        if (data instanceof ArrayBuffer || ArrayBuffer.isView(data)) {
           data = new Uint8Array(data);
 
           // This is slow
@@ -144,10 +139,6 @@ export class XVIZData {
     let data = this._data;
     switch (getDataContainer(data)) {
       case 'binary':
-        if (data instanceof Buffer) {
-          data = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
-        }
-
         if (isPBEXVIZ(data)) {
           this._dataFormat = XVIZ_FORMAT.BINARY_PBE;
         } else if (isGLBXVIZ(data)) {
