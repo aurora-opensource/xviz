@@ -14,9 +14,11 @@
 
 /* eslint-env node */
 /* eslint no-console: ["error", { allow: ["log"] }] */
+import fs from 'fs';
 
 import {XVIZMiddlewareStack} from './middleware';
 import {WebSocketInterface} from './websocket';
+import {FileSystemInterface} from './filesystem';
 import {TransformLogFlow, OnlyMetadata} from './core';
 
 const W3CWebSocket = require('websocket').w3cwebsocket;
@@ -27,21 +29,32 @@ const W3CWebSocket = require('websocket').w3cwebsocket;
  * facilitate processing as needed.
  */
 export function openSource(args, middlewares) {
-  // Non-live sessions require sending a transform log message
-  if (!isLive(args)) {
-    middlewares.push(new TransformLogFlow(null, args));
-  }
-
   // If we just want metadata we shutdown afterwards
   if (args.metadata) {
     middlewares.push(new OnlyMetadata(null));
   }
 
-  // Assemble our message processors
-  const socket = webSocketFromArgs(args);
   const stackedMiddleware = new XVIZMiddlewareStack(middlewares);
 
-  const client = new WebSocketInterface({middleware: stackedMiddleware, socket});
+  let client = null;
+  let socket = null;
+  if (isWSURL(args.host)) {
+    // Non-live sessions require sending a transform log message
+    if (!isLive(args)) {
+      middlewares.unshift(new TransformLogFlow(null, args));
+    }
+
+    // Assemble our message processors
+    socket = webSocketFromArgs(args);
+    client = new WebSocketInterface({middleware: stackedMiddleware, socket});
+  } else if (isPath(args.host)) {
+    client = new FileSystemInterface({...args, middleware: stackedMiddleware});
+    // TODO: what to do with the return value?
+    client.open(args.host);
+  } else {
+    console.log(`The argument '${args.log}' is not a websocket url or an existing file path.`);
+    process.exit(1); // eslint-disable-line no-process-exit
+  }
 
   // Some middleware needs to be able to send messages/close connections
   // so provide them access to the client.
@@ -57,7 +70,9 @@ export function openSource(args, middlewares) {
   process.on('SIGINT', () => {
     if (sigintCount === 0) {
       console.log('Closing');
-      socket.close();
+      if (socket) {
+        socket.close();
+      }
     } else {
       // If the user or system is really mashing Ctrl-C, then abort
       console.log('Aborting');
@@ -79,7 +94,7 @@ export function webSocketFromArgs(args) {
 }
 
 /**
- * Arg we operating a live session or not
+ * Are we operating a live session or not
  */
 export function isLive(args) {
   return args.log === undefined;
@@ -93,6 +108,21 @@ export function urlFromArgs(args) {
   const url = `${args.host}?version=2.0&${extraArgs}`;
 
   return url;
+}
+
+/**
+ * Test if the 'log' is a Websocket URL
+ */
+function isWSURL(log) {
+  const wsRegex = /^ws{1,2}:\/\//;
+  return wsRegex.test(log);
+}
+
+/**
+ * Test if the 'log' is a Websocket URL
+ */
+export function isPath(log) {
+  return fs.existsSync(log);
 }
 
 /**
