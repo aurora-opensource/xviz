@@ -31,7 +31,11 @@ export class XVIZBaseReader {
 
   readMetadata() {
     if (this.source) {
-      return this.source.readSync(this._xvizMessage(1));
+      let data = this.source.readSync(this._xvizMessage(1));
+      if (!data) {
+        data = this.source.readSync(this._xvizMessage(1, {forceJson: true}));
+      }
+      return data;
     }
 
     return undefined;
@@ -44,6 +48,14 @@ export class XVIZBaseReader {
     }
 
     return undefined;
+  }
+
+  checkMessage(messageIndex) {
+    if (this.source) {
+      return this.source.existsSync(this._xvizMessage(2 + messageIndex));
+    }
+
+    return false;
   }
 
   timeRange() {
@@ -112,10 +124,9 @@ export class XVIZBaseReader {
   }
 
   // Support various formatted message names
-  _xvizMessage(index) {
-    if (index === 0) {
-      // index file is always json
-      return `0-frame.json`;
+  _xvizMessage(index, {forceJson = false} = {}) {
+    if (index === 0 || forceJson) {
+      return `${index}-frame.json`;
     }
 
     return `${index}${this.suffix}`;

@@ -30,5 +30,10 @@ export class FileSource {
     return undefined;
   }
 
+  existsSync(name) {
+    const path = this.path.join(this.root, name);
+    return this.fs.existsSync(path);
+  }
+
   close() {}
 }

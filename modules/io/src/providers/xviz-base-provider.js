@@ -64,7 +64,12 @@ export class XVIZBaseProvider {
     const {startTime, endTime} = this.reader.timeRange();
     this.metadata = this._readMetadata();
 
-    if (this.metadata && Number.isFinite(startTime) && Number.isFinite(endTime)) {
+    if (
+      this.metadata &&
+      Number.isFinite(startTime) &&
+      Number.isFinite(endTime) &&
+      this.reader.checkMessage(0) // verify the first message exists
+    ) {
       this._valid = true;
     }
 

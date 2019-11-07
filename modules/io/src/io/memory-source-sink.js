@@ -34,6 +34,10 @@ export class MemorySourceSink {
     }
   }
 
+  existsSync(name) {
+    return this.data.has(name);
+  }
+
   close() {}
 
   entries() {
