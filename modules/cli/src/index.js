@@ -22,6 +22,9 @@ import {WebSocketInterface} from './websocket';
 // Pull in sub commands
 import {validateArgs} from './cmds/validate';
 import {dumpArgs} from './cmds/dump';
+import {showArgs} from './cmds/show';
+import {saveArgs} from './cmds/save';
+import {fixArgs} from './cmds/fix';
 
 /**
  * Main function for entire tool
@@ -31,6 +34,9 @@ function main() {
 
   args = dumpArgs(args);
   args = validateArgs(args);
+  args = showArgs(args);
+  args = saveArgs(args);
+  args = fixArgs(args);
 
   return args.argv;
 }

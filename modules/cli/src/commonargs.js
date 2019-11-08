@@ -44,3 +44,9 @@ export function addCondensedArg(args, help) {
     describe: help
   });
 }
+
+export function addStreamArg(args, help) {
+  args.options('stream', {
+    describe: help
+  });
+}
