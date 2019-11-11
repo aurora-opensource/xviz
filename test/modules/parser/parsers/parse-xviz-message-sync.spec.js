@@ -1094,3 +1094,50 @@ tape('getDataFormat', t => {
 
   t.end();
 });
+
+tape('parseXVIZData timeslice with link', t => {
+  resetXVIZConfigAndSettings();
+  setXVIZConfig({currentMajorVersion: 2});
+
+  const testData = {
+    update_type: 'COMPLETE_STATE',
+    updates: [
+      {
+        timestamp: 1001.0,
+        poses: {
+          '/vehicle_pose': {
+            timestamp: 1001.0,
+            map_origin: {longitude: 11.2, latitude: 33.4, altitude: 55.6},
+            position: [1.1, 2.2, 3.3],
+            orientation: [0.1, 0.2, 0.3]
+          }
+        },
+        links: {
+          '/vehicle_pose/lidar': {
+            target_pose: '/vehicle_pose'
+          }
+        },
+        primitives: {
+          '/vehicle_pose/lidar': {
+            points: [
+              {
+                points: [[1000, 1000, 200]]
+              }
+            ]
+          }
+        }
+      }
+    ]
+  };
+
+  const result = parseXVIZData({...testData}, {v2Type: 'state_update'});
+
+  t.ok(result.links, 'Has links entry');
+  t.equal(Object.keys(result.links).length, 1, 'Has 1 entry in links object');
+
+  const link = result.links['/vehicle_pose/lidar'];
+  t.ok(link, 'lidar link entry defined');
+  t.equal(link.target_pose, '/vehicle_pose', 'link has correct target_pose');
+
+  t.end();
+});

@@ -103,6 +103,70 @@ test('XVIZBuilder#multiple-poses', t => {
   t.end();
 });
 
+test('XVIZBuilder#links', t => {
+  const builder = new XVIZBuilder();
+
+  builder
+    .pose('/vehicle_pose')
+    .timestamp(1000.0)
+    .position(1, 1, 0)
+    .orientation(0, 0, 0);
+
+  builder
+    .pose('/pose_1')
+    .timestamp(1000.0)
+    .position(10, 10, 0)
+    .orientation(0, 0, 0);
+  builder.link('/pose_1', '/lidar_1');
+
+  builder
+    .pose('/pose_2')
+    .timestamp(1000.0)
+    .position(20, 20, 0)
+    .orientation(0, 0, 0);
+  builder.link('/pose_2', '/lidar_2');
+
+  const expected = {
+    update_type: 'SNAPSHOT',
+    updates: [
+      {
+        timestamp: 1000.0,
+        poses: {
+          ['/vehicle_pose']: {
+            timestamp: 1000.0,
+            position: [1, 1, 0],
+            orientation: [0, 0, 0]
+          },
+
+          ['/pose_1']: {
+            timestamp: 1000.0,
+            position: [10, 10, 0],
+            orientation: [0, 0, 0]
+          },
+          ['/pose_2']: {
+            timestamp: 1000.0,
+            position: [20, 20, 0],
+            orientation: [0, 0, 0]
+          }
+        },
+        links: {
+          ['/lidar_1']: {
+            target_pose: '/pose_1'
+          },
+          ['/lidar_2']: {
+            target_pose: '/pose_2'
+          }
+        }
+      }
+    ]
+  };
+
+  const message = builder.getMessage();
+  t.deepEqual(message, expected, 'XVIZBuilder links match expected output');
+  schemaValidator.validate('session/state_update', message);
+  t.end();
+});
+
 test('XVIZBuilder#polygon', t => {
   const builder = new XVIZBuilder();
   setupPose(builder);

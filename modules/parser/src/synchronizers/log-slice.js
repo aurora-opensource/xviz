@@ -43,15 +43,16 @@ function updateObjects(streamName, features) {
 
 // One time slice, one datum from each stream.
 export default class LogSlice {
-  constructor(streamFilter, lookAheadMs, streamsByReverseTime) {
+  constructor(streamFilter, lookAheadMs, linksByReverseTime, streamsByReverseTime) {
     this.features = {};
     this.variables = {};
     this.pointCloud = null;
     this.lookAheads = {};
     this.components = {};
+    this.links = {};
     this.streams = {};
 
-    this.initialize(streamFilter, lookAheadMs, streamsByReverseTime);
+    this.initialize(streamFilter, lookAheadMs, linksByReverseTime, streamsByReverseTime);
   }
 
   // Extract car data from vehicle_pose and get geoJson for related frames
@@ -73,7 +74,8 @@ export default class LogSlice {
       variables: this.variables,
       pointCloud: this.pointCloud,
       components: this.components,
-      streams: this.streams
+      streams: this.streams,
+      links: this.links
     };
 
     // OBJECTS
@@ -108,7 +110,7 @@ export default class LogSlice {
    * Among other things parses XVIZ Object-related info from misc streams and merge into XVIZ
    * feature properties.
    */
-  initialize(streamFilter, lookAheadMs, streamsByReverseTime) {
+  initialize(streamFilter, lookAheadMs, linksByReverseTime, streamsByReverseTime) {
     const filter = streamFilter && Object.keys(streamFilter).length > 0 ? streamFilter : null;
 
     // get data if we don't already have that stream && it is not filtered.
@@ -120,6 +122,19 @@ export default class LogSlice {
           this._includeStream(filter, streamName)
         ) {
           this.addStreamDatum(streams[streamName], streamName, lookAheadMs, this);
+        }
+      }
+    });
+
+    // get data if we don't already have that stream && it is not filtered.
+    linksByReverseTime.forEach(links => {
+      for (const streamName in links) {
+        if (
+          this.links[streamName] !== null && // Explicit no data entry
+          !this.links[streamName] && // undefined means it has not been seen so keep looking for valid entry
+          this._includeStream(filter, streamName)
+        ) {
+          this.links[streamName] = links[streamName];
         }
       }
     });

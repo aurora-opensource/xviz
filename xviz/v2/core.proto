@@ -114,3 +114,8 @@ message Values {
   repeated bool bools = 4;
   repeated string strings = 5;
 }
+
+message Link {
+  option (xviz_json_schema) = "core/link_state";
+  string target_pose = 1;
+}

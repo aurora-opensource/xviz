@@ -118,6 +118,7 @@
     "core/timeseries_state/with_object_id.json",
     "core/stream_set/complete.json",
     "core/stream_set/future_instances_only.json",
+    "core/stream_set/link.json",
     "core/stream_set/primitives_and_poses.json",
     "core/stream_set/primitives_only.json",
     "core/stream_set/ui_primitive_only.json",

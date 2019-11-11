@@ -70,7 +70,7 @@ export default class XVIZStreamBuffer {
    * @property {number} the count of timeslices in buffer
    */
   get size() {
-    return this.timeslices.length;
+    return this.timeslices.length + this.persistent.length;
   }
 
   /**
@@ -140,6 +140,7 @@ export default class XVIZStreamBuffer {
    * @returns {object | null} - {start, end} timestamps if any timeslice is loaded
    */
   getLoadedTimeRange() {
+    // TODO what about persistent?
     const {timeslices} = this;
     const len = timeslices.length;
 
@@ -216,6 +217,7 @@ export default class XVIZStreamBuffer {
     // backwards compatibility - normalize time slice
     timeslice.streams = timeslice.streams || {};
     timeslice.videos = timeslice.videos || {};
+    timeslice.links = timeslice.links || {};
 
     const {timeslices, streams, videos} = this;
 
@@ -294,6 +296,7 @@ export default class XVIZStreamBuffer {
    *                 if the time range is satisfied
    */
   hasBuffer(fromTime, toTime) {
+    // TODO: persistent
     if (!this.timeslices.length) {
       return true;
     }
@@ -350,14 +353,15 @@ export default class XVIZStreamBuffer {
 
   _insertPersistentSlice(persistentSlice) {
     const {persistent, persistentStreams} = this;
-    const {timestamp, streams} = persistentSlice;
+    const {timestamp, streams, links} = persistentSlice;
     const index = findInsertPos(persistent, timestamp, LEFT);
     const timesliceAtInsertPosition = persistent[index];
 
     if (timesliceAtInsertPosition && timesliceAtInsertPosition.timestamp === timestamp) {
       // merge
       Object.assign(timesliceAtInsertPosition, persistentSlice, {
-        streams: Object.assign(timesliceAtInsertPosition.streams, streams)
+        streams: Object.assign(timesliceAtInsertPosition.streams, streams),
+        links: Object.assign(timesliceAtInsertPosition.links, links)
       });
     } else {
       // insert
@@ -378,6 +382,7 @@ export default class XVIZStreamBuffer {
 
     Object.assign(timesliceAtInsertPosition, timeslice, {
       streams: Object.assign(timesliceAtInsertPosition.streams, timeslice.streams),
+      links: Object.assign(timesliceAtInsertPosition.links, timeslice.links),
       videos: Object.assign(timesliceAtInsertPosition.videos, timeslice.videos)
     });
 
@@ -398,6 +403,7 @@ export default class XVIZStreamBuffer {
     for (const streamName in streams) {
       streams[streamName].splice(index, deleteCount, timeslice.streams[streamName]);
     }
+
     for (const streamName in videos) {
       videos[streamName].splice(index, deleteCount, timeslice.videos[streamName]);
     }

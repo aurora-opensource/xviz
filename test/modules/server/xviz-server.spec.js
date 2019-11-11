@@ -233,3 +233,57 @@ tape('XVIZServer#scenario-straight', t => {
     });
   });
 });
+
+tape('XVIZServer#scenario-orbit', t => {
+  const testCase = {
+    path: '/scenario-orbit',
+    params: {duration: '1', hz: '2'}
+  };
+
+  const handler = new XVIZProviderHandler(XVIZProviderFactory, {d: '.'});
+  const wss = new XVIZServer([handler], {port: 0}, () => {
+    const clientSocket = connect(
+      wss,
+      testCase
+    );
+    const start = Date.now() / 1000;
+    const end = start + 1;
+
+    const sequence = [
+      {
+        expect: msg => {
+          t.equal(msg, undefined, 'onOpen sends no message');
+        },
+        response: {
+          type: 'xviz/transform_log',
+          data: {
+            id: '1',
+            start_timestamp: start,
+            end_timestamp: end
+          }
+        }
+      },
+      {
+        expect: msg => {
+          t.equal(msg.type, 'metadata', 'received metadata');
+        }
+      },
+      {
+        expect: msg => {
+          t.equal(msg.type, 'state_update', 'received state_update');
+        }
+      },
+      {
+        expect: msg => {
+          t.equal(msg.type, 'transform_log_done', 'received done');
+        }
+      }
+    ];
+
+    const client = new TestClient(clientSocket, sequence, () => {
+      // t.equal(logger.count(), 5, 'logger is working');
+      wss.close();
+      t.end();
+    });
+  });
+});

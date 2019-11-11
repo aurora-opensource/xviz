@@ -44,6 +44,9 @@ export default class StreamSynchronizer extends BaseSynchronizer {
    */
   _getTimeRangeInReverse(startTime, endTime) {
     const slices = this.streamBuffer.getTimeslices({start: startTime, end: endTime}).reverse();
-    return slices.map(timeslice => timeslice.streams).filter(Boolean);
+    return {
+      streams: slices.map(timeslice => timeslice.streams).filter(Boolean),
+      links: slices.map(timeslice => timeslice.links).filter(Boolean)
+    };
   }
 }

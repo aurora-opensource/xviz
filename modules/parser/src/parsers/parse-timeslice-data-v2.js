@@ -16,6 +16,7 @@
 import {XVIZ_MESSAGE_TYPE, STATE_UPDATE_TYPE} from '../constants';
 import {getXVIZConfig} from '../config/xviz-config';
 import {parseXVIZPose} from './parse-xviz-pose';
+import {parseXVIZLink} from './parse-xviz-link';
 import {
   parseStreamFutures,
   parseStreamPrimitive,
@@ -58,29 +59,33 @@ export default function parseStreamSet(data, convertPrimitive) {
   const streamSets = updates;
 
   let timestamp = null;
-  if (!timestamp && streamSets) {
+  if (streamSets) {
     timestamp = streamSets.reduce((t, stateUpdate) => {
+      if (!t) {
+        return stateUpdate && stateUpdate.timestamp;
+      }
       return Math.max(t, stateUpdate.timestamp);
-    }, 0);
+    }, null);
   }
 
-  if (!timestamp) {
+  if (!Number.isFinite(timestamp)) {
     // Incomplete stream message, just tag it accordingly so client can ignore it
     return {type: XVIZ_MESSAGE_TYPE.INCOMPLETE, message: 'Missing timestamp in "updates"'};
   }
 
-  const newStreams = {};
   const result = {
     type: XVIZ_MESSAGE_TYPE.TIMESLICE,
     updateType,
-    streams: newStreams,
+    streams: {},
+    links: {},
     timestamp
     // TODO/Xintong validate primary vehicle pose in each update?
   };
 
   if (streamSets) {
-    const xvizStreams = parseStreamSets(streamSets, timestamp, convertPrimitive);
-    Object.assign(newStreams, xvizStreams);
+    const {streams, links} = parseStreamSets(streamSets, timestamp, convertPrimitive);
+    Object.assign(result.streams, streams);
+    Object.assign(result.links, links);
   }
 
   return result;
@@ -91,6 +96,8 @@ function parseStreamSets(streamSets, timestamp, convertPrimitive) {
   const {STREAM_BLACKLIST} = getXVIZConfig();
 
   const newStreams = {};
+  const newLinks = {};
+
   const poses = {};
   const primitives = {};
   const variables = {};
@@ -100,6 +107,8 @@ function parseStreamSets(streamSets, timestamp, convertPrimitive) {
   const noDataStreams = [];
 
   for (const streamSet of streamSets) {
+    Object.assign(newLinks, streamSet.links);
+
     Object.assign(poses, streamSet.poses);
     Object.assign(primitives, streamSet.primitives);
     Object.assign(variables, streamSet.variables);
@@ -116,6 +125,12 @@ function parseStreamSets(streamSets, timestamp, convertPrimitive) {
       noDataStreams.push(...streamSet.no_data_streams);
     }
   }
+
+  Object.keys(newLinks)
+    .filter(streamName => !STREAM_BLACKLIST.has(streamName))
+    .forEach(streamName => {
+      newLinks[streamName] = parseXVIZLink(newLinks[streamName]);
+    });
 
   Object.keys(poses)
     .filter(streamName => !STREAM_BLACKLIST.has(streamName))
@@ -166,6 +181,9 @@ function parseStreamSets(streamSets, timestamp, convertPrimitive) {
     noDataStreams.forEach(stream => (newStreams[stream] = null));
   }
 
-  return newStreams;
+  return {
+    streams: newStreams,
+    links: newLinks
+  };
 }
 /* eslint-enable max-statements */
