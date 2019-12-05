@@ -32,7 +32,7 @@ builder
   .polygon([[0, 0, 0], [4, 0, 0], [4, 3, 0]]);
 
 // Validate it
-import {XVIZValidator} from '@xviz/schema;
+import {XVIZValidator} from '@xviz/schema';
 
 const validator = new XVIZValidator();
 
