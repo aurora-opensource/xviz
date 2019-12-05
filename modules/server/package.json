@@ -8,13 +8,14 @@
     "url": "https://github.com/uber/xviz.git"
   },
   "bin": {
-    "xviz": "./bin/xvizserver"
+    "xvizserver": "./bin/xvizserver"
   },
   "main": "dist/es5/index.js",
   "module": "dist/esm/index.js",
   "esnext": "dist/es6/index.js",
   "files": [
-    "dist"
+    "dist",
+    "bin/xvizserver"
   ],
   "browser": {
     "text-encoding": false
