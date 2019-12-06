@@ -58,6 +58,8 @@ message StyleStreamValue {
   uint32 radius_pixels = 18;
   uint32 font_weight = 19;
   string font_family = 20;
+  PointColorMode point_color_mode = 21;
+  repeated float point_color_domain = 22;
 }
 
 message Color {
@@ -77,4 +79,10 @@ enum TextAlignmentBaseline {
   TOP = 1;
   CENTER = 2;
   BOTTOM = 3;
+}
+
+enum PointColorMode {
+  POINT_COLOR_MODE_INVALID = 0;
+  ELEVATION = 1;
+  DISTANCE_TO_VEHICLE = 2;
 }

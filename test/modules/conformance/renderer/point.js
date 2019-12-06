@@ -38,11 +38,11 @@ export default function renderPoint({context, feature, stylesheet, project}) {
     let color;
 
     switch (colorMode) {
-      case 'elevation':
+      case 'ELEVATION':
         color = getColor(vertex[2], colorDomain);
         break;
 
-      case 'distance_to_vehicle':
+      case 'DISTANCE_TO_VEHICLE':
         color = getColor(new Vector3(vertex[0], vertex[1], vertex[2]).len(), colorDomain);
         break;
 

@@ -43,7 +43,7 @@
         "category": "primitive",
         "primitive_type": "point",
         "stream_style": {
-          "point_color_mode": "elevation"
+          "point_color_mode": "ELEVATION"
         }
       },
 
@@ -51,7 +51,7 @@
         "category": "primitive",
         "primitive_type": "point",
         "stream_style": {
-          "point_color_mode": "distance_to_vehicle",
+          "point_color_mode": "DISTANCE_TO_VEHICLE",
           "point_color_domain": [0, 5]
         }
       }

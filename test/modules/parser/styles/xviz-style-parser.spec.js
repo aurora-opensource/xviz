@@ -189,7 +189,7 @@ tape('XVIZStyleParser#Stylesheet#getPropertyDefault', t => {
 
   stylesheet = new Stylesheet([
     {
-      style: {point_color_mode: 'elevation'}
+      style: {point_color_mode: 'ELEVATION'}
     }
   ]);
   t.deepEquals(

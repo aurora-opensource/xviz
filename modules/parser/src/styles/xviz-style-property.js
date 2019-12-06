@@ -124,13 +124,16 @@ const DEFAULT_STYLES = {
   stroke_width_min_pixels: 0,
   stroke_width_max_pixels: Number.MAX_SAFE_INTEGER,
 
-  point_color_mode: 'default',
+  point_color_mode: 'DEFAULT',
   point_color_domain: stylesheet => {
-    const colorMode = stylesheet.getProperty('point_color_mode');
+    let colorMode = stylesheet.getProperty('point_color_mode');
+    if (colorMode) {
+      colorMode = colorMode.toUpperCase();
+    }
     switch (colorMode) {
-      case 'elevation':
+      case 'ELEVATION':
         return [0, 3];
-      case 'distance_to_vehicle':
+      case 'DISTANCE_TO_VEHICLE':
         return [0, 60];
       default:
         return [0, 0];
