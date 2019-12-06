@@ -177,9 +177,6 @@ export default class LogSlice {
 
     // Point cloud
     if (pointCloud) {
-      if (this.pointCloud) {
-        console.warn(`Point cloud for ${streamName} overwriting previous cloud`); // eslint-disable-line
-      }
       this.pointCloud = pointCloud;
     }
 
