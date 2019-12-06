@@ -23,6 +23,7 @@ import {XVIZBuilder} from '@xviz/builder';
 
 const builder = new XVIZBuilder();
 
+// prettier-ignore
 builder
   .pose()
   .timestamp(ts1);
@@ -36,5 +37,5 @@ import {XVIZValidator} from '@xviz/schema';
 
 const validator = new XVIZValidator();
 
-validator.validateStateUpdate(builder.getMessage())
+validator.validateStateUpdate(builder.getMessage());
 ```
