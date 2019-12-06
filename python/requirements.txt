@@ -1,0 +1,4 @@
+easydict
+protobuf
+numpy
+websockets
