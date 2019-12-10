@@ -2,7 +2,7 @@
   "name": "@xviz/schema",
   "description": "XVIZ JSON schema",
   "license": "Apache-2.0",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "repository": {
     "type": "git",
     "url": "https://github.com/uber/xviz.git"
@@ -26,5 +26,6 @@
     "build-schema": "node ./build-schema",
     "build-protos": "yarn pbjs --keep-case --target json --proto-path ../.. --out dist/proto.v2.json ../../xviz/v2/*.proto",
     "build": "npm run build-schema && npm run build-protos"
-  }
+  },
+  "gitHead": "8e323ac31950395d3513e5e34df32c44e304c321"
 }
