@@ -169,8 +169,8 @@ Supported style properties by primitive types:
 | -------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- | --------------------------------------------------------------------- | ---------- | ---------- |
 | `radius_pixels`      | The point radius in pixels                                                                                                             | Number                              | `1`                                                                   | X          |            |
 | `fill_color`         | Fill color of the point                                                                                                                | [Color](#color)                     | `'#fff'`                                                              | X          |            |
-| `point_color_mode`   | How to color point primitives                                                                                                          | [PointColorMode](#point-color-mode) | `'default'`                                                           | X          |            |
-| `point_color_domain` | The lower and upper bounds of the point measurement that maps to blue and red respectively. Only used if `point_color_mode` is defined | Array                               | `[0, 3]` in `elevation` mode, `[0, 60]` in `distance_to_vehicle` mode | X          |            |
+| `point_color_mode`   | How to color point primitives                                                                                                          | [PointColorMode](#point-color-mode) | `'DEFAULT'`                                                           | X          |            |
+| `point_color_domain` | The lower and upper bounds of the point measurement that maps to blue and red respectively. Only used if `point_color_mode` is defined | Array                               | `[0, 3]` in `ELEVATION` mode, `[0, 60]` in `DISTANCE_TO_VEHICLE` mode | X          |            |
 | `opacity`            | Opacity of the object                                                                                                                  | Number                              | `1`                                                                   | X          |            |
 
 ### polygon
@@ -235,9 +235,9 @@ Color values can be in one of the following formats:
 
 How to color `point` primitives. Can be one of 3 values:
 
-- `default` - use inline colors if provided, or `fill_colors` style otherwise
-- `elevation` - color by elevation from the ground.
-- `distance_to_vehicle` - color by distance to the vehicle.
+- `DEFAULT` - use inline colors if provided, or `fill_colors` style otherwise
+- `ELEVATION` - color by elevation from the ground.
+- `DISTANCE_TO_VEHICLE` - color by distance to the vehicle.
 
 ## Remarks
 

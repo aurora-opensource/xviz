@@ -70,6 +70,17 @@
       },
       "font_weight": {
         "type": "number"
+      },
+      "point_color_mode": {
+        "enum": ["ELEVATION", "DISTANCE_TO_VEHICLE"]
+      },
+      "point_color_domain": {
+        "type": "array",
+        "minItems": 2,
+        "maxItems": 2,
+        "items": {
+          "type": "number"
+        }
       }
   },
   "anyOf": [
@@ -91,7 +102,10 @@
       {"required": ["filled"]},
       {"required": ["extruded"]},
       {"required": ["font_family"]},
-      {"required": ["font_weight"]}
+      {"required": ["font_weight"]},
+      {"required": ["point_color_mode"]},
+      {"required": ["point_color_domain"]}
+
   ],
   "additionalProperties": false
 }

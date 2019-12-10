@@ -15,5 +15,7 @@
   "opacity": 0.4,
   "stroked": false,
   "filled": true,
-  "extruded": false
+  "extruded": false,
+  "point_color_mode": "ELEVATION",
+  "point_color_domain": [0, 4]
 }
