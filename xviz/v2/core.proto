@@ -19,10 +19,6 @@ import "xviz/v2/options.proto";
 import "xviz/v2/primitives.proto";
 import "xviz/v2/uiprimitives.proto";
 
-message Link {
-  string target_pose = 1;
-}
-
 message StreamSet {
   option (xviz_json_schema) = "core/stream_set";
   double timestamp = 1;
