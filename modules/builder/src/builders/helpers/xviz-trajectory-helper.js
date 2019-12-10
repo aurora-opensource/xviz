@@ -27,7 +27,7 @@ export function getRelativeCoordinates(vertices, basePose) {
   }
 
   const transformMatrix = basePose.getTransformationMatrix();
-  return vertices.map(p => transformMatrix.transformVector(p));
+  return vertices.map(p => transformMatrix.transform(p));
 }
 
 /**
@@ -54,9 +54,9 @@ export function getPoseTrajectory({poses, startFrame, endFrame}) {
     const offset = getGeospatialVector(startPose, currPose);
 
     // transform offset to startPose coordinate system
-    const relativeOffset = worldToStartPoseTransformMatrix.transformVector(offset);
+    const relativeOffset = worldToStartPoseTransformMatrix.transform(offset);
 
-    return [relativeOffset.x, relativeOffset.y, relativeOffset.z];
+    return relativeOffset;
   });
 }
 
@@ -87,7 +87,7 @@ export function getGeospatialToPoseTransform(from, to) {
   // transform offset to `fromPose` coordinate
   // TODO figure out why this step is needed
   const worldToFromPoseTransformMatrix = fromPose.getTransformationMatrix().invert();
-  offset = worldToFromPoseTransformMatrix.transformVector(offset);
+  offset = worldToFromPoseTransformMatrix.transform(offset);
 
   const toPose = new Pose({
     x: offset[0],
@@ -134,7 +134,7 @@ export function getObjectTrajectory({
 
     // objects in curr frame are meters offset based on currVehiclePose
     // need to convert to the coordinate system of the startVehiclePose
-    const p = transformMatrix.transformVector([step.x, step.y, step.z]);
+    const p = transformMatrix.transform([step.x, step.y, step.z]);
     vertices.push(p);
   }
 

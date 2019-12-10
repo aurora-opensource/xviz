@@ -154,7 +154,7 @@ export default class FutureTrackletsConverter {
           const pose = this._makePoseShape(object.data.poses.item[futurePoseIndex]);
 
           // Translate the future position
-          const v = transform.transformVector([pose.x, pose.y, pose.z]);
+          const v = transform.transform([pose.x, pose.y, pose.z]);
           pose.x = v[0];
           pose.y = v[1];
           pose.z = v[2];
