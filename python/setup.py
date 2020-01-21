@@ -1,4 +1,5 @@
 from setuptools import setup, find_packages
+import os
 
 with open("README.md", "r") as fh:
     DESCR = fh.read()
@@ -6,13 +7,20 @@ with open("README.md", "r") as fh:
 PKGS = find_packages()
 PKGS.remove('test')
 
+# Get version
+here = os.path.dirname(os.path.abspath(__file__))
+
+version_ns = {}
+with open(os.path.join(here, '_version.py')) as f:
+    exec(f.read(), {}, version_ns)
+
 setup(
-    name='xviz',
-    version='0.1.1',
+    name='pyxviz',
+    version=version_ns['__version__'],
     description='Python implementation of XVIZ protocol',
-    author='Yuanxin Zhong',
-    author_email='cmpute@gmail.com',
-    url="https://github.com/cmpute/xviz.py",
+    author='Timothy Wojtaszek',
+    author_email='twojtasz@uber.com',
+    url="https://github.com/uber/xviz",
     long_description=DESCR,
     long_description_content_type='text/markdown',
     packages=PKGS,
