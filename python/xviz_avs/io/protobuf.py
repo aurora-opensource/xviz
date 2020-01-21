@@ -1,7 +1,7 @@
 import json
 from .base import XVIZBaseWriter
 
-from xviz.message import XVIZEnvelope, XVIZMessage, Metadata
+from xviz_avs.message import XVIZEnvelope, XVIZMessage, Metadata
 
 class XVIZProtobufWriter(XVIZBaseWriter):
     def __init__(self, sink, wrap_envelope=True, float_precision=10, as_array_buffer=False):

@@ -1,5 +1,5 @@
-from xviz.builder.base_builder import XVIZBaseBuilder, CATEGORY, PRIMITIVE_TYPES
-from xviz.v2.core_pb2 import Link
+from xviz_avs.builder.base_builder import XVIZBaseBuilder, CATEGORY, PRIMITIVE_TYPES
+from xviz_avs.v2.core_pb2 import Link
 
 class XVIZLinkBuilder(XVIZBaseBuilder):
     def __init__(self, metadata, logger=None):

@@ -2,9 +2,9 @@ import logging
 from typing import Union
 from easydict import EasyDict as edict
 
-from xviz.message import XVIZMessage
-from xviz.v2.session_pb2 import Metadata, StreamMetadata
-from xviz.v2.style_pb2 import StyleStreamValue
+from xviz_avs.message import XVIZMessage
+from xviz_avs.v2.session_pb2 import Metadata, StreamMetadata
+from xviz_avs.v2.style_pb2 import StyleStreamValue
 
 ANNOTATION_TYPES = StreamMetadata.AnnotationType
 CATEGORY = StreamMetadata.Category
@@ -147,7 +147,7 @@ class XVIZBaseBuilder:
         self._validate_match_metadata()
 
 import array
-from xviz.v2.style_pb2 import StyleObjectValue, StyleStreamValue
+from xviz_avs.v2.style_pb2 import StyleObjectValue, StyleStreamValue
 
 def build_object_style(style):
     '''

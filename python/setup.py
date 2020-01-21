@@ -5,17 +5,18 @@ with open("README.md", "r") as fh:
     DESCR = fh.read()
 
 PKGS = find_packages()
-PKGS.remove('test')
+if 'test' in PKGS:
+    PKGS.remove('test')
 
 # Get version
 here = os.path.dirname(os.path.abspath(__file__))
 
 version_ns = {}
-with open(os.path.join(here, '_version.py')) as f:
+with open(os.path.join(here, 'xviz_avs', '_version.py')) as f:
     exec(f.read(), {}, version_ns)
 
 setup(
-    name='pyxviz',
+    name='xviz_avs',
     version=version_ns['__version__'],
     description='Python implementation of XVIZ protocol',
     author='Timothy Wojtaszek',

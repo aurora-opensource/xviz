@@ -1,5 +1,5 @@
-from xviz.builder.base_builder import XVIZBaseBuilder, CATEGORY
-from xviz.v2.core_pb2 import Pose, MapOrigin
+from xviz_avs.builder.base_builder import XVIZBaseBuilder, CATEGORY
+from xviz_avs.v2.core_pb2 import Pose, MapOrigin
 
 class XVIZPoseBuilder(XVIZBaseBuilder):
     """

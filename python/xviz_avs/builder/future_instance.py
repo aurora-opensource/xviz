@@ -1,6 +1,6 @@
-from xviz.builder.base_builder import CATEGORY, PRIMITIVE_TYPES
-from xviz.builder.primitive import XVIZPrimitiveBuilder
-from xviz.v2.core_pb2 import FutureInstances, PrimitiveState
+from xviz_avs.builder.base_builder import CATEGORY, PRIMITIVE_TYPES
+from xviz_avs.builder.primitive import XVIZPrimitiveBuilder
+from xviz_avs.v2.core_pb2 import FutureInstances, PrimitiveState
 
 class XVIZFutureInstanceBuilder(XVIZPrimitiveBuilder):
     def __init__(self, metadata, logger=None):

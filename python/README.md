@@ -1,4 +1,4 @@
-# pyxviz
+# xviz_avs
 
 Python implementation of XVIZ protocol libraries.
 

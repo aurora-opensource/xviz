@@ -1,18 +1,18 @@
 import logging
 from easydict import EasyDict as edict
 
-from xviz.message import XVIZFrame, XVIZMessage
+from xviz_avs.message import XVIZFrame, XVIZMessage
 
-from xviz.builder.link import XVIZLinkBuilder
-from xviz.builder.future_instance import XVIZFutureInstanceBuilder
-from xviz.builder.pose import XVIZPoseBuilder
-from xviz.builder.primitive import XVIZPrimitiveBuilder
-from xviz.builder.variable import XVIZVariableBuilder
-from xviz.builder.ui_primitive import XVIZUIPrimitiveBuilder
-from xviz.builder.time_series import XVIZTimeSeriesBuilder
+from xviz_avs.builder.link import XVIZLinkBuilder
+from xviz_avs.builder.future_instance import XVIZFutureInstanceBuilder
+from xviz_avs.builder.pose import XVIZPoseBuilder
+from xviz_avs.builder.primitive import XVIZPrimitiveBuilder
+from xviz_avs.builder.variable import XVIZVariableBuilder
+from xviz_avs.builder.ui_primitive import XVIZUIPrimitiveBuilder
+from xviz_avs.builder.time_series import XVIZTimeSeriesBuilder
 
-from xviz.v2.core_pb2 import StreamSet
-from xviz.v2.session_pb2 import StateUpdate
+from xviz_avs.v2.core_pb2 import StreamSet
+from xviz_avs.v2.session_pb2 import StateUpdate
 from google.protobuf.json_format import MessageToDict
 
 PRIMARY_POSE_STREAM = '/vehicle_pose'
