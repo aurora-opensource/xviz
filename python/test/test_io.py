@@ -1,6 +1,6 @@
 import json
-import xviz.io as xi
-import xviz.builder as xb
+import xviz_avs.io as xi
+import xviz_avs.builder as xb
 
 class TestIO:
     def test_json_metadata_writer(self):

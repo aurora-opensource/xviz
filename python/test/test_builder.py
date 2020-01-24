@@ -1,7 +1,7 @@
 import json
 from easydict import EasyDict as edict
 
-from xviz.builder import XVIZBuilder, XVIZUIPrimitiveBuilder, XVIZTimeSeriesBuilder
+from xviz_avs.builder import XVIZBuilder, XVIZUIPrimitiveBuilder, XVIZTimeSeriesBuilder
 from google.protobuf.json_format import MessageToDict
 import unittest
 
