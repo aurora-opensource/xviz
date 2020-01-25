@@ -31,9 +31,8 @@ PRIMITIVE_STYLE_MAP = dict([
         'opacity',
         'fill_color',
         'radius_pixels',
-        # TODO: Following two are not listed in protobuf
-        # 'point_color_mode',
-        # 'point_color_domain'
+        'point_color_mode',
+        'point_color_domain'
     ]),
     (PRIMITIVE_TYPES.POLYGON, [
         'stroke_color',

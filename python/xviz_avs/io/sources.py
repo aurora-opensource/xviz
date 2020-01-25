@@ -37,7 +37,7 @@ class DirectorySource:
 
     def write(self, data, name):
         with open(os.path.join(self._dir, name), 'wb') as fout:
-            fout.write(fout, data)
+            fout.write(data)
 
     def close(self):
         pass
