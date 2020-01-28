@@ -39,7 +39,7 @@
     "cross-spawn": "^6.0.5",
     "json-diff": "^0.5.4",
     "jsonlint": "^1.6.3",
-    "ocular-dev-tools": "0.0.27",
+    "ocular-dev-tools": "0.0.35",
     "pre-commit": "^1.2.2",
     "protobufjs": "https://github.com/jlisee/protobuf.js#ed8e699671da6f9a169074aa0f2a160cefe0844a",
     "reify": "^0.18.1",
