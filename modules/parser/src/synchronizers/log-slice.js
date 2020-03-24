@@ -94,6 +94,13 @@ export default class LogSlice {
           updateObjects(streamName, features);
         }
       }
+
+      for (const streamName in this.variables) {
+        const variables = this.variables[streamName];
+        if (variables.length && variables[0].id) {
+          updateObjects(streamName, variables);
+        }
+      }
     }
 
     frame.objects = XVIZObject.getAllInCurrentFrame(); // Map of XVIZ ids in current slice
