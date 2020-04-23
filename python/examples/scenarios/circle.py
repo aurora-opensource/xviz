@@ -13,7 +13,7 @@ DEG_1_AS_RAD = math.pi / 180
 DEG_90_AS_RAD = 90 * DEG_1_AS_RAD
 
 class CircleScenario:
-    def __init__(self, live=True, radius=30, duration=10, speed=10):
+    def __init__(self, live=False, radius=30, duration=10, speed=10):
         self._timestamp = time.time()
         self._radius = radius
         self._duration = duration

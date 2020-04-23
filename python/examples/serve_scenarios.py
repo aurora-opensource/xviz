@@ -8,10 +8,11 @@ from xviz.builder import XVIZBuilder, XVIZMetadataBuilder
 from xviz.server import XVIZServer, XVIZBaseSession
 
 from scenarios.circle import CircleScenario
+from scenarios.simple_tracking import SimpleTrackingScenario
 
 
 class ScenarioSession(XVIZBaseSession):
-    def __init__(self, socket, request, scenario=CircleScenario()):
+    def __init__(self, socket, request, scenario=SimpleTrackingScenario()):
         super().__init__(socket, request)
         self._scenario = scenario
         self._socket = socket
@@ -32,7 +33,7 @@ class ScenarioSession(XVIZBaseSession):
             await self._socket.send(json.dumps(message))
 
             t += 0.5
-            await asyncio.sleep(0.5)
+            await asyncio.sleep(0.05)
 
 class ScenarioHandler:
     def __init__(self):

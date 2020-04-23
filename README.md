@@ -24,6 +24,12 @@ And examples:
   [KITTI](http://www.cvlibs.net/datasets/kitti/raw_data.php) and [Nutonomy](https://nuscenes.org) to
   the XVIZ protocol.
 
+# Raven Setup Steps
+```bash
+$ cd ./python
+$ python examples/serve_scenarios.py
+```
+
 ## Quick start
 
 You need [Node.js](https://nodejs.org/en/) and [yarn](https://yarnpkg.com/lang/en/docs/install) to
