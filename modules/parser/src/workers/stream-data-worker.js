@@ -11,6 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+/* eslint-disable max-depth */
 
 import {setXVIZConfig} from '../config/xviz-config';
 import {parseXVIZMessageSync} from '../parsers/parse-xviz-message-sync';
@@ -28,10 +29,12 @@ export default config => self => {
       case XVIZ_MESSAGE_TYPE.TIMESLICE:
         for (const streamName in message.streams) {
           const stream = message.streams[streamName];
-          getTransferList(stream.pointCloud, true, transfers);
-          getTransferList(stream.vertices, false, transfers);
-          if (stream.images && stream.images.length) {
-            stream.images.forEach(image => getTransferList(image, true, transfers));
+          if (stream) {
+            getTransferList(stream.pointCloud, true, transfers);
+            getTransferList(stream.vertices, false, transfers);
+            if (stream.images && stream.images.length) {
+              stream.images.forEach(image => getTransferList(image, true, transfers));
+            }
           }
         }
         break;
