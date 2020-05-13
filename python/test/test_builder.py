@@ -23,10 +23,11 @@ def setup_pose(builder):
 
 class TestPoseBuilder(unittest.TestCase):
 
-    def test_single_pose(self):
-        builder = XVIZBuilder()
-        setup_pose(builder)
+    def setUp(self):
+        self.builder = XVIZBuilder()
+        setup_pose(self.builder)
 
+    def test_single_pose(self):
         expected = {
             'timestamp': 1.0,
             'poses': {
@@ -34,14 +35,11 @@ class TestPoseBuilder(unittest.TestCase):
             }
         }
 
-        data = builder.get_data().to_object()
+        data = self.builder.get_data().to_object()
         assert json.dumps(data, sort_keys=True) == json.dumps(expected, sort_keys=True)
 
     def test_multiple_poses(self):
-        builder = XVIZBuilder()
-        setup_pose(builder)
-
-        builder.pose('/vehicle-pose-2')\
+        self.builder.pose('/vehicle-pose-2')\
             .timestamp(2.0)\
             .map_origin(4.4, 5.5, 6.6)\
             .position(44., 55., 66.)\
@@ -60,17 +58,17 @@ class TestPoseBuilder(unittest.TestCase):
             }
         }
 
-        data = builder.get_data().to_object()
+        data = self.builder.get_data().to_object()
         assert json.dumps(data, sort_keys=True) == json.dumps(expected, sort_keys=True)
 
 class TestPrimitiveBuilder(unittest.TestCase):
+    def setUp(self):
+        self.builder = XVIZBuilder()
+        setup_pose(self.builder)
 
     def test_polygon(self):
-        builder = XVIZBuilder()
-        setup_pose(builder)
-
         verts = [0., 0., 0., 4., 0., 0., 4., 3., 0.]
-        builder.primitive('/test/polygon')\
+        self.builder.primitive('/test/polygon')\
             .polygon(verts)\
             .id('1')\
             .style({
@@ -99,10 +97,14 @@ class TestPrimitiveBuilder(unittest.TestCase):
             }
         }
 
-        data = builder.get_data().to_object()
+        data = self.builder.get_data().to_object()
         assert json.dumps(data, sort_keys=True) == json.dumps(expected, sort_keys=True)
 
-class TestUIPrimitiveBuilder:
+class TestUIPrimitiveBuilder(unittest.TestCase):
+    def setUp(self):
+        self.builder = XVIZBuilder()
+        setup_pose(self.builder)
+
     def test_null(self):
         builder = XVIZUIPrimitiveBuilder(None, None)
         data = builder.stream('/test').get_data()
@@ -110,12 +112,9 @@ class TestUIPrimitiveBuilder:
         assert data is None
 
     def test_treetable(self):
-        builder = XVIZBuilder()
-        setup_pose(builder)
-
         TEST_COLUMNS = [{'display_text': 'Name', 'type': 'STRING'}] # FIXME: type is in lower case in XVIZ
-        builder.ui_primitives('/test').treetable(TEST_COLUMNS)
-        data = builder.get_data().to_object()
+        self.builder.ui_primitives('/test').treetable(TEST_COLUMNS)
+        data = self.builder.get_data().to_object()
 
         expected = {
             '/test': {
@@ -127,7 +126,11 @@ class TestUIPrimitiveBuilder:
         }
         assert json.dumps(data['ui_primitives'], sort_keys=True) == json.dumps(expected, sort_keys=True)
 
-class TestTimeSeriesBuilder:
+class TestTimeSeriesBuilder(unittest.TestCase):
+    def setUp(self):
+        self.builder = XVIZBuilder()
+        setup_pose(self.builder)
+
     def test_null(self):
         builder = XVIZTimeSeriesBuilder(None, None)
         data = builder.stream('/test').get_data()
@@ -135,10 +138,10 @@ class TestTimeSeriesBuilder:
         assert data is None
 
     def test_single_entry(self):
-        builder = XVIZBuilder()
-        setup_pose(builder)
+        self.builder = XVIZBuilder()
+        setup_pose(self.builder)
 
-        builder.time_series('/test')\
+        self.builder.time_series('/test')\
             .timestamp(20.)\
             .value(1.)
 
@@ -147,18 +150,15 @@ class TestTimeSeriesBuilder:
             'streams': ['/test'],
             'values': {'doubles': [1.]}
         }]
-        data = builder.get_data().to_object()
+        data = self.builder.get_data().to_object()
         assert json.dumps(data['time_series'], sort_keys=True) == json.dumps(expected, sort_keys=True)
 
     def test_multiple_entries(self):
-        builder = XVIZBuilder()
-        setup_pose(builder)
-
-        builder.time_series('/test')\
+        self.builder.time_series('/test')\
             .timestamp(20.)\
             .value(1.)
 
-        builder.time_series('/foo')\
+        self.builder.time_series('/foo')\
             .timestamp(20.)\
             .value(2.)
 
@@ -167,5 +167,221 @@ class TestTimeSeriesBuilder:
             'streams': ['/test', '/foo'],
             'values': {'doubles': [1., 2.]}
         }]
-        data = builder.get_data().to_object()
+        data = self.builder.get_data().to_object()
         assert json.dumps(data['time_series'], sort_keys=True) == json.dumps(expected, sort_keys=True)
+
+
+class TestFutureInstanceBuilder(unittest.TestCase):
+    def setUp(self):
+        self.builder = XVIZBuilder()
+        setup_pose(self.builder)
+
+    def test_primitives(self):
+        verts = [1., 0., 0., 1., 1., 0., 1., 1., 1.]
+        self.builder.future_instance('/test/future_circle', 1.0)\
+            .circle([1., 0., 0.], 2)
+        self.builder.future_instance('/test/future_text', 1.0)\
+            .text('testing')\
+            .position([1., 1., 0.])
+        self.builder.future_instance('/test/future_stadium', 1.0)\
+            .stadium([1., 0., 0.], [1., 1., 0.], 2)
+        self.builder.future_instance('/test/future_points', 1.0)\
+            .points([1., 1., 1.])
+        self.builder.future_instance('/test/future_polyline', 1.0)\
+            .polyline([1., 1., 1.])
+        self.builder.future_instance('/test/future_polygon', 1.0)\
+            .polygon(verts)\
+            .id('1')
+
+        expected = {
+            'timestamp': 1.0,
+            'poses': {
+                PRIMARY_POSE_STREAM: DEFAULT_POSE
+            },
+            'future_instances': {
+                '/test/future_circle': {
+                    'timestamps': [1.0],
+                    'primitives': [
+                        {
+                            'circles': [
+                                {
+                                    'center': [1., 0., 0.],
+                                    'radius': 2.0
+                                }
+                            ]
+                        }
+                    ]
+                },
+                '/test/future_text': {
+                    'timestamps': [1.0],
+                    'primitives': [
+                        {
+                            'texts': [
+                                {
+                                    'text': 'testing',
+                                    'position': [1., 1., 0.]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                '/test/future_stadium': {
+                    'timestamps': [1.0],
+                    'primitives': [
+                        {
+                            'stadiums': [
+                                {
+                                    'start': [1., 0., 0.],
+                                    'end': [1., 1., 0.],
+                                    'radius': 2.0
+                                }
+                            ]
+                        }
+                    ]
+                },
+                '/test/future_points': {
+                    'timestamps': [1.0],
+                    'primitives': [
+                        {
+                            'points': [
+                                {
+                                    'points': [1., 1., 1.]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                '/test/future_polyline': {
+                    'timestamps': [1.0],
+                    'primitives': [
+                        {
+                            'polylines': [
+                                {
+                                    'vertices': [1., 1., 1.]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                '/test/future_polygon': {
+                    'timestamps': [1.0],
+                    'primitives': [
+                        {
+                            'polygons': [
+                                {
+                                    'base': {
+                                        'object_id': '1'
+                                    },
+                                    'vertices': verts
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        }
+
+        data = self.builder.get_data().to_object()
+        assert data == expected
+
+    def test_multiple_inserts(self):
+        verts = [1., 0., 0., 1., 1., 0., 1., 1., 1.]
+        # TODO test style({'fill_color': [255, 0, 0]})
+        self.builder.future_instance('/test/future_polygon', 1.0)\
+            .polygon(verts)\
+            .id('1')
+        self.builder.future_instance('/test/future_polygon', 1.1)\
+            .polygon(verts)\
+            .id('1')
+        self.builder.future_instance('/test/future_polygon', 1.0)\
+            .polygon(verts)\
+            .id('2')
+
+        expected = {
+            'timestamp': 1.0,
+            'poses': {
+                PRIMARY_POSE_STREAM: DEFAULT_POSE
+            },
+            'future_instances': {
+                '/test/future_polygon': {
+                    'timestamps': [1.0, 1.1],
+                    'primitives': [
+                        {
+                            'polygons': [
+                                {
+                                    'base': {
+                                        'object_id': '1'
+                                    },
+                                    'vertices': verts
+                                },
+                                {
+                                    'base': {
+                                        'object_id': '2'
+                                    },
+                                    'vertices': verts
+                                }
+                            ]
+                        },
+                        {
+                            'polygons': [
+                                {
+                                    'base': {
+                                        'object_id': '1'
+                                    },
+                                    'vertices': verts
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        }
+
+        data = self.builder.get_data().to_object()
+        assert data == expected
+
+    def test_multiple_inserts_reverse_order(self):
+        verts = [1., 0., 0., 1., 1., 0., 1., 1., 1.]
+        self.builder.future_instance('/test/future_polygon', 1.1)\
+            .polygon(verts)\
+            .id('1')
+        self.builder.future_instance('/test/future_polygon', 1.0)\
+            .polygon(verts)\
+            .id('1')
+
+        expected = {
+            'timestamp': 1.0,
+            'poses': {
+                PRIMARY_POSE_STREAM: DEFAULT_POSE
+            },
+            'future_instances': {
+                '/test/future_polygon': {
+                    'timestamps': [1.0, 1.1],
+                    'primitives': [
+                        {
+                            'polygons': [
+                                {
+                                    'base': {
+                                        'object_id': '1'
+                                    },
+                                    'vertices': verts
+                                }
+                            ]
+                        },
+                        {
+                            'polygons': [
+                                {
+                                    'base': {
+                                        'object_id': '1'
+                                    },
+                                    'vertices': verts
+                                }
+                            ]
+                        }
+                    ]
+                }
+            }
+        }
+
+        data = self.builder.get_data().to_object()
+        assert data == expected
