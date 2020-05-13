@@ -2,8 +2,8 @@
 from easydict import EasyDict as edict
 import json
 
-from xviz.io.sources import BaseSource
-from xviz.message import AllDataType, XVIZMessage, Metadata
+from xviz_avs.io.sources import BaseSource
+from xviz_avs.message import AllDataType, XVIZMessage, Metadata
 
 class XVIZBaseWriter:
     def __init__(self, source: BaseSource):

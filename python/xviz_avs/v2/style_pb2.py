@@ -14,7 +14,7 @@ from google.protobuf import symbol_database as _symbol_database
 _sym_db = _symbol_database.Default()
 
 
-from xviz.v2 import options_pb2 as xviz_dot_v2_dot_options__pb2
+from xviz_avs.v2 import options_pb2 as xviz_dot_v2_dot_options__pb2
 
 
 DESCRIPTOR = _descriptor.FileDescriptor(
@@ -22,7 +22,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='xviz.v2',
   syntax='proto3',
   serialized_options=_b('\n\013com.xviz.v2B\nStyleProtoP\001Z\004v2pb\242\002\004XVIZ\252\002\007xviz.V2\312\002\007Xviz\\V2'),
-  serialized_pb=_b('\n\x13xviz/v2/style.proto\x12\x07xviz.v2\x1a\x15xviz/v2/options.proto\"U\n\nStyleClass\x12\x0c\n\x04name\x18\x01 \x01(\t\x12(\n\x05style\x18\x02 \x01(\x0b\x32\x19.xviz.v2.StyleObjectValue:\x0f\xc2\xbb\x1a\x0bstyle/class\"\x95\x02\n\x10StyleObjectValue\x12\x12\n\nfill_color\x18\x01 \x01(\x0c\x12\x14\n\x0cstroke_color\x18\x02 \x01(\x0c\x12\x14\n\x0cstroke_width\x18\x03 \x01(\x02\x12\x0e\n\x06radius\x18\x04 \x01(\x02\x12\x11\n\ttext_size\x18\x05 \x01(\x02\x12\x15\n\rtext_rotation\x18\x06 \x01(\x02\x12(\n\x0btext_anchor\x18\x07 \x01(\x0e\x32\x13.xviz.v2.TextAnchor\x12\x35\n\rtext_baseline\x18\x08 \x01(\x0e\x32\x1e.xviz.v2.TextAlignmentBaseline\x12\x0e\n\x06height\x18\t \x01(\x02:\x16\xc2\xbb\x1a\x12style/object_value\"\x92\x04\n\x10StyleStreamValue\x12\x12\n\nfill_color\x18\x01 \x01(\x0c\x12\x14\n\x0cstroke_color\x18\x02 \x01(\x0c\x12\x14\n\x0cstroke_width\x18\x03 \x01(\x02\x12\x0e\n\x06radius\x18\x04 \x01(\x02\x12\x11\n\ttext_size\x18\x05 \x01(\x02\x12\x15\n\rtext_rotation\x18\x06 \x01(\x02\x12(\n\x0btext_anchor\x18\x07 \x01(\x0e\x32\x13.xviz.v2.TextAnchor\x12\x35\n\rtext_baseline\x18\x08 \x01(\x0e\x32\x1e.xviz.v2.TextAlignmentBaseline\x12\x0e\n\x06height\x18\t \x01(\x02\x12\x19\n\x11radius_min_pixels\x18\n \x01(\r\x12\x19\n\x11radius_max_pixels\x18\x0b \x01(\r\x12\x1f\n\x17stroke_width_min_pixels\x18\x0c \x01(\r\x12\x1f\n\x17stroke_width_max_pixels\x18\r \x01(\r\x12\x0f\n\x07opacity\x18\x0e \x01(\x02\x12\x0f\n\x07stroked\x18\x0f \x01(\x08\x12\x0e\n\x06\x66illed\x18\x10 \x01(\x08\x12\x10\n\x08\x65xtruded\x18\x11 \x01(\x08\x12\x15\n\rradius_pixels\x18\x12 \x01(\r\x12\x13\n\x0b\x66ont_weight\x18\x13 \x01(\r\x12\x13\n\x0b\x66ont_family\x18\x14 \x01(\t:\x16\xc2\xbb\x1a\x12style/stream_value\"\x17\n\x05\x43olor\x12\x0e\n\x06values\x18\x01 \x01(\x0c*E\n\nTextAnchor\x12\x17\n\x13TEXT_ANCHOR_INVALID\x10\x00\x12\t\n\x05START\x10\x01\x12\n\n\x06MIDDLE\x10\x02\x12\x07\n\x03\x45ND\x10\x03*]\n\x15TextAlignmentBaseline\x12#\n\x1fTEXT_ALIGNMENT_BASELINE_INVALID\x10\x00\x12\x07\n\x03TOP\x10\x01\x12\n\n\x06\x43\x45NTER\x10\x02\x12\n\n\x06\x42OTTOM\x10\x03\x42<\n\x0b\x63om.xviz.v2B\nStyleProtoP\x01Z\x04v2pb\xa2\x02\x04XVIZ\xaa\x02\x07xviz.V2\xca\x02\x07Xviz\\V2b\x06proto3')
+  serialized_pb=_b('\n\x13xviz/v2/style.proto\x12\x07xviz.v2\x1a\x15xviz/v2/options.proto\"U\n\nStyleClass\x12\x0c\n\x04name\x18\x01 \x01(\t\x12(\n\x05style\x18\x02 \x01(\x0b\x32\x19.xviz.v2.StyleObjectValue:\x0f\xc2\xbb\x1a\x0bstyle/class\"\x95\x02\n\x10StyleObjectValue\x12\x12\n\nfill_color\x18\x01 \x01(\x0c\x12\x14\n\x0cstroke_color\x18\x02 \x01(\x0c\x12\x14\n\x0cstroke_width\x18\x03 \x01(\x02\x12\x0e\n\x06radius\x18\x04 \x01(\x02\x12\x11\n\ttext_size\x18\x05 \x01(\x02\x12\x15\n\rtext_rotation\x18\x06 \x01(\x02\x12(\n\x0btext_anchor\x18\x07 \x01(\x0e\x32\x13.xviz.v2.TextAnchor\x12\x35\n\rtext_baseline\x18\x08 \x01(\x0e\x32\x1e.xviz.v2.TextAlignmentBaseline\x12\x0e\n\x06height\x18\t \x01(\x02:\x16\xc2\xbb\x1a\x12style/object_value\"\xe1\x04\n\x10StyleStreamValue\x12\x12\n\nfill_color\x18\x01 \x01(\x0c\x12\x14\n\x0cstroke_color\x18\x02 \x01(\x0c\x12\x14\n\x0cstroke_width\x18\x03 \x01(\x02\x12\x0e\n\x06radius\x18\x04 \x01(\x02\x12\x11\n\ttext_size\x18\x05 \x01(\x02\x12\x15\n\rtext_rotation\x18\x06 \x01(\x02\x12(\n\x0btext_anchor\x18\x07 \x01(\x0e\x32\x13.xviz.v2.TextAnchor\x12\x35\n\rtext_baseline\x18\x08 \x01(\x0e\x32\x1e.xviz.v2.TextAlignmentBaseline\x12\x0e\n\x06height\x18\t \x01(\x02\x12\x19\n\x11radius_min_pixels\x18\n \x01(\r\x12\x19\n\x11radius_max_pixels\x18\x0b \x01(\r\x12\x1f\n\x17stroke_width_min_pixels\x18\x0c \x01(\r\x12\x1f\n\x17stroke_width_max_pixels\x18\r \x01(\r\x12\x0f\n\x07opacity\x18\x0e \x01(\x02\x12\x0f\n\x07stroked\x18\x0f \x01(\x08\x12\x0e\n\x06\x66illed\x18\x10 \x01(\x08\x12\x10\n\x08\x65xtruded\x18\x11 \x01(\x08\x12\x15\n\rradius_pixels\x18\x12 \x01(\r\x12\x13\n\x0b\x66ont_weight\x18\x13 \x01(\r\x12\x13\n\x0b\x66ont_family\x18\x14 \x01(\t\x12\x31\n\x10point_color_mode\x18\x15 \x01(\x0e\x32\x17.xviz.v2.PointColorMode\x12\x1a\n\x12point_color_domain\x18\x16 \x03(\x02:\x16\xc2\xbb\x1a\x12style/stream_value\"\x17\n\x05\x43olor\x12\x0e\n\x06values\x18\x01 \x01(\x0c*E\n\nTextAnchor\x12\x17\n\x13TEXT_ANCHOR_INVALID\x10\x00\x12\t\n\x05START\x10\x01\x12\n\n\x06MIDDLE\x10\x02\x12\x07\n\x03\x45ND\x10\x03*]\n\x15TextAlignmentBaseline\x12#\n\x1fTEXT_ALIGNMENT_BASELINE_INVALID\x10\x00\x12\x07\n\x03TOP\x10\x01\x12\n\n\x06\x43\x45NTER\x10\x02\x12\n\n\x06\x42OTTOM\x10\x03*V\n\x0ePointColorMode\x12\x1c\n\x18POINT_COLOR_MODE_INVALID\x10\x00\x12\r\n\tELEVATION\x10\x01\x12\x17\n\x13\x44ISTANCE_TO_VEHICLE\x10\x02\x42<\n\x0b\x63om.xviz.v2B\nStyleProtoP\x01Z\x04v2pb\xa2\x02\x04XVIZ\xaa\x02\x07xviz.V2\xca\x02\x07Xviz\\V2b\x06proto3')
   ,
   dependencies=[xviz_dot_v2_dot_options__pb2.DESCRIPTOR,])
 
@@ -51,8 +51,8 @@ _TEXTANCHOR = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=980,
-  serialized_end=1049,
+  serialized_start=1059,
+  serialized_end=1128,
 )
 _sym_db.RegisterEnumDescriptor(_TEXTANCHOR)
 
@@ -82,12 +82,39 @@ _TEXTALIGNMENTBASELINE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=1051,
-  serialized_end=1144,
+  serialized_start=1130,
+  serialized_end=1223,
 )
 _sym_db.RegisterEnumDescriptor(_TEXTALIGNMENTBASELINE)
 
 TextAlignmentBaseline = enum_type_wrapper.EnumTypeWrapper(_TEXTALIGNMENTBASELINE)
+_POINTCOLORMODE = _descriptor.EnumDescriptor(
+  name='PointColorMode',
+  full_name='xviz.v2.PointColorMode',
+  filename=None,
+  file=DESCRIPTOR,
+  values=[
+    _descriptor.EnumValueDescriptor(
+      name='POINT_COLOR_MODE_INVALID', index=0, number=0,
+      serialized_options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='ELEVATION', index=1, number=1,
+      serialized_options=None,
+      type=None),
+    _descriptor.EnumValueDescriptor(
+      name='DISTANCE_TO_VEHICLE', index=2, number=2,
+      serialized_options=None,
+      type=None),
+  ],
+  containing_type=None,
+  serialized_options=None,
+  serialized_start=1225,
+  serialized_end=1311,
+)
+_sym_db.RegisterEnumDescriptor(_POINTCOLORMODE)
+
+PointColorMode = enum_type_wrapper.EnumTypeWrapper(_POINTCOLORMODE)
 TEXT_ANCHOR_INVALID = 0
 START = 1
 MIDDLE = 2
@@ -96,6 +123,9 @@ TEXT_ALIGNMENT_BASELINE_INVALID = 0
 TOP = 1
 CENTER = 2
 BOTTOM = 3
+POINT_COLOR_MODE_INVALID = 0
+ELEVATION = 1
+DISTANCE_TO_VEHICLE = 2
 
 
 
@@ -371,6 +401,20 @@ _STYLESTREAMVALUE = _descriptor.Descriptor(
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='point_color_mode', full_name='xviz.v2.StyleStreamValue.point_color_mode', index=20,
+      number=21, type=14, cpp_type=8, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='point_color_domain', full_name='xviz.v2.StyleStreamValue.point_color_domain', index=21,
+      number=22, type=2, cpp_type=6, label=3,
+      has_default_value=False, default_value=[],
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
   ],
   extensions=[
   ],
@@ -384,7 +428,7 @@ _STYLESTREAMVALUE = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=423,
-  serialized_end=953,
+  serialized_end=1032,
 )
 
 
@@ -414,8 +458,8 @@ _COLOR = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=955,
-  serialized_end=978,
+  serialized_start=1034,
+  serialized_end=1057,
 )
 
 _STYLECLASS.fields_by_name['style'].message_type = _STYLEOBJECTVALUE
@@ -423,12 +467,14 @@ _STYLEOBJECTVALUE.fields_by_name['text_anchor'].enum_type = _TEXTANCHOR
 _STYLEOBJECTVALUE.fields_by_name['text_baseline'].enum_type = _TEXTALIGNMENTBASELINE
 _STYLESTREAMVALUE.fields_by_name['text_anchor'].enum_type = _TEXTANCHOR
 _STYLESTREAMVALUE.fields_by_name['text_baseline'].enum_type = _TEXTALIGNMENTBASELINE
+_STYLESTREAMVALUE.fields_by_name['point_color_mode'].enum_type = _POINTCOLORMODE
 DESCRIPTOR.message_types_by_name['StyleClass'] = _STYLECLASS
 DESCRIPTOR.message_types_by_name['StyleObjectValue'] = _STYLEOBJECTVALUE
 DESCRIPTOR.message_types_by_name['StyleStreamValue'] = _STYLESTREAMVALUE
 DESCRIPTOR.message_types_by_name['Color'] = _COLOR
 DESCRIPTOR.enum_types_by_name['TextAnchor'] = _TEXTANCHOR
 DESCRIPTOR.enum_types_by_name['TextAlignmentBaseline'] = _TEXTALIGNMENTBASELINE
+DESCRIPTOR.enum_types_by_name['PointColorMode'] = _POINTCOLORMODE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 StyleClass = _reflection.GeneratedProtocolMessageType('StyleClass', (_message.Message,), {

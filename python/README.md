@@ -1,6 +1,6 @@
-# xviz.py
+# xviz_avs
 
-Python implementation of XVIZ protocol. Note that this repository only comply with the protocol standard, the some of the implemented structure and modules definition are not the same. 
+Python implementation of XVIZ protocol libraries.
 
 # Requirements
 
@@ -10,4 +10,6 @@ Python3, `websockets`, `protobuf`, `numpy`
 
 You can try running the scenario server by `python examples/serve_scenarios.py`. Then you can run `cd examples/get-started && yarn start-live` under your `streetscape.gl` repository to see the example scenarios.
 
-Refer to documentation (to be created), examples and tests to learn how to use the library.
+# Acknowledgements
+
+ * **[Yuanxin Zhong](https://github.com/cmpute)** created [xviz.py](https://github.com/cmpute/xviz.py) and allowed us to use it as the base for the official python XVIZ library.

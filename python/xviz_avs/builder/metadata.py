@@ -2,9 +2,9 @@ import logging
 from easydict import EasyDict as edict
 import numpy as np
 
-from xviz.message import XVIZMessage
-from xviz.builder.base_builder import build_object_style, build_stream_style
-from xviz.v2.session_pb2 import Metadata, StreamMetadata, LogInfo, UIPanelInfo
+from xviz_avs.message import XVIZMessage
+from xviz_avs.builder.base_builder import build_object_style, build_stream_style
+from xviz_avs.v2.session_pb2 import Metadata, StreamMetadata, LogInfo, UIPanelInfo
 
 class XVIZMetadataBuilder:
     def __init__(self, logger=logging.getLogger("xviz")):

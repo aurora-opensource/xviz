@@ -1,10 +1,10 @@
 import base64
 from typing import Union, Dict, List
 
-from xviz.v2.core_pb2 import StreamSet
-from xviz.v2.session_pb2 import StateUpdate, Metadata
-from xviz.v2.options_pb2 import xviz_json_schema
-from xviz.v2.envelope_pb2 import Envelope
+from xviz_avs.v2.core_pb2 import StreamSet
+from xviz_avs.v2.session_pb2 import StateUpdate, Metadata
+from xviz_avs.v2.options_pb2 import xviz_json_schema
+from xviz_avs.v2.envelope_pb2 import Envelope
 from google.protobuf.json_format import MessageToDict
 
 def _unravel_list(list_: list, width: int) -> List[list]: # XXX: This is actually not used

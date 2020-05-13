@@ -3,9 +3,9 @@ import asyncio, json
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-import xviz
-from xviz.builder import XVIZBuilder, XVIZMetadataBuilder
-from xviz.server import XVIZServer, XVIZBaseSession
+import xviz_avs
+from xviz_avs.builder import XVIZBuilder, XVIZMetadataBuilder
+from xviz_avs.server import XVIZServer, XVIZBaseSession
 
 from scenarios.circle import CircleScenario
 

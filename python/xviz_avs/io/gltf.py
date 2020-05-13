@@ -8,8 +8,8 @@ from typing import Union
 from collections import namedtuple
 from easydict import EasyDict as edict
 
-from xviz.io.base import XVIZBaseWriter
-from xviz.message import XVIZMessage, XVIZEnvelope, StateUpdate
+from xviz_avs.io.base import XVIZBaseWriter
+from xviz_avs.message import XVIZMessage, XVIZEnvelope, StateUpdate
 
 # Constants
 

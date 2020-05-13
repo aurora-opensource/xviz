@@ -13,10 +13,10 @@ from google.protobuf import symbol_database as _symbol_database
 _sym_db = _symbol_database.Default()
 
 
-from xviz.v2 import annotation_pb2 as xviz_dot_v2_dot_annotation__pb2
-from xviz.v2 import options_pb2 as xviz_dot_v2_dot_options__pb2
-from xviz.v2 import primitives_pb2 as xviz_dot_v2_dot_primitives__pb2
-from xviz.v2 import uiprimitives_pb2 as xviz_dot_v2_dot_uiprimitives__pb2
+from xviz_avs.v2 import annotation_pb2 as xviz_dot_v2_dot_annotation__pb2
+from xviz_avs.v2 import options_pb2 as xviz_dot_v2_dot_options__pb2
+from xviz_avs.v2 import primitives_pb2 as xviz_dot_v2_dot_primitives__pb2
+from xviz_avs.v2 import uiprimitives_pb2 as xviz_dot_v2_dot_uiprimitives__pb2
 
 
 DESCRIPTOR = _descriptor.FileDescriptor(

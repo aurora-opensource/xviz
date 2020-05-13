@@ -1,6 +1,6 @@
-from xviz.builder.base_builder import XVIZBaseBuilder, CATEGORY, UIPRIMITIVE_TYPES
-from xviz.v2.core_pb2 import UIPrimitiveState
-from xviz.v2.uiprimitives_pb2 import TreeTableNode, TreeTable, TreeTableColumn
+from xviz_avs.builder.base_builder import XVIZBaseBuilder, CATEGORY, UIPRIMITIVE_TYPES
+from xviz_avs.v2.core_pb2 import UIPrimitiveState
+from xviz_avs.v2.uiprimitives_pb2 import TreeTableNode, TreeTable, TreeTableColumn
 
 class XVIZTreeTableRowBuilder:
     def __init__(self, id_, values, parent=None):

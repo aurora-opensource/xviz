@@ -2,9 +2,9 @@
 import numpy as np
 from easydict import EasyDict as edict
 
-from xviz.builder.base_builder import XVIZBaseBuilder, build_object_style, CATEGORY, PRIMITIVE_TYPES, PRIMITIVE_STYLE_MAP
-from xviz.v2.core_pb2 import PrimitiveState
-from xviz.v2.primitives_pb2 import PrimitiveBase, Circle, Image, Point, Polygon, Polyline, Stadium, Text
+from xviz_avs.builder.base_builder import XVIZBaseBuilder, build_object_style, CATEGORY, PRIMITIVE_TYPES, PRIMITIVE_STYLE_MAP
+from xviz_avs.v2.core_pb2 import PrimitiveState
+from xviz_avs.v2.primitives_pb2 import PrimitiveBase, Circle, Image, Point, Polygon, Polyline, Stadium, Text
 
 class XVIZPrimitiveBuilder(XVIZBaseBuilder):
     """

@@ -13,7 +13,7 @@ from google.protobuf import symbol_database as _symbol_database
 _sym_db = _symbol_database.Default()
 
 
-from xviz.v2 import options_pb2 as xviz_dot_v2_dot_options__pb2
+from xviz_avs.v2 import options_pb2 as xviz_dot_v2_dot_options__pb2
 
 
 DESCRIPTOR = _descriptor.FileDescriptor(

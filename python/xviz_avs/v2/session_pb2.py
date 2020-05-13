@@ -15,9 +15,9 @@ _sym_db = _symbol_database.Default()
 
 
 from google.protobuf import struct_pb2 as google_dot_protobuf_dot_struct__pb2
-from xviz.v2 import core_pb2 as xviz_dot_v2_dot_core__pb2
-from xviz.v2 import options_pb2 as xviz_dot_v2_dot_options__pb2
-from xviz.v2 import style_pb2 as xviz_dot_v2_dot_style__pb2
+from xviz_avs.v2 import core_pb2 as xviz_dot_v2_dot_core__pb2
+from xviz_avs.v2 import options_pb2 as xviz_dot_v2_dot_options__pb2
+from xviz_avs.v2 import style_pb2 as xviz_dot_v2_dot_style__pb2
 
 
 DESCRIPTOR = _descriptor.FileDescriptor(
