@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/* eslint-disable no-console no-undef */
 import XVIZStyleProperty from './xviz-style-property';
 
 const SELECTOR_REGEX = /\S+/g;

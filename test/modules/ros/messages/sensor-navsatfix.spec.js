@@ -84,7 +84,8 @@ tape('SensorNavSatFix#basic', async t => {
               altitude: 0
             },
             position: [0, 0, 0],
-            orientation: [0, 0, 0]
+            // TODO(twojtasz): update to deps required this -0
+            orientation: [0, -0, 0]
           }
         }
       }

@@ -13,7 +13,7 @@
     "jsonlint": false
   },
   "scripts": {
-    "bootstrap": "yarn && ocular-bootstrap",
+    "bootstrap": "PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true yarn && ocular-bootstrap",
     "bench": "ocular-test bench",
     "build": "ocular-clean && yarn build-schema && lerna run pre-build && ocular-build",
     "build-schema": "cd modules/schema && yarn build",
