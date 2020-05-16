@@ -1,0 +1,88 @@
+// --------------------------------------------------------
+// WARNING: XVIZ Protobuf files are unstable, do not use
+// --------------------------------------------------------
+
+syntax = "proto3";
+
+package xviz;
+
+option csharp_namespace = "xviz.V2";
+option go_package = "v2pb";
+option java_multiple_files = true;
+option java_outer_classname = "StyleProto";
+option java_package = "com.xviz.v2";
+option objc_class_prefix = "XVIZ";
+
+
+import "options.proto";
+
+message StyleClass {
+  option (xviz_json_schema) = "style/class";
+  string name = 1;
+  StyleObjectValue style = 2;
+}
+
+message StyleObjectValue {
+  option (xviz_json_schema) = "style/object_value";
+  string fill_color = 1;
+  string stroke_color = 2;
+  float stroke_width = 3;
+  float radius = 4;
+  float text_size = 5;
+  // Angle in degrees
+  float text_rotation = 6;
+  TextAnchor text_anchor = 7;
+  TextAlignmentBaseline text_baseline = 8;
+  float height = 9;
+}
+
+message StyleStreamValue {
+  option (xviz_json_schema) = "style/stream_value";
+  string  fill_color = 1;
+  string stroke_color = 2;
+  float stroke_width = 3;
+  float radius = 4;
+  float text_size = 5;
+  float text_rotation = 6;
+  TextAnchor text_anchor = 7;
+  TextAlignmentBaseline text_baseline = 8;
+  float height = 9;
+  uint32 radius_min_pixels = 10;
+  uint32 radius_max_pixels = 11;
+  uint32 stroke_width_min_pixels = 12;
+  uint32 stroke_width_max_pixels = 13;
+  float opacity = 14;
+  bool stroked = 15;
+  bool filled = 16;
+  bool extruded = 17;
+  uint32 radius_pixels = 18;
+  uint32 font_weight = 19;
+  string font_family = 20;
+  PointColorMode point_color_mode = 21;
+  repeated float point_color_domain = 22;
+}
+
+message Color {
+  // Always 3 or 4 values, (r, g, b) or (r, g, b, a)
+  bytes values = 1;
+}
+
+enum TextAnchor {
+  TEXT_ANCHOR_INVALID = 0;
+  START = 1;
+  MIDDLE = 2;
+  END = 3;
+}
+
+enum TextAlignmentBaseline {
+  TEXT_ALIGNMENT_BASELINE_INVALID = 0;
+  TOP = 1;
+  CENTER = 2;
+  BOTTOM = 3;
+}
+
+enum PointColorMode {
+  POINT_COLOR_MODE_INVALID = 0;
+  ELEVATION = 1;
+  DISTANCE_TO_VEHICLE = 2;
+}

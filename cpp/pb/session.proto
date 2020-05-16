@@ -1,0 +1,200 @@
+// --------------------------------------------------------
+// WARNING: XVIZ Protobuf files are unstable, do not use
+// --------------------------------------------------------
+
+syntax = "proto3";
+
+package xviz;
+
+option csharp_namespace = "xviz.V2";
+option go_package = "v2pb";
+option java_multiple_files = true;
+option java_outer_classname = "SessionProto";
+option java_package = "com.xviz.v2";
+option objc_class_prefix = "XVIZ";
+
+
+import "google/protobuf/struct.proto";
+import "core.proto";
+import "options.proto";
+import "style.proto";
+import "declarativeui.proto";
+
+// NOTE: this enum purposely not scoped inside Start to avoid naming conflict
+// with "log" field and "log" type
+enum SessionType {
+  SESSION_TYPE_INVALID = 0;
+  LIVE = 1;
+  LOG = 2;
+  UNBUFFERED_LOG = 3;
+}
+
+message Start {
+  option (xviz_json_schema) = "session/start";
+  enum MessageFormat {
+    START_MESSAGE_FORMAT_INVALID = 0;
+    JSON = 1;
+    BINARY = 2;
+  }
+  // XVIZ protocol version, currently 2.0.0
+  string version = 1;
+  string profile = 2;
+  SessionType session_type = 3;
+  MessageFormat message_format = 4;
+  string log = 5;
+}
+
+message TransformLog {
+  option (xviz_json_schema) = "session/transform_log";
+  string id = 1;
+  double start_timestamp = 2;
+  double end_timestamp = 3;
+  repeated string desired_streams = 4;
+}
+
+message StateUpdate {
+  option (xviz_json_schema) = "session/state_update";
+  enum UpdateType {
+    STATE_UPDATE_UPDATE_TYPE_INVALID = 0;
+    SNAPSHOT = 1; // DO NOT USE - same as incremental
+    INCREMENTAL = 2;
+    COMPLETE_STATE = 3;
+    PERSISTENT = 4;
+  }
+  UpdateType update_type = 1;
+  repeated StreamSet updates = 2;
+}
+
+message TransformLogDone {
+  option (xviz_json_schema) = "session/transform_log_done";
+  string id = 1;
+}
+
+message TransformPointInTime {
+  option (xviz_json_schema) = "session/transform_point_in_time";
+  string id = 1;
+  double query_timestamp = 2;
+  repeated string desired_streams = 3;
+}
+
+message Reconfigure {
+  option (xviz_json_schema) = "session/reconfigure";
+  enum UpdateType {
+    RECONFIGURE_UPDATE_TYPE_INVALID = 0;
+    DELTA = 1;
+    FULL = 2;
+  }
+  UpdateType update_type = 1;
+  google.protobuf.Struct config_update = 2;
+}
+
+message Metadata {
+  option (xviz_json_schema) = "session/metadata";
+  string version = 1;
+  map<string, StreamMetadata> streams = 2;
+  map<string, CameraInfo> cameras = 3;
+  map<string, string> stream_aliases = 4;
+  map<string, UIPanelInfo> ui_config = 5;
+  LogInfo log_info = 6;
+}
+
+message Error {
+  option (xviz_json_schema) = "session/error";
+  string message = 1;
+}
+
+message StreamMetadata {
+  option (xviz_json_schema) = "session/stream_metadata";
+  // Separate broad types of XVIZ data
+  enum Category {
+    STREAM_METADATA_CATEGORY_INVALID = 0;
+    PRIMITIVE = 1;
+    TIME_SERIES = 2;
+    VARIABLE = 3;
+    ANNOTATION = 4;
+    FUTURE_INSTANCE = 5;
+    POSE = 6;
+    UI_PRIMITIVE = 7;
+  }
+  // The specific data type for time_series and varialbe categories
+  enum ScalarType {
+    STREAM_METADATA_SCALAR_TYPE_INVALID = 0;
+    FLOAT = 1;
+    INT32 = 2;
+    STRING = 3;
+    BOOL = 4;
+  }
+  // The specific data type for the primitive category
+  enum PrimitiveType {
+    STREAM_METADATA_PRIMITIVE_TYPE_INVALID = 0;
+    CIRCLE = 1;
+    IMAGE = 2;
+    POINT = 3;
+    POLYGON = 4;
+    POLYLINE = 5;
+    STADIUM = 6;
+    TEXT = 7;
+  }
+  // The specific type for the ui primitive category
+  enum UIPrimitiveType {
+    STREAM_METADATA_UI_PRIMITIVE_TYPE_INVALID = 0;
+    TREETABLE = 1;
+  }
+  // The specific type for annotation category
+  enum AnnotationType {
+    STREAM_METADATA_ANNOTATION_TYPE_INVALID = 0;
+    VISUAL = 1;
+  }
+  enum CoordinateType {
+    STREAM_METADATA_COORDINATE_TYPE_INVALID = 0;
+    GEOGRAPHIC = 1;
+    IDENTITY = 2;
+    DYNAMIC = 3;
+    VEHICLE_RELATIVE = 4;
+  }
+  string source = 1;
+  string units = 2;
+  Category category = 3;
+  ScalarType scalar_type = 4;
+  PrimitiveType primitive_type = 5;
+  UIPrimitiveType ui_primitive_type = 6;
+  AnnotationType annotation_type = 7;
+  StyleStreamValue stream_style = 8;
+  repeated StyleClass style_classes = 9;
+  CoordinateType coordinate = 10;
+  // 4x4 matrix flattened into 16 elements
+  repeated double transform = 11;
+  string transform_callback = 12;
+}
+
+message CameraInfo {
+  option (xviz_json_schema) = "session/camera_info";
+  string human_name = 1;
+  string source = 2;
+  // (x,y,z) vehicle position as 3 elements
+  repeated double vehicle_position = 3;
+  // 3x3 matrix, flattened into 9 elements
+  repeated double vehicle_orientation = 4;
+  double pixel_width = 5;
+  double pixel_height = 6;
+  // 3x3 matrix, flattened into 9 elements
+  repeated double rectification_projection = 7;
+  // 4x4 matrix, flattened into 9 elements
+  repeated double gl_projection = 8;
+}
+
+message UIPanelInfo {
+  option (xviz_json_schema) = "session/ui_panel_info";
+  string name = 1;
+  // repeated string needed_streams = 2;
+  // google.protobuf.Struct config = 3;
+  repeated UIPanel children = 2;
+  string type = 3;
+}
+
+message LogInfo
+{
+    option (xviz_json_schema) = "session/log_info";
+    double start_time = 1;
+    double end_time = 2;
+}

@@ -1,0 +1,62 @@
+// --------------------------------------------------------
+// WARNING: XVIZ Protobuf files are unstable, do not use
+// --------------------------------------------------------
+
+syntax = "proto3";
+
+package xviz;
+
+option csharp_namespace = "xviz.V2";
+option go_package = "v2pb";
+option java_multiple_files = true;
+option java_outer_classname = "DeclarativeUIProto";
+option java_package = "com.xviz.v2";
+option objc_class_prefix = "XVIZ";
+
+
+import "options.proto";
+
+enum LayoutType {
+  VERTICAL = 0;
+  HORIZONTAL = 1;
+}
+
+enum ComponentType {
+  NONE = 0;
+  TABLE = 1;
+  METRIC = 2;
+  PLOT = 3;
+  TREETABLE = 4;
+  VIDEO = 5;
+  SELECT = 6;
+  CONTAINER = 7;
+}
+
+// LAYOUT INTERACTION TYPE AND COMPONENT INTERACTION TYPE
+
+message UIPanel {
+  option (xviz_json_schema) = "declarativeui/ui_panel";
+  string name = 1;
+  ComponentType type = 2;
+  LayoutType layout = 3;
+
+  string title = 4;
+  string description = 5;
+
+  // for contanier type only
+  repeated UIPanel children = 6;
+
+  // for video type only
+  repeated string cameras = 7;
+
+  // for metric type only
+  repeated string streams = 8;
+
+  // for plot type only
+  string independent_variable = 9;
+  repeated string dependent_variables = 10;
+
+  // for table and treetable only
+  string stream = 11;
+  bool display_object_id = 12;
+}

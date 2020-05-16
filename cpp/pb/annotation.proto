@@ -1,0 +1,30 @@
+// --------------------------------------------------------
+// WARNING: XVIZ Protobuf files are unstable, do not use
+// --------------------------------------------------------
+
+syntax = "proto3";
+
+package xviz;
+
+option csharp_namespace = "xviz.V2";
+option go_package = "v2pb";
+option java_multiple_files = true;
+option java_outer_classname = "AnnotationProto";
+option java_package = "com.xviz.v2";
+option objc_class_prefix = "XVIZ";
+
+
+import "options.proto";
+import "style.proto";
+
+message VisualBase {
+  option (xviz_json_schema) = "core/annotation_base";
+  string object_id = 1;
+}
+
+message Visual {
+  option (xviz_json_schema) = "core/annotation_visual";
+  VisualBase base = 1;
+  repeated string style_classes = 2;
+  StyleObjectValue inline_style = 3;
+}

@@ -1,0 +1,119 @@
+// --------------------------------------------------------
+// WARNING: XVIZ Protobuf files are unstable, do not use
+// --------------------------------------------------------
+
+syntax = "proto3";
+
+package xviz;
+
+option csharp_namespace = "xviz.V2";
+option go_package = "v2pb";
+option java_multiple_files = true;
+option java_outer_classname = "CoreProto";
+option java_package = "com.xviz.v2";
+option objc_class_prefix = "XVIZ";
+
+
+import "annotation.proto";
+import "options.proto";
+import "primitives.proto";
+import "uiprimitives.proto";
+
+
+
+message StreamSet {
+  option (xviz_json_schema) = "core/stream_set";
+  double timestamp = 1;
+  map<string, Pose> poses = 2;
+  map<string, PrimitiveState> primitives = 3;
+  repeated TimeSeriesState time_series = 4;
+  map<string, FutureInstances> future_instances = 6;
+  map<string, VariableState> variables = 7;
+  map<string, AnnotationState> annotations = 8;
+  map<string, UIPrimitiveState> ui_primitives = 9;
+  repeated string no_data_streams = 10;
+  map<string, Link> links = 11;
+}
+
+message Pose {
+  option (xviz_json_schema) = "core/pose";
+  double timestamp = 1;
+  MapOrigin map_origin = 2;
+  // 3 element x, y, z
+  repeated double position = 3;
+  // 4 element quaternion
+  repeated double orientation = 4;
+}
+
+message MapOrigin {
+  double longitude = 1;
+  double latitude = 2;
+  double altitude = 3;
+}
+
+message PrimitiveState {
+  option (xviz_json_schema) = "core/primitive_state";
+  repeated Polygon polygons = 1;
+  repeated Polyline polylines = 2;
+  repeated Text texts = 3;
+  repeated Circle circles = 4;
+  repeated Point points = 5;
+  repeated Stadium stadiums = 6;
+  repeated Image images = 7;
+}
+
+message UIPrimitiveState {
+  option (xviz_json_schema) = "core/ui_primitive_state";
+  TreeTable treetable = 1;
+}
+
+message TimeSeriesState {
+  option (xviz_json_schema) = "core/timeseries_state";
+  double timestamp = 1;
+  string object_id = 2;
+  repeated string streams = 3;
+  Values values = 4;
+}
+
+message FutureInstances {
+  option (xviz_json_schema) = "core/future_instances";
+  repeated double timestamps = 1;
+  repeated PrimitiveState primitives = 2;
+}
+
+message VariableState {
+  option (xviz_json_schema) = "core/variable_state";
+  repeated Variable variables = 1;
+}
+
+message AnnotationState {
+  option (xviz_json_schema) = "core/annotation_state";
+  repeated Visual visuals = 1;
+}
+
+message Variable {
+  option (xviz_json_schema) = "core/variable";
+  VariableBase base = 1;
+  Values values = 2;
+}
+
+// Incase we introduce different kinds of variables and to match
+// annotations and primitives
+message VariableBase {
+  string object_id = 1;
+}
+
+message Values {
+  option (xviz_json_schema) = "core/values";
+  // ONLY SET ONE OF THESE (protobuf does not allow oneof with
+  // repeated fields)
+  repeated double doubles = 2;
+  repeated int32 int32s = 3;
+  repeated bool bools = 4;
+  repeated string strings = 5;
+}
+
+message Link {
+  option (xviz_json_schema) = "core/link_state";
+  string target_pose = 1;
+}

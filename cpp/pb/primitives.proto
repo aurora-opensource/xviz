@@ -1,0 +1,87 @@
+// --------------------------------------------------------
+// WARNING: XVIZ Protobuf files are unstable, do not use
+// --------------------------------------------------------
+
+syntax = "proto3";
+
+package xviz;
+
+option csharp_namespace = "xviz.V2";
+option go_package = "v2pb";
+option java_multiple_files = true;
+option java_outer_classname = "PrimitivesProto";
+option java_package = "com.xviz.v2";
+option objc_class_prefix = "XVIZ";
+
+
+import "options.proto";
+import "style.proto";
+import "google/protobuf/struct.proto";
+
+message PrimitiveBase {
+  //    option (xviz_json_schema) = "primitives/base";
+
+  string object_id = 1;
+  repeated string classes = 2;
+  StyleObjectValue style = 3;
+}
+
+message Circle {
+  option (xviz_json_schema) = "primitives/circle";
+  PrimitiveBase base = 1;
+  repeated float center = 2;
+  float radius = 3;
+}
+
+message Image {
+  option (xviz_json_schema) = "primitives/image";
+  PrimitiveBase base = 1;
+  repeated float position = 2;
+  // bytes data = 3;
+  string data = 3;
+  uint32 width_px = 4;
+  uint32 height_px = 5;
+  bool is_encoded = 6;
+}
+
+message Point {
+  option (xviz_json_schema) = "primitives/point";
+  PrimitiveBase base = 1;
+  // Flattened X, Y, Z list
+  // repeated float points = 2;
+  google.protobuf.Value points = 2;
+
+  // Flattened list of (R, G, B) or (R, G, B, A)
+  google.protobuf.Value colors = 3;
+}
+
+message Polygon {
+  option (xviz_json_schema) = "primitives/polygon";
+  PrimitiveBase base = 1;
+  // Flattened X, Y, Z list
+  repeated float vertices = 2;
+}
+
+message Polyline {
+  option (xviz_json_schema) = "primitives/polyline";
+  PrimitiveBase base = 1;
+  // Flattened X, Y, Z list
+  repeated float vertices = 2;
+  // Flattened (R, G, B) or (R, G, B, A) list
+  bytes colors = 3;
+}
+
+message Stadium {
+  option (xviz_json_schema) = "primitives/stadium";
+  PrimitiveBase base = 1;
+  repeated float start = 2;
+  repeated float end = 3;
+  float radius = 4;
+}
+
+message Text {
+  option (xviz_json_schema) = "primitives/text";
+  PrimitiveBase base = 1;
+  repeated float position = 2;
+  string text = 3;
+}
