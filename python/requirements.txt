@@ -2,3 +2,4 @@ easydict
 protobuf
 numpy
 websockets
+pytest
