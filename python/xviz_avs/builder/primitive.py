@@ -1,15 +1,14 @@
-
 import numpy as np
-from easydict import EasyDict as edict
 
 from xviz_avs.builder.base_builder import XVIZBaseBuilder, build_object_style, CATEGORY, PRIMITIVE_TYPES, PRIMITIVE_STYLE_MAP
 from xviz_avs.v2.core_pb2 import PrimitiveState
 from xviz_avs.v2.primitives_pb2 import PrimitiveBase, Circle, Image, Point, Polygon, Polyline, Stadium, Text
 
+
 class XVIZPrimitiveBuilder(XVIZBaseBuilder):
     """
     Method chaining is supported by this builder.
-    
+
     # Reference
     [@xviz/builder/xviz-primitive-builder]/(https://github.com/uber/xviz/blob/master/modules/builder/src/builders/xviz-primitive-builder.js)
     """
@@ -26,7 +25,7 @@ class XVIZPrimitiveBuilder(XVIZBaseBuilder):
         if self._type:
             self._flush()
 
-        if not isinstance(data, np.ndarray) or not isinstance(data, str):
+        if not isinstance(data, (bytes, np.ndarray, str)):
             # TODO: support PILLOW and other image types
             # should save raw data and preserve mimetype?
             self._logger.error("An image data must be a string or numpy array")
@@ -100,8 +99,7 @@ class XVIZPrimitiveBuilder(XVIZBaseBuilder):
             self._logger.error("The start position must be of the form [x, y, z] where {} was provided".format(start))
         if len(end) != 3:
             self._logger.error("The end position must be of the form [x, y, z] where {} was provided".format(end))
-        
-        
+
         self._vertices = [start, end]
         self._radius = radius
         self._type = PRIMITIVE_TYPES.STADIUM
@@ -119,13 +117,13 @@ class XVIZPrimitiveBuilder(XVIZBaseBuilder):
         self._type = PRIMITIVE_TYPES.TEXT
 
         return self
-    
+
     def position(self, point):
         self._validate_prop_set_once("_vertices")
 
         if len(point) != 3:
             self._logger.error("A position must be of the form [x, y, z] where {} was provided".format(point))
-        
+
         self._vertices = [point]
         return self
 
@@ -155,15 +153,15 @@ class XVIZPrimitiveBuilder(XVIZBaseBuilder):
 
         self._classes = class_list
         return self
-        
+
     def _validate(self):
         super()._validate()
 
         if self._type == PRIMITIVE_TYPES.IMAGE:
-            if self._image == None or self._image.data == None:
+            if self._image is None or self._image.data is None:
                 self._logger.warning("Stream {} image data are not provided.".format(self._stream_id))
         else:
-            if self._vertices == None:
+            if self._vertices is None:
                 self._logger.warning("Stream {} primitives vertices are not provided.".format(self._stream_id))
 
     def _flush(self):
