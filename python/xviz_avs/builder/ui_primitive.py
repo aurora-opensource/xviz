@@ -28,6 +28,7 @@ class XVIZUIPrimitiveBuilder(XVIZBaseBuilder):
         self._primitives = {}
 
     def reset(self):
+        super().reset()
         self._type = None
         self._columns = None
         self._row = None

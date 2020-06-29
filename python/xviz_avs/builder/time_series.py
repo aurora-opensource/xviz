@@ -8,7 +8,7 @@ class XVIZTimeSeriesBuilder(XVIZBaseBuilder):
         # Stores time_series data by timestamp then id
         # They will then be group when constructing final object
         self._data = {}
-        self._reset()
+        self.reset()
 
     def id(self, identifier):
         self._validate_prop_set_once('_id')
@@ -76,7 +76,7 @@ class XVIZTimeSeriesBuilder(XVIZBaseBuilder):
             field_name = "doubles"
         else:
             self._logger.error("The type of input value is not recognized!")
-        
+
         ts_entry = self._data.get(self._timestamp)
         if ts_entry:
             id_entry = ts_entry.get(self._id)
@@ -112,9 +112,10 @@ class XVIZTimeSeriesBuilder(XVIZBaseBuilder):
     def _flush(self):
         self._validate()
         self._add_timestamp_entry()
-        self._reset()
+        self.reset()
 
-    def _reset(self):
+    def reset(self):
+        super().reset()
         self._id = None
         self._value = None
         self._timestamp = None
