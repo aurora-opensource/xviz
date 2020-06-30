@@ -80,8 +80,9 @@ class XVIZVariableBuilder(XVIZBaseBuilder):
     def _flush(self):
         self._validate()
         self._add_variable_entry()
-        self._reset()
+        self.reset()
 
-    def _reset(self):
+    def reset(self):
+        super().reset()
         self._id = None
         self._values = None

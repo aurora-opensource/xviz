@@ -247,6 +247,7 @@ class XVIZPrimitiveBuilder(XVIZBaseBuilder):
                                      ', '.join(invalid_props), self.stream_id)
 
     def reset(self):
+        super().reset()
         self._type = None
 
         self._image = None
