@@ -108,6 +108,9 @@ class XVIZMessage:
                 for sdata in dataobj['streams'].values():
                     if 'stream_style' in sdata:
                         _unravel_style_object(sdata['stream_style'])
+                    if 'style_classes' in sdata:
+                        for style_class in sdata['style_classes']:
+                            _unravel_style_object(style_class['style'])
 
             return dataobj
 

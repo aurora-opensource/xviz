@@ -230,7 +230,7 @@ class XVIZPrimitiveBuilder(XVIZBaseBuilder):
             base.style.MergeFrom(build_object_style(self._style))
         if self._classes:
             have_base = True
-            base.classes = self._classes
+            base.classes.extend(self._classes)
 
         if have_base:
             obj.base.MergeFrom(base)

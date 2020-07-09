@@ -103,9 +103,9 @@ class XVIZMetadataBuilder:
         if not self._stream_id:
             self._logger.error('A stream must set before adding a style rule.')
             return self
-
-        stream_rule = edict(name=name, style=build_object_style(style))
-        self._temp_stream.style_classes.append(stream_rule)
+        style_class = self._temp_stream.style_classes.add()
+        style_class.name = name
+        style_class.style.MergeFrom(build_object_style(style))
         return self
 
     def log_info(self, data):
