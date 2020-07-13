@@ -11,12 +11,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-import {encodeBinaryXVIZ} from '@xviz/io';
-
-export function writeBinaryXVIZtoFile(sink, directory, name, json, options) {
-  const glbFileBuffer = encodeBinaryXVIZ(json, options);
-  /* global Buffer */
-  sink.writeSync(directory, `${name}.glb`, Buffer.from(glbFileBuffer), {flag: 'w'});
-  return glbFileBuffer;
+export function padTo4Bytes(byteLength) {
+  return (byteLength + 3) & ~3;
 }

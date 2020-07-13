@@ -11,12 +11,11 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
-import {encodeBinaryXVIZ} from '@xviz/io';
-
-export function writeBinaryXVIZtoFile(sink, directory, name, json, options) {
-  const glbFileBuffer = encodeBinaryXVIZ(json, options);
-  /* global Buffer */
-  sink.writeSync(directory, `${name}.glb`, Buffer.from(glbFileBuffer), {flag: 'w'});
-  return glbFileBuffer;
+// Replacement for the external assert method to reduce bundle size
+// Note: We don't use the second "message" argument in calling code,
+// so no need to support it here
+export function assert(condition, message) {
+  if (!condition) {
+    throw new Error(message || 'gltf/glb assertion failed.');
+  }
 }
