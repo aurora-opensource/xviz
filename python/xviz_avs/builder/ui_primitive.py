@@ -31,7 +31,7 @@ class XVIZUIPrimitiveBuilder(XVIZBaseBuilder):
         super().reset()
         self._type = None
         self._columns = None
-        self._row = None
+        self._rows = []
 
     def treetable(self, columns):
         if self._type:
@@ -45,15 +45,13 @@ class XVIZUIPrimitiveBuilder(XVIZBaseBuilder):
         return self
 
     def row(self, id_, values):
-        if self._type:
-            self._flush()
-
         self._validate_prop_set_once('_id')
 
-        self._row = XVIZTreeTableRowBuilder(id_, values)
+        row = XVIZTreeTableRowBuilder(id_, values)
+        self._rows.append(row)
         self._type = UIPRIMITIVE_TYPES.TREETABLE
 
-        return self._row
+        return row
 
     def _flush(self):
         self._validate()
@@ -75,7 +73,7 @@ class XVIZUIPrimitiveBuilder(XVIZBaseBuilder):
                 self._validate_has_prop('_columns')
                 self._primitives[self._stream_id].treetable.columns.extend(self._columns)
 
-            if self._row:
-                self._primitives[self._stream_id].treetable.nodes.extend(self._row.get_data())
+            for row in self._rows:
+                self._primitives[self._stream_id].treetable.nodes.extend(row.get_data())
 
         self.reset()

@@ -211,6 +211,34 @@ class TestUIPrimitiveBuilder(unittest.TestCase):
         }
         assert data['ui_primitives'] == expected
 
+    def test_treetable_row_children_creation_order(self):
+        TEST_COLUMNS = [{'display_text': 'Name', 'type': 'STRING'}]
+        table = self.builder.ui_primitives('/test').treetable(TEST_COLUMNS)
+        # Ensure rows can be created and references remain valid
+        row1 = table.row(1, ['Test Row 1'])
+        row2 = table.row(10, ['Test Row 10'])
+
+        # Children can be added to rows
+        row1.child(2, ['Test Row 2'])
+        row2.child(20, ['Test Row 20'])
+        data = self.builder.get_data().to_object()
+
+        expected = {
+            '/test': {
+                'treetable': {
+                    'columns': TEST_COLUMNS,
+                    'nodes': [
+                        {'id': 1, 'column_values': ['Test Row 1']},
+                        {'parent': 1, 'id': 2, 'column_values': ['Test Row 2']},
+                        {'id': 10, 'column_values': ['Test Row 10']},
+                        {'parent': 10, 'id': 20, 'column_values': ['Test Row 20']}
+                    ]
+                }
+            }
+        }
+        assert data['ui_primitives'] == expected
+
+
     def test_treetable_column_types(self):
         TEST_COLUMNS = [
             {'display_text': 'string', 'type': 'STRING'},
