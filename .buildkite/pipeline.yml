@@ -1,7 +1,7 @@
 steps:
   - name: ':docker:'
     plugins:
-      docker-compose#v1.5.2:
+      docker-compose#v3.5.0:
         build: xviz
         image-repository: 027047743804.dkr.ecr.us-east-2.amazonaws.com/uber
     agents:
@@ -12,7 +12,7 @@ steps:
   - name: ':eslint:'
     command: 'yarn lint'
     plugins:
-      docker-compose#v1.5.2:
+      docker-compose#v3.5.0:
         run: xviz
     agents:
       queue: workers
@@ -20,7 +20,7 @@ steps:
   - name: ':node:'
     command: 'yarn test-ci'
     plugins:
-      docker-compose#v1.5.2:
+      docker-compose#v3.5.0:
         run: xviz
     agents:
       queue: workers
@@ -28,7 +28,7 @@ steps:
   - name: ':chrome:'
     command: 'yarn test browser-headless'
     plugins:
-      docker-compose#v1.5.2:
+      docker-compose#v3.5.0:
         run: xviz
     agents:
       queue: workers
