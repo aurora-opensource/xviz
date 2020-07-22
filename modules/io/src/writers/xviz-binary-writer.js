@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import '@loaders.gl/polyfills';
 import {XVIZBaseWriter} from './xviz-base-writer';
-import {GLTFBuilder} from '@loaders.gl/gltf';
+import {GLTFBuilder} from '../gltf/gltf-builder';
 import {packBinaryJson} from './xviz-pack-binary';
 import {XVIZEnvelope, XVIZ_GLTF_EXTENSION} from '@xviz/io';
 

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 /* global Buffer */
-import {GLTFParser} from '@loaders.gl/gltf';
+import {GLTFParser} from '../gltf/gltf-parser';
 
 import {XVIZ_GLTF_EXTENSION} from './constants';
 import {TextDecoder} from './text-encoding';
