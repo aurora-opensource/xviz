@@ -2,7 +2,7 @@
   "name": "@xviz/io",
   "description": "IO library for reading and writing XVIZ messages",
   "license": "Apache-2.0",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "repository": {
     "type": "git",
     "url": "https://github.com/uber/xviz.git"
@@ -16,11 +16,11 @@
   ],
   "dependencies": {
     "@turf/turf": "^5.1.6",
-    "@xviz/schema": "1.0.5",
+    "@xviz/schema": "1.0.6",
     "base64-js": "^1.3.0",
+    "fast-text-encoding": "^1.0.3",
     "math.gl": "^3.0.0",
-    "protobufjs": "https://github.com/jlisee/protobuf.js#ed8e699671da6f9a169074aa0f2a160cefe0844a",
-    "fast-text-encoding": "^1.0.3"
+    "protobufjs": "https://github.com/jlisee/protobuf.js#ed8e699671da6f9a169074aa0f2a160cefe0844a"
   },
   "scripts": {},
   "browser": {
