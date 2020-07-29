@@ -7,9 +7,11 @@
 #include "xviz/builder/declarative_ui/container_builder.h"
 
 using namespace xviz;
-XVIZContainerBuilder::XVIZContainerBuilder(const std::string& name, LayoutType layout)
-  : XVIZBaseUIBuilder(ComponentType::CONTAINER), name_(name), layout_(layout) {}
-
+XVIZContainerBuilder::XVIZContainerBuilder(const std::string& name,
+                                           LayoutType layout)
+    : XVIZBaseUIBuilder(ComponentType::CONTAINER),
+      name_(name),
+      layout_(layout) {}
 
 UIPanel XVIZContainerBuilder::GetUI() {
   UIPanel ui_panel = XVIZBaseUIBuilder::GetUI();

@@ -12,19 +12,18 @@
 namespace xviz {
 
 class XVIZTableBuilder : public XVIZBaseUIBuilder {
-public: 
-  XVIZTableBuilder(const std::string& title, const std::string& description, const std::string& stream, bool display_object_id);
+ public:
+  XVIZTableBuilder(const std::string& title, const std::string& description,
+                   const std::string& stream, bool display_object_id);
   UIPanel GetUI() override;
 
-private:
+ private:
   std::string title_{};
   std::string description_{};
   std::string stream_{};
   bool display_object_id_{};
-
 };
-  
-} // namespace xviz
 
+}  // namespace xviz
 
 #endif

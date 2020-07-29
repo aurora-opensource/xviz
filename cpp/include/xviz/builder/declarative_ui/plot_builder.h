@@ -12,23 +12,22 @@
 namespace xviz {
 
 class XVIZPlotBuilder : public XVIZBaseUIBuilder {
-public: 
-  XVIZPlotBuilder(const std::string& title, const std::string& description, const std::string& independent_variable,
-    const std::vector<std::string>& dependent_variables);
-  XVIZPlotBuilder(const std::string& title, const std::string& description, const std::string& independent_variable,
-    std::vector<std::string>&& dependent_variables);
+ public:
+  XVIZPlotBuilder(const std::string& title, const std::string& description,
+                  const std::string& independent_variable,
+                  const std::vector<std::string>& dependent_variables);
+  XVIZPlotBuilder(const std::string& title, const std::string& description,
+                  const std::string& independent_variable,
+                  std::vector<std::string>&& dependent_variables);
   UIPanel GetUI() override;
 
-private:
+ private:
   std::string title_{};
   std::string description_{};
   std::string independent_variable_{};
   std::vector<std::string> dependent_variables_{};
-
 };
-  
-} // namespace xviz
 
-
+}  // namespace xviz
 
 #endif

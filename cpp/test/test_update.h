@@ -6,12 +6,11 @@
 #ifndef XVIZ_TEST_UPDATE_H_
 #define XVIZ_TEST_UPDATE_H_
 
-#include "xviz/builder/xviz_builder.h"
-#include "test_utils.h"
 #include "gtest/gtest.h"
+#include "test_utils.h"
+#include "xviz/builder/xviz_builder.h"
 
-class XVIZUpdateTest : public ::testing::Test {
-};
+class XVIZUpdateTest : public ::testing::Test {};
 
 TEST_F(XVIZUpdateTest, DeepCopySameTest) {
   auto metadata_builder = xviz::test::GetTestMetadataBuilder();

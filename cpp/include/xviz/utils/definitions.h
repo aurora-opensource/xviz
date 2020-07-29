@@ -4,7 +4,6 @@
  * File Created: Saturday, 7th December 2019 2:46:43 pm
  */
 
-
 #ifndef XVIZ_DEFINES_H_
 #define XVIZ_DEFINES_H_
 
@@ -28,7 +27,6 @@ using UIPrimitiveType = xviz::StreamMetadata::UIPrimitiveType;
 //     x(xx), y(yy), z(zz) {}
 // };
 
-} // namespace minjun
-
+}  // namespace xviz
 
 #endif

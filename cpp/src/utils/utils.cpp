@@ -6,7 +6,6 @@
 
 #include "xviz/utils/utils.h"
 
-
 using Json = nlohmann::json;
 
 std::string ToUpper(const std::string& input) {
@@ -19,8 +18,8 @@ std::string ToUpper(const std::string& input) {
   return output;
 }
 
-
-std::shared_ptr<xviz::StyleObjectValue> xviz::JsonObjectToStyleObject(const nlohmann::json& json_ori) {
+std::shared_ptr<xviz::StyleObjectValue> xviz::JsonObjectToStyleObject(
+    const nlohmann::json& json_ori) {
   auto json = json_ori;
   auto style_object = std::make_shared<xviz::StyleObjectValue>();
   auto desc = style_object->GetDescriptor();
@@ -42,12 +41,15 @@ std::shared_ptr<xviz::StyleObjectValue> xviz::JsonObjectToStyleObject(const nloh
     json.erase(invalid_key);
   }
   if (!invalid_json_fields.empty()) {
-    XVIZ_LOG_WARNING("Keys: %s are invalid in StyleObject.", VectorToString(invalid_json_fields).c_str());
+    XVIZ_LOG_WARNING("Keys: %s are invalid in StyleObject.",
+                     VectorToString(invalid_json_fields).c_str());
   }
-  auto status = google::protobuf::util::JsonStringToMessage(json.dump(), style_object.get());
+  auto status = google::protobuf::util::JsonStringToMessage(json.dump(),
+                                                            style_object.get());
   if (!status.ok()) {
-    XVIZ_LOG_WARNING("Parse style object json (%s) with error: %s, not parsing this one.", json_ori.dump().c_str(),
-      status.ToString().c_str());
+    XVIZ_LOG_WARNING(
+        "Parse style object json (%s) with error: %s, not parsing this one.",
+        json_ori.dump().c_str(), status.ToString().c_str());
   }
   return style_object;
 
@@ -55,7 +57,6 @@ std::shared_ptr<xviz::StyleObjectValue> xviz::JsonObjectToStyleObject(const nloh
   //   auto field_name = desc->field(i)->name();
   //   auto field_type = std::string(desc->field(i)->type_name());
   // }
-
 
   // if (json.find("fill_color") != json.end()) {
   //   auto fill_color = json.value("fill_color", "#FFFFFF");
@@ -94,18 +95,21 @@ std::shared_ptr<xviz::StyleObjectValue> xviz::JsonObjectToStyleObject(const nloh
   // }
 
   // if (json.find("text_anchor") != json.end()) {
-  //   auto text_anchro_str = ToUpper(json.value("text_anchor", "TEXT_ANCHOR_INVALID"));
-  //   xviz::TextAnchor text_anchor = xviz::TextAnchor::TEXT_ANCHOR_INVALID;
-  //   if (xviz::TextAnchor_Parse(text_anchro_str, &text_anchor)) {
+  //   auto text_anchro_str = ToUpper(json.value("text_anchor",
+  //   "TEXT_ANCHOR_INVALID")); xviz::TextAnchor text_anchor =
+  //   xviz::TextAnchor::TEXT_ANCHOR_INVALID; if
+  //   (xviz::TextAnchor_Parse(text_anchro_str, &text_anchor)) {
   //     style_object->set_text_anchor(text_anchor);
   //   }
   //   json.erase("text_anchor");
   // }
 
   // if (json.find("text_baseline") != json.end()) {
-  //   auto text_baseline_str = ToUpper(json.value("text_baseline", "TEXT_ALIGNMENT_BASELINE_INVALID"));
-  //   xviz::TextAlignmentBaseline text_baseline = xviz::TextAlignmentBaseline::TEXT_ALIGNMENT_BASELINE_INVALID;
-  //   if (xviz::TextAlignmentBaseline_Parse(text_baseline_str, &text_baseline)) {
+  //   auto text_baseline_str = ToUpper(json.value("text_baseline",
+  //   "TEXT_ALIGNMENT_BASELINE_INVALID")); xviz::TextAlignmentBaseline
+  //   text_baseline =
+  //   xviz::TextAlignmentBaseline::TEXT_ALIGNMENT_BASELINE_INVALID; if
+  //   (xviz::TextAlignmentBaseline_Parse(text_baseline_str, &text_baseline)) {
   //     style_object->set_text_baseline(text_baseline);
   //   }
   //   json.erase("text_baseline");
@@ -119,13 +123,15 @@ std::shared_ptr<xviz::StyleObjectValue> xviz::JsonObjectToStyleObject(const nloh
 
   // if (json.size() != 0) {
   //   for (auto json_itr = json.begin(); json_itr != json.end(); json_itr++) {
-  //     XVIZ_LOG_WARNING("Key: %s is not valid in a StyleObject.", json_itr.key().c_str());
+  //     XVIZ_LOG_WARNING("Key: %s is not valid in a StyleObject.",
+  //     json_itr.key().c_str());
   //   }
   // }
   // return style_object;
 }
 
-// std::shared_ptr<xviz::StyleObjectValue> xviz::JsonObjectToStyleObject(nlohmann::json&& json) {
+// std::shared_ptr<xviz::StyleObjectValue>
+// xviz::JsonObjectToStyleObject(nlohmann::json&& json) {
 //   auto style_object = std::make_shared<xviz::StyleObjectValue>();
 //   if (json.find("fill_color") != json.end()) {
 //     auto fill_color = json.value("fill_color", "#FFFFFF");
@@ -174,15 +180,18 @@ std::shared_ptr<xviz::StyleObjectValue> xviz::JsonObjectToStyleObject(const nloh
 //   return style_object;
 // }
 
-std::shared_ptr<xviz::StyleObjectValue> xviz::JsonStringToStyleObject(const std::string& json_str) {
+std::shared_ptr<xviz::StyleObjectValue> xviz::JsonStringToStyleObject(
+    const std::string& json_str) {
   return JsonObjectToStyleObject(Json::parse(json_str));
 }
 
-// std::shared_ptr<xviz::StyleObjectValue> xviz::JsonStringToStyleObject(std::string&& json_str) {
+// std::shared_ptr<xviz::StyleObjectValue>
+// xviz::JsonStringToStyleObject(std::string&& json_str) {
 //   return JsonObjectToStyleObject(Json::parse(std::move(json_str)));
 // }
 
-std::shared_ptr<xviz::StyleStreamValue> xviz::JsonObjectToStyleStream(const nlohmann::json& json_ori) {
+std::shared_ptr<xviz::StyleStreamValue> xviz::JsonObjectToStyleStream(
+    const nlohmann::json& json_ori) {
   auto style_stream = std::make_shared<xviz::StyleStreamValue>();
   auto json = json_ori;
 
@@ -205,17 +214,18 @@ std::shared_ptr<xviz::StyleStreamValue> xviz::JsonObjectToStyleStream(const nloh
     json.erase(invalid_key);
   }
   if (!invalid_json_fields.empty()) {
-    XVIZ_LOG_WARNING("Keys: %s are invalid in StyleStream.", VectorToString(invalid_json_fields).c_str());
+    XVIZ_LOG_WARNING("Keys: %s are invalid in StyleStream.",
+                     VectorToString(invalid_json_fields).c_str());
   }
-  auto status = google::protobuf::util::JsonStringToMessage(json.dump(), style_stream.get());
+  auto status = google::protobuf::util::JsonStringToMessage(json.dump(),
+                                                            style_stream.get());
   if (!status.ok()) {
-    XVIZ_LOG_WARNING("Parse style stream json (%s) with error: %s, not parsing this one.", json_ori.dump().c_str(),
-      status.ToString().c_str());
+    XVIZ_LOG_WARNING(
+        "Parse style stream json (%s) with error: %s, not parsing this one.",
+        json_ori.dump().c_str(), status.ToString().c_str());
   }
 
   return style_stream;
-
-
 
   // if (json.find("fill_color") != json.end()) {
   //   auto fill_color = json.value("fill_color", "#FFFFFF");
@@ -318,16 +328,18 @@ std::shared_ptr<xviz::StyleStreamValue> xviz::JsonObjectToStyleStream(const nloh
   // }
 
   // if (json.find("point_color_mode") != json.end()) {
-  //   auto point_color_mode_str = ToUpper(json.value("point_color_mode", "DISTANCE_TO_VEHICLE"));
-  //   xviz::PointColorMode point_color_mode = xviz::PointColorMode::POINT_COLOR_MODE_INVALID;
-  //   if (xviz::PointColorMode_Parse(point_color_mode_str, &point_color_mode)) {
+  //   auto point_color_mode_str = ToUpper(json.value("point_color_mode",
+  //   "DISTANCE_TO_VEHICLE")); xviz::PointColorMode point_color_mode =
+  //   xviz::PointColorMode::POINT_COLOR_MODE_INVALID; if
+  //   (xviz::PointColorMode_Parse(point_color_mode_str, &point_color_mode)) {
   //     style_stream->set_point_color_mode(point_color_mode);
   //   }
   // }
   // return style_stream;
 }
 
-// std::shared_ptr<xviz::StyleStreamValue> xviz::JsonObjectToStyleStream(nlohmann::json&& json) {
+// std::shared_ptr<xviz::StyleStreamValue>
+// xviz::JsonObjectToStyleStream(nlohmann::json&& json) {
 //   auto style_stream = std::make_shared<xviz::StyleStreamValue>();
 //   if (json.find("fill_color") != json.end()) {
 //     auto fill_color = json.value("fill_color", "#FFFFFF");
@@ -430,10 +442,11 @@ std::shared_ptr<xviz::StyleStreamValue> xviz::JsonObjectToStyleStream(const nloh
 //   }
 
 //   if (json.find("point_color_mode") != json.end()) {
-//     auto point_color_mode_str = ToUpper(json.value("point_color_mode", "DISTANCE_TO_VEHICLE"));
-//     std::cerr << point_color_mode_str << std::endl;
-//     xviz::PointColorMode point_color_mode = xviz::PointColorMode::POINT_COLOR_MODE_INVALID;
-//     if (xviz::PointColorMode_Parse(point_color_mode_str, &point_color_mode)) {
+//     auto point_color_mode_str = ToUpper(json.value("point_color_mode",
+//     "DISTANCE_TO_VEHICLE")); std::cerr << point_color_mode_str << std::endl;
+//     xviz::PointColorMode point_color_mode =
+//     xviz::PointColorMode::POINT_COLOR_MODE_INVALID; if
+//     (xviz::PointColorMode_Parse(point_color_mode_str, &point_color_mode)) {
 //       style_stream->set_point_color_mode(point_color_mode);
 //     } else {
 //       std::cerr << "parse not success" << std::endl;
@@ -442,15 +455,18 @@ std::shared_ptr<xviz::StyleStreamValue> xviz::JsonObjectToStyleStream(const nloh
 //   return style_stream;
 // }
 
-std::shared_ptr<xviz::StyleStreamValue> xviz::JsonStringToStyleStream(const std::string& json_str) {
+std::shared_ptr<xviz::StyleStreamValue> xviz::JsonStringToStyleStream(
+    const std::string& json_str) {
   return JsonObjectToStyleStream(Json::parse(json_str));
 }
 
-// std::shared_ptr<xviz::StyleStreamValue> xviz::JsonStringToStyleStream(std::string&& json_str) {
+// std::shared_ptr<xviz::StyleStreamValue>
+// xviz::JsonStringToStyleStream(std::string&& json_str) {
 //   return JsonObjectToStyleStream(Json::parse(std::move(json_str)));
 // }
 
-std::string xviz::AllEnumOptionNames(const google::protobuf::EnumDescriptor* enum_desc) {
+std::string xviz::AllEnumOptionNames(
+    const google::protobuf::EnumDescriptor* enum_desc) {
   std::vector<std::string> names;
   for (int i = 0; i < enum_desc->value_count(); i++) {
     names.push_back(enum_desc->value(i)->full_name());

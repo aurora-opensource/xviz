@@ -7,6 +7,7 @@ project(libxviz
         LANGUAGES CXX)
 
 set(XVIZ_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory("cmake")
 

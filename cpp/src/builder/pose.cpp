@@ -8,8 +8,9 @@
 
 using namespace xviz;
 
-XVIZPoseBuilder::XVIZPoseBuilder(const std::shared_ptr<xviz::Metadata>& metadata) : 
-  XVIZBaseBuilder(xviz::StreamMetadata::POSE, metadata) {
+XVIZPoseBuilder::XVIZPoseBuilder(
+    const std::shared_ptr<xviz::Metadata>& metadata)
+    : XVIZBaseBuilder(xviz::StreamMetadata::POSE, metadata) {
   poses_ = nullptr;
   temp_poses_ = xviz::Pose();
 }
@@ -28,7 +29,8 @@ XVIZPoseBuilder& XVIZPoseBuilder::Stream(const std::string& stream_id) {
   return *this;
 }
 
-XVIZPoseBuilder& XVIZPoseBuilder::MapOrigin(double longitude, double latitude, double altitude) {
+XVIZPoseBuilder& XVIZPoseBuilder::MapOrigin(double longitude, double latitude,
+                                            double altitude) {
   temp_poses_.mutable_map_origin()->set_longitude(longitude);
   temp_poses_.mutable_map_origin()->set_latitude(latitude);
   temp_poses_.mutable_map_origin()->set_altitude(altitude);
@@ -42,7 +44,8 @@ XVIZPoseBuilder& XVIZPoseBuilder::Position(double x, double y, double z) {
   return *this;
 }
 
-XVIZPoseBuilder& XVIZPoseBuilder::Orientation(double roll, double pitch, double yaw) {
+XVIZPoseBuilder& XVIZPoseBuilder::Orientation(double roll, double pitch,
+                                              double yaw) {
   temp_poses_.add_orientation(roll);
   temp_poses_.add_orientation(pitch);
   temp_poses_.add_orientation(yaw);
@@ -62,7 +65,8 @@ void XVIZPoseBuilder::Flush() {
   temp_poses_ = xviz::Pose();
 }
 
-std::shared_ptr<std::unordered_map<std::string, xviz::Pose>> XVIZPoseBuilder::GetData() {
+std::shared_ptr<std::unordered_map<std::string, xviz::Pose>>
+XVIZPoseBuilder::GetData() {
   if (stream_id_.size() > 0) {
     Flush();
   }

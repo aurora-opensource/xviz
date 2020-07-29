@@ -8,7 +8,9 @@
 
 // using namespace xviz;
 
-// std::shared_ptr<XVIZBaseSession> XVIZBaseHandler::GetSession(const std::unordered_map<std::string, std::string>& params,
-//     std::shared_ptr<websocketpp::connection<websocketpp::config::asio>> conn_ptr) {
+// std::shared_ptr<XVIZBaseSession> XVIZBaseHandler::GetSession(const
+// std::unordered_map<std::string, std::string>& params,
+//     std::shared_ptr<websocketpp::connection<websocketpp::config::asio>>
+//     conn_ptr) {
 //   return nullptr;
 // }

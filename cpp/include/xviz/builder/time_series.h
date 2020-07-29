@@ -13,14 +13,14 @@
 #include "xviz/utils/utils.h"
 
 #include <memory>
-#include <unordered_map>
 #include <string>
+#include <unordered_map>
 #include <variant>
 
 namespace xviz {
 
 class XVIZTimeSeriesBuilder : public XVIZBaseBuilder {
-public:
+ public:
   XVIZTimeSeriesBuilder(const std::shared_ptr<Metadata>& metadata);
   void DeepCopyFrom(const XVIZTimeSeriesBuilder& other);
 
@@ -39,7 +39,8 @@ public:
   XVIZTimeSeriesBuilder& Timestamp(double timestamp);
 
   std::shared_ptr<std::vector<TimeSeriesState>> GetData();
-private:
+
+ private:
   void Flush() override;
   void FlushNotReset();
   void Validate();
@@ -47,10 +48,30 @@ private:
   void Reset();
   bool IsDataPending();
 
-  std::pair<std::vector<std::string>, std::unordered_map<std::string, std::vector<std::variant<std::string, bool, int, double>>>> GetFieldEntry(const std::string& field_name);
-  std::unordered_map<std::string, std::pair<std::vector<std::string>, std::unordered_map<std::string, std::vector<std::variant<std::string, bool, int, double>>>>> GetIdEntry(const std::string& field_name);
+  std::pair<std::vector<std::string>,
+            std::unordered_map<
+                std::string,
+                std::vector<std::variant<std::string, bool, int, double>>>>
+  GetFieldEntry(const std::string& field_name);
+  std::unordered_map<
+      std::string,
+      std::pair<std::vector<std::string>,
+                std::unordered_map<
+                    std::string,
+                    std::vector<std::variant<std::string, bool, int, double>>>>>
+  GetIdEntry(const std::string& field_name);
 
-  std::shared_ptr<std::unordered_map<double, std::unordered_map<std::string, std::unordered_map<std::string, std::pair<std::vector<std::string>, std::unordered_map<std::string, std::vector<std::variant<std::string, bool, int, double>>>>>>>> data_{nullptr};
+  std::shared_ptr<std::unordered_map<
+      double, std::unordered_map<
+                  std::string,
+                  std::unordered_map<
+                      std::string,
+                      std::pair<std::vector<std::string>,
+                                std::unordered_map<
+                                    std::string,
+                                    std::vector<std::variant<std::string, bool,
+                                                             int, double>>>>>>>>
+      data_{nullptr};
   std::shared_ptr<std::string> id_{nullptr};
   std::shared_ptr<std::variant<std::string, bool, int, double>> value_{nullptr};
   std::shared_ptr<double> timestamp_{nullptr};
@@ -58,7 +79,6 @@ private:
   size_t vpos_ = std::variant_npos;
 };
 
-} // namespace xviz
-
+}  // namespace xviz
 
 #endif

@@ -9,19 +9,21 @@
 using namespace xviz;
 
 // template<typename T>
-// void AddChild(std::vector<std::shared_ptr<XVIZBaseUIBuilder>>& children, T&& child) {
+// void AddChild(std::vector<std::shared_ptr<XVIZBaseUIBuilder>>& children, T&&
+// child) {
 //   children.push_back(std::move(child));
 // }
 
 // template<typename T>
-// void AddChild(std::vector<std::shared_ptr<XVIZBaseUIBuilder>>& children, const T& child) {
+// void AddChild(std::vector<std::shared_ptr<XVIZBaseUIBuilder>>& children,
+// const T& child) {
 //   children.push_back(child);
 // }
 
-XVIZUIBuilder::XVIZUIBuilder() {
-}
+XVIZUIBuilder::XVIZUIBuilder() {}
 
-XVIZUIBuilder& XVIZUIBuilder::Child(const std::shared_ptr<XVIZBaseUIBuilder>& child) {
+XVIZUIBuilder& XVIZUIBuilder::Child(
+    const std::shared_ptr<XVIZBaseUIBuilder>& child) {
   children_.push_back(child);
   return *this;
 }

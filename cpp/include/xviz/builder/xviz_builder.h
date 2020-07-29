@@ -19,7 +19,7 @@
 namespace xviz {
 
 class XVIZBuilder {
-public:
+ public:
   // TODO add "disabled stream var"
   XVIZBuilder(std::shared_ptr<xviz::Metadata> metadata);
   void DeepCopyFrom(const XVIZBuilder& other);
@@ -31,7 +31,7 @@ public:
   XVIZFrame GetData();
   XVIZMessage GetMessage();
 
-private:
+ private:
   void Reset();
 
   std::shared_ptr<XVIZPoseBuilder> pose_builder_{nullptr};
@@ -41,9 +41,7 @@ private:
   // TODO do I need optional?
   std::shared_ptr<Metadata> metadata_{nullptr};
 };
-  
-} // namespace xviz
 
-
+}  // namespace xviz
 
 #endif

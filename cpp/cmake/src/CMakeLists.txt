@@ -9,6 +9,11 @@ else()
     message(FATAL_ERROR "protobuf library is needed but cant be found")
 endif()
 
+find_package(websocketpp CONFIG REQUIRED)
+find_package(nlohmann_json CONFIG REQUIRED)
+find_path(CPP_BASE64_INCLUDE_DIRS "cpp-base64/base64.cpp")
+
+
 
 include_directories(${XVIZ_ROOT_DIR}/include)
 include_directories(${PROTOBUF_INCLUDE_DIRS})
@@ -78,12 +83,22 @@ file(GLOB libxviz_server_sources
 )
 set(libxviz_sources "${libxviz_sources};${libxviz_server_sources}")
 
+add_library(cpp-base64
+  ${CPP_BASE64_INCLUDE_DIRS}/cpp-base64/base64.h
+  ${CPP_BASE64_INCLUDE_DIRS}/cpp-base64/base64.cpp
+)
+
 add_library(xviz 
   STATIC
   ${libxviz_sources}
 )
 
 target_link_libraries(xviz ${PROTOBUF_LIBRARIES})
+target_link_libraries(xviz websocketpp::websocketpp)
+target_link_libraries(xviz cpp-base64)
+target_link_libraries(xviz nlohmann_json nlohmann_json::nlohmann_json)
+
+
 install(TARGETS xviz DESTINATION lib)
 
 target_include_directories(xviz PUBLIC ${XVIZ_ROOT_DIR}/include)

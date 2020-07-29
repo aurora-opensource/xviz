@@ -17,7 +17,6 @@
 
 class XVIZMetadataTest : public ::testing::Test {
  protected:
-
   xviz::XVIZMetadataBuilder metadata_builder_{};
   std::string expected_str_{};
   nlohmann::json expected_json_{};

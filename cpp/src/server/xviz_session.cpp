@@ -8,5 +8,7 @@
 
 using namespace xviz;
 
-XVIZBaseSession::XVIZBaseSession(std::shared_ptr<websocketpp::connection<websocketpp::config::asio>> conn_ptr) :
-  conn_ptr_(conn_ptr) {}
+XVIZBaseSession::XVIZBaseSession(
+    std::shared_ptr<websocketpp::connection<websocketpp::config::asio>>
+        conn_ptr)
+    : conn_ptr_(conn_ptr) {}

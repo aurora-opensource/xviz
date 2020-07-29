@@ -9,22 +9,22 @@
 
 #include "xviz/builder/declarative_ui/base_ui_builder.h"
 
-#include <vector>
 #include <string>
+#include <vector>
 
 namespace xviz {
 
 class XVIZVideoBuilder : public XVIZBaseUIBuilder {
-public:
+ public:
   XVIZVideoBuilder(const std::vector<std::string>& cameras);
   XVIZVideoBuilder(std::vector<std::string>&& cameras);
 
   UIPanel GetUI() override;
-private:
+
+ private:
   std::vector<std::string> cameras_{};
 };
-  
-} // namespace xviz
 
+}  // namespace xviz
 
 #endif

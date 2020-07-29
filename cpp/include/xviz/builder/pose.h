@@ -12,18 +12,18 @@
 #include "xviz/utils/utils.h"
 
 #include <memory>
-#include <unordered_map>
 #include <string>
+#include <unordered_map>
 
 namespace xviz {
 
 class XVIZPoseBuilder : public XVIZBaseBuilder {
-public:
-
+ public:
   XVIZPoseBuilder(const std::shared_ptr<xviz::Metadata>& metadata);
   void DeepCopyFrom(const XVIZPoseBuilder& other);
 
-  XVIZPoseBuilder& MapOrigin(double longitude, double latitude, double altitude);
+  XVIZPoseBuilder& MapOrigin(double longitude, double latitude,
+                             double altitude);
   XVIZPoseBuilder& Position(double x, double y, double z);
   XVIZPoseBuilder& Orientation(double roll, double pitch, double yaw);
   XVIZPoseBuilder& Timestamp(double timestamp);
@@ -32,13 +32,13 @@ public:
 
   std::shared_ptr<std::unordered_map<std::string, xviz::Pose>> GetData();
 
-private:
+ private:
   std::shared_ptr<std::unordered_map<std::string, xviz::Pose>> poses_{nullptr};
   xviz::Pose temp_poses_{};
 
   void Flush() override;
 };
-  
-} // namespace minjun 
+
+}  // namespace xviz
 
 #endif

@@ -6,7 +6,7 @@
 
 #ifndef XVIZ_HANDLER_H_
 #define XVIZ_HANDLER_H_
-#define ASIO_STANDALONE
+// #define ASIO_STANDALONE
 
 #include <memory>
 
@@ -15,13 +15,14 @@
 namespace xviz {
 
 class XVIZBaseHandler {
-public:
+ public:
   XVIZBaseHandler() = default;
-  virtual std::shared_ptr<XVIZBaseSession> GetSession(const std::unordered_map<std::string, std::string>& params,
-    std::shared_ptr<websocketpp::connection<websocketpp::config::asio>> conn_ptr) = 0;
+  virtual std::shared_ptr<XVIZBaseSession> GetSession(
+      const std::unordered_map<std::string, std::string>& params,
+      std::shared_ptr<websocketpp::connection<websocketpp::config::asio>>
+          conn_ptr) = 0;
 };
-  
-} // namespace xviz
 
+}  // namespace xviz
 
 #endif

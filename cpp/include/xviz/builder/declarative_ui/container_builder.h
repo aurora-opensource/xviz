@@ -4,7 +4,6 @@
  * File Created: Wednesday, 8th January 2020 1:17:51 am
  */
 
-
 #ifndef XVIZ_DECLARATIVE_UI_CONTAINER_BUILDER_H_
 #define XVIZ_DECLARATIVE_UI_CONTAINER_BUILDER_H_
 
@@ -13,15 +12,15 @@
 namespace xviz {
 
 class XVIZContainerBuilder : public XVIZBaseUIBuilder {
-public:
+ public:
   XVIZContainerBuilder(const std::string& name, LayoutType layout);
   UIPanel GetUI() override;
-private:
+
+ private:
   std::string name_{};
   LayoutType layout_{};
 };
-  
-} // namespace xviz
 
+}  // namespace xviz
 
 #endif

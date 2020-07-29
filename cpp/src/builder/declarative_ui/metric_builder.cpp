@@ -8,10 +8,20 @@
 
 using namespace xviz;
 
-XVIZMetricBuilder::XVIZMetricBuilder(const std::vector<std::string>& streams, const std::string& description, const std::string& title) 
-  : XVIZBaseUIBuilder(ComponentType::METRIC), streams_(streams), description_(description), title_(title) {}
-XVIZMetricBuilder::XVIZMetricBuilder(std::vector<std::string>&& streams, const std::string& description, const std::string& title)
-  : XVIZBaseUIBuilder(ComponentType::METRIC), streams_(std::move(streams)), description_(description), title_(title) {}
+XVIZMetricBuilder::XVIZMetricBuilder(const std::vector<std::string>& streams,
+                                     const std::string& description,
+                                     const std::string& title)
+    : XVIZBaseUIBuilder(ComponentType::METRIC),
+      streams_(streams),
+      description_(description),
+      title_(title) {}
+XVIZMetricBuilder::XVIZMetricBuilder(std::vector<std::string>&& streams,
+                                     const std::string& description,
+                                     const std::string& title)
+    : XVIZBaseUIBuilder(ComponentType::METRIC),
+      streams_(std::move(streams)),
+      description_(description),
+      title_(title) {}
 
 UIPanel XVIZMetricBuilder::GetUI() {
   UIPanel ui_panel = XVIZBaseUIBuilder::GetUI();

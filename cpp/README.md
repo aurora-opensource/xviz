@@ -2,7 +2,8 @@
 
 ## Minimum Requirements
 1. CMake 3.5.0+
-2. Protobuf 3.11.0+
+2. Protobuf 3.11.0
+3. [vcpkg](https://github.com/microsoft/vcpkg/tree/master)
 
 ## Example
 
@@ -13,10 +14,18 @@ Please see [example.cpp](https://github.com/wx9698/xviz/blob/master/examples/exa
 
 ## Build
 
+### Download required packages
+```bash
+cd VCPKG_PATH
+./vcpkg install websocketpp
+./vcpkg install nlohmann-json
+./vcpkg install cpp-base64
+```
+
 ### Build xviz builder example
 ```bash
 mkdir build && cd build
-cmake ../
+cmake ../ -DCMAKE_TOOLCHAIN_FILE=VCPKG_PATH/scripts/buildsystems/vcpkg.cmake
 make example -j12
 ../bin/example
 ```
@@ -27,7 +36,7 @@ Frontend is needed. You can refer to these two repos for frontend:
 2. [uber streetscape.gl](https://github.com/uber/streetscape.gl)
 ```bash
 mkdir build && cd build
-cmake ../
+cmake ../ -DCMAKE_TOOLCHAIN_FILE=VCPKG_PATH/scripts/buildsystems/vcpkg.cmake
 make example-server -j12
 ../bin/example-server [PNG FILE PATH (this is optional)]
 ```
@@ -35,7 +44,7 @@ make example-server -j12
 ### Build tests
 ```bash
 mkdir build && cd build
-cmake ../ -DBUILD_XVIZ_TESTS=ON
+cmake ../ -DBUILD_XVIZ_TESTS=ON -DCMAKE_TOOLCHAIN_FILE=VCPKG_PATH/scripts/buildsystems/vcpkg.cmake
 make xviz-test -j12
 ../bin/xviz-test
 ```
@@ -43,9 +52,15 @@ make xviz-test -j12
 ### Install
 ```bash
 mkdir build && cd build
-cmake ../ -DCMAKE_INSTALL_PREFIX=/path/you/want/to/install/
+cmake ../ -DCMAKE_INSTALL_PREFIX=/path/you/want/to/install/ -DCMAKE_TOOLCHAIN_FILE=VCPKG_PATH/scripts/buildsystems/vcpkg.cmake
 make example example-server xviz-test -j12
 make install
+```
+
+### Format
+```bash
+find . -name "*.h" -not -wholename "**/proto/*.h" -exec clang-format -style=file -i {} \;
+find . -name "*.cpp" -not -wholename "./build/*" -exec clang-format -style=file -i {} \;
 ```
 
 ## Related Work

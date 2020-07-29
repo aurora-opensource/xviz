@@ -4,19 +4,18 @@
  * File Created: Monday, 20th January 2020 4:15:31 pm
  */
 
-
 #ifndef XVIZ_IO_GLB_WRITER_H_
 #define XVIZ_IO_GLB_WRITER_H_
 
-#include "xviz/utils/gltf.h"
-#include "xviz/utils/base64.h"
+#include <cpp-base64/base64.h>
 #include "xviz/message.h"
+#include "xviz/utils/gltf.h"
 
-#include <memory>
-#include <vector>
-#include <string>
-#include <sstream>
 #include <iostream>
+#include <memory>
+#include <sstream>
+#include <string>
+#include <vector>
 
 namespace xviz {
 
@@ -30,7 +29,7 @@ namespace xviz {
 // };
 
 class XVIZGLBWriter {
-public:
+ public:
   XVIZGLBWriter() = default;
   XVIZGLBWriter(const std::shared_ptr<std::string>& sink);
 
@@ -40,11 +39,10 @@ public:
   void WriteMessage(std::string& sink, xviz::XVIZMessage&& message);
   void WriteMessage(const std::string& file_sink, xviz::XVIZMessage& message);
 
-private:
+ private:
   std::shared_ptr<std::string> sink_{nullptr};
 };
-  
-} // namespace xviz
 
+}  // namespace xviz
 
 #endif

@@ -10,8 +10,9 @@ using namespace xviz;
 
 std::string primary_pose_stream = "/vehicle_pose";
 
-template<typename K, typename V>
-void ConvertFromStdMapToProtoBufMap(google::protobuf::Map<K, V>* map, std::unordered_map<K, V>& m) {
+template <typename K, typename V>
+void ConvertFromStdMapToProtoBufMap(google::protobuf::Map<K, V>* map,
+                                    std::unordered_map<K, V>& m) {
   map->clear();
   for (auto& [k, v] : m) {
     // TODO is it correct
@@ -19,9 +20,10 @@ void ConvertFromStdMapToProtoBufMap(google::protobuf::Map<K, V>* map, std::unord
   }
 }
 
-template<typename T>
-void DeepCopy(std::shared_ptr<T>& dest_ptr, const std::shared_ptr<T>& source_ptr,
-  const std::shared_ptr<Metadata>& metadata) {
+template <typename T>
+void DeepCopy(std::shared_ptr<T>& dest_ptr,
+              const std::shared_ptr<T>& source_ptr,
+              const std::shared_ptr<Metadata>& metadata) {
   if (source_ptr == nullptr) {
     dest_ptr = nullptr;
     return;
@@ -32,9 +34,8 @@ void DeepCopy(std::shared_ptr<T>& dest_ptr, const std::shared_ptr<T>& source_ptr
   dest_ptr->DeepCopyFrom(*source_ptr);
 }
 
-XVIZBuilder::XVIZBuilder(std::shared_ptr<Metadata> metadata) :
-  metadata_(metadata) {
-
+XVIZBuilder::XVIZBuilder(std::shared_ptr<Metadata> metadata)
+    : metadata_(metadata) {
   pose_builder_ = std::make_shared<XVIZPoseBuilder>(metadata_);
   primitive_builder_ = std::make_shared<XVIZPrimitiveBuilder>(metadata_);
   time_series_builder_ = std::make_shared<XVIZTimeSeriesBuilder>(metadata_);
@@ -68,7 +69,8 @@ XVIZFrame XVIZBuilder::GetData() {
   auto data = std::make_shared<StreamSet>();
   auto poses = pose_builder_->GetData();
   if (poses == nullptr || poses->find(primary_pose_stream) == poses->end()) {
-    XVIZ_LOG_ERROR("every frame requires a %s message", primary_pose_stream.c_str());
+    XVIZ_LOG_ERROR("every frame requires a %s message",
+                   primary_pose_stream.c_str());
   }
   if (poses != nullptr) {
     data->set_timestamp((*poses)[primary_pose_stream].timestamp());
@@ -79,7 +81,8 @@ XVIZFrame XVIZBuilder::GetData() {
   auto primitives = primitive_builder_->GetData();
   auto primitives_map = data->mutable_primitives();
   if (primitives != nullptr) {
-    ConvertFromStdMapToProtoBufMap<std::string, xviz::PrimitiveState>(primitives_map, *primitives);
+    ConvertFromStdMapToProtoBufMap<std::string, xviz::PrimitiveState>(
+        primitives_map, *primitives);
   }
 
   auto time_series = time_series_builder_->GetData();
@@ -92,7 +95,8 @@ XVIZFrame XVIZBuilder::GetData() {
   auto ui_primitives = ui_primitive_builder_->GetData();
   auto ui_primitives_map = data->mutable_ui_primitives();
   if (ui_primitives != nullptr) {
-    ConvertFromStdMapToProtoBufMap<std::string, xviz::UIPrimitiveState>(ui_primitives_map, *ui_primitives);
+    ConvertFromStdMapToProtoBufMap<std::string, xviz::UIPrimitiveState>(
+        ui_primitives_map, *ui_primitives);
   }
 
   return XVIZFrame(data);
@@ -100,7 +104,8 @@ XVIZFrame XVIZBuilder::GetData() {
 
 XVIZMessage XVIZBuilder::GetMessage() {
   auto state_update = std::make_shared<StateUpdate>();
-  state_update->set_update_type(StateUpdate::UpdateType::StateUpdate_UpdateType_SNAPSHOT);
+  state_update->set_update_type(
+      StateUpdate::UpdateType::StateUpdate_UpdateType_SNAPSHOT);
   auto new_update = state_update->add_updates();
   auto frame = GetData();
   *new_update = std::move(*(frame.Data()));

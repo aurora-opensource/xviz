@@ -7,13 +7,25 @@
 #include "xviz/builder/declarative_ui/plot_builder.h"
 
 using namespace xviz;
-XVIZPlotBuilder::XVIZPlotBuilder(const std::string& title, const std::string& description, const std::string& independent_variable,
-    const std::vector<std::string>& dependent_variables) : XVIZBaseUIBuilder(ComponentType::PLOT),
-      title_(title), description_(description), independent_variable_(independent_variable), dependent_variables_(dependent_variables) {}
+XVIZPlotBuilder::XVIZPlotBuilder(
+    const std::string& title, const std::string& description,
+    const std::string& independent_variable,
+    const std::vector<std::string>& dependent_variables)
+    : XVIZBaseUIBuilder(ComponentType::PLOT),
+      title_(title),
+      description_(description),
+      independent_variable_(independent_variable),
+      dependent_variables_(dependent_variables) {}
 
-XVIZPlotBuilder::XVIZPlotBuilder(const std::string& title, const std::string& description, const std::string& independent_variable,
-    std::vector<std::string>&& dependent_variables) : XVIZBaseUIBuilder(ComponentType::PLOT),
-      title_(title), description_(description), independent_variable_(independent_variable), dependent_variables_(std::move(dependent_variables)) {}
+XVIZPlotBuilder::XVIZPlotBuilder(const std::string& title,
+                                 const std::string& description,
+                                 const std::string& independent_variable,
+                                 std::vector<std::string>&& dependent_variables)
+    : XVIZBaseUIBuilder(ComponentType::PLOT),
+      title_(title),
+      description_(description),
+      independent_variable_(independent_variable),
+      dependent_variables_(std::move(dependent_variables)) {}
 
 UIPanel XVIZPlotBuilder::GetUI() {
   UIPanel ui_panel = XVIZBaseUIBuilder::GetUI();

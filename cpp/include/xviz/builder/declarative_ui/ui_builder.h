@@ -7,23 +7,20 @@
 #ifndef XVIZ_DECLARATIVE_UI_BUILDER_H_
 #define XVIZ_DECLARATIVE_UI_BUILDER_H_
 
-#include "xviz/proto/declarativeui.pb.h"
 #include "xviz/builder/declarative_ui/base_ui_builder.h"
 #include "xviz/builder/declarative_ui/container_builder.h"
 #include "xviz/builder/declarative_ui/metric_builder.h"
-#include "xviz/builder/declarative_ui/video_builder.h"
 #include "xviz/builder/declarative_ui/plot_builder.h"
 #include "xviz/builder/declarative_ui/table_builder.h"
+#include "xviz/builder/declarative_ui/video_builder.h"
+#include "xviz/proto/declarativeui.pb.h"
 
 #include <vector>
 
 namespace xviz {
-  
-
 
 class XVIZUIBuilder {
-public:
-
+ public:
   XVIZUIBuilder();
 
   XVIZUIBuilder& Child(const std::shared_ptr<XVIZBaseUIBuilder>& child);
@@ -45,9 +42,9 @@ public:
 
   std::vector<xviz::UIPanel> GetUI();
 
-private:
+ private:
   std::vector<std::shared_ptr<XVIZBaseUIBuilder>> children_{};
 };
 
-} // namespace xviz
+}  // namespace xviz
 #endif

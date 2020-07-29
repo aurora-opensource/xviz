@@ -5,12 +5,12 @@
  */
 
 #include <gtest/gtest.h>
-#include "test_metadata.h"
-#include "test_update.h"
-#include "test_server.h"
 #include "test_builder.hpp"
-#include "test_writer.hpp"
 #include "test_message.hpp"
+#include "test_metadata.h"
+#include "test_server.h"
+#include "test_update.h"
+#include "test_writer.hpp"
 
 int main(int argc, char** argv) {
   ::testing::InitGoogleTest(&argc, argv);

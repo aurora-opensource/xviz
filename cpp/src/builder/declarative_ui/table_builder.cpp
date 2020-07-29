@@ -7,8 +7,15 @@
 #include "xviz/builder/declarative_ui/table_builder.h"
 
 using namespace xviz;
-XVIZTableBuilder::XVIZTableBuilder(const std::string& title, const std::string& description, const std::string& stream, bool display_object_id) 
-  : XVIZBaseUIBuilder(ComponentType::TABLE), title_(title), description_(description), stream_(stream), display_object_id_(display_object_id) {}
+XVIZTableBuilder::XVIZTableBuilder(const std::string& title,
+                                   const std::string& description,
+                                   const std::string& stream,
+                                   bool display_object_id)
+    : XVIZBaseUIBuilder(ComponentType::TABLE),
+      title_(title),
+      description_(description),
+      stream_(stream),
+      display_object_id_(display_object_id) {}
 
 UIPanel XVIZTableBuilder::GetUI() {
   auto ui_panel = XVIZBaseUIBuilder::GetUI();

@@ -8,13 +8,19 @@
 
 using namespace xviz;
 
-using TimeSeriesFieldEntryType = std::pair<std::vector<std::string>, std::unordered_map<std::string, std::vector<std::variant<std::string, bool, int, double>>>>;
-using TimeSeriesFieldType = std::unordered_map<std::string, TimeSeriesFieldEntryType>;
+using TimeSeriesFieldEntryType =
+    std::pair<std::vector<std::string>,
+              std::unordered_map<
+                  std::string,
+                  std::vector<std::variant<std::string, bool, int, double>>>>;
+using TimeSeriesFieldType =
+    std::unordered_map<std::string, TimeSeriesFieldEntryType>;
 using TimeSeriesIdType = std::unordered_map<std::string, TimeSeriesFieldType>;
 using TimeSeriesType = std::unordered_map<double, TimeSeriesIdType>;
 
-XVIZTimeSeriesBuilder::XVIZTimeSeriesBuilder(const std::shared_ptr<Metadata>& metadata) : 
-  XVIZBaseBuilder(Category::StreamMetadata_Category_TIME_SERIES, metadata) {
+XVIZTimeSeriesBuilder::XVIZTimeSeriesBuilder(
+    const std::shared_ptr<Metadata>& metadata)
+    : XVIZBaseBuilder(Category::StreamMetadata_Category_TIME_SERIES, metadata) {
   data_ = std::make_shared<TimeSeriesType>();
   Reset();
 }
@@ -28,7 +34,8 @@ void XVIZTimeSeriesBuilder::DeepCopyFrom(const XVIZTimeSeriesBuilder& other) {
   vpos_ = other.vpos_;
 }
 
-XVIZTimeSeriesBuilder& XVIZTimeSeriesBuilder::Stream(const std::string& stream_id) {
+XVIZTimeSeriesBuilder& XVIZTimeSeriesBuilder::Stream(
+    const std::string& stream_id) {
   if (stream_id_.size() > 0) {
     Flush();
   }
@@ -48,32 +55,38 @@ XVIZTimeSeriesBuilder& XVIZTimeSeriesBuilder::Id(std::string&& id) {
 }
 
 XVIZTimeSeriesBuilder& XVIZTimeSeriesBuilder::Value(const std::string& value) {
-  value_ = std::make_shared<std::variant<std::string, bool, int, double>>(value);
+  value_ =
+      std::make_shared<std::variant<std::string, bool, int, double>>(value);
   return *this;
 }
 
 XVIZTimeSeriesBuilder& XVIZTimeSeriesBuilder::Value(std::string&& value) {
-  value_ = std::make_shared<std::variant<std::string, bool, int, double>>(std::move(value));
+  value_ = std::make_shared<std::variant<std::string, bool, int, double>>(
+      std::move(value));
   return *this;
 }
 
 XVIZTimeSeriesBuilder& XVIZTimeSeriesBuilder::Value(const char* value) {
-  value_ = std::make_shared<std::variant<std::string, bool, int, double>>(std::string(value));
+  value_ = std::make_shared<std::variant<std::string, bool, int, double>>(
+      std::string(value));
   return *this;
 }
 
 XVIZTimeSeriesBuilder& XVIZTimeSeriesBuilder::Value(bool value) {
-  value_ = std::make_shared<std::variant<std::string, bool, int, double>>(value);
+  value_ =
+      std::make_shared<std::variant<std::string, bool, int, double>>(value);
   return *this;
 }
 
 XVIZTimeSeriesBuilder& XVIZTimeSeriesBuilder::Value(int value) {
-  value_ = std::make_shared<std::variant<std::string, bool, int, double>>(value);
+  value_ =
+      std::make_shared<std::variant<std::string, bool, int, double>>(value);
   return *this;
 }
 
 XVIZTimeSeriesBuilder& XVIZTimeSeriesBuilder::Value(double value) {
-  value_ = std::make_shared<std::variant<std::string, bool, int, double>>(value);
+  value_ =
+      std::make_shared<std::variant<std::string, bool, int, double>>(value);
   return *this;
 }
 
@@ -137,9 +150,7 @@ std::shared_ptr<std::vector<TimeSeriesState>> XVIZTimeSeriesBuilder::GetData() {
   return ts_state;
 }
 
-void XVIZTimeSeriesBuilder::Validate() {
-  XVIZBaseBuilder::Validate();
-}
+void XVIZTimeSeriesBuilder::Validate() { XVIZBaseBuilder::Validate(); }
 
 void XVIZTimeSeriesBuilder::AddTimestampEntry() {
   // if (!IsDataPending()) {
@@ -181,9 +192,7 @@ void XVIZTimeSeriesBuilder::AddTimestampEntry() {
       ts_entry[*id_] = GetIdEntry(field_name);
     }
   } else {
-    (*data_)[*timestamp_] = TimeSeriesIdType{
-      {*id_, GetIdEntry(field_name)}
-    };
+    (*data_)[*timestamp_] = TimeSeriesIdType{{*id_, GetIdEntry(field_name)}};
   }
 }
 
@@ -214,15 +223,15 @@ bool XVIZTimeSeriesBuilder::IsDataPending() {
   return id_ != nullptr && timestamp_ != nullptr && value_ != nullptr;
 }
 
-TimeSeriesFieldEntryType XVIZTimeSeriesBuilder::GetFieldEntry(const std::string& field_name) {
+TimeSeriesFieldEntryType XVIZTimeSeriesBuilder::GetFieldEntry(
+    const std::string& field_name) {
   TimeSeriesFieldEntryType entry;
   std::get<0>(entry).emplace_back(stream_id_);
   std::get<1>(entry)[field_name].emplace_back(*value_);
   return entry;
 }
 
-TimeSeriesFieldType XVIZTimeSeriesBuilder::GetIdEntry(const std::string& field_name) {
-  return TimeSeriesFieldType{
-    {field_name, GetFieldEntry(field_name)}
-  };
+TimeSeriesFieldType XVIZTimeSeriesBuilder::GetIdEntry(
+    const std::string& field_name) {
+  return TimeSeriesFieldType{{field_name, GetFieldEntry(field_name)}};
 }

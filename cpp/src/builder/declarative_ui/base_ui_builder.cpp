@@ -5,21 +5,22 @@
  */
 
 #include "xviz/builder/declarative_ui/base_ui_builder.h"
-#include "xviz/builder/declarative_ui/video_builder.h"
 #include "xviz/builder/declarative_ui/container_builder.h"
 #include "xviz/builder/declarative_ui/metric_builder.h"
+#include "xviz/builder/declarative_ui/video_builder.h"
 
 using namespace xviz;
 
 // template<typename... Args>
-// std::shared_ptr<XVIZBaseUIBuilder> GetChild(ComponentType type, Args... args) {
+// std::shared_ptr<XVIZBaseUIBuilder> GetChild(ComponentType type, Args... args)
+// {
 //   std::shared_ptr<XVIZBaseUIBuilder> child = nullptr;
 
 //   switch (type) {
 //     case ComponentType::METRIC:
 //       child = std::make_shared<XVIZMetricBuilder>(args...);
 //       break;
-    
+
 //     case ComponentType::VIDEO:
 //       break;
 
@@ -37,30 +38,33 @@ XVIZBaseUIBuilder::XVIZBaseUIBuilder(ComponentType type) {
   type_ = std::make_shared<ComponentType>(type);
 }
 
-std::shared_ptr<XVIZBaseUIBuilder> XVIZBaseUIBuilder::Child(const std::shared_ptr<XVIZBaseUIBuilder>& child) {
+std::shared_ptr<XVIZBaseUIBuilder> XVIZBaseUIBuilder::Child(
+    const std::shared_ptr<XVIZBaseUIBuilder>& child) {
   children_.push_back(child);
   return child;
 }
 
 // // Video child
-// std::shared_ptr<XVIZBaseUIBuilder> XVIZBaseUIBuilder::Child(const std::vector<std::string>& cameras) {
+// std::shared_ptr<XVIZBaseUIBuilder> XVIZBaseUIBuilder::Child(const
+// std::vector<std::string>& cameras) {
 //   auto child = std::make_shared<XVIZVideoBuilder>(cameras);
 //   children_.push_back(child);
 //   return child;
 // }
 // // Metric child
-// std::shared_ptr<XVIZBaseUIBuilder> XVIZBaseUIBuilder::Child(const std::vector<std::string>& streams, const std::string& description, const std::string& title) {
-//   auto child = std::make_shared<XVIZMetricBuilder>(streams, description, title);
-//   children_.push_back(child);
-//   return child;
+// std::shared_ptr<XVIZBaseUIBuilder> XVIZBaseUIBuilder::Child(const
+// std::vector<std::string>& streams, const std::string& description, const
+// std::string& title) {
+//   auto child = std::make_shared<XVIZMetricBuilder>(streams, description,
+//   title); children_.push_back(child); return child;
 // }
 // // Container child
-// std::shared_ptr<XVIZBaseUIBuilder> XVIZBaseUIBuilder::Child(const std::string& name, LayoutType layout) {
+// std::shared_ptr<XVIZBaseUIBuilder> XVIZBaseUIBuilder::Child(const
+// std::string& name, LayoutType layout) {
 //   auto child = std::make_shared<XVIZContainerBuilder>(name, layout);
 //   children_.push_back(child);
 //   return child;
 // }
-
 
 UIPanel XVIZBaseUIBuilder::GetUI() {
   UIPanel uis;
