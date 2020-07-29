@@ -15,7 +15,7 @@
 import {flattenToTypedArray} from './flatten';
 
 function packBinaryJsonTypedArray(gltfBuilder, object, objectKey, info) {
-  if (gltfBuilder.isImage(object)) {
+  if (gltfBuilder.isImage(object) || (info && info.isImage)) {
     const imageIndex = gltfBuilder.addImage(object);
     return `#/images/${imageIndex}`;
   }
@@ -28,6 +28,7 @@ function packBinaryJsonTypedArray(gltfBuilder, object, objectKey, info) {
 // Follows a convention used by @loaders.gl to use JSONPointers
 // to encode where the binary data for an XVIZ element resides.
 // The unpacking is handled automatically by @loaders.gl
+/* eslint-disable complexity */
 export function packBinaryJson(json, gltfBuilder, objectKey = null, options = {}) {
   const {flattenArrays = true} = options;
   let object = json;
@@ -45,18 +46,25 @@ export function packBinaryJson(json, gltfBuilder, objectKey = null, options = {}
       object = flatObject.typedArray;
       objectInfo = flatObject;
     } else {
-      return object.map(element => packBinaryJson(element, gltfBuilder, options));
+      return object.map(element => packBinaryJson(element, gltfBuilder, null, options));
     }
   }
 
   // Typed arrays, pack them as binary
   if (ArrayBuffer.isView(object) && gltfBuilder) {
+    if (options && options.isImage) {
+      objectInfo = {...objectInfo, isImage: true};
+    }
     return packBinaryJsonTypedArray(gltfBuilder, object, objectKey, objectInfo);
   }
 
   if (object !== null && typeof object === 'object') {
     const newObject = {};
     for (const key in object) {
+      // Detect XVIZ Image entry and mark appropriately
+      if (['data', 'width_px', 'height_px'].every(field => field in object)) {
+        options = {...options, isImage: true};
+      }
       newObject[key] = packBinaryJson(object[key], gltfBuilder, key, options);
     }
     return newObject;
@@ -64,6 +72,7 @@ export function packBinaryJson(json, gltfBuilder, objectKey = null, options = {}
 
   return object;
 }
+/* eslint-enable complexity */
 
 function flattenObject(key, object) {
   let typedArray = null;

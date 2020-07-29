@@ -21,6 +21,7 @@ import {parseBinaryXVIZ, XVIZ_GLTF_EXTENSION} from '@xviz/parser';
 
 import {GLBWriter} from '@loaders.gl/gltf';
 import {encodeSync} from '@loaders.gl/core';
+import '@loaders.gl/polyfills';
 
 import clone from 'clone';
 

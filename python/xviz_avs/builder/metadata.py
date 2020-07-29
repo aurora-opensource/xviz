@@ -4,7 +4,8 @@ import numpy as np
 
 from xviz_avs.message import XVIZMessage
 from xviz_avs.builder.base_builder import build_object_style, build_stream_style
-from xviz_avs.v2.session_pb2 import Metadata, StreamMetadata, LogInfo, UIPanelInfo
+from xviz_avs.v2.session_pb2 import Metadata, StreamMetadata, LogInfo
+
 
 class XVIZMetadataBuilder:
     def __init__(self, logger=logging.getLogger("xviz")):
@@ -16,18 +17,16 @@ class XVIZMetadataBuilder:
 
     def get_data(self):
         self._flush()
-        
+
         metadata = self._data
 
         if self._temp_ui_builder:
             panels = self._temp_ui_builder.get_ui()
-            metadata.ui_config = edict()
 
             for panel_key in panels.keys():
-                metadata.ui_config[panel_key] = UIPanelInfo(
-                    name=panels[panel_key].name,
-                    config=panels[panel_key]
-                )
+                metadata.ui_config[panel_key].name = panel_key
+                metadata.ui_config[panel_key].config.update(panels[panel_key])
+
         return metadata
 
     def get_message(self):
@@ -104,9 +103,9 @@ class XVIZMetadataBuilder:
         if not self._stream_id:
             self._logger.error('A stream must set before adding a style rule.')
             return self
-
-        stream_rule = edict(name=name, style=build_object_style(style))
-        self._temp_stream.style_classes.append(stream_rule)
+        style_class = self._temp_stream.style_classes.add()
+        style_class.name = name
+        style_class.style.MergeFrom(build_object_style(style))
         return self
 
     def log_info(self, data):
@@ -123,7 +122,7 @@ class XVIZMetadataBuilder:
                 stream_data.scalar_type = self._temp_type
 
             self._data.streams[self._stream_id].MergeFrom(stream_data)
-        
+
         self._reset()
 
     def _reset(self):

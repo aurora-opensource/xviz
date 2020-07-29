@@ -106,8 +106,9 @@ class XVIZBaseBuilder:
 
     def _flush(self):
         raise NotImplementedError("Derived class should implement this method")
+
     def reset(self):
-        self._category = None
+        self._stream_id = None
 
     def _validate_has_prop(self, name):
         if not hasattr(self, name) or not getattr(self, name):

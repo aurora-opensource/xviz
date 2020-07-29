@@ -69,16 +69,13 @@ export default class XVIZUIPrimitiveBuilder extends XVIZBaseBuilder {
   }
 
   row(id, values) {
-    if (this._type) {
-      this._flush();
-    }
-
     this.validatePropSetOnce('_id');
 
-    this._row = new XVIZTreeTableRowBuilder(id, values);
+    const row = new XVIZTreeTableRowBuilder(id, values);
+    this._rows.push(row);
     this._type = PRIMITIVE_TYPES.treetable;
 
-    return this._row;
+    return row;
   }
 
   _validate() {
@@ -144,8 +141,8 @@ export default class XVIZUIPrimitiveBuilder extends XVIZBaseBuilder {
   _formatPrimitives() {
     switch (this._type) {
       case PRIMITIVE_TYPES.treetable:
-        if (this._row !== null) {
-          return this._row.getData();
+        if (this._rows.length > 0) {
+          return [].concat(...this._rows.map(row => row.getData()));
         }
         break;
 
@@ -159,6 +156,6 @@ export default class XVIZUIPrimitiveBuilder extends XVIZBaseBuilder {
     this._type = null;
 
     this._columns = null;
-    this._row = null;
+    this._rows = [];
   }
 }
