@@ -13,7 +13,7 @@
 #include "xviz/builder/declarative_ui/plot_builder.h"
 #include "xviz/builder/declarative_ui/table_builder.h"
 #include "xviz/builder/declarative_ui/video_builder.h"
-#include "xviz/proto/declarativeui.pb.h"
+#include "declarativeui.pb.h"
 
 #include <vector>
 

@@ -8,8 +8,8 @@
 #define XVIZ_UI_PRIMITIVE_H_
 
 #include "base_builder.h"
-#include "xviz/proto/core.pb.h"
-#include "xviz/proto/uiprimitives.pb.h"
+#include "core.pb.h"
+#include "uiprimitives.pb.h"
 #include "xviz/utils/utils.h"
 
 #include <memory>

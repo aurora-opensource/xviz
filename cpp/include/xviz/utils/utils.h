@@ -8,7 +8,7 @@
 #define XVIZ_UTILS_H_
 
 #include <nlohmann/json.hpp>
-#include "xviz/proto/style.pb.h"
+#include "style.pb.h"
 #include "xviz/utils/definitions.h"
 #include "xviz/utils/macrologger.h"
 

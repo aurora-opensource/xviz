@@ -7,7 +7,7 @@
 #ifndef XVIZ_DECLARATIVE_UI_BASE_BUILDER_H_
 #define XVIZ_DECLARATIVE_UI_BASE_BUILDER_H_
 
-#include "xviz/proto/declarativeui.pb.h"
+#include "declarativeui.pb.h"
 
 #include <memory>
 #include <vector>

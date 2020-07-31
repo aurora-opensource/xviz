@@ -10,8 +10,8 @@
 #include <cpp-base64/base64.h>
 #include <nlohmann/json.hpp>
 #include "base_builder.h"
-#include "xviz/proto/core.pb.h"
-#include "xviz/proto/primitives.pb.h"
+#include "core.pb.h"
+#include "primitives.pb.h"
 #include "xviz/utils/macrologger.h"
 #include "xviz/utils/utils.h"
 

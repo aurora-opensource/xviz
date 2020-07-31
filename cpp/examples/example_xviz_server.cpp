@@ -13,7 +13,7 @@
 #include "xviz/builder/metadata.h"
 #include "xviz/builder/pose.h"
 #include "xviz/builder/xviz_builder.h"
-#include "xviz/proto/primitives.pb.h"
+#include "primitives.pb.h"
 
 #include "xviz/builder/declarative_ui/container_builder.h"
 #include "xviz/builder/declarative_ui/metric_builder.h"

@@ -2,39 +2,17 @@
 message(STATUS "libxviz CMAKE_CXX_FLAGS: " ${CMAKE_CXX_FLAGS})
 
 
-find_package(Protobuf REQUIRED)
-if(PROTOBUF_FOUND)
-    message(STATUS "protobuf library found")
-else()
-    message(FATAL_ERROR "protobuf library is needed but cant be found")
-endif()
-
+find_package(protobuf REQUIRED)
 find_package(websocketpp CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 find_path(CPP_BASE64_INCLUDE_DIRS "cpp-base64/base64.cpp")
 
 
-
 include_directories(${XVIZ_ROOT_DIR}/include)
-include_directories(${PROTOBUF_INCLUDE_DIRS})
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # all headers
 install(DIRECTORY ${XVIZ_ROOT_DIR}/include/xviz DESTINATION include)
-
-# protobuf files
-file(GLOB libxviz_pb_sources
-  "${XVIZ_ROOT_DIR}/src/proto/declarativeui.pb.cc"
-  "${XVIZ_ROOT_DIR}/src/proto/session.pb.cc"
-  "${XVIZ_ROOT_DIR}/src/proto/session.pb.cc"
-  "${XVIZ_ROOT_DIR}/src/proto/core.pb.cc"
-  "${XVIZ_ROOT_DIR}/src/proto/annotation.pb.cc"
-  "${XVIZ_ROOT_DIR}/src/proto/primitives.pb.cc"
-  "${XVIZ_ROOT_DIR}/src/proto/uiprimitives.pb.cc"
-  "${XVIZ_ROOT_DIR}/src/proto/style.pb.cc"
-  "${XVIZ_ROOT_DIR}/src/proto/options.pb.cc"
-  "${XVIZ_ROOT_DIR}/src/proto/envelope.pb.cc"
-)
-set(libxviz_sources "${libxviz_sources};${libxviz_pb_sources}")
 
 # utils sources
 file(GLOB libxviz_utils_sources
@@ -93,12 +71,20 @@ add_library(xviz
   ${libxviz_sources}
 )
 
-target_link_libraries(xviz ${PROTOBUF_LIBRARIES})
+# generate protobuf files
+file(GLOB PROTO_FILES "${XVIZ_ROOT_DIR}/pb/*.proto")
+protobuf_generate(
+  LANGUAGE CPP
+  TARGET xviz
+  IMPORT_DIRS ${XVIZ_ROOT_DIR}/pb/ ${protobuf_DIR}/../../include/
+  PROTOS ${PROTO_FILES})
+
+target_link_libraries(xviz protobuf::libprotoc protobuf::libprotobuf protobuf::libprotobuf-lite)
 target_link_libraries(xviz websocketpp::websocketpp)
 target_link_libraries(xviz cpp-base64)
 target_link_libraries(xviz nlohmann_json nlohmann_json::nlohmann_json)
+target_include_directories(xviz PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
+target_include_directories(xviz PUBLIC ${XVIZ_ROOT_DIR}/include)
 
 
 install(TARGETS xviz DESTINATION lib)
-
-target_include_directories(xviz PUBLIC ${XVIZ_ROOT_DIR}/include)

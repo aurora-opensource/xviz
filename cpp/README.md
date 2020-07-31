@@ -1,9 +1,8 @@
 # XVIZ In C++ [![Build Status](https://travis-ci.com/wx9698/xviz.svg?branch=master)](https://travis-ci.com/wx9698/xviz) [![codecov](https://codecov.io/gh/wx9698/xviz/branch/master/graph/badge.svg)](https://codecov.io/gh/wx9698/xviz)
 
 ## Minimum Requirements
-1. CMake 3.5.0+
-2. Protobuf 3.11.0
-3. [vcpkg](https://github.com/microsoft/vcpkg/tree/master)
+1. CMake 3.14+ (This is high temporarily because of a protobuf cmake problem. I will lower this requirement upon the problem is resolved.)
+2. [vcpkg](https://github.com/microsoft/vcpkg/tree/master)
 
 ## Example
 
@@ -17,9 +16,9 @@ Please see [example.cpp](https://github.com/wx9698/xviz/blob/master/examples/exa
 ### Download required packages
 ```bash
 cd VCPKG_PATH
-./vcpkg install websocketpp
-./vcpkg install nlohmann-json
-./vcpkg install cpp-base64
+./vcpkg install websocketpp nlohmann-json cpp-base64 protobuf
+# if you want to build tests, don't forget to download gtest
+./vcpkg install gtest
 ```
 
 ### Build xviz builder example
@@ -50,6 +49,7 @@ make xviz-test -j12
 ```
 
 ### Install
+This is not tested.
 ```bash
 mkdir build && cd build
 cmake ../ -DCMAKE_INSTALL_PREFIX=/path/you/want/to/install/ -DCMAKE_TOOLCHAIN_FILE=VCPKG_PATH/scripts/buildsystems/vcpkg.cmake

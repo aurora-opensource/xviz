@@ -8,8 +8,8 @@
 #define XVIZ_MESSAGE_H_
 
 #include <nlohmann/json.hpp>
-#include "xviz/proto/core.pb.h"
-#include "xviz/proto/session.pb.h"
+#include "core.pb.h"
+#include "session.pb.h"
 #include "xviz/utils/macrologger.h"
 #include "xviz/utils/utils.h"
 

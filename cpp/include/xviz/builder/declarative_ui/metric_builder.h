@@ -8,7 +8,7 @@
 #define XVIZ_DECLARATIVE_UI_METRIC_BUILDER_H_
 
 #include "base_ui_builder.h"
-#include "xviz/proto/declarativeui.pb.h"
+#include "declarativeui.pb.h"
 
 namespace xviz {
 
