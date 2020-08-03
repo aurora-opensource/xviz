@@ -1,8 +1,8 @@
 # Raven Setup
 
 ## To install
-# python3 
 ```bash
+# python3 is the expected runtime environment
 # pwd - xviz/python
 python setup.py .
 ```
