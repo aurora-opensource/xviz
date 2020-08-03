@@ -1,3 +1,23 @@
+# Raven Setup
+
+## To install
+# python3 
+```bash
+# pwd - xviz/python
+python setup.py .
+```
+## To run
+```bash
+# We use steetscape.gl for the front end
+# the frontend should be served from the streetscape.gl repo
+# pwd - streetscape.gl/examples/get-started
+# npm run start-live
+
+# For the backend, we use the python xviz tooling
+# pwd - xviz/python
+python examples/serve_scenarios.py
+```
+
 # xviz.py
 
 Python implementation of XVIZ protocol. Note that this repository only comply with the protocol standard, the some of the implemented structure and modules definition are not the same. 
