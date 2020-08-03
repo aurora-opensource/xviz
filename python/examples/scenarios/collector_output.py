@@ -1,11 +1,5 @@
-"""
-This module provides a example scenario where a vehicle drives along a circle.
-"""
-
 import math
 import time
-import json
-import os
 import shutil
 import cv2
 import numpy as np
@@ -42,9 +36,19 @@ class CollectorScenario:
 
         tar_file = '/home/raven.ravenind.net/r103943/Desktop/collector/v2020-25-0-25ed12058f204e60ab6bf655e1d95640-nodetection-primary-forward-57-smartag-autocart-1596479215515-3668.tar'
         extract_dir = '/home/raven.ravenind.net/r103943/Desktop/collector/extracted'
+        tar_file = Path(tar_file)
+        extract_dir = Path(extract_dir)
 
+        if not tar_file.is_file():
+            print('tar file does not exit')
+        if not extract_dir.is_dir():
+            extract_dir.mkdir(parents=True)
 
+        # if there are no txt files in the directory, the tar needs to be unpacked
+        if not list(extract_dir.glob('*.txt')):
+            shutil.unpack_archive(str(tar_file), str(extract_dir))
 
+        self.perception_instances = sorted(extract_dir.glob('*.txt'))
 
 
     def get_metadata(self):
@@ -52,6 +56,16 @@ class CollectorScenario:
             builder = xviz.XVIZMetadataBuilder()
             builder.stream("/vehicle_pose").category(xviz.CATEGORY.POSE)
             builder.stream("/radar_targets")\
+                .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
+                .stream_style({'fill_color': [200, 0, 70, 128]})\
+                .category(xviz.CATEGORY.PRIMITIVE)\
+                .type(xviz.PRIMITIVE_TYPES.CIRCLE)
+            builder.stream("/tracking_targets")\
+                .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
+                .stream_style({'fill_color': [200, 0, 70, 128]})\
+                .category(xviz.CATEGORY.PRIMITIVE)\
+                .type(xviz.PRIMITIVE_TYPES.CIRCLE)
+            builder.stream("/camera_targets")\
                 .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
                 .stream_style({'fill_color': [200, 0, 70, 128]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
@@ -106,7 +120,7 @@ class CollectorScenario:
 
             builder = xviz.XVIZBuilder(metadata=self._metadata)
             self._draw_measuring_circles(builder, timestamp)
-            self._draw_tracks(builder, timestamp)
+            self._draw_perception_tracks(builder, timestamp)
             data = builder.get_message()
 
             return {
@@ -196,18 +210,30 @@ class CollectorScenario:
         except Exception as e:
             print("Crashed in draw tracks:", e)
 
+    
+    def _draw_perception_tracks(self, builder: xviz.XVIZBuilder, timestamp):
+        try:
+            print("Drawing perception instance")
+            builder.pose()\
+                .timestamp(timestamp)
 
-    def unpack_tar(self, tar_file, destination_direc):
-        if not destination_direc.is_dir():
-            destination_direc.mkdir(parents=True)
-        shutil.unpack_archive(str(tar_file), str(destination_direc))
+            if self.index == len(self.perception_instances):
+                self.index = 0
+
+            perception_instance = self.perception_instances[self.index]
+
+            collector_proto_msg = self.deserialize_collector_proto_msg(perception_instance)
+            img = self.extract_image(collector_proto_msg.frame)
+            camera_output, radar_output, tracking_output = self.extract_proto_msgs(collector_proto_msg)
+
+            self.index += 1
 
     
-    def visualize_collector_output(self):
+    def visualize_collector_proto_msg(self):
         for serialized_perception_file in sorted(self.extract_directory.glob('*.txt')):
-            collector_output = self.extract_collector_output(serialized_perception_file)
-            img = self.extract_image(collector_output.frame)
-            camera_output, radar_output, tracking_output = self.extract_proto_msgs(collector_output)
+            collector_proto_msg = self.deserialize_collector_proto_msg(serialized_perception_file)
+            img = self.extract_image(collector_proto_msg.frame)
+            camera_output, radar_output, tracking_output = self.extract_proto_msgs(collector_proto_msg)
             if len(radar_output.targets) > 0:
                 print(radar_output.targets[1])
             # radar_output = MessageToDict(radar_output)
@@ -215,10 +241,10 @@ class CollectorScenario:
             #     print(radar_output['targets'])
 
 
-    def extract_collector_output(self, file_path):
-        collector_output = collector_pb2.CollectorOutput()
-        collector_output.ParseFromString(Path(file_path).read_bytes())
-        return collector_output
+    def deserialize_collector_proto_msg(self, file_path):
+        collector_proto_msg = collector_pb2.CollectorOutput()
+        collector_proto_msg.ParseFromString(Path(file_path).read_bytes())
+        return collector_proto_msg
 
 
     def extract_image(self, img_bytes):
@@ -227,19 +253,14 @@ class CollectorScenario:
         return decimg
 
     
-    def extract_proto_msgs(self, collector_output):
+    def extract_proto_msgs(self, collector_proto_msg):
         camera_output = camera_pb2.CameraOutput()
-        camera_output.ParseFromString(collector_output.camera_output)
+        camera_output.ParseFromString(collector_proto_msg.camera_output)
 
         radar_output = radar_pb2.RadarOutput()
-        radar_output.ParseFromString(collector_output.radar_output)
+        radar_output.ParseFromString(collector_proto_msg.radar_output)
 
         tracking_output = falconeye_pb2.TrackingOutput()
-        tracking_output.ParseFromString(collector_output.tracking_output)
+        tracking_output.ParseFromString(collector_proto_msg.tracking_output)
 
         return camera_output, radar_output, tracking_output
-
-
-    def show_image(self, img):
-        cv2.imshow('', img)
-        cv2.waitKey(33)
