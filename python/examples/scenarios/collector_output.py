@@ -268,31 +268,55 @@ class CollectorScenario:
         try:
             for target in radar_output['targets'].values():
                 if 'dr' in target:
-                    (x, y, z) = self.get_target_xyz(target)
+                    (x, y, z) = self.get_object_xyz(target, 'phi', 'dr')
                     if self.radar_filter.is_valid_target(target['target_id'], target):
-                        #Red
-                        fill_color = [255, 0, 0]
+                        fill_color = [255, 0, 0] # Red
                     else:
-                        #Blue
-                        fill_color = [0, 0, 255]
+                        fill_color = [0, 0, 255] # Blue
+
                     builder.primitive('/radar_targets').circle([x, y, z], .5)\
                         .style({'fill_color': fill_color})\
                         .id(str(target['target_id']))
+
         except Exception as e:
             print('Crashed in draw radar targets: ', e)
 
     
-    def _draw_tracking_targets(self, camera_output):
-        pass
+    def _draw_tracking_targets(self, tracking_output, builder: xviz.XVIZBuilder):
+        try:
+            if 'tracks' in tracking_output:
+                min_confidence = 0.1
+                min_hits = 2
+                for track in tracking_output['tracks']:
+                    if track['score'] > min_confidence and track['hitStreak'] > min_hits:
+                        (x, y, z) = self.get_object_xyz(track, 'angle', 'distance')
+                        fill_color = [0, 255, 0] # Green
+
+                        builder.primitive('/tracking_targets').circle([x, y, z], .5)\
+                            .style({'fill_color': fill_color})\
+                            .id(track['trackId'])
+
+        except Exception as e:
+            print('Crashed in draw tracking targets: ', e)
 
 
-    def _draw_camera_targets(self, camera_output):
-        pass
-    
+    def _draw_camera_targets(self, camera_output, builder: xviz.XVIZBuilder):
+        try:
+            for target in camera_output['targets']:
+                (x, y, z) = self.get_object_xyz(target, 'objectAngle', 'objectDistance')
+                fill_color = [0, 0, 0] # Black
 
-    def get_target_xyz(self, target):
-        x = math.cos(target['phi']) * target['dr']
-        y = math.sin(target['phi']) * target['dr']
+                builder.primitive('/camera_targets').circle([x, y, z], .5)\
+                        .style({'fill_color': fill_color})\
+                        .id(target['label'])
+
+        except Exception as e:
+            print('Crashed in draw camera targets: ', e)
+
+
+    def get_object_xyz(self, ob, angle_key, dist_key):
+        x = math.cos(ob[angle_key]) * ob[dist_key]
+        y = math.sin(ob[angle_key]) * ob[dist_key]
         z = .1
 
         return (x, y, z)
