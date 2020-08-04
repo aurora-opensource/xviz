@@ -29,41 +29,57 @@
                                        << expected_json << std::endl;
 }
 
-std::unordered_map<std::string, xviz::XVIZUIBuilder>
-xviz::test::GetTestUIBuilders() {
+xviz::XVIZUIBuilder xviz::test::GetTestUIBuilders() {
   using namespace xviz;
+  XVIZUIBuilder ui_builder;
 
-  std::unordered_map<std::string, XVIZUIBuilder> ui_builders;
-
-  ui_builders["Camera"] = XVIZUIBuilder();
-  ui_builders["Metrics"] = XVIZUIBuilder();
-  ui_builders["Plot"] = XVIZUIBuilder();
-  ui_builders["Table"] = XVIZUIBuilder();
-
+  XVIZPanelBuilder panel("Camera");
   std::vector<std::string> cameras = {"/camera/images0"};
-  std::vector<std::string> streams = {"/object/ts"};
-  std::vector<std::string> dep_vars = {"ddd", "aaa"};
-  // auto camera_builder = std::make_shared<XVIZVideoBuilder>(cameras);
-  XVIZVideoBuilder camera_builder(cameras);
-  XVIZPlotBuilder plot_builder("title", "des", "indep_var",
-                               std::move(dep_vars));
-  XVIZTableBuilder table_builder("title", "des", "/some_stream/table", true);
+  panel.Child<XVIZVideoBuilder>(cameras);
+  ui_builder.Child(panel);
 
-  std::shared_ptr<XVIZBaseUIBuilder> metric_builder1 =
-      std::make_shared<XVIZMetricBuilder>(streams, "123", "123");
-  std::shared_ptr<XVIZBaseUIBuilder> metric_builder2 =
-      std::make_shared<XVIZMetricBuilder>(streams, "123", "123");
+  std::vector<std::string> streams = {"/vehicle/acceleration"};
+  XVIZContainerBuilder container("Metrics", "VERTICAL");
+  container.Child<XVIZMetricBuilder>(streams, "123", "123");
+  container.Child<XVIZMetricBuilder>(streams, "123", "123");
+  container.Child<XVIZMetricBuilder>(streams, "123", "123");
+  ui_builder.Child(container);
 
-  std::shared_ptr<XVIZBaseUIBuilder> container_builder =
-      std::make_shared<XVIZContainerBuilder>("metrics", LayoutType::VERTICAL);
-  container_builder->Child(metric_builder1);
-  container_builder->Child(metric_builder2);
-  container_builder->Child<XVIZMetricBuilder>(streams, "123", "123");
-  ui_builders["Camera"].Child(std::move(camera_builder));
-  ui_builders["Metrics"].Child(container_builder);
-  ui_builders["Plot"].Child(plot_builder);
-  ui_builders["Table"].Child(table_builder);
-  return ui_builders;
+  return ui_builder;
+  // using namespace xviz;
+
+  // std::unordered_map<std::string, XVIZUIBuilder> ui_builders;
+
+  // ui_builders["Camera"] = XVIZUIBuilder();
+  // ui_builders["Metrics"] = XVIZUIBuilder();
+  // ui_builders["Plot"] = XVIZUIBuilder();
+  // ui_builders["Table"] = XVIZUIBuilder();
+
+  // std::vector<std::string> cameras = {"/camera/images0"};
+  // std::vector<std::string> streams = {"/object/ts"};
+  // std::vector<std::string> dep_vars = {"ddd", "aaa"};
+  // // auto camera_builder = std::make_shared<XVIZVideoBuilder>(cameras);
+  // XVIZVideoBuilder camera_builder(cameras);
+  // XVIZPlotBuilder plot_builder("title", "des", "indep_var",
+  //                              std::move(dep_vars));
+  // XVIZTableBuilder table_builder("title", "des", "/some_stream/table", true);
+
+  // std::shared_ptr<XVIZBaseUIBuilder> metric_builder1 =
+  //     std::make_shared<XVIZMetricBuilder>(streams, "123", "123");
+  // std::shared_ptr<XVIZBaseUIBuilder> metric_builder2 =
+  //     std::make_shared<XVIZMetricBuilder>(streams, "123", "123");
+
+  // std::shared_ptr<XVIZBaseUIBuilder> container_builder =
+  //     std::make_shared<XVIZContainerBuilder>("metrics",
+  //     LayoutType::VERTICAL);
+  // container_builder->Child(metric_builder1);
+  // container_builder->Child(metric_builder2);
+  // container_builder->Child<XVIZMetricBuilder>(streams, "123", "123");
+  // ui_builders["Camera"].Child(std::move(camera_builder));
+  // ui_builders["Metrics"].Child(container_builder);
+  // ui_builders["Plot"].Child(plot_builder);
+  // ui_builders["Table"].Child(table_builder);
+  // return ui_builders;
 }
 
 xviz::XVIZMetadataBuilder xviz::test::GetTestMetadataBuilder() {
@@ -189,23 +205,17 @@ nlohmann::json xviz::test::GetTestMetadataExpectedJson() {
       "uptest\":{\"category\":\"UI_PRIMITIVE\",\"source\":\"unknown "
       "source\"},\"/"
       "vehicle_pose\":{\"category\":\"POSE\"}},\"ui_config\":{\"Camera\":{"
-      "\"children\":[{\"cameras\":[\"/camera/"
-      "images0\"],\"type\":\"VIDEO\"}],\"name\":\"Camera\",\"type\":\"panel\"},"
-      "\"Metrics\":{\"children\":[{\"children\":[{\"description\":\"123\","
-      "\"streams\":[\"/object/"
-      "ts\"],\"title\":\"123\",\"type\":\"METRIC\"},{\"description\":\"123\","
-      "\"streams\":[\"/object/"
-      "ts\"],\"title\":\"123\",\"type\":\"METRIC\"},{\"description\":\"123\","
-      "\"streams\":[\"/object/"
-      "ts\"],\"title\":\"123\",\"type\":\"METRIC\"}],\"name\":\"metrics\","
-      "\"type\":\"CONTAINER\"}],\"name\":\"Metrics\",\"type\":\"panel\"},"
-      "\"Plot\":{\"children\":[{\"dependent_variables\":[\"ddd\",\"aaa\"],"
-      "\"description\":\"des\",\"independent_variable\":\"indep_var\","
-      "\"title\":\"title\",\"type\":\"PLOT\"}],\"name\":\"Plot\",\"type\":"
-      "\"panel\"},\"Table\":{\"children\":[{\"description\":\"des\",\"display_"
-      "object_id\":true,\"stream\":\"/some_stream/"
-      "table\",\"title\":\"title\",\"type\":\"TABLE\"}],\"name\":\"Table\","
-      "\"type\":\"panel\"}},\"version\":\"2.0.0\"}";
+      "\"config\":{\"children\":[{\"cameras\":[\"/camera/"
+      "images0\"],\"type\":\"VIDEO\"}],\"name\":\"Camera\",\"type\":\"PANEL\"},"
+      "\"name\":\"Camera\"},\"Metrics\":{\"config\":{\"children\":[{"
+      "\"description\":\"123\",\"streams\":[\"/vehicle/"
+      "acceleration\"],\"title\":\"123\",\"type\":\"METRIC\"},{\"description\":"
+      "\"123\",\"streams\":[\"/vehicle/"
+      "acceleration\"],\"title\":\"123\",\"type\":\"METRIC\"},{\"description\":"
+      "\"123\",\"streams\":[\"/vehicle/"
+      "acceleration\"],\"title\":\"123\",\"type\":\"METRIC\"}],\"layout\":"
+      "\"VERTICAL\",\"name\":\"Metrics\",\"type\":\"CONTAINER\"},\"name\":"
+      "\"Metrics\"}},\"version\":\"2.0.0\"}";
   return nlohmann::json::parse(expected_str);
 }
 

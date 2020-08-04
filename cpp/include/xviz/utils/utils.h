@@ -7,10 +7,11 @@
 #ifndef XVIZ_UTILS_H_
 #define XVIZ_UTILS_H_
 
+#include <cpp-base64/base64.h>
 #include <nlohmann/json.hpp>
-#include "style.pb.h"
 #include "xviz/utils/definitions.h"
 #include "xviz/utils/macrologger.h"
+#include "xviz/v2/style.pb.h"
 
 #include <google/protobuf/util/json_util.h>
 #include <memory>

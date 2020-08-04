@@ -9,29 +9,18 @@
 using namespace xviz;
 
 XVIZMetricBuilder::XVIZMetricBuilder(const std::vector<std::string>& streams,
-                                     const std::string& description,
-                                     const std::string& title)
-    : XVIZBaseUIBuilder(ComponentType::METRIC),
-      streams_(streams),
-      description_(description),
-      title_(title) {}
+                                     const std::string& title,
+                                     const std::string& description)
+    : XVIZBaseUIComponentBuilder("METRIC", title, description),
+      streams_(streams) {}
 XVIZMetricBuilder::XVIZMetricBuilder(std::vector<std::string>&& streams,
-                                     const std::string& description,
-                                     const std::string& title)
-    : XVIZBaseUIBuilder(ComponentType::METRIC),
-      streams_(std::move(streams)),
-      description_(description),
-      title_(title) {}
+                                     const std::string& title,
+                                     const std::string& description)
+    : XVIZBaseUIComponentBuilder("METRIC", title, description),
+      streams_(std::move(streams)) {}
 
-UIPanel XVIZMetricBuilder::GetUI() {
-  UIPanel ui_panel = XVIZBaseUIBuilder::GetUI();
-
-  for (const auto& stream : streams_) {
-    auto new_stream_ptr = ui_panel.add_streams();
-    *new_stream_ptr = stream;
-  }
-  ui_panel.set_description(description_);
-  ui_panel.set_title(title_);
-
+nlohmann::json XVIZMetricBuilder::GetUI() const {
+  nlohmann::json ui_panel = XVIZBaseUIComponentBuilder::GetUI();
+  ui_panel["streams"] = streams_;
   return ui_panel;
 }

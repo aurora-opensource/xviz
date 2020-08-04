@@ -4,7 +4,7 @@
 
 syntax = "proto3";
 
-package xviz;
+package xviz.v2;
 
 option csharp_namespace = "xviz.V2";
 option go_package = "v2pb";
@@ -12,14 +12,12 @@ option java_multiple_files = true;
 option java_outer_classname = "CoreProto";
 option java_package = "com.xviz.v2";
 option objc_class_prefix = "XVIZ";
+option php_namespace = "Xviz\\V2";
 
-
-import "annotation.proto";
-import "options.proto";
-import "primitives.proto";
-import "uiprimitives.proto";
-
-
+import "xviz/v2/annotation.proto";
+import "xviz/v2/options.proto";
+import "xviz/v2/primitives.proto";
+import "xviz/v2/uiprimitives.proto";
 
 message StreamSet {
   option (xviz_json_schema) = "core/stream_set";

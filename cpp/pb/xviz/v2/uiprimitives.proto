@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package xviz;
+package xviz.v2;
 
 option csharp_namespace = "xviz.V2";
 option go_package = "v2pb";
@@ -8,9 +8,9 @@ option java_multiple_files = true;
 option java_outer_classname = "UiprimitivesProto";
 option java_package = "com.xviz.v2";
 option objc_class_prefix = "XVIZ";
+option php_namespace = "Xviz\\V2";
 
-
-import "options.proto";
+import "xviz/v2/options.proto";
 
 message TreeTable {
   option (xviz_json_schema) = "ui-primitives/treetable";

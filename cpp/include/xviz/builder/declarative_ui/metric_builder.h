@@ -7,24 +7,23 @@
 #ifndef XVIZ_DECLARATIVE_UI_METRIC_BUILDER_H_
 #define XVIZ_DECLARATIVE_UI_METRIC_BUILDER_H_
 
-#include "base_ui_builder.h"
-#include "declarativeui.pb.h"
+#include "base_ui_component_builder.h"
 
 namespace xviz {
 
-class XVIZMetricBuilder : public XVIZBaseUIBuilder {
+class XVIZMetricBuilder : public XVIZBaseUIComponentBuilder {
  public:
   XVIZMetricBuilder(const std::vector<std::string>& streams,
-                    const std::string& description, const std::string& title);
+                    const std::string& title = "",
+                    const std::string& description = "");
   XVIZMetricBuilder(std::vector<std::string>&& streams,
-                    const std::string& description, const std::string& title);
+                    const std::string& title = "",
+                    const std::string& description = "");
 
-  UIPanel GetUI() override;
+  nlohmann::json GetUI() const override;
 
  private:
   std::vector<std::string> streams_{};
-  std::string description_{};
-  std::string title_{};
 };
 
 }  // namespace xviz

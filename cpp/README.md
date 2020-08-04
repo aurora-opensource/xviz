@@ -59,7 +59,7 @@ make install
 
 ### Format
 ```bash
-find . -name "*.h" -not -wholename "**/proto/*.h" -exec clang-format -style=file -i {} \;
+find . -name "*.h" -not -exec clang-format -style=file -i {} \;
 find . -name "*.cpp" -not -wholename "./build/*" -exec clang-format -style=file -i {} \;
 ```
 

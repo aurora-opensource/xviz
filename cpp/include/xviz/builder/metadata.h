@@ -15,7 +15,7 @@
 #include "xviz/utils/utils.h"
 
 #include "xviz/message.h"
-#include "session.pb.h"
+#include "xviz/v2/session.pb.h"
 
 #include <memory>
 
@@ -32,13 +32,9 @@ class XVIZMetadataBuilder : public XVIZBaseBuilder {
   XVIZMetadataBuilder& StartTime(double time);
   XVIZMetadataBuilder& EndTime(double time);
 
-  XVIZMetadataBuilder& UI(
-      const std::unordered_map<std::string, XVIZUIBuilder>& ui_builder);
-  XVIZMetadataBuilder& UI(
-      std::unordered_map<std::string, XVIZUIBuilder>&& ui_builder);
-  XVIZMetadataBuilder& UI(
-      const std::shared_ptr<std::unordered_map<std::string, XVIZUIBuilder>>&
-          ui_builder_ptr);
+  XVIZMetadataBuilder& UI(const XVIZUIBuilder& ui_builder);
+  XVIZMetadataBuilder& UI(XVIZUIBuilder&& ui_builder);
+  XVIZMetadataBuilder& UI(const std::shared_ptr<XVIZUIBuilder>& ui_builder_ptr);
 
   XVIZMetadataBuilder& Source(const std::string& source);
   // XVIZMetadataBuilder& Source(std::string&& source);
@@ -70,7 +66,7 @@ class XVIZMetadataBuilder : public XVIZBaseBuilder {
   void Vaildate();
 
   std::shared_ptr<Metadata> data_{nullptr};
-  std::shared_ptr<std::unordered_map<std::string, XVIZUIBuilder>> ui_{nullptr};
+  std::shared_ptr<XVIZUIBuilder> ui_{nullptr};
   // std::string stream_id_{};
   StreamMetadata temp_stream_{};
   int type_ = -1;

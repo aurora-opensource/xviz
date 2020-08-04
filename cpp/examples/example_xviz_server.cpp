@@ -13,45 +13,58 @@
 #include "xviz/builder/metadata.h"
 #include "xviz/builder/pose.h"
 #include "xviz/builder/xviz_builder.h"
-#include "primitives.pb.h"
+#include "xviz/v2/primitives.pb.h"
 
 #include "xviz/builder/declarative_ui/container_builder.h"
 #include "xviz/builder/declarative_ui/metric_builder.h"
 #include "xviz/builder/declarative_ui/table_builder.h"
 #include "xviz/builder/declarative_ui/video_builder.h"
-#include "xviz/io/glb_writer.h"
+#include "xviz/io/protobuf_writer.h"
 
 using namespace xviz;
 
-std::unordered_map<std::string, XVIZUIBuilder> GetUIBuilders() {
-  std::unordered_map<std::string, XVIZUIBuilder> ui_builders;
+XVIZUIBuilder GetUIBuilder() {
+  XVIZUIBuilder ui_builder;
 
-  ui_builders["Camera"] = XVIZUIBuilder();
-  ui_builders["Metrics"] = XVIZUIBuilder();
-  ui_builders["Tables"] = XVIZUIBuilder();
-
+  XVIZPanelBuilder panel("Camera");
   std::vector<std::string> cameras = {"/camera/images0"};
+  panel.Child<XVIZVideoBuilder>(cameras);
+  ui_builder.Child(panel);
+
   std::vector<std::string> streams = {"/vehicle/acceleration"};
-  std::vector<std::string> dep_vars = {"ddd", "aaa"};
-  XVIZVideoBuilder camera_builder(cameras);
+  XVIZContainerBuilder container("Metrics", "VERTICAL");
+  container.Child<XVIZMetricBuilder>(streams, "123", "123");
+  container.Child<XVIZMetricBuilder>(streams, "123", "123");
+  container.Child<XVIZMetricBuilder>(streams, "123", "123");
+  ui_builder.Child(container);
 
-  std::shared_ptr<XVIZBaseUIBuilder> container_builder =
-      std::make_shared<XVIZContainerBuilder>("metrics", LayoutType::VERTICAL);
-  container_builder->Child<XVIZMetricBuilder>(streams, "acceleration",
-                                              "acceleration");
+  return ui_builder;
+  // std::unordered_map<std::string, XVIZUIBuilder> ui_builders;
 
-  auto table_builder1 =
-      std::make_shared<XVIZTableBuilder>("table1", "table1", "/table/1", false);
-  std::shared_ptr<XVIZBaseUIBuilder> container_builder2 =
-      std::make_shared<XVIZContainerBuilder>("tables", LayoutType::VERTICAL);
-  container_builder2->Child(table_builder1);
-  container_builder2->Child<XVIZTableBuilder>("table2", "table2", "/table/2",
-                                              true);
+  // ui_builders["Camera"] = XVIZUIBuilder();
+  // ui_builders["Metrics"] = XVIZUIBuilder();
+  // ui_builders["Tables"] = XVIZUIBuilder();
 
-  ui_builders["Camera"].Child(std::move(camera_builder));
-  ui_builders["Metrics"].Child(container_builder);
-  ui_builders["Tables"].Child(container_builder2);
-  return ui_builders;
+  // std::vector<std::string> cameras = {"/camera/images0"};
+  // std::vector<std::string> streams = {"/vehicle/acceleration"};
+  // std::vector<std::string> dep_vars = {"ddd", "aaa"};
+  // XVIZVideoBuilder camera_builder(cameras);
+  // std::shared_ptr<XVIZBaseUIBuilder> container_builder =
+  // std::make_shared<XVIZContainerBuilder>("metrics", LayoutType::VERTICAL);
+  // container_builder->Child<XVIZMetricBuilder>(streams, "acceleration",
+  // "acceleration");
+
+  // auto table_builder1 = std::make_shared<XVIZTableBuilder>("table1",
+  // "table1", "/table/1", false); std::shared_ptr<XVIZBaseUIBuilder>
+  // container_builder2 = std::make_shared<XVIZContainerBuilder>("tables",
+  // LayoutType::VERTICAL); container_builder2->Child(table_builder1);
+  // container_builder2->Child<XVIZTableBuilder>("table2", "table2", "/table/2",
+  // true);
+
+  // ui_builders["Camera"].Child(std::move(camera_builder));
+  // ui_builders["Metrics"].Child(container_builder);
+  // ui_builders["Tables"].Child(container_builder2);
+  // return ui_builders;
 }
 
 class Scenario {
@@ -86,9 +99,15 @@ class Scenario {
   }
 
   std::shared_ptr<XVIZMetadataBuilder> GetMetaBuilder() {
-    std::string s = "{\"fill_color\": \"#fff\"}";
-    std::string s1 = "{\"fill_color\": \"#0ff\"}";  //, \"point_color_mode\":
+    std::string s = "{\"fill_color\": \"#f00\"}";
+    std::string s1 = "{\"fill_color\": \"#f00\"}";  //, \"point_color_mode\":
                                                     //\"ELEVATION\"}";
+    //     std::vector<unsigned char> colors = {(unsigned char)255, 0 ,0};
+    // auto ss = base64_encode(colors.data(), colors.size());
+
+    //   std::string s = "{\"fill_color\":\"" + ss + "\"}";
+    //   std::cout << s << std::endl;
+
     auto metadata_builder = std::make_shared<XVIZMetadataBuilder>();
     metadata_builder->Stream("/vehicle_pose")
         .Category(Category::StreamMetadata_Category_POSE)
@@ -111,7 +130,7 @@ class Scenario {
         .Category(Category::StreamMetadata_Category_TIME_SERIES)
         .Unit("m/s^2")
         .Type(ScalarType::StreamMetadata_ScalarType_FLOAT)
-        .UI(std::move(GetUIBuilders()));
+        .UI(GetUIBuilder());
     metadata_ptr_ = metadata_builder;
     return metadata_builder;
   }
@@ -161,10 +180,12 @@ class Scenario {
         .Row(1, {"2"});
 
     cnt++;
-    XVIZGLBWriter writer;
     std::string str;
-    writer.WriteMessage(str, builder.GetMessage());
-    return str;
+    // XVIZGLBWriter writer;
+    // writer.WriteMessage(str, builder.GetMessage());
+    // return builder.GetMessage().ToObjectString();
+    return WriteToProtobuf(builder.GetMessage());
+    // return str;
     // return builder.GetMessage().ToObjectString();
   }
 

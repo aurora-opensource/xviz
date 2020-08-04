@@ -7,21 +7,17 @@
 #include "xviz/builder/declarative_ui/table_builder.h"
 
 using namespace xviz;
-XVIZTableBuilder::XVIZTableBuilder(const std::string& title,
-                                   const std::string& description,
-                                   const std::string& stream,
-                                   bool display_object_id)
-    : XVIZBaseUIBuilder(ComponentType::TABLE),
-      title_(title),
-      description_(description),
+XVIZTableBuilder::XVIZTableBuilder(const std::string& stream,
+                                   bool display_object_id,
+                                   const std::string& title,
+                                   const std::string& description)
+    : XVIZBaseUIComponentBuilder("TABLE", title, description),
       stream_(stream),
       display_object_id_(display_object_id) {}
 
-UIPanel XVIZTableBuilder::GetUI() {
-  auto ui_panel = XVIZBaseUIBuilder::GetUI();
-  ui_panel.set_title(title_);
-  ui_panel.set_description(description_);
-  ui_panel.set_stream(stream_);
-  ui_panel.set_display_object_id(display_object_id_);
+nlohmann::json XVIZTableBuilder::GetUI() const {
+  auto ui_panel = XVIZBaseUIComponentBuilder::GetUI();
+  ui_panel["stream"] = stream_;
+  ui_panel["displayObjectId"] = display_object_id_;
   return ui_panel;
 }

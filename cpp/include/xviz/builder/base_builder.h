@@ -11,7 +11,7 @@
 #include "xviz/utils/macrologger.h"
 #include "xviz/utils/utils.h"
 
-#include "session.pb.h"
+#include "xviz/v2/session.pb.h"
 
 #include <memory>
 #include <string>

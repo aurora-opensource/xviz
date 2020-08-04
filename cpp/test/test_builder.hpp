@@ -28,8 +28,8 @@
     auto vec_ptr = std::make_shared<decltype(vec)>(vector); \
     builder.Primitive(base_name + std::string("/copy")).FUNC_NAME(vector); \
     builder.Primitive(base_name + std::string("/move")).FUNC_NAME(std::move(vec)); \
-    builder.Primitive(base_name + std::string("/pointer")).FUNC_NAME(vec_ptr); \
   } \
+    // builder.Primitive(base_name + std::string("/pointer")).FUNC_NAME(vec_ptr); \
 
 #define TYPE_FUNC_3(FUNC_NAME, ADDON_FUNC_NAME, builder, base_name, vector_ori, addon_vector_ori) \
   { \
@@ -79,12 +79,12 @@ TEST_F(XVIZBuilderTest, PritimiveTest) {
     .Circle(std::make_shared<std::vector<double>>(CreateNPointsVector(1)), 0.1);
 
   // image
-  TYPE_FUNC_1(Image, builder, "/primitive/IMAGE", std::string("123"), true);
+  TYPE_FUNC_2(Image, builder, "/primitive/IMAGE", std::string("123"));
   builder.Primitive("/primitive/IMAGE/pointer")
-    .Image("AAA", false).Dimensions(100u, 100u);
+    .Image("AAA").Dimensions(100u, 100u);
   const std::string image_tmp("AAA");
   builder.Primitive("/primitive/IMAGE/pointer")
-    .Image(image_tmp, false).Position({1, 2, 3});
+    .Image(image_tmp).Position({1, 2, 3});
 
   // point
   TYPE_FUNC_3(Points, Colors, builder, "/primitive/POINT", CreateNPointsVector(1), std::vector<uint8_t>(4, 4u));
@@ -104,7 +104,7 @@ TEST_F(XVIZBuilderTest, PritimiveTest) {
   TYPE_FUNC_3(Text, Position, builder, "/primitive/TEXT", std::string("text"), CreateNPointsVector(1));
 
   auto builder_json = builder.GetMessage().ToObject();
-  auto expected_str = "{\"update_type\":\"SNAPSHOT\",\"updates\":[{\"poses\":{\"/vehicle_pose\":{\"map_origin\":{},\"orientation\":[0,0,0],\"position\":[0,0,0],\"timestamp\":1000}},\"primitives\":{\"/primitive/CIRCLE/copy\":{\"circles\":[{\"center\":[0,1,2],\"radius\":0.1}]},\"/primitive/CIRCLE/move\":{\"circles\":[{\"center\":[0,1,2],\"radius\":0.1}]},\"/primitive/CIRCLE/pointer\":{\"circles\":[{\"center\":[0,1,2],\"radius\":0.1}]},\"/primitive/IMAGE/copy\":{\"images\":[{\"data\":\"MTIz\",\"is_encoded\":true}]},\"/primitive/IMAGE/move\":{\"images\":[{\"data\":\"MTIz\",\"is_encoded\":true}]},\"/primitive/IMAGE/pointer\":{\"images\":[{\"data\":\"AAA\",\"height_px\":100,\"width_px\":100},{\"data\":\"AAA\",\"position\":[1,2,3]}]},\"/primitive/POINT/copy\":{\"points\":[{\"colors\":[4,4,4,4],\"points\":[0,1,2]}]},\"/primitive/POINT/move\":{\"points\":[{\"colors\":[4,4,4,4],\"points\":[0,1,2]}]},\"/primitive/POINT/pointer\":{\"points\":[{\"colors\":[4,4,4,4],\"points\":[0,1,2]}]},\"/primitive/POLYGON/copy\":{\"polygons\":[{\"base\":{\"classes\":[\"classes\"]},\"vertices\":[0,1,2,3,4,5,6,7,8,9,10,11]}]},\"/primitive/POLYGON/move\":{\"polygons\":[{\"base\":{\"classes\":[\"classes\"]},\"vertices\":[0,1,2,3,4,5,6,7,8,9,10,11]}]},\"/primitive/POLYGON/pointer\":{\"polygons\":[{\"base\":{\"classes\":[\"classes\"]},\"vertices\":[0,1,2,3,4,5,6,7,8,9,10,11]}]},\"/primitive/POLYLINE/copy\":{\"polylines\":[{\"base\":{\"object_id\":\"1123\"},\"vertices\":[0,1,2,3,4,5,6,7,8,9,10,11]}]},\"/primitive/POLYLINE/move\":{\"polylines\":[{\"base\":{\"object_id\":\"1123\"},\"vertices\":[0,1,2,3,4,5,6,7,8,9,10,11]}]},\"/primitive/POLYLINE/pointer\":{\"polylines\":[{\"base\":{\"object_id\":\"1123\"},\"vertices\":[0,1,2,3,4,5,6,7,8,9,10,11]}]},\"/primitive/STADIUM/copy\":{\"stadiums\":[{\"end\":[0,1,2],\"radius\":0.5,\"start\":[0,1,2]}]},\"/primitive/TEXT/copy\":{\"texts\":[{\"position\":[0,1,2],\"text\":\"text\"}]},\"/primitive/TEXT/move\":{\"texts\":[{\"position\":[0,1,2],\"text\":\"text\"}]},\"/primitive/TEXT/pointer\":{\"texts\":[{\"position\":[0,1,2],\"text\":\"text\"}]}},\"timestamp\":1000}]}";
+  auto expected_str = "{\"update_type\":\"SNAPSHOT\",\"updates\":[{\"poses\":{\"/vehicle_pose\":{\"map_origin\":{},\"orientation\":[0,0,0],\"position\":[0,0,0],\"timestamp\":1000}},\"primitives\":{\"/primitive/CIRCLE/copy\":{\"circles\":[{\"center\":[0,1,2],\"radius\":0.1}]},\"/primitive/CIRCLE/move\":{\"circles\":[{\"center\":[0,1,2],\"radius\":0.1}]},\"/primitive/CIRCLE/pointer\":{\"circles\":[{\"center\":[0,1,2],\"radius\":0.1}]},\"/primitive/IMAGE/copy\":{\"images\":[{\"data\":\"MTIz\"}]},\"/primitive/IMAGE/move\":{\"images\":[{\"data\":\"MTIz\"}]},\"/primitive/IMAGE/pointer\":{\"images\":[{\"data\":\"QUFB\",\"height_px\":100,\"width_px\":100},{\"data\":\"QUFB\",\"position\":[1,2,3]}]},\"/primitive/POINT/copy\":{\"points\":[{\"colors\":[4,4,4,4],\"points\":[0,1,2]}]},\"/primitive/POINT/move\":{\"points\":[{\"colors\":[4,4,4,4],\"points\":[0,1,2]}]},\"/primitive/POINT/pointer\":{\"points\":[{\"colors\":[4,4,4,4],\"points\":[0,1,2]}]},\"/primitive/POLYGON/copy\":{\"polygons\":[{\"base\":{\"classes\":[\"classes\"]},\"vertices\":[0,1,2,3,4,5,6,7,8,9,10,11]}]},\"/primitive/POLYGON/move\":{\"polygons\":[{\"base\":{\"classes\":[\"classes\"]},\"vertices\":[0,1,2,3,4,5,6,7,8,9,10,11]}]},\"/primitive/POLYGON/pointer\":{\"polygons\":[{\"base\":{\"classes\":[\"classes\"]},\"vertices\":[0,1,2,3,4,5,6,7,8,9,10,11]}]},\"/primitive/POLYLINE/copy\":{\"polylines\":[{\"base\":{\"object_id\":\"1123\"},\"vertices\":[0,1,2,3,4,5,6,7,8,9,10,11]}]},\"/primitive/POLYLINE/move\":{\"polylines\":[{\"base\":{\"object_id\":\"1123\"},\"vertices\":[0,1,2,3,4,5,6,7,8,9,10,11]}]},\"/primitive/POLYLINE/pointer\":{\"polylines\":[{\"base\":{\"object_id\":\"1123\"},\"vertices\":[0,1,2,3,4,5,6,7,8,9,10,11]}]},\"/primitive/STADIUM/copy\":{\"stadiums\":[{\"end\":[0,1,2],\"radius\":0.5,\"start\":[0,1,2]}]},\"/primitive/TEXT/copy\":{\"texts\":[{\"position\":[0,1,2],\"text\":\"text\"}]},\"/primitive/TEXT/move\":{\"texts\":[{\"position\":[0,1,2],\"text\":\"text\"}]},\"/primitive/TEXT/pointer\":{\"texts\":[{\"position\":[0,1,2],\"text\":\"text\"}]}},\"timestamp\":1000}]}";
   auto expected_json = nlohmann::json::parse(expected_str);
 
   ASSERT_TRUE(xviz::test::IsSameJson(expected_json, builder_json));

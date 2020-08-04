@@ -8,12 +8,10 @@
 #define XVIZ_PRIMITIVE_BUILDER_H_
 
 #include <cpp-base64/base64.h>
-#include <nlohmann/json.hpp>
 #include "base_builder.h"
-#include "core.pb.h"
-#include "primitives.pb.h"
-#include "xviz/utils/macrologger.h"
 #include "xviz/utils/utils.h"
+#include "xviz/v2/core.pb.h"
+#include "xviz/v2/primitives.pb.h"
 
 namespace xviz {
 
@@ -57,10 +55,8 @@ class XVIZPrimitiveBuilder : public XVIZBaseBuilder {
       const std::shared_ptr<std::vector<double>>& vertices_ptr, double radius);
 
   XVIZPrimitiveBuilder& Dimensions(uint32_t width_pixel, uint32_t height_pixel);
-  XVIZPrimitiveBuilder& Image(const std::string& raw_data_str,
-                              bool is_encoding_needed = false);
-  XVIZPrimitiveBuilder& Image(std::string&& raw_data_str,
-                              bool is_encoding_needed = false);
+  XVIZPrimitiveBuilder& Image(const std::string& raw_data_str);
+  XVIZPrimitiveBuilder& Image(std::string&& raw_data_str);
 
   XVIZPrimitiveBuilder& Text(const std::string& message);
   XVIZPrimitiveBuilder& Text(std::string&& message);

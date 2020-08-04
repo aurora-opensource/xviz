@@ -4,7 +4,7 @@
 
 syntax = "proto3";
 
-package xviz;
+package xviz.v2;
 
 option csharp_namespace = "xviz.V2";
 option go_package = "v2pb";
@@ -12,13 +12,12 @@ option java_multiple_files = true;
 option java_outer_classname = "SessionProto";
 option java_package = "com.xviz.v2";
 option objc_class_prefix = "XVIZ";
-
+option php_namespace = "Xviz\\V2";
 
 import "google/protobuf/struct.proto";
-import "core.proto";
-import "options.proto";
-import "style.proto";
-import "declarativeui.proto";
+import "xviz/v2/core.proto";
+import "xviz/v2/options.proto";
+import "xviz/v2/style.proto";
 
 // NOTE: this enum purposely not scoped inside Start to avoid naming conflict
 // with "log" field and "log" type
@@ -186,10 +185,8 @@ message CameraInfo {
 message UIPanelInfo {
   option (xviz_json_schema) = "session/ui_panel_info";
   string name = 1;
-  // repeated string needed_streams = 2;
-  // google.protobuf.Struct config = 3;
-  repeated UIPanel children = 2;
-  string type = 3;
+  repeated string needed_streams = 2;
+  google.protobuf.Struct config = 3;
 }
 
 message LogInfo

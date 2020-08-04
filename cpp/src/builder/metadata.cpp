@@ -19,19 +19,16 @@ std::shared_ptr<Metadata> XVIZMetadataBuilder::GetData() {
   Flush();
 
   if (ui_ != nullptr) {
-    auto ui_config_ptr = data_->mutable_ui_config();
-
-    for (auto& [panel_key, builder] : *ui_) {
-      auto ui_panel_info = UIPanelInfo();
-      ui_panel_info.set_name(panel_key);
-      ui_panel_info.set_type("panel");
-      auto uis = builder.GetUI();
-      for (auto& ui : uis) {
-        auto new_ui = ui_panel_info.add_children();
-        *new_ui = std::move(ui);
-      }
-      // *(ui_panel_info.mutable_config()) = std::move(cfg);
-      (*ui_config_ptr)[panel_key] = std::move(ui_panel_info);
+    auto panels = ui_->GetUI();
+    auto ui_config = data_->mutable_ui_config();
+    for (const auto& [panel_key, ui] : panels) {
+      xviz::v2::UIPanelInfo panel;
+      panel.set_name(panel_key);
+      google::protobuf::Struct s;
+      google::protobuf::util::JsonStringToMessage(
+          ui.dump(), &s, google::protobuf::util::JsonParseOptions());
+      panel.mutable_config()->MergeFrom(std::move(s));
+      ui_config->insert({panel_key, panel});
     }
   }
 
@@ -58,21 +55,16 @@ XVIZMetadataBuilder& XVIZMetadataBuilder::EndTime(double time) {
   return *this;
 }
 
-XVIZMetadataBuilder& XVIZMetadataBuilder::UI(
-    const std::unordered_map<std::string, XVIZUIBuilder>& ui_builder) {
-  return UI(std::make_shared<std::unordered_map<std::string, XVIZUIBuilder>>(
-      ui_builder));
+XVIZMetadataBuilder& XVIZMetadataBuilder::UI(const XVIZUIBuilder& ui_builder) {
+  return UI(std::make_shared<XVIZUIBuilder>(ui_builder));
+}
+
+XVIZMetadataBuilder& XVIZMetadataBuilder::UI(XVIZUIBuilder&& ui_builder) {
+  return UI(std::make_shared<XVIZUIBuilder>(std::move(ui_builder)));
 }
 
 XVIZMetadataBuilder& XVIZMetadataBuilder::UI(
-    std::unordered_map<std::string, XVIZUIBuilder>&& ui_builder) {
-  return UI(std::make_shared<std::unordered_map<std::string, XVIZUIBuilder>>(
-      std::move(ui_builder)));
-}
-
-XVIZMetadataBuilder& XVIZMetadataBuilder::UI(
-    const std::shared_ptr<std::unordered_map<std::string, XVIZUIBuilder>>&
-        ui_builder_ptr) {
+    const std::shared_ptr<XVIZUIBuilder>& ui_builder_ptr) {
   ui_ = ui_builder_ptr;
   return *this;
 }

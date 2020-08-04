@@ -9,11 +9,7 @@
 
 #include "xviz/builder/declarative_ui/base_ui_builder.h"
 #include "xviz/builder/declarative_ui/container_builder.h"
-#include "xviz/builder/declarative_ui/metric_builder.h"
-#include "xviz/builder/declarative_ui/plot_builder.h"
-#include "xviz/builder/declarative_ui/table_builder.h"
-#include "xviz/builder/declarative_ui/video_builder.h"
-#include "declarativeui.pb.h"
+#include "xviz/builder/declarative_ui/panel_builder.h"
 
 #include <vector>
 
@@ -23,27 +19,30 @@ class XVIZUIBuilder {
  public:
   XVIZUIBuilder();
 
-  XVIZUIBuilder& Child(const std::shared_ptr<XVIZBaseUIBuilder>& child);
+  XVIZUIBuilder& Child(const XVIZPanelBuilder& panel);
+  XVIZUIBuilder& Child(const XVIZContainerBuilder& container);
+  // XVIZUIBuilder& Child(const std::shared_ptr<XVIZBaseUIBuilder>& child);
 
-  XVIZUIBuilder& Child(const XVIZContainerBuilder& child);
-  XVIZUIBuilder& Child(XVIZContainerBuilder&& child);
+  // XVIZUIBuilder& Child(const XVIZContainerBuilder& child);
+  // XVIZUIBuilder& Child(XVIZContainerBuilder&& child);
 
-  XVIZUIBuilder& Child(const XVIZMetricBuilder& child);
-  XVIZUIBuilder& Child(XVIZMetricBuilder&& child);
+  // XVIZUIBuilder& Child(const XVIZMetricBuilder& child);
+  // XVIZUIBuilder& Child(XVIZMetricBuilder&& child);
 
-  XVIZUIBuilder& Child(const XVIZVideoBuilder& child);
-  XVIZUIBuilder& Child(XVIZVideoBuilder&& child);
+  // XVIZUIBuilder& Child(const XVIZVideoBuilder& child);
+  // XVIZUIBuilder& Child(XVIZVideoBuilder&& child);
 
-  XVIZUIBuilder& Child(const XVIZPlotBuilder& child);
-  XVIZUIBuilder& Child(XVIZPlotBuilder&& child);
+  // XVIZUIBuilder& Child(const XVIZPlotBuilder& child);
+  // XVIZUIBuilder& Child(XVIZPlotBuilder&& child);
 
-  XVIZUIBuilder& Child(const XVIZTableBuilder& child);
-  XVIZUIBuilder& Child(XVIZTableBuilder&& child);
+  // XVIZUIBuilder& Child(const XVIZTableBuilder& child);
+  // XVIZUIBuilder& Child(XVIZTableBuilder&& child);
 
-  std::vector<xviz::UIPanel> GetUI();
+  std::unordered_map<std::string, nlohmann::json> GetUI() const;
 
  private:
-  std::vector<std::shared_ptr<XVIZBaseUIBuilder>> children_{};
+  std::vector<XVIZPanelBuilder> panel_children_{};
+  std::vector<XVIZContainerBuilder> container_children_{};
 };
 
 }  // namespace xviz

@@ -10,6 +10,8 @@
 #include <gtest/gtest.h>
 #include <nlohmann/json.hpp>
 #include <sstream>
+#include "xviz/builder/declarative_ui/metric_builder.h"
+#include "xviz/builder/declarative_ui/video_builder.h"
 #include "xviz/builder/metadata.h"
 #include "xviz/builder/xviz_builder.h"
 
@@ -23,7 +25,7 @@ namespace test {
                                            const nlohmann::json& given_json);
 
 // Metadata
-std::unordered_map<std::string, xviz::XVIZUIBuilder> GetTestUIBuilders();
+xviz::XVIZUIBuilder GetTestUIBuilders();
 
 XVIZMetadataBuilder GetTestMetadataBuilder();
 

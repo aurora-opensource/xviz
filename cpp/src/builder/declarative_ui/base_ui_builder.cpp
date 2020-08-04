@@ -34,15 +34,13 @@ using namespace xviz;
 //   return child;
 // }
 
-XVIZBaseUIBuilder::XVIZBaseUIBuilder(ComponentType type) {
-  type_ = std::make_shared<ComponentType>(type);
-}
+XVIZBaseUIBuilder::XVIZBaseUIBuilder(const std::string& type) : type_(type) {}
 
-std::shared_ptr<XVIZBaseUIBuilder> XVIZBaseUIBuilder::Child(
-    const std::shared_ptr<XVIZBaseUIBuilder>& child) {
-  children_.push_back(child);
-  return child;
-}
+// std::shared_ptr<XVIZBaseUIBuilder> XVIZBaseUIBuilder::Child(const
+// std::shared_ptr<XVIZBaseUIBuilder>& child) {
+//   children_.push_back(child);
+//   return child;
+// }
 
 // // Video child
 // std::shared_ptr<XVIZBaseUIBuilder> XVIZBaseUIBuilder::Child(const
@@ -66,23 +64,8 @@ std::shared_ptr<XVIZBaseUIBuilder> XVIZBaseUIBuilder::Child(
 //   return child;
 // }
 
-UIPanel XVIZBaseUIBuilder::GetUI() {
-  UIPanel uis;
-  uis.set_type(*type_);
-  if (children_.size() > 0) {
-    for (auto& child : children_) {
-      auto new_ui_panels = uis.add_children();
-      *new_ui_panels = child->GetUI();
-    }
-  }
-  return uis;
-}
-
-void XVIZBaseUIBuilder::AddChildUIs(UIPanel& ui_panel) {
-  if (children_.size() > 0) {
-    for (auto& child : children_) {
-      auto new_ui_panels = ui_panel.add_children();
-      *new_ui_panels = child->GetUI();
-    }
-  }
+nlohmann::json XVIZBaseUIBuilder::GetUI() const {
+  nlohmann::json json;
+  json["type"] = type_;
+  return json;
 }

@@ -8,8 +8,8 @@
 #define XVIZ_POSE_BUILDER_H_
 
 #include "xviz/builder/base_builder.h"
-#include "core.pb.h"
 #include "xviz/utils/utils.h"
+#include "xviz/v2/core.pb.h"
 
 #include <memory>
 #include <string>
