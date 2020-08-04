@@ -238,7 +238,6 @@ class CollectorScenario:
     
     def _draw_perception_outputs(self, builder: xviz.XVIZBuilder, timestamp):
         try:
-            print("Drawing perception instance")
             builder.pose()\
                 .timestamp(timestamp)
 
@@ -248,8 +247,8 @@ class CollectorScenario:
             perception_instance = self.perception_instances[self.index]
 
             collector_proto_msg = self.deserialize_collector_proto_msg(perception_instance)
-            img = self.extract_image(collector_proto_msg.frame)
             camera_output, radar_output, tracking_output = self.extract_proto_msgs(collector_proto_msg)
+            img = self.extract_image(collector_proto_msg.frame)
 
             if radar_output:
                 self._draw_radar_targets(radar_output, builder)
@@ -257,29 +256,32 @@ class CollectorScenario:
                 self._draw_tracking_targets(tracking_output, builder)
             if camera_output:
                 self._draw_camera_targets(camera_output, builder)
+                img = self.postprocess(img, camera_output)
+            
+            self.show_image(img)
 
             self.index += 1
         
         except Exception as e:
-            print('Crashed in draw perception outputs: ', e)
+            print('Crashed in draw perception outputs:', e)
 
     
     def _draw_radar_targets(self, radar_output, builder: xviz.XVIZBuilder):
         try:
             for target in radar_output['targets'].values():
                 if 'dr' in target:
-                    (x, y, z) = self.get_object_xyz(target, 'phi', 'dr')
+                    (x, y, z) = self.get_object_xyz(target, 'phi', 'dr', radar_ob=True)
                     if self.radar_filter.is_valid_target(target['target_id'], target):
-                        fill_color = [255, 0, 0] # Red
+                        fill_color = [255, 255, 0] # Yellow
                     else:
-                        fill_color = [0, 0, 255] # Blue
+                        fill_color = [255, 0, 0] # Red
 
                     builder.primitive('/radar_targets').circle([x, y, z], .5)\
                         .style({'fill_color': fill_color})\
                         .id(str(target['target_id']))
 
         except Exception as e:
-            print('Crashed in draw radar targets: ', e)
+            print('Crashed in draw radar targets:', e)
 
     
     def _draw_tracking_targets(self, tracking_output, builder: xviz.XVIZBuilder):
@@ -297,27 +299,31 @@ class CollectorScenario:
                             .id(track['trackId'])
 
         except Exception as e:
-            print('Crashed in draw tracking targets: ', e)
+            print('Crashed in draw tracking targets:', e)
 
 
     def _draw_camera_targets(self, camera_output, builder: xviz.XVIZBuilder):
         try:
             for target in camera_output['targets']:
                 (x, y, z) = self.get_object_xyz(target, 'objectAngle', 'objectDistance')
-                fill_color = [0, 0, 0] # Black
+                fill_color = [0, 0, 255] # Blue
 
                 builder.primitive('/camera_targets').circle([x, y, z], .5)\
                         .style({'fill_color': fill_color})\
                         .id(target['label'])
 
         except Exception as e:
-            print('Crashed in draw camera targets: ', e)
+            print('Crashed in draw camera targets:', e)
 
 
-    def get_object_xyz(self, ob, angle_key, dist_key):
+    def get_object_xyz(self, ob, angle_key, dist_key, radar_ob=False):
         x = math.cos(ob[angle_key]) * ob[dist_key]
         y = math.sin(ob[angle_key]) * ob[dist_key]
         z = .1
+
+        if radar_ob:
+            radar_offset_inline = 3.21213 # meters
+            x += radar_offset_inline
 
         return (x, y, z)
 
@@ -348,3 +354,46 @@ class CollectorScenario:
         tracking_output = MessageToDict(tracking_output)
 
         return camera_output, radar_output, tracking_output
+
+    
+    def show_image(self, image):
+        image = cv2.resize(image, (0, 0), fx=.7, fy=.7)
+        cv2.imshow('', image)
+        cv2.waitKey(1)
+
+
+    def postprocess(self, image, camera_output):
+        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+
+        for target in camera_output['targets']:
+            tl, br = target['topleft'], target['bottomright']
+            tl['x'], tl['y'] = int(tl['x']), int(tl['y'])
+            br['x'], br['y'] = int(br['x']), int(br['y'])
+
+            label = target['label']
+            conf = str("%.1f" % (target['confidence'] * 100)) + '%'
+
+            thickness = (image.shape[0] + image.shape[1]) // 1000
+            fontFace = cv2.FONT_HERSHEY_SIMPLEX  # 'font/FiraMono-Medium.otf',
+            fontScale = 1
+            label_size = cv2.getTextSize(label, fontFace, fontScale, thickness)
+            if tl['y'] - label_size[1] >= 0:
+                text_origin = (tl['x'], tl['y'] - label_size[1])
+            else:
+                text_origin = (tl['x'], tl['y'] + 1)
+
+            '''
+            cv2.rectangle(image, (tl['x'], tl['y']), (br['x'], br['y']),
+                        self.colors.get(label, (0, 0, 0)), thickness)
+            cv2.putText(image, conf, text_origin, fontFace,
+                        fontScale, self.colors.get(label, (0, 0, 0)), 2)
+            '''
+            box_color = (241, 240, 236)
+            cv2.rectangle(image, (tl['x'], tl['y']), (br['x'], br['y']),
+                        box_color, thickness)
+            cv2.putText(image, conf, text_origin, fontFace,
+                        fontScale, box_color, 2)
+
+        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+        
+        return image
