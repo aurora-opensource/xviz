@@ -3,7 +3,9 @@ import time
 import shutil
 import cv2
 import numpy as np
+from collections import deque
 from pathlib import Path
+from google.protobuf.json_format import MessageToDict
 
 import xviz
 import xviz.builder as xbuilder
@@ -20,6 +22,96 @@ from protobuf_APIs import collector_pb2, falconeye_pb2, radar_pb2, camera_pb2
 
 DEG_1_AS_RAD = math.pi / 180
 DEG_90_AS_RAD = 90 * DEG_1_AS_RAD
+
+
+class RadarFilter:
+
+    def __init__(self, qfilter_enabled=True, queue_size=12, consecutive_min=7,
+                    pexist_min=0.8, d_bpower_min=-10, phi_sdv_max=0.1, nan_threshold=0.5):
+        self.qfilter_enabled = qfilter_enabled
+        self.queue_size = queue_size
+        self.consecutive_min = consecutive_min
+        self.pexist_min = pexist_min
+        self.d_bpower_min = d_bpower_min
+        self.phi_sdv_max = phi_sdv_max
+        self.nan_threshold = nan_threshold # maximum percent of queue that can be nan before it is automatically evaluated as an invalid target
+
+        self.target_queues = {}
+
+
+    def is_valid_target(self, target_id, target):
+        if self.qfilter_enabled:
+            self.make_target_queue_if_nonexistent(target_id)
+            self.update_queues(target_id, target)
+
+            if self.is_default_target(target):
+                return False
+
+            return self.queue_filter(target_id)
+
+        # use passive filter
+        if self.is_default_target(target):
+            return False
+
+        return self.passive_filter(target)
+
+
+    def passive_filter(self, target):
+        ''' Determines if the target is valid or noise based on simple value checks.
+            Returns True if the target is valid.
+        '''
+        if target['consecutive'] < self.consecutive_min \
+            or target['pexist'] < self.pexist_min \
+            or target['d_bpower'] <= self.d_bpower_min \
+            or target['phi_sdv'] >= self.phi_sdv_max:
+            return False
+        return True
+            
+
+    def queue_filter(self, target_id):
+        ''' Determines if the target is valid or noise based on a given method.
+            Returns True if the target is valid.
+        '''
+        if np.isnan(self.target_queues[target_id]['consecutive_queue']).sum() / self.queue_size > self.nan_threshold \
+            or np.nanmean(self.target_queues[target_id]['consecutive_queue']) < self.consecutive_min \
+            or np.nanmean(self.target_queues[target_id]['pexist_queue']) < self.pexist_min \
+            or np.nanmean(self.target_queues[target_id]['d_bpower_queue']) <= self.d_bpower_min \
+            or np.nanmean(self.target_queues[target_id]['phi_sdv_queue']) >= self.phi_sdv_max:
+            return False
+        return True
+
+        
+    def is_default_target(self, target):
+        ''' Determines if there are measurments corresponding to the given target
+            or if it is just a default message.
+            Returns True if the target is a default message.
+        '''
+        if target['consecutive'] < 1:
+            return True
+        return False
+
+
+    def update_queues(self, target_id, target):
+        if self.is_default_target(target):
+            self.target_queues[target_id]['consecutive_queue'].append(np.nan)
+            self.target_queues[target_id]['pexist_queue'].append(np.nan)
+            self.target_queues[target_id]['d_bpower_queue'].append(np.nan)
+            self.target_queues[target_id]['phi_sdv_queue'].append(np.nan)
+        else:
+            self.target_queues[target_id]['consecutive_queue'].append(target['consecutive'])
+            self.target_queues[target_id]['pexist_queue'].append(target['pexist'])
+            self.target_queues[target_id]['d_bpower_queue'].append(target['d_bpower'])
+            self.target_queues[target_id]['phi_sdv_queue'].append(target['phi_sdv'])
+
+
+    def make_target_queue_if_nonexistent(self, target_id):
+        if target_id not in self.target_queues:
+            self.target_queues[target_id] = {}
+            self.target_queues[target_id]['consecutive_queue'] = deque(maxlen=self.queue_size)
+            self.target_queues[target_id]['pexist_queue'] = deque(maxlen=self.queue_size)
+            self.target_queues[target_id]['d_bpower_queue'] = deque(maxlen=self.queue_size)
+            self.target_queues[target_id]['phi_sdv_queue'] = deque(maxlen=self.queue_size)
+
 
 class CollectorScenario:
     def __init__(self, live=True, radius=30, duration=10, speed=10):
@@ -49,6 +141,8 @@ class CollectorScenario:
             shutil.unpack_archive(str(tar_file), str(extract_dir))
 
         self.perception_instances = sorted(extract_dir.glob('*.txt'))
+
+        self.radar_filter = RadarFilter()
 
 
     def get_metadata(self):
@@ -107,12 +201,6 @@ class CollectorScenario:
 
         return metadata
 
-    def get_track_xyz(self, track, dist_key, angle_key):
-        x = math.cos(track[angle_key]) * track[dist_key]
-        y = math.sin(track[angle_key]) * track[dist_key]
-        z = .1
-
-        return (x,y,z)
 
     def get_message(self, time_offset):
         try:
@@ -120,7 +208,7 @@ class CollectorScenario:
 
             builder = xviz.XVIZBuilder(metadata=self._metadata)
             self._draw_measuring_circles(builder, timestamp)
-            self._draw_perception_tracks(builder, timestamp)
+            self._draw_perception_outputs(builder, timestamp)
             data = builder.get_message()
 
             return {
@@ -129,6 +217,7 @@ class CollectorScenario:
             }
         except Exception as e:
             print("Crashed in get_message:", e)
+
 
     def _draw_measuring_circles(self, builder: xviz.XVIZBuilder, timestamp):
 
@@ -146,72 +235,8 @@ class CollectorScenario:
         builder.primitive('/measuring_circles').circle([0, 0, 0], 10).id('10')
         builder.primitive('/measuring_circles').circle([0, 0, 0], 5).id('5')
 
-    def _draw_tracks(self, builder: xviz.XVIZBuilder, timestamp):
-        try:
-            print("Drawing tracks")
-            builder.pose()\
-                .timestamp(timestamp)
-
-            if self.index >= len(self.data):
-                self.index = 0
-
-            cntr = 0.0 # increases the size of bubble with every target
-
-            confidence = 'pexist', .1
-            hits = 'consecutive', 1
-            the_id = 'target_id'
-            dist_key = 'dr'
-            angle_key = 'phi'
-
-            print("len targets:", len(self.data[self.index]["targets"]))
-            print("len data[index]:", len(self.data[self.index]))
-
-            for tgt in self.data[self.index]["targets"]:
-                
-                #print("tgt", tgt)
-                print("index", self.index)
-                # skip target which do not meet min confidence
-                if len(confidence) != 0:
-                    if tgt[confidence[0]] < confidence[1]:
-                        continue
-                    else:
-                        score = tgt[confidence[0]]
-                # skip target which do not meet min confidence
-                if len(hits) != 0:
-                    if tgt[hits[0]] < hits[1]:
-                        continue
-                    else:
-                        hit_streak = tgt[hits[0]]
-
-                print(" | ", end="")
-                print ('score: ', score, end="")
-                print(" | ", end="")
-                print ('hit_streak: ', hit_streak, end="")
-                print("\n")
-
-                (x,y,z) = self.get_track_xyz(tgt, dist_key=dist_key, angle_key=angle_key)
-                print("using (x,y,z):", (x,y,z))
-
-                if tgt[the_id] in self.id_tracks:
-                    int_id = self.id_tracks[tgt[the_id]]
-                else:
-                    int_id = self.id_last
-                    self.id_tracks[tgt[the_id]] = int_id
-                    self.id_last += 1
-                
-                #Blue
-                fill_color = [0, 0, 255]
-
-                builder.primitive('/radar_targets').circle([x, y, z], .5)\
-                    .style({'fill_color': fill_color})\
-                    .id(str(tgt[the_id]))
-
-            self.index += 1
-        except Exception as e:
-            print("Crashed in draw tracks:", e)
-
     
-    def _draw_perception_tracks(self, builder: xviz.XVIZBuilder, timestamp):
+    def _draw_perception_outputs(self, builder: xviz.XVIZBuilder, timestamp):
         try:
             print("Drawing perception instance")
             builder.pose()\
@@ -226,19 +251,51 @@ class CollectorScenario:
             img = self.extract_image(collector_proto_msg.frame)
             camera_output, radar_output, tracking_output = self.extract_proto_msgs(collector_proto_msg)
 
+            if radar_output:
+                self._draw_radar_targets(radar_output, builder)
+            if tracking_output:
+                self._draw_tracking_targets(tracking_output, builder)
+            if camera_output:
+                self._draw_camera_targets(camera_output, builder)
+
             self.index += 1
+        
+        except Exception as e:
+            print('Crashed in draw perception outputs: ', e)
 
     
-    def visualize_collector_proto_msg(self):
-        for serialized_perception_file in sorted(self.extract_directory.glob('*.txt')):
-            collector_proto_msg = self.deserialize_collector_proto_msg(serialized_perception_file)
-            img = self.extract_image(collector_proto_msg.frame)
-            camera_output, radar_output, tracking_output = self.extract_proto_msgs(collector_proto_msg)
-            if len(radar_output.targets) > 0:
-                print(radar_output.targets[1])
-            # radar_output = MessageToDict(radar_output)
-            # if radar_output:
-            #     print(radar_output['targets'])
+    def _draw_radar_targets(self, radar_output, builder: xviz.XVIZBuilder):
+        try:
+            for target in radar_output['targets'].values():
+                if 'dr' in target:
+                    (x, y, z) = self.get_target_xyz(target)
+                    if self.radar_filter.is_valid_target(target['target_id'], target):
+                        #Red
+                        fill_color = [255, 0, 0]
+                    else:
+                        #Blue
+                        fill_color = [0, 0, 255]
+                    builder.primitive('/radar_targets').circle([x, y, z], .5)\
+                        .style({'fill_color': fill_color})\
+                        .id(str(target['target_id']))
+        except Exception as e:
+            print('Crashed in draw radar targets: ', e)
+
+    
+    def _draw_tracking_targets(self, camera_output):
+        pass
+
+
+    def _draw_camera_targets(self, camera_output):
+        pass
+    
+
+    def get_target_xyz(self, target):
+        x = math.cos(target['phi']) * target['dr']
+        y = math.sin(target['phi']) * target['dr']
+        z = .1
+
+        return (x, y, z)
 
 
     def deserialize_collector_proto_msg(self, file_path):
@@ -256,11 +313,14 @@ class CollectorScenario:
     def extract_proto_msgs(self, collector_proto_msg):
         camera_output = camera_pb2.CameraOutput()
         camera_output.ParseFromString(collector_proto_msg.camera_output)
+        camera_output = MessageToDict(camera_output)
 
         radar_output = radar_pb2.RadarOutput()
         radar_output.ParseFromString(collector_proto_msg.radar_output)
+        radar_output = MessageToDict(radar_output)
 
         tracking_output = falconeye_pb2.TrackingOutput()
         tracking_output.ParseFromString(collector_proto_msg.tracking_output)
+        tracking_output = MessageToDict(tracking_output)
 
         return camera_output, radar_output, tracking_output
