@@ -56,11 +56,11 @@ class RadarFilter:
         '''
         if target['consecutive'] < self.consecutive_min \
             or target['pexist'] < self.pexist_min \
-            or target['d_bpower'] <= self.d_bpower_min \
-            or target['phi_sdv'] >= self.phi_sdv_max:
+            or target['dBpower'] <= self.d_bpower_min \
+            or target['phiSdv'] >= self.phi_sdv_max:
             return False
         return True
-            
+
 
     def queue_filter(self, target_id):
         ''' Determines if the target is valid or noise based on a given method.
@@ -74,7 +74,7 @@ class RadarFilter:
             return False
         return True
 
-        
+
     def is_default_target(self, target):
         ''' Determines if there are measurments corresponding to the given target
             or if it is just a default message.
@@ -94,8 +94,8 @@ class RadarFilter:
         else:
             self.target_queues[target_id]['consecutive_queue'].append(target['consecutive'])
             self.target_queues[target_id]['pexist_queue'].append(target['pexist'])
-            self.target_queues[target_id]['d_bpower_queue'].append(target['d_bpower'])
-            self.target_queues[target_id]['phi_sdv_queue'].append(target['phi_sdv'])
+            self.target_queues[target_id]['d_bpower_queue'].append(target['dBpower'])
+            self.target_queues[target_id]['phi_sdv_queue'].append(target['phiSdv'])
 
 
     def make_target_queue_if_nonexistent(self, target_id):
@@ -125,7 +125,9 @@ class CollectorScenario:
         collector_output_file = config['collector_output_file']
         extract_directory = config['extract_directory']
         collector_output_file = Path(collector_output_file)
+        print("Using:collector_output_file:", collector_output_file)
         extract_directory = Path(extract_directory)
+        print("Using:extract_directory:", extract_directory)
 
         if not collector_output_file.is_file():
             print('collector output file does not exit')
@@ -140,7 +142,7 @@ class CollectorScenario:
 
         self.radar_filter = RadarFilter()
 
-    
+
     def load_config(self):
         configfile = 'scenarios/collector-scenario-config.yaml'
 
@@ -169,7 +171,7 @@ class CollectorScenario:
                 .stream_style({'fill_color': [200, 0, 70, 128]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
-            
+
             builder.stream("/measuring_circles")\
                 .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
                 .stream_style({
@@ -181,7 +183,7 @@ class CollectorScenario:
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
 
-            
+
             builder.stream("/measuring_circles_lbl")\
                 .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
                 .stream_style({
@@ -240,7 +242,7 @@ class CollectorScenario:
         builder.primitive('/measuring_circles').circle([0, 0, 0], 10).id('10')
         builder.primitive('/measuring_circles').circle([0, 0, 0], 5).id('5')
 
-    
+
     def _draw_perception_outputs(self, builder: xviz.XVIZBuilder, timestamp):
         try:
             builder.pose()\
@@ -262,15 +264,15 @@ class CollectorScenario:
             if camera_output:
                 self._draw_camera_targets(camera_output, builder)
                 img = self.postprocess(img, camera_output)
-            
+
             self.show_image(img)
 
             self.index += 1
-        
+
         except Exception as e:
             print('Crashed in draw perception outputs:', e)
 
-    
+
     def _draw_radar_targets(self, radar_output, builder: xviz.XVIZBuilder):
         try:
             for target_id, target in radar_output['targets'].items():
@@ -285,12 +287,12 @@ class CollectorScenario:
 
                     builder.primitive('/radar_targets').circle([x, y, z], .5)\
                         .style({'fill_color': fill_color})\
-                        .id(str(target['target_id']))
+                        .id(str(target['targetId']))
 
         except Exception as e:
             print('Crashed in draw radar targets:', e)
 
-    
+
     def _draw_tracking_targets(self, tracking_output, builder: xviz.XVIZBuilder):
         try:
             if 'tracks' in tracking_output:
@@ -346,23 +348,23 @@ class CollectorScenario:
         decimg = cv2.imdecode(encoded_img, 1) # uncompress image
         return decimg
 
-    
+
     def extract_proto_msgs(self, collector_proto_msg):
         camera_output = camera_pb2.CameraOutput()
         camera_output.ParseFromString(collector_proto_msg.camera_output)
-        camera_output = MessageToDict(camera_output)
+        camera_output = MessageToDict(camera_output, including_default_value_fields=True)
 
         radar_output = radar_pb2.RadarOutput()
         radar_output.ParseFromString(collector_proto_msg.radar_output)
-        radar_output = MessageToDict(radar_output)
+        radar_output = MessageToDict(radar_output, including_default_value_fields=True)
 
         tracking_output = falconeye_pb2.TrackingOutput()
         tracking_output.ParseFromString(collector_proto_msg.tracking_output)
-        tracking_output = MessageToDict(tracking_output)
+        tracking_output = MessageToDict(tracking_output, including_default_value_fields=True)
 
         return camera_output, radar_output, tracking_output
 
-    
+
     def show_image(self, image):
         image = cv2.resize(image, (0, 0), fx=.7, fy=.7)
         cv2.imshow('', image)
@@ -398,5 +400,5 @@ class CollectorScenario:
                         box_color, thickness)
             cv2.putText(image, conf, text_origin, fontFace,
                         fontScale, box_color, 2)
-        
+
         return image

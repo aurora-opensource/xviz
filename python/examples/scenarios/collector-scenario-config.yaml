@@ -1,5 +1,5 @@
-collector_output_file: /home/raven.ravenind.net/r103943/Desktop/collector/v2020-25-0-01474c5e94b248948cc32b0081d21b22-detection-primary-forward-57-smartag-autocart-1596642289318-188.tar
-extract_directory: /home/raven.ravenind.net/r103943/Desktop/collector/extracted
+collector_output_file: /Users/azizalibasic/Downloads/v2020-25-0-6de872fc781a4edba9139698ec01f5d8-detection-primary-forward-57-smartag-autocart-1596653720420-792.tar
+extract_directory: /Users/azizalibasic/Documents/dev/VIZ_STACK/xviz/python/examples/scenarios/tmp/
 
 radar_filter:
   qfilter_enabled: True
