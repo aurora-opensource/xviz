@@ -25,8 +25,21 @@ And examples:
   the XVIZ protocol.
 
 # Raven Setup Steps
+
+## To Install
 ```bash
-$ cd ./python
+$ install node v11.12.0 (curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash)
+$ nvm install 11.12.0
+$ nvm use 11.12.0
+$ git clone https://github.com/uber/xviz.git
+$ cd xviz
+$ npm run bootstrap
+```
+
+## To Run
+```bash
+$ cd xviz/python
+$ python setup.py install
 $ python examples/serve_scenarios.py
 ```
 
