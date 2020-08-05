@@ -39,7 +39,7 @@ $ npm run bootstrap
 ## To Run
 ```bash
 $ cd xviz/python
-$ python setup.py install
+$ bash setup.sh
 $ python examples/serve_scenarios.py
 ```
 
