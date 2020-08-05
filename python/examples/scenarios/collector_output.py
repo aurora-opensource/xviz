@@ -2,6 +2,7 @@ import math
 import time
 import shutil
 import cv2
+import yaml
 import numpy as np
 from collections import deque
 from pathlib import Path
@@ -114,6 +115,7 @@ class RadarFilter:
 
 
 class CollectorScenario:
+
     def __init__(self, live=True, radius=30, duration=10, speed=10):
         self._timestamp = time.time()
         self._radius = radius
@@ -126,23 +128,33 @@ class CollectorScenario:
         self.id_last = 1
         self.data = []
 
-        tar_file = '/home/raven.ravenind.net/r103943/Desktop/collector/v2020-25-0-25ed12058f204e60ab6bf655e1d95640-nodetection-primary-forward-57-smartag-autocart-1596479215515-3668.tar'
-        extract_dir = '/home/raven.ravenind.net/r103943/Desktop/collector/extracted'
-        tar_file = Path(tar_file)
-        extract_dir = Path(extract_dir)
+        config = self.load_config()
+        collector_output_file = config['collector_output_file']
+        extract_directory = config['extract_directory']
+        collector_output_file = Path(collector_output_file)
+        extract_directory = Path(extract_directory)
 
-        if not tar_file.is_file():
-            print('tar file does not exit')
-        if not extract_dir.is_dir():
-            extract_dir.mkdir(parents=True)
+        if not collector_output_file.is_file():
+            print('collector output file does not exit')
+        if not extract_directory.is_dir():
+            extract_directory.mkdir(parents=True)
 
         # if there are no txt files in the directory, the tar needs to be unpacked
-        if not list(extract_dir.glob('*.txt')):
-            shutil.unpack_archive(str(tar_file), str(extract_dir))
+        if not list(extract_directory.glob('*.txt')):
+            shutil.unpack_archive(str(collector_output_file), str(extract_directory))
 
-        self.perception_instances = sorted(extract_dir.glob('*.txt'))
+        self.perception_instances = sorted(extract_directory.glob('*.txt'))
 
         self.radar_filter = RadarFilter()
+
+    
+    def load_config(self):
+        configfile = 'collector-scenario-config.yaml'
+
+        with open(configfile, 'r') as f:
+            config = yaml.safe_load(f)
+
+        return config
 
 
     def get_metadata(self):
