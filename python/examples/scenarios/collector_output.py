@@ -133,10 +133,10 @@ class CollectorScenario:
             print('collector output file does not exit')
         if not extract_directory.is_dir():
             extract_directory.mkdir(parents=True)
+        else:
+            self.clear_directory(extract_directory)
 
-        # if there are no txt files in the directory, the tar needs to be unpacked
-        if not list(extract_directory.glob('*.txt')):
-            shutil.unpack_archive(str(collector_output_file), str(extract_directory))
+        shutil.unpack_archive(str(collector_output_file), str(extract_directory))
 
         self.perception_instances = sorted(extract_directory.glob('*.txt'))
 
@@ -150,6 +150,11 @@ class CollectorScenario:
             config = yaml.safe_load(f)
 
         return config
+
+    
+    def clear_directory(self, path):
+        for child in path.glob('*.txt'):
+            child.unlink()
 
 
     def get_metadata(self):
