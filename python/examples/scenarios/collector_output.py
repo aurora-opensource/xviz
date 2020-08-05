@@ -332,7 +332,7 @@ class CollectorScenario:
         z = .1
 
         if radar_ob:
-            radar_offset_inline = 3.21213 # meters
+            radar_offset_inline = 3.2131 # meters
             x += radar_offset_inline
 
         return (x, y, z)
