@@ -2,4 +2,6 @@ easydict
 protobuf
 numpy
 websockets
-opencv==4.2.0
+opencv-python==4.3.0.36 
+Cython==0.29.21
+wheel==0.34.2
