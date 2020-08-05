@@ -255,8 +255,8 @@ class CollectorScenario:
             camera_output, radar_output, tracking_output = self.extract_proto_msgs(collector_proto_msg)
             img = self.extract_image(collector_proto_msg.frame)
 
-            # if radar_output:
-            #     self._draw_radar_targets(radar_output, builder)
+            if radar_output:
+                self._draw_radar_targets(radar_output, builder)
             if tracking_output:
                 self._draw_tracking_targets(tracking_output, builder)
             if camera_output:

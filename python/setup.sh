@@ -14,9 +14,8 @@
 # limitations under the License.
 pip install -r requirements.txt
 cd ../Proto-Files
-ls
+rm -rf dist
 python setup.py bdist_wheel
-ls
 pip install dist/*.whl
 cd ../python
 python setup.py install
