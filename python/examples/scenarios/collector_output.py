@@ -276,16 +276,15 @@ class CollectorScenario:
             for target_id, target in radar_output['targets'].items():
                 if 'dr' in target:
                     (x, y, z) = self.get_object_xyz(target, 'phi', 'dr', radar_ob=True)
-                    if 'targetId' not in target:
-                        target['targetId'] = target_id
+
                     if self.radar_filter.is_valid_target(target['targetId'], target):
-                        fill_color = [255, 255, 0] # Yellow
-                    else:
                         fill_color = [255, 0, 0] # Red
+                    else:
+                        fill_color = [255, 255, 0] # Yellow
 
                     builder.primitive('/radar_targets').circle([x, y, z], .5)\
                         .style({'fill_color': fill_color})\
-                        .id(str(target['target_id']))
+                        .id(str(target['targetId']))
 
         except Exception as e:
             print('Crashed in draw radar targets:', e)
@@ -299,7 +298,11 @@ class CollectorScenario:
                 for track in tracking_output['tracks']:
                     if track['score'] > min_confidence and track['hitStreak'] > min_hits:
                         (x, y, z) = self.get_object_xyz(track, 'angle', 'distance')
-                        fill_color = [0, 255, 0] # Green
+
+                        if track['radarDistCamFrame'] > 0.1:
+                            fill_color = [0, 255, 0] # Green
+                        else:
+                            fill_color = [0, 0, 255] # Blue
 
                         builder.primitive('/tracking_targets').circle([x, y, z], .5)\
                             .style({'fill_color': fill_color})\
@@ -313,7 +316,7 @@ class CollectorScenario:
         try:
             for target in camera_output['targets']:
                 (x, y, z) = self.get_object_xyz(target, 'objectAngle', 'objectDistance')
-                fill_color = [0, 0, 255] # Blue
+                fill_color = [0, 255, 255] # Cyan
 
                 builder.primitive('/camera_targets').circle([x, y, z], .5)\
                         .style({'fill_color': fill_color})\
