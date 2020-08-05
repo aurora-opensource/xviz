@@ -11,13 +11,6 @@ from google.protobuf.json_format import MessageToDict
 import xviz
 import xviz.builder as xbuilder
 
-def prepare_parent_import(N):
-    import sys
-    # N = number of parent directories up that you want to import from, cwd of file would be N=0
-    top_dir = Path(__file__).resolve().parents[N]
-    sys.path.append(str(top_dir / 'Proto-Files'))
-
-prepare_parent_import(3)
 from protobuf_APIs import collector_pb2, falconeye_pb2, radar_pb2, camera_pb2
 
 
@@ -149,7 +142,7 @@ class CollectorScenario:
 
     
     def load_config(self):
-        configfile = 'collector-scenario-config.yaml'
+        configfile = 'scenarios/collector-scenario-config.yaml'
 
         with open(configfile, 'r') as f:
             config = yaml.safe_load(f)
@@ -262,8 +255,8 @@ class CollectorScenario:
             camera_output, radar_output, tracking_output = self.extract_proto_msgs(collector_proto_msg)
             img = self.extract_image(collector_proto_msg.frame)
 
-            if radar_output:
-                self._draw_radar_targets(radar_output, builder)
+            # if radar_output:
+            #     self._draw_radar_targets(radar_output, builder)
             if tracking_output:
                 self._draw_tracking_targets(tracking_output, builder)
             if camera_output:
@@ -280,10 +273,14 @@ class CollectorScenario:
     
     def _draw_radar_targets(self, radar_output, builder: xviz.XVIZBuilder):
         try:
-            for target in radar_output['targets'].values():
+            for target_id, target in radar_output['targets'].items():
                 if 'dr' in target:
                     (x, y, z) = self.get_object_xyz(target, 'phi', 'dr', radar_ob=True)
-                    if self.radar_filter.is_valid_target(target['target_id'], target):
+                    if 'targetId' not in target:
+                        tgt_id = target_id:
+                    else:
+                        tgt_id = target['targetId']
+                    if self.radar_filter.is_valid_target(tgt_id, target):
                         fill_color = [255, 255, 0] # Yellow
                     else:
                         fill_color = [255, 0, 0] # Red
@@ -375,8 +372,6 @@ class CollectorScenario:
 
 
     def postprocess(self, image, camera_output):
-        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-
         for target in camera_output['targets']:
             tl, br = target['topleft'], target['bottomright']
             tl['x'], tl['y'] = int(tl['x']), int(tl['y'])
@@ -405,7 +400,5 @@ class CollectorScenario:
                         box_color, thickness)
             cv2.putText(image, conf, text_origin, fontFace,
                         fontScale, box_color, 2)
-
-        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
         
         return image
