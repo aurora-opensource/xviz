@@ -277,10 +277,8 @@ class CollectorScenario:
                 if 'dr' in target:
                     (x, y, z) = self.get_object_xyz(target, 'phi', 'dr', radar_ob=True)
                     if 'targetId' not in target:
-                        tgt_id = target_id
-                    else:
-                        tgt_id = target['targetId']
-                    if self.radar_filter.is_valid_target(tgt_id, target):
+                        target['targetId'] = target_id
+                    if self.radar_filter.is_valid_target(target['targetId'], target):
                         fill_color = [255, 255, 0] # Yellow
                     else:
                         fill_color = [255, 0, 0] # Red
