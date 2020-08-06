@@ -167,27 +167,39 @@ class CollectorScenario:
             builder = xviz.XVIZMetadataBuilder()
             builder.stream("/vehicle_pose").category(xviz.CATEGORY.POSE)
             builder.stream("/radar_targets")\
-                .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
+                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
                 .stream_style({'fill_color': [200, 0, 70, 128]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
             builder.stream("/tracking_targets")\
-                .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
+                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
                 .stream_style({'fill_color': [200, 0, 70, 128]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
             builder.stream("/camera_targets")\
-                .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
+                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+                .stream_style({'fill_color': [200, 0, 70, 128]})\
+                .category(xviz.CATEGORY.PRIMITIVE)\
+                .type(xviz.PRIMITIVE_TYPES.CIRCLE)
+            builder.stream("/radar_fov")\
+                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+                .stream_style({'fill_color': [200, 0, 70, 128]})\
+                .category(xviz.CATEGORY.PRIMITIVE)\
+                .type(xviz.PRIMITIVE_TYPES.CIRCLE)
+
+            builder.stream("/camera_fov")\
+                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
                 .stream_style({'fill_color': [200, 0, 70, 128]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
 
             builder.stream("/measuring_circles")\
-                .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
+                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
                 .stream_style({
                     'stroked': True,
-                    'stroke_width': 1,
-                    'stroke_color': [0, 255, 0, 128],
+                    'stroke_width': 0.3,
+                    'stroke_color': [0, 128, 50, 50],
+                    # 'opacity': 10,
                     #'stroke_width_min_pixels': 10
                 })\
                 .category(xviz.CATEGORY.PRIMITIVE)\
@@ -224,7 +236,7 @@ class CollectorScenario:
             timestamp = self._timestamp + time_offset
 
             builder = xviz.XVIZBuilder(metadata=self._metadata)
-            self._draw_measuring_circles(builder, timestamp)
+            self._draw_measuring_references(builder, timestamp)
             self._draw_perception_outputs(builder, timestamp)
             data = builder.get_message()
 
@@ -236,7 +248,7 @@ class CollectorScenario:
             print("Crashed in get_message:", e)
 
 
-    def _draw_measuring_circles(self, builder: xviz.XVIZBuilder, timestamp):
+    def _draw_measuring_references(self, builder: xviz.XVIZBuilder, timestamp):
 
         builder.primitive('/measuring_circles_lbl').text("30").position([30, 0, 0]).id('30lb')
         builder.primitive('/measuring_circles_lbl').text("25").position([25, 0, 0]).id('25lb')
@@ -251,6 +263,30 @@ class CollectorScenario:
         builder.primitive('/measuring_circles').circle([0, 0, 0], 15).id('15')
         builder.primitive('/measuring_circles').circle([0, 0, 0], 10).id('10')
         builder.primitive('/measuring_circles').circle([0, 0, 0], 5).id('5')
+
+        cam_fov = [-28.5, 28.5] # 57 deg
+        radar_fov = [-27, -13.5, -6.75, 0, 6.75, 13.5, 27] # 54 degrees
+        radial_distances = [5, 10, 15, 20, 25, 30, 35, 40]
+        for r in radial_distances:
+            for c_phi in cam_fov:
+                label = (r, c_phi)
+                (x, y, z) = self.get_object_xyz_primitive(r, c_phi*math.pi/180)
+                fill_color = [206, 205, 203]
+                builder.primitive('/camera_fov').circle([x, y, z], 0.15)\
+                    .style({'fill_color': fill_color})\
+                    .id("cam_fov: "+str(label))
+
+                
+
+            for r_phi in radar_fov:
+                label = (r, r_phi)
+                (x, y, z) = self.get_object_xyz_primitive(r, r_phi*math.pi/180)
+                fill_color = [210,105,30]
+                builder.primitive('/radar_fov').circle([x, y, z], 0.15)\
+                    .style({'fill_color': fill_color})\
+                    .id("radar_fov: "+str(label))
+                if r == radial_distances[-1]:
+                    builder.primitive('/measuring_circles_lbl').text(str(r_phi)).position([x, y, z]).id(str(r_phi)+'lb')
 
 
     def _draw_perception_outputs(self, builder: xviz.XVIZBuilder, timestamp):
@@ -341,11 +377,18 @@ class CollectorScenario:
     def get_object_xyz(self, ob, angle_key, dist_key, radar_ob=False):
         x = math.cos(ob[angle_key]) * ob[dist_key]
         y = math.sin(ob[angle_key]) * ob[dist_key]
-        z = .1
+        z = 0.5
 
         if radar_ob:
             radar_offset_inline = 3.2131 # meters
             x += radar_offset_inline
+
+        return (x, y, z)
+
+    def get_object_xyz_primitive(self, radial_dist, angle_radians):
+        x = math.cos(angle_radians) * radial_dist
+        y = math.sin(angle_radians) * radial_dist
+        z = -.1
 
         return (x, y, z)
 

@@ -1,7 +1,7 @@
 /data
 node_modules
 dist
-
+python/examples/scenarios/tmp/
 node_modules
 .reify-cache
 */**/yarn.lock
