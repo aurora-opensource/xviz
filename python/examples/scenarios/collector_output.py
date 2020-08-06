@@ -131,10 +131,8 @@ class CollectorScenario:
 
         if not collector_output_file.is_file():
             print('collector output file does not exit')
-        if not extract_directory.is_dir():
-            extract_directory.mkdir(parents=True)
-        else:
-            self.clear_directory(extract_directory)
+        
+        self.establish_fresh_directory(extract_directory)
 
         shutil.unpack_archive(str(collector_output_file), str(extract_directory))
 
@@ -150,6 +148,13 @@ class CollectorScenario:
             config = yaml.safe_load(f)
 
         return config
+
+    
+    def establish_fresh_directory(self, path):
+        if path.is_dir():
+            self.clear_directory(path)
+        else:
+            path.mkdir(parents=True)
 
     
     def clear_directory(self, path):
