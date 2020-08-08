@@ -32,7 +32,7 @@ class ScenarioSession(XVIZBaseSession):
             await self._socket.send(json.dumps(message))
 
             t += 0.5
-            await asyncio.sleep(0.01)
+            await asyncio.sleep(0.001)
 
 class ScenarioHandler:
     def __init__(self):
