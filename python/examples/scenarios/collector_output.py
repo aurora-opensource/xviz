@@ -314,7 +314,7 @@ class CollectorScenario:
 
             if tracking_output is not None:
                 self._draw_tracking_targets(tracking_output, builder)
-                
+
             if external_data is not None:
                 self._draw_vehicle_states(external_data['vehicleStates'], builder)
 
@@ -484,12 +484,6 @@ class CollectorScenario:
             else:
                 text_origin = (tl['x'], tl['y'] + 1)
 
-            '''
-            cv2.rectangle(image, (tl['x'], tl['y']), (br['x'], br['y']),
-                        self.colors.get(label, (0, 0, 0)), thickness)
-            cv2.putText(image, conf, text_origin, fontFace,
-                        fontScale, self.colors.get(label, (0, 0, 0)), 2)
-            '''
             box_color = (241, 240, 236)
             cv2.rectangle(image, (tl['x'], tl['y']), (br['x'], br['y']),
                         box_color, thickness)
