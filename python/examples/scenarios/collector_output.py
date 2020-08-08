@@ -2,16 +2,16 @@ import math
 import time
 import shutil
 import cv2
+import utm
 import yaml
 import numpy as np
 from collections import deque
 from pathlib import Path
 from google.protobuf.json_format import MessageToDict
+from protobuf_APIs import collector_pb2, falconeye_pb2, radar_pb2, camera_pb2
 
 import xviz
 import xviz.builder as xbuilder
-
-from protobuf_APIs import collector_pb2, falconeye_pb2, radar_pb2, camera_pb2
 
 
 DEG_1_AS_RAD = math.pi / 180
@@ -132,7 +132,7 @@ class CollectorScenario:
         if not collector_output_file.is_file():
             print('collector output file does not exit')
         
-        self.establish_fresh_directory(extract_directory)
+        establish_fresh_directory(extract_directory)
 
         shutil.unpack_archive(str(collector_output_file), str(extract_directory))
 
@@ -148,18 +148,6 @@ class CollectorScenario:
             config = yaml.safe_load(f)
 
         return config
-
-    
-    def establish_fresh_directory(self, path):
-        if path.is_dir():
-            self.clear_directory(path)
-        else:
-            path.mkdir(parents=True)
-
-    
-    def clear_directory(self, path):
-        for child in path.glob('*.txt'):
-            child.unlink()
 
 
     def get_metadata(self):
@@ -276,8 +264,6 @@ class CollectorScenario:
                     .style({'fill_color': fill_color})\
                     .id("cam_fov: "+str(label))
 
-                
-
             for r_phi in radar_fov:
                 label = (r, r_phi)
                 (x, y, z) = self.get_object_xyz_primitive(r, r_phi*math.pi/180)
@@ -385,7 +371,7 @@ class CollectorScenario:
                 print('COMINE STATE:', combine_state)
             if 'tractor' in vehicle_states:
                 tractor_state = vehicle_states['tractor']
-                print('TRACTOR STATE:', tractor_state)
+                # print('TRACTOR STATE:', tractor_state)
 
         except Exception as e:
             print('Crashed in draw vehicle states:', e)
@@ -491,3 +477,28 @@ class CollectorScenario:
                         fontScale, box_color, 2)
 
         return image
+
+
+def lonlat_to_utm(lonlat, zone):
+    """
+    lonlat: (lon, lat) or [lon, lat]
+    Returns
+    -------
+    tuple
+        (utm_x, utm_y)
+    """
+    zone_number, zone_letter = parse_utm_zone(zone)
+    converted = utm.from_latlon(lonlat[1], lonlat[0],
+                                force_zone_number=zone_number,
+                                force_zone_letter=zone_letter)
+    return converted[0], converted[1]  # only return easting, northing
+
+def establish_fresh_directory(path):
+    if path.is_dir():
+        clear_directory(path)
+    else:
+        path.mkdir(parents=True)
+
+def clear_directory(path):
+    for child in path.glob('*.txt'):
+        child.unlink()
