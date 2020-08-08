@@ -136,7 +136,7 @@ class CollectorScenario:
 
         shutil.unpack_archive(str(collector_output_file), str(extract_directory))
 
-        self.perception_instances = sorted(extract_directory.glob('*.txt'))
+        self.collector_outputs = sorted(extract_directory.glob('*.txt'))
 
         self.radar_filter = RadarFilter()
 
@@ -294,24 +294,29 @@ class CollectorScenario:
             builder.pose()\
                 .timestamp(timestamp)
 
-            if self.index == len(self.perception_instances):
+            if self.index == len(self.collector_outputs):
                 self.index = 0
 
-            perception_instance = self.perception_instances[self.index]
+            collector_output = self.collector_outputs[self.index]
 
-            collector_proto_msg = self.deserialize_collector_proto_msg(perception_instance)
-            camera_output, radar_output, tracking_output = self.extract_proto_msgs(collector_proto_msg)
-            img = self.extract_image(collector_proto_msg.frame)
+            collector_output = self.deserialize_collector_output(collector_output)
+            img, camera_output, radar_output, tracking_output, external_data = self.extract_collector_output_content(collector_output)
 
-            if radar_output:
-                self._draw_radar_targets(radar_output, builder)
-            if tracking_output:
-                self._draw_tracking_targets(tracking_output, builder)
-            if camera_output:
+            if camera_output is not None:
                 self._draw_camera_targets(camera_output, builder)
                 img = self.postprocess(img, camera_output)
 
-            self.show_image(img)
+            if img is not None:
+                self.show_image(img)
+
+            if radar_output is not None:
+                self._draw_radar_targets(radar_output, builder)
+
+            if tracking_output is not None:
+                self._draw_tracking_targets(tracking_output, builder)
+                
+            if external_data is not None:
+                self._draw_vehicle_states(external_data['vehicleStates'], builder)
 
             self.index += 1
 
@@ -322,17 +327,16 @@ class CollectorScenario:
     def _draw_radar_targets(self, radar_output, builder: xviz.XVIZBuilder):
         try:
             for target_id, target in radar_output['targets'].items():
-                if 'dr' in target:
-                    (x, y, z) = self.get_object_xyz(target, 'phi', 'dr', radar_ob=True)
+                (x, y, z) = self.get_object_xyz(target, 'phi', 'dr', radar_ob=True)
 
-                    if self.radar_filter.is_valid_target(target['targetId'], target):
-                        fill_color = [255, 0, 0] # Red
-                    else:
-                        fill_color = [255, 255, 0] # Yellow
+                if self.radar_filter.is_valid_target(target['targetId'], target):
+                    fill_color = [255, 0, 0] # Red
+                else:
+                    fill_color = [255, 255, 0] # Yellow
 
-                    builder.primitive('/radar_targets').circle([x, y, z], .5)\
-                        .style({'fill_color': fill_color})\
-                        .id(str(target['targetId']))
+                builder.primitive('/radar_targets').circle([x, y, z], .5)\
+                    .style({'fill_color': fill_color})\
+                    .id(str(target['targetId']))
 
         except Exception as e:
             print('Crashed in draw radar targets:', e)
@@ -373,6 +377,19 @@ class CollectorScenario:
         except Exception as e:
             print('Crashed in draw camera targets:', e)
 
+    
+    def _draw_vehicle_states(self, vehicle_states, builder: xviz.XVIZBuilder):
+        try:
+            if 'combine' in vehicle_states:
+                combine_state = vehicle_states['combine']
+                print('COMINE STATE:', combine_state)
+            if 'tractor' in vehicle_states:
+                tractor_state = vehicle_states['tractor']
+                print('TRACTOR STATE:', tractor_state)
+
+        except Exception as e:
+            print('Crashed in draw vehicle states:', e)
+
 
     def get_object_xyz(self, ob, angle_key, dist_key, radar_ob=False):
         x = math.cos(ob[angle_key]) * ob[dist_key]
@@ -393,32 +410,54 @@ class CollectorScenario:
         return (x, y, z)
 
 
-    def deserialize_collector_proto_msg(self, file_path):
-        collector_proto_msg = collector_pb2.CollectorOutput()
-        collector_proto_msg.ParseFromString(Path(file_path).read_bytes())
-        return collector_proto_msg
+    def deserialize_collector_output(self, file_path):
+        collector_output = collector_pb2.CollectorOutput()
+        collector_output.ParseFromString(Path(file_path).read_bytes())
+        return collector_output
+
+
+    def extract_collector_output_content(self, collector_output):
+        if collector_output.frame:
+            frame = self.extract_image(collector_output.frame)
+        else:
+            print('missing frame from collector output')
+            frame = None
+
+        if collector_output.camera_output:
+            camera_output = camera_pb2.CameraOutput()
+            camera_output.ParseFromString(collector_output.camera_output)
+            camera_output = MessageToDict(camera_output, including_default_value_fields=True)
+        else:
+            camera_output = None
+
+        if collector_output.radar_output:
+            radar_output = radar_pb2.RadarOutput()
+            radar_output.ParseFromString(collector_output.radar_output)
+            radar_output = MessageToDict(radar_output, including_default_value_fields=True)
+        else:
+            radar_output = None
+
+        if collector_output.tracking_output:
+            tracking_output = falconeye_pb2.TrackingOutput()
+            tracking_output.ParseFromString(collector_output.tracking_output)
+            tracking_output = MessageToDict(tracking_output, including_default_value_fields=True)
+        else:
+            tracking_output = None
+
+        if collector_output.external_data:
+            external_data = collector_pb2.ExternalData()
+            external_data.ParseFromString(collector_output.external_data)
+            external_data = MessageToDict(external_data, including_default_value_fields=True)
+        else:
+            external_data = None
+
+        return frame, camera_output, radar_output, tracking_output, external_data
 
 
     def extract_image(self, img_bytes):
         encoded_img = np.frombuffer(img_bytes, dtype=np.uint8) # decode bytes
         decimg = cv2.imdecode(encoded_img, 1) # uncompress image
         return decimg
-
-
-    def extract_proto_msgs(self, collector_proto_msg):
-        camera_output = camera_pb2.CameraOutput()
-        camera_output.ParseFromString(collector_proto_msg.camera_output)
-        camera_output = MessageToDict(camera_output, including_default_value_fields=True)
-
-        radar_output = radar_pb2.RadarOutput()
-        radar_output.ParseFromString(collector_proto_msg.radar_output)
-        radar_output = MessageToDict(radar_output, including_default_value_fields=True)
-
-        tracking_output = falconeye_pb2.TrackingOutput()
-        tracking_output.ParseFromString(collector_proto_msg.tracking_output)
-        tracking_output = MessageToDict(tracking_output, including_default_value_fields=True)
-
-        return camera_output, radar_output, tracking_output
 
 
     def show_image(self, image):
