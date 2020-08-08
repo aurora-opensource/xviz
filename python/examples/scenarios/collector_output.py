@@ -169,12 +169,18 @@ class CollectorScenario:
                 .stream_style({'fill_color': [200, 0, 70, 128]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
-            builder.stream("/radar_fov")\
+                
+            builder.stream("/combine_position")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
                 .stream_style({'fill_color': [200, 0, 70, 128]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
 
+            builder.stream("/radar_fov")\
+                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+                .stream_style({'fill_color': [200, 0, 70, 128]})\
+                .category(xviz.CATEGORY.PRIMITIVE)\
+                .type(xviz.PRIMITIVE_TYPES.CIRCLE)
             builder.stream("/camera_fov")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
                 .stream_style({'fill_color': [200, 0, 70, 128]})\
@@ -366,12 +372,16 @@ class CollectorScenario:
     
     def _draw_vehicle_states(self, vehicle_states, builder: xviz.XVIZBuilder):
         try:
-            if 'combine' in vehicle_states:
+            if 'combine' and 'tractor' in vehicle_states:
                 combine_state = vehicle_states['combine']
-                print('COMINE STATE:', combine_state)
-            if 'tractor' in vehicle_states:
                 tractor_state = vehicle_states['tractor']
-                # print('TRACTOR STATE:', tractor_state)
+                x, y = transform_combine_to_local(combine_state, tractor_state)
+                z = 0.5
+                fill_color = [0, 0, 0] # Black
+
+                builder.primitive('/combine_position').circle([x, y, z], .5)\
+                        .style({'fill_color': fill_color})\
+                        .id('combine')
 
         except Exception as e:
             print('Crashed in draw vehicle states:', e)
@@ -478,20 +488,23 @@ class CollectorScenario:
 
         return image
 
+def transform_combine_to_local(combine_state, tractor_state):
+    combine_x, combine_y = latlon_to_utm(combine_state['latitude'], combine_state['longitude'])
+    tractor_x, tractor_y = latlon_to_utm(tractor_state['latitude'], tractor_state['longitude'])
+    dx, dy = utm_to_local(combine_x, combine_y, tractor_x, tractor_y, tractor_state['heading'])
+    return dx, dy
 
-def lonlat_to_utm(lonlat, zone):
-    """
-    lonlat: (lon, lat) or [lon, lat]
-    Returns
-    -------
-    tuple
-        (utm_x, utm_y)
-    """
-    zone_number, zone_letter = parse_utm_zone(zone)
-    converted = utm.from_latlon(lonlat[1], lonlat[0],
-                                force_zone_number=zone_number,
-                                force_zone_letter=zone_letter)
+def latlon_to_utm(lat, lon):
+    converted = utm.from_latlon(lat, lon)
     return converted[0], converted[1]  # only return easting, northing
+
+def utm_to_local(translate_x, translate_y, reference_x, reference_y, heading):
+    theta = (math.pi / 2) - (heading * math.pi / 180)
+    dx_a = translate_x - reference_x
+    dy_a = translate_y - reference_y
+    dx = (math.cos(theta) * dx_a) + (math.sin(theta) * dy_a)
+    dy = -(math.sin(theta) * dx_a) + (math.cos(theta) * dy_a)
+    return dx, dy
 
 def establish_fresh_directory(path):
     if path.is_dir():
