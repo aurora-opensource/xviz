@@ -8,7 +8,7 @@ import numpy as np
 from collections import deque
 from pathlib import Path
 from google.protobuf.json_format import MessageToDict
-from protobuf_APIs import collector_pb2, falconeye_pb2, radar_pb2, camera_pb2
+from protobuf_APIs import collector_pb2, gandalf_pb2, falconeye_pb2, radar_pb2, camera_pb2
 
 import xviz
 import xviz.builder as xbuilder
@@ -231,7 +231,7 @@ class CollectorScenario:
 
             builder = xviz.XVIZBuilder(metadata=self._metadata)
             self._draw_measuring_references(builder, timestamp)
-            self._draw_perception_outputs(builder, timestamp)
+            self._draw_collector_output(builder, timestamp)
             data = builder.get_message()
 
             return {
@@ -281,7 +281,7 @@ class CollectorScenario:
                     builder.primitive('/measuring_circles_lbl').text(str(r_phi)).position([x, y, z]).id(str(r_phi)+'lb')
 
 
-    def _draw_perception_outputs(self, builder: xviz.XVIZBuilder, timestamp):
+    def _draw_collector_output(self, builder: xviz.XVIZBuilder, timestamp):
         try:
             builder.pose()\
                 .timestamp(timestamp)
@@ -292,7 +292,7 @@ class CollectorScenario:
             collector_output = self.collector_outputs[self.index]
 
             collector_output = self.deserialize_collector_output(collector_output)
-            img, camera_output, radar_output, tracking_output, external_data = self.extract_collector_output_content(collector_output)
+            img, camera_output, radar_output, tracking_output, machine_state = self.extract_collector_output_content(collector_output)
 
             if camera_output is not None:
                 self._draw_camera_targets(camera_output, builder)
@@ -307,13 +307,13 @@ class CollectorScenario:
             if tracking_output is not None:
                 self._draw_tracking_targets(tracking_output, builder)
 
-            if external_data is not None:
-                self._draw_vehicle_states(external_data['vehicleStates'], builder)
+            if machine_state is not None:
+                self._draw_combine_position(machine_state, builder)
 
             self.index += 1
 
         except Exception as e:
-            print('Crashed in draw perception outputs:', e)
+            print('Crashed in draw collector output:', e)
 
 
     def _draw_radar_targets(self, radar_output, builder: xviz.XVIZBuilder):
@@ -370,12 +370,18 @@ class CollectorScenario:
             print('Crashed in draw camera targets:', e)
 
     
-    def _draw_vehicle_states(self, vehicle_states, builder: xviz.XVIZBuilder):
+    def _draw_combine_position(self, machine_state, builder: xviz.XVIZBuilder):
         try:
+            vehicle_states = machine_state['vehicleStates']
             if 'combine' and 'tractor' in vehicle_states:
                 combine_state = vehicle_states['combine']
                 tractor_state = vehicle_states['tractor']
-                x, y = transform_combine_to_local(combine_state, tractor_state)
+                operation_state = machine_state['opState']
+                if operation_state['refUtmZone']:
+                    utm_zone = operation_state['refUtmZone']
+                else:
+                    utm_zone = None
+                x, y = transform_combine_to_local(combine_state, tractor_state, utm_zone)
                 z = 0.5
                 fill_color = [0, 0, 0] # Black
 
@@ -384,7 +390,7 @@ class CollectorScenario:
                         .id('combine')
 
         except Exception as e:
-            print('Crashed in draw vehicle states:', e)
+            print('Crashed in draw combine position:', e)
 
 
     def get_object_xyz(self, ob, angle_key, dist_key, radar_ob=False):
@@ -440,14 +446,14 @@ class CollectorScenario:
         else:
             tracking_output = None
 
-        if collector_output.external_data:
-            external_data = collector_pb2.ExternalData()
-            external_data.ParseFromString(collector_output.external_data)
-            external_data = MessageToDict(external_data, including_default_value_fields=True)
+        if collector_output.machine_state:
+            machine_state = gandalf_pb2.MachineState()
+            machine_state.ParseFromString(collector_output.machine_state)
+            machine_state = MessageToDict(machine_state, including_default_value_fields=True)
         else:
-            external_data = None
+            machine_state = None
 
-        return frame, camera_output, radar_output, tracking_output, external_data
+        return frame, camera_output, radar_output, tracking_output, machine_state
 
 
     def extract_image(self, img_bytes):
@@ -488,15 +494,30 @@ class CollectorScenario:
 
         return image
 
-def transform_combine_to_local(combine_state, tractor_state):
-    combine_x, combine_y = latlon_to_utm(combine_state['latitude'], combine_state['longitude'])
-    tractor_x, tractor_y = latlon_to_utm(tractor_state['latitude'], tractor_state['longitude'])
+def transform_combine_to_local(combine_state, tractor_state, utm_zone):
+    combine_x, combine_y = latlon_to_utm(combine_state['latitude'], combine_state['longitude'], utm_zone)
+    tractor_x, tractor_y = latlon_to_utm(tractor_state['latitude'], tractor_state['longitude'], utm_zone)
     dx, dy = utm_to_local(combine_x, combine_y, tractor_x, tractor_y, tractor_state['heading'])
     return dx, dy
 
-def latlon_to_utm(lat, lon):
-    converted = utm.from_latlon(lat, lon)
+def latlon_to_utm(lat, lon, zone=None):
+    zone_number, zone_letter = parse_utm_zone(zone)
+    converted = utm.from_latlon(
+        lat, lon,
+        force_zone_number=zone_number,
+        force_zone_letter=zone_letter
+    )
     return converted[0], converted[1]  # only return easting, northing
+
+def parse_utm_zone(zone):
+    if zone is None:
+        return None, None
+    index = 0
+    zone_num = ''
+    while zone[index].isdigit():
+        zone_num += zone[index]
+        index += 1
+    return int(zone_num), zone[index]
 
 def utm_to_local(translate_x, translate_y, reference_x, reference_y, heading):
     theta = (math.pi / 2) - (heading * math.pi / 180)
