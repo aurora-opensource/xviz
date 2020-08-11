@@ -313,7 +313,6 @@ class CollectorScenario:
             self.index += 1
 
         except Exception as e:
-            print ("Number of perception instances: ", len(self.perception_instances))
             print('Crashed in draw perception outputs:', e)
 
 
