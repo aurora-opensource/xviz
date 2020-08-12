@@ -214,7 +214,7 @@ class CollectorScenario:
                 .stream_style({
                     'stroked': True,
                     'stroke_width': 0.3,
-                    'stroke_color': [0, 128, 50, 50],
+                    'stroke_color': [0, 128, 50, 10],
                     # 'opacity': 10,
                     #'stroke_width_min_pixels': 10
                 })\
@@ -282,7 +282,7 @@ class CollectorScenario:
 
         cam_fov = [-28.5, 28.5] # 57 deg
         radar_fov = [-27, -13.5, -6.75, 0, 6.75, 13.5, 27] # 54 degrees
-        radial_distances = [5, 10, 15, 20, 25, 30, 35, 40]
+        radial_distances = [5, 10, 20, 30, 35, 40]
         for r in radial_distances:
             for c_phi in cam_fov:
                 label = (r, c_phi)
@@ -410,7 +410,7 @@ class CollectorScenario:
                 builder.primitive('/combine_position').circle([x, y, z], .5)\
                         .style({'fill_color': fill_color})\
                         .id('combine')
-                builder.primitive('/combine_region').text(str('combine_length')).circle([x, y, z], self.combine_length).id("combine_bubble: " + str(self.combine_length))
+                builder.primitive('/combine_region').circle([x, y, z], self.combine_length).id("combine_bubble: " + str(self.combine_length))
 
         except Exception as e:
             print('Crashed in draw combine position:', e)
@@ -430,7 +430,7 @@ class CollectorScenario:
     def get_object_xyz_primitive(self, radial_dist, angle_radians):
         x = math.cos(angle_radians) * radial_dist
         y = math.sin(angle_radians) * radial_dist
-        z = -.1
+        z = 1.0
 
         return (x, y, z)
 
