@@ -465,6 +465,7 @@ class CollectorScenario:
     def show_image(self, image):
         image = cv2.resize(image, (0, 0), fx=.7, fy=.7)
         cv2.imshow('collector-scenario', image)
+        cv2.moveWindow('collector-scenario', 0, 0)
         cv2.waitKey(1)
 
 
