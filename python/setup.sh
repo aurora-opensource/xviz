@@ -16,6 +16,6 @@ pip install -r requirements.txt
 cd ../Proto-Files
 rm -rf dist
 python setup.py bdist_wheel
-pip install dist/*.whl
+pip install --ignore-installed dist/*.whl
 cd ../python
-python setup.py install
+python setup.py --ignore-installed install
