@@ -27,12 +27,16 @@ class ScenarioSession(XVIZBaseSession):
         await self._socket.send(json.dumps(metadata))
 
         t = 0
+        s = 0.001
         while True:
-            message = self._scenario.get_message(t)
-            await self._socket.send(json.dumps(message))
+            try:
+                message = self._scenario.get_message(t)
+                await self._socket.send(json.dumps(message))
 
-            t += 0.5
-            await asyncio.sleep(0.001)
+                t += 0.5
+                await asyncio.sleep(s)
+            except KeyboardInterrupt:
+                s = 1
 
 class ScenarioHandler:
     def __init__(self):
