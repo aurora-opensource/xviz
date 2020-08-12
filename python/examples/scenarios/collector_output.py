@@ -141,6 +141,8 @@ class CollectorScenario:
         global_config = self.load_config(configfile="../../Global-Configs/Tractors/John-Deere/8RIVT_WHEEL.yaml")
         radar_safety_config = global_config['safety']['radar']
         self.combine_length = radar_safety_config['combine_length']
+        self.distance_threshold = radar_safety_config['distance_threshold']
+        self.slowdown_threshold = radar_safety_config['slowdown_threshold']
 
         qfilter_enabled = radar_safety_config['enable_queue_filter']
         queue_size=12
@@ -221,6 +223,11 @@ class CollectorScenario:
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
 
+            builder.stream("/safety_region")\
+                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+                .category(xviz.CATEGORY.PRIMITIVE)\
+                .type(xviz.PRIMITIVE_TYPES.CIRCLE)
+
 
             builder.stream("/measuring_circles_lbl")\
                 .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
@@ -279,6 +286,8 @@ class CollectorScenario:
         builder.primitive('/measuring_circles').circle([0, 0, 0], 15).id('15')
         builder.primitive('/measuring_circles').circle([0, 0, 0], 10).id('10')
         builder.primitive('/measuring_circles').circle([0, 0, 0], 5).id('5')
+        builder.primitive('/safety_region').circle([0, 0, 0], self.distance_threshold).style({'fill_color': [255, 50, 10, 10]}).id('stop: ' + str(self.distance_threshold))
+        builder.primitive('/safety_region').circle([0, 0, 0], self.slowdown_threshold).style({'fill_color': [255, 153, 51, 10]}).id('slowdown: ' + str(self.slowdown_threshold))
 
         cam_fov = [-28.5, 28.5] # 57 deg
         radar_fov = [-27, -13.5, -6.75, 0, 6.75, 13.5, 27] # 54 degrees
