@@ -20,13 +20,20 @@ DEG_90_AS_RAD = 90 * DEG_1_AS_RAD
 
 class RadarFilter:
 
-    def __init__(self, qfilter_enabled=True, queue_size=12, consecutive_min=7,
-                    pexist_min=0.8, d_bpower_min=-10, phi_sdv_max=0.1, nan_threshold=0.5):
+    def __init__(self, pfilter_enabled, qfilter_enabled, queue_size, consecutive_min, pf_pexist_min,
+                    qf_pexist_min, pf_dbpower_min, qf_dbpower_min, phi_sdv_max, nan_threshold):
+
+        if not pfilter_enabled and not qfilter_enabled:
+            print('no filter is enabled')
+
+        self.pfilter_enabled = pfilter_enabled
         self.qfilter_enabled = qfilter_enabled
         self.queue_size = queue_size
         self.consecutive_min = consecutive_min
-        self.pexist_min = pexist_min
-        self.d_bpower_min = d_bpower_min
+        self.pf_pexist_min = pf_pexist_min
+        self.qf_pexist_min = qf_pexist_min
+        self.pf_dbpower_min = pf_dbpower_min
+        self.qf_dbpower_min = qf_dbpower_min
         self.phi_sdv_max = phi_sdv_max
         self.nan_threshold = nan_threshold # maximum percent of queue that can be nan before it is automatically evaluated as an invalid target
 
@@ -34,20 +41,22 @@ class RadarFilter:
 
 
     def is_valid_target(self, target_id, target):
+        is_valid = True # start by assuming the target is valid
+
+        if self.pfilter_enabled:
+            is_valid = self.passive_filter(target)
+        
         if self.qfilter_enabled:
             self.make_target_queue_if_nonexistent(target_id)
             self.update_queues(target_id, target)
 
-            if self.is_default_target(target):
-                return False
+            if is_valid: # only apply the queue filter if the target passed through the passive filter
+                if self.is_default_target(target):
+                    return False
 
-            return self.queue_filter(target_id)
+                is_valid = self.queue_filter(target_id)
 
-        # use passive filter
-        if self.is_default_target(target):
-            return False
-
-        return self.passive_filter(target)
+        return is_valid
 
 
     def passive_filter(self, target):
@@ -55,8 +64,8 @@ class RadarFilter:
             Returns True if the target is valid.
         '''
         if target['consecutive'] < self.consecutive_min \
-            or target['pexist'] < self.pexist_min \
-            or target['dBpower'] <= self.d_bpower_min \
+            or target['pexist'] < self.pf_pexist_min \
+            or target['dBpower'] <= self.pf_dbpower_min \
             or target['phiSdv'] >= self.phi_sdv_max:
             return False
         return True
@@ -68,8 +77,8 @@ class RadarFilter:
         '''
         if np.isnan(self.target_queues[target_id]['consecutive_queue']).sum() / self.queue_size > self.nan_threshold \
             or np.nanmean(self.target_queues[target_id]['consecutive_queue']) < self.consecutive_min \
-            or np.nanmean(self.target_queues[target_id]['pexist_queue']) < self.pexist_min \
-            or np.nanmean(self.target_queues[target_id]['d_bpower_queue']) <= self.d_bpower_min \
+            or np.nanmean(self.target_queues[target_id]['pexist_queue']) < self.qf_pexist_min \
+            or np.nanmean(self.target_queues[target_id]['d_bpower_queue']) <= self.qf_dbpower_min \
             or np.nanmean(self.target_queues[target_id]['phi_sdv_queue']) >= self.phi_sdv_max:
             return False
         return True
@@ -144,14 +153,21 @@ class CollectorScenario:
         self.distance_threshold = radar_safety_config['distance_threshold']
         self.slowdown_threshold = radar_safety_config['slowdown_threshold']
 
+        pfilter_enabled = True
         qfilter_enabled = radar_safety_config['enable_queue_filter']
-        queue_size=12
-        consecutive_min=radar_safety_config['consecutive_detections']
-        pexist_min=radar_safety_config['qf_confidence_threshold']
-        d_bpower_min=radar_safety_config['qf_d_bpower_threshold']
-        phi_sdv_max=radar_safety_config['phi_sdv_threshold']
-        nan_threshold=radar_safety_config['qf_none_ratio_threshold']
-        self.radar_filter = RadarFilter(qfilter_enabled, queue_size, consecutive_min, pexist_min, d_bpower_min, phi_sdv_max, nan_threshold)
+        queue_size = 12
+        consecutive_min = radar_safety_config['consecutive_detections']
+        phi_sdv_max = radar_safety_config['phi_sdv_threshold']
+        pf_pexist_min = radar_safety_config['confidence_threshold']
+
+        qf_pexist_min = radar_safety_config['qf_confidence_threshold']
+        pf_dbpower_min = radar_safety_config['d_bpower_threshold']
+        qf_dbpower_min = radar_safety_config['qf_d_bpower_threshold']
+        nan_threshold = radar_safety_config['qf_none_ratio_threshold']
+
+        self.radar_filter = RadarFilter(pfilter_enabled, qfilter_enabled, queue_size,
+                                        consecutive_min, pf_pexist_min, qf_pexist_min,
+                                        pf_dbpower_min, qf_dbpower_min, phi_sdv_max, nan_threshold)
 
 
     def load_config(self, configfile):
@@ -340,6 +356,11 @@ class CollectorScenario:
 
             if machine_state is not None:
                 self._draw_combine_position(machine_state, builder)
+
+            # if self.index == 0:
+            #     print('start time:', time.gmtime(float(collector_output.timestamp)))
+            # elif self.index == len(self.collector_outputs) - 1:
+            #     print('end time:', time.gmtime(float(collector_output.timestamp)))
 
             self.index += 1
 
