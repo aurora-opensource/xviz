@@ -121,9 +121,9 @@ class CollectorScenario:
         self.id_last = 1
         self.data = []
 
-        config = self.load_config()
-        collector_output_file = config['collector_output_file']
-        extract_directory = config['extract_directory']
+        collector_config = self.load_config(configfile='scenarios/collector-scenario-config.yaml')
+        collector_output_file = collector_config['collector_output_file']
+        extract_directory = collector_config['extract_directory']
         collector_output_file = Path(collector_output_file)
         print("Using:collector_output_file:", collector_output_file)
         extract_directory = Path(extract_directory)
@@ -138,11 +138,21 @@ class CollectorScenario:
 
         self.collector_outputs = sorted(extract_directory.glob('*.txt'))
 
-        self.radar_filter = RadarFilter()
+        global_config = self.load_config(configfile="../../Global-Configs/Tractors/John-Deere/8RIVT_WHEEL.yaml")
+        radar_safety_config = global_config['safety']['radar']
+        self.combine_length = radar_safety_config['combine_length']
+
+        qfilter_enabled = radar_safety_config['enable_queue_filter']
+        queue_size=12
+        consecutive_min=radar_safety_config['consecutive_detections']
+        pexist_min=radar_safety_config['qf_confidence_threshold']
+        d_bpower_min=radar_safety_config['qf_d_bpower_threshold']
+        phi_sdv_max=radar_safety_config['phi_sdv_threshold']
+        nan_threshold=radar_safety_config['qf_none_ratio_threshold']
+        self.radar_filter = RadarFilter(qfilter_enabled, queue_size, consecutive_min, pexist_min, d_bpower_min, phi_sdv_max, nan_threshold)
 
 
-    def load_config(self):
-        configfile = 'scenarios/collector-scenario-config.yaml'
+    def load_config(self, configfile):
 
         with open(configfile, 'r') as f:
             config = yaml.safe_load(f)
@@ -173,6 +183,18 @@ class CollectorScenario:
             builder.stream("/combine_position")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
                 .stream_style({'fill_color': [200, 0, 70, 128]})\
+                .category(xviz.CATEGORY.PRIMITIVE)\
+                .type(xviz.PRIMITIVE_TYPES.CIRCLE)
+
+            builder.stream("/combine_region")\
+                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+                .stream_style({
+                    'stroked': True,
+                    'stroke_width': 0.3,
+                    'stroke_color': [0, 20, 128, 50],
+                    # 'opacity': 10,
+                    #'stroke_width_min_pixels': 10
+                })\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
 
@@ -388,6 +410,7 @@ class CollectorScenario:
                 builder.primitive('/combine_position').circle([x, y, z], .5)\
                         .style({'fill_color': fill_color})\
                         .id('combine')
+                builder.primitive('/combine_region').text(str('combine_length')).circle([x, y, z], self.combine_length).id("combine_bubble: " + str(self.combine_length))
 
         except Exception as e:
             print('Crashed in draw combine position:', e)
