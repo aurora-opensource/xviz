@@ -33,6 +33,7 @@ $ nvm install 11.12.0
 $ nvm use 11.12.0
 $ git clone https://github.com/uber/xviz.git
 $ cd xviz
+$ npm install
 $ npm run bootstrap
 ```
 
