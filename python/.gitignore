@@ -108,4 +108,4 @@ venv.bak/
 # vscode settings
 .vscode/
 
-examples/scenarios/collector-scenario-config.yaml
+# examples/scenarios/collector-scenario-config.yaml
