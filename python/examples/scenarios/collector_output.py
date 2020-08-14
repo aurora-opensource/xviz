@@ -215,11 +215,11 @@ class CollectorScenario:
         builder.primitive('/measuring_circles_lbl').text("10").position([10, 0, .1]).id('10lb')
         builder.primitive('/measuring_circles_lbl').text("5").position([5, 0, .1]).id('5lb')
 
-        builder.primitive('/measuring_circles').circle([0, 0, 0], self.slowdown_threshold)\
+        builder.primitive('/measuring_circles').circle([cab_to_nose, 0, 0], self.slowdown_threshold)\
                                                 .style({'stroke_color': [255, 200, 0, 70]})\
                                                 .id('slowdown: ' + str(self.slowdown_threshold))
-        builder.primitive('/measuring_circles').circle([0, 0, 0], 25).id('25')
-        builder.primitive('/measuring_circles').circle([0, 0, 0], self.distance_threshold)\
+        builder.primitive('/measuring_circles').circle([cab_to_nose, 0, 0], 25).id('25')
+        builder.primitive('/measuring_circles').circle([cab_to_nose, 0, 0], self.distance_threshold)\
                                                 .style({'stroke_color': [255, 50, 10, 70]})\
                                                 .id('stop: ' + str(self.distance_threshold))
         builder.primitive('/measuring_circles').circle([cab_to_nose, 0, 0], 15).id('15')
