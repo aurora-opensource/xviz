@@ -15,6 +15,7 @@ from scenarios.safety_subsystems.path_prediction import PathPrediction
 import xviz
 import xviz.builder as xbuilder
 
+cab_to_nose = 3.2131
 
 DEG_1_AS_RAD = math.pi / 180
 DEG_90_AS_RAD = 90 * DEG_1_AS_RAD
@@ -213,16 +214,16 @@ class CollectorScenario:
         builder.primitive('/measuring_circles_lbl').text("10").position([10, 0, .1]).id('10lb')
         builder.primitive('/measuring_circles_lbl').text("5").position([5, 0, .1]).id('5lb')
 
-        builder.primitive('/measuring_circles').circle([0, 0, 0], self.slowdown_threshold)\
+        builder.primitive('/measuring_circles').circle([cab_to_nose, 0, 0], self.slowdown_threshold)\
                                                 .style({'stroke_color': [255, 200, 0, 50]})\
                                                 .id('slowdown: ' + str(self.slowdown_threshold))
-        builder.primitive('/measuring_circles').circle([0, 0, 0], 25).id('25')
-        builder.primitive('/measuring_circles').circle([0, 0, 0], self.distance_threshold)\
+        builder.primitive('/measuring_circles').circle([cab_to_nose, 0, 0], 25).id('25')
+        builder.primitive('/measuring_circles').circle([cab_to_nose, 0, 0], self.distance_threshold)\
                                                 .style({'stroke_color': [255, 50, 10, 50]})\
                                                 .id('stop: ' + str(self.distance_threshold))
-        builder.primitive('/measuring_circles').circle([0, 0, 0], 15).id('15')
-        builder.primitive('/measuring_circles').circle([0, 0, 0], 10).id('10')
-        builder.primitive('/measuring_circles').circle([0, 0, 0], 5).id('5')
+        builder.primitive('/measuring_circles').circle([cab_to_nose, 0, 0], 15).id('15')
+        builder.primitive('/measuring_circles').circle([cab_to_nose, 0, 0], 10).id('10')
+        builder.primitive('/measuring_circles').circle([cab_to_nose, 0, 0], 5).id('5')
 
         cam_fov = [-28.5, 28.5] # 57 deg
         radar_fov = [-27, -13.5, -6.75, 0, 6.75, 13.5, 27] # 54 degrees
@@ -230,7 +231,7 @@ class CollectorScenario:
         for r in radial_distances:
             for c_phi in cam_fov:
                 label = (r, c_phi)
-                (x, y, z) = self.get_object_xyz_primitive(r, c_phi*math.pi/180)
+                (x, y, z) = self.get_object_xyz_primitive(r+cab_to_nose, c_phi*math.pi/180)
                 fill_color = [206, 205, 203]
                 builder.primitive('/camera_fov').circle([x, y, z], 0.15)\
                     .style({'fill_color': fill_color})\
@@ -238,7 +239,7 @@ class CollectorScenario:
 
             for r_phi in radar_fov:
                 label = (r, r_phi)
-                (x, y, z) = self.get_object_xyz_primitive(r, r_phi*math.pi/180)
+                (x, y, z) = self.get_object_xyz_primitive(r+cab_to_nose, r_phi*math.pi/180)
                 fill_color = [210,105,30]
                 builder.primitive('/radar_fov').circle([x, y, z], 0.15)\
                     .style({'fill_color': fill_color})\
@@ -291,6 +292,8 @@ class CollectorScenario:
     def _draw_radar_targets(self, radar_output, builder: xviz.XVIZBuilder):
         try:
             for target in radar_output['targets'].values():
+                if abs(target['dr']) < 0.1 and abs(target['phi']) < 0.01:
+                    continue 
                 to_path_prediction = False
                 (x, y, z) = self.get_object_xyz(target, 'phi', 'dr', radar_ob=True)
     
