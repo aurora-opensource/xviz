@@ -1,11 +1,2 @@
-collector_output_file: /home/raven.ravenind.net/r103943/Desktop/collector/v2020-25-0-6de872fc781a4edba9139698ec01f5d8-detection-primary-forward-57-smartag-autocart-1597179022815-451.tar
+collector_output_file: /home/raven.ravenind.net/r103943/Desktop/collector/today/v2020-3-0-01474c5e94b248948cc32b0081d21b22-detection-primary-forward-57-smartag-autocart-1597359788663-143.tar 
 extract_directory: /home/raven.ravenind.net/r103943/Desktop/collector/extracted
-
-radar_filter:
-  qfilter_enabled: True
-  queue_size: 12
-  consecutive_min: 7
-  pexist_min: 0.8
-  d_bpower_min: -10
-  phi_sdv_max: 0.1
-  nan_threshold: 0.5

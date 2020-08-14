@@ -10,6 +10,8 @@ from pathlib import Path
 from google.protobuf.json_format import MessageToDict
 from protobuf_APIs import collector_pb2, gandalf_pb2, falconeye_pb2, radar_pb2, camera_pb2
 
+from scenarios.path_prediction import PathPrediction
+
 import xviz
 import xviz.builder as xbuilder
 
@@ -133,6 +135,7 @@ class CollectorScenario:
         collector_config = self.load_config(configfile='scenarios/collector-scenario-config.yaml')
         collector_output_file = collector_config['collector_output_file']
         extract_directory = collector_config['extract_directory']
+
         collector_output_file = Path(collector_output_file)
         print("Using:collector_output_file:", collector_output_file)
         extract_directory = Path(extract_directory)
@@ -169,9 +172,14 @@ class CollectorScenario:
                                         consecutive_min, pf_pexist_min, qf_pexist_min,
                                         pf_dbpower_min, qf_dbpower_min, phi_sdv_max, nan_threshold)
 
+        prediction_args = {
+            'wheel_base': global_config['guidance']['wheel_base'],
+            'machine_width': global_config['navigation']['machine_width']
+        }
+        self.path_prediction = PathPrediction(prediction_args)
+
 
     def load_config(self, configfile):
-
         with open(configfile, 'r') as f:
             config = yaml.safe_load(f)
 
@@ -182,10 +190,6 @@ class CollectorScenario:
         if not self._metadata:
             builder = xviz.XVIZMetadataBuilder()
             builder.stream("/vehicle_pose").category(xviz.CATEGORY.POSE)
-            builder.stream("/vehicle_heading")\
-                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
-                .category(xviz.CATEGORY.PRIMITIVE)\
-                .type(xviz.PRIMITIVE_TYPES.POLYLINE)
 
             builder.stream("/radar_targets")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
@@ -224,6 +228,11 @@ class CollectorScenario:
                 })\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
+
+            # builder.stream("/predicted_path")\
+            #     .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+            #     .stream_style({'#048'}\
+            #     .)
 
             builder.stream("/radar_fov")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
