@@ -1,0 +1,6 @@
+[submodule "Proto-Files"]
+	path = Proto-Files
+	url = https://github.com/Smart-Ag/Proto-Files.git
+[submodule "Global-Configs"]
+	path = Global-Configs
+	url = https://github.com/Smart-Ag/Global-Configs.git

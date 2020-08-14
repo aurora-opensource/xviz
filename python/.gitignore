@@ -6,6 +6,8 @@ __pycache__/
 # C extensions
 *.so
 
+python/examples/scenarios/tmp/
+
 # Distribution / packaging
 .Python
 build/
@@ -105,3 +107,5 @@ venv.bak/
 
 # vscode settings
 .vscode/
+
+examples/scenarios/collector-scenario-config.yaml
