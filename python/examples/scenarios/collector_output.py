@@ -203,8 +203,8 @@ class CollectorScenario:
     def get_metadata(self):
         if not self._metadata:
             builder = xviz.XVIZMetadataBuilder()
-            builder.stream("/vehicle_pose").category(xviz.CATEGORY.POSE)
-            builder.stream("/vehicle_heading")\
+            builder.stream("/tractor_pose").category(xviz.CATEGORY.POSE)
+            builder.stream("/tractor_heading")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.POLYLINE)
@@ -508,11 +508,11 @@ class CollectorScenario:
                     .id('combine_heading')
 
                 tractor_color = [0,128, 128]
-                builder.primitive('/vehicle_heading')\
+                builder.primitive('/tractor_heading')\
                         .polyline([0, 0, z, t_r_x, t_r_y, z])\
                         .style({'stroke_width': 0.3,
                                 "stroke_color": tractor_color})\
-                        .id('vehicle_heading')
+                        .id('tractor_heading')
 
         except Exception as e:
             print('Crashed in draw machine state:', e)
