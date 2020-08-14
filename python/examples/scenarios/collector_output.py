@@ -345,6 +345,8 @@ class CollectorScenario:
         try:
             for target in camera_output['targets']:
                 (x, y, z) = self.get_object_xyz(target, 'objectAngle', 'objectDistance', radar_ob=False)
+                if target['label'] == 'qrcode':
+                    continue
                 fill_color = [0, 255, 255] # Cyan
 
                 builder.primitive('/camera_targets')\
