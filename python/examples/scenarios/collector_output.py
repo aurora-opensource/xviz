@@ -215,7 +215,7 @@ class CollectorScenario:
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
             builder.stream("/radar_crucial_targets")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
-                .stream_style({'fill_color': [200, 0, 70, 128]})\
+                .stream_style({'fill_color': [0, 0, 0]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
             builder.stream("/tracking_targets")\
@@ -422,7 +422,6 @@ class CollectorScenario:
 
                 if to_path_prediction:
                     builder.primitive('/radar_crucial_targets').circle([x, y, z], .5)\
-                        .style({'fill_color': [0, 0, 0]})\
                         .id(str(target['targetId']))
 
         except Exception as e:
