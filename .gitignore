@@ -2,6 +2,7 @@
 node_modules
 dist
 python/examples/scenarios/tmp/
+python/examples/scenarios/collector-scenario-config.yaml
 node_modules
 .reify-cache
 */**/yarn.lock
