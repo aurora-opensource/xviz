@@ -441,7 +441,7 @@ class CollectorScenario:
     def get_object_xyz(self, ob, angle_key, dist_key, radar_ob=False):
         x = math.cos(ob[angle_key]) * ob[dist_key]
         y = math.sin(ob[angle_key]) * ob[dist_key]
-        z = 0.5
+        z = 1.5
 
         if not radar_ob:
             nose_to_cab = 3.2131 # meters
