@@ -329,11 +329,11 @@ class CollectorScenario:
 
         builder.primitive('/measuring_circles').circle([0, 0, 0], self.slowdown_threshold)\
                                                 .style({'stroke_color': [255, 200, 0, 50]})\
-                                                .id('slowdown:' + str(self.slowdown_threshold))
+                                                .id('slowdown: ' + str(self.slowdown_threshold))
         builder.primitive('/measuring_circles').circle([0, 0, 0], 25).id('25')
         builder.primitive('/measuring_circles').circle([0, 0, 0], self.distance_threshold)\
                                                 .style({'stroke_color': [255, 50, 10, 50]})\
-                                                .id('stop:' + str(self.distance_threshold))
+                                                .id('stop: ' + str(self.distance_threshold))
         builder.primitive('/measuring_circles').circle([0, 0, 0], 15).id('15')
         builder.primitive('/measuring_circles').circle([0, 0, 0], 10).id('10')
         builder.primitive('/measuring_circles').circle([0, 0, 0], 5).id('5')
@@ -416,12 +416,14 @@ class CollectorScenario:
                 else:
                     fill_color = [255, 255, 0] # Yellow
 
-                builder.primitive('/radar_targets').circle([x, y, z], .5)\
+                builder.primitive('/radar_targets')\
+                    .circle([x, y, z], .5)\
                     .style({'fill_color': fill_color})\
                     .id(str(target['targetId']))
 
                 if to_path_prediction:
-                    builder.primitive('/radar_crucial_targets').circle([x, y, z], .5)\
+                    builder.primitive('/radar_crucial_targets')\
+                        .circle([x, y, z], .5)\
                         .id(str(target['targetId']))
 
         except Exception as e:
@@ -442,7 +444,8 @@ class CollectorScenario:
                         else:
                             fill_color = [0, 0, 255] # Blue
 
-                        builder.primitive('/tracking_targets').circle([x, y, z], .5)\
+                        builder.primitive('/tracking_targets')\
+                            .circle([x, y, z], .5)\
                             .style({'fill_color': fill_color})\
                             .id(track['trackId'])
 
@@ -456,9 +459,10 @@ class CollectorScenario:
                 (x, y, z) = self.get_object_xyz(target, 'objectAngle', 'objectDistance', not_radar_ob=True)
                 fill_color = [0, 255, 255] # Cyan
 
-                builder.primitive('/camera_targets').circle([x, y, z], .5)\
-                        .style({'fill_color': fill_color})\
-                        .id(target['label'])
+                builder.primitive('/camera_targets')\
+                    .circle([x, y, z], .5)\
+                    .style({'fill_color': fill_color})\
+                    .id(target['label'])
 
         except Exception as e:
             print('Crashed in draw camera targets:', e)
@@ -490,20 +494,25 @@ class CollectorScenario:
                 c_r_x, c_r_y, _ = combine_rel_heading_xyz
                 t_r_x, t_r_y, _ = tractor_rel_heading_xyz
 
-                builder.primitive('/combine_position').circle([x, y, z], .5)\
-                        .style({'fill_color': fill_color})\
-                        .id('combine')
-                builder.primitive('/combine_region').circle([x, y, z], self.combine_length).id("combine_bubble: " + str(self.combine_length))
+                builder.primitive('/combine_position')\
+                    .circle([x, y, z], .5)\
+                    .style({'fill_color': fill_color})\
+                    .id('combine')
+                builder.primitive('/combine_region')\
+                    .circle([x, y, z], self.combine_length)\
+                    .id("combine_bubble: " + str(self.combine_length))
 
                 builder.primitive('/combine_heading')\
-                        .polyline([x, y, z, x+c_r_x, y+c_r_y, z])\
-                        .style({'stroke_width': 0.3, "stroke_color": fill_color})\
-                        .id('combine_heading')
+                    .polyline([x, y, z, x+c_r_x, y+c_r_y, z])\
+                    .style({'stroke_width': 0.3, 
+                            "stroke_color": fill_color})\
+                    .id('combine_heading')
 
                 tractor_color = [0,128,128]
                 builder.primitive('/vehicle_heading')\
                         .polyline([0, 0, z, t_r_x, t_r_y, z])\
-                        .style({'stroke_width': 0.3, "stroke_color": tractor_color})\
+                        .style({'stroke_width': 0.3,
+                                "stroke_color": tractor_color})\
                         .id('vehicle_heading')
 
         except Exception as e:
