@@ -190,6 +190,10 @@ class CollectorScenario:
         if not self._metadata:
             builder = xviz.XVIZMetadataBuilder()
             builder.stream("/vehicle_pose").category(xviz.CATEGORY.POSE)
+            builder.stream("/vehicle_heading")\
+                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+                .category(xviz.CATEGORY.PRIMITIVE)\
+                .type(xviz.PRIMITIVE_TYPES.POLYLINE)
 
             builder.stream("/radar_targets")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
