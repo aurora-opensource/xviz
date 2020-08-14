@@ -247,7 +247,7 @@ class CollectorScenario:
 
             builder.stream("/predicted_path")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
-                .stream_style({'stroke_color': [255, 0, 70, 128]})\
+                .stream_style({'stroke_color': [0,128, 128, 128]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.POLYLINE)
 
@@ -267,7 +267,7 @@ class CollectorScenario:
                 .stream_style({
                     'stroked': True,
                     'filled': False,
-                    'stroke_width': 0.3,
+                    'stroke_width': 0.2,
                     'stroke_color': [0, 0, 0, 20],
                 })\
                 .category(xviz.CATEGORY.PRIMITIVE)\
@@ -525,7 +525,7 @@ class CollectorScenario:
                 tractor_state = vehicle_states['tractor']
                 speed = tractor_state['speed']
                 curvature = tractor_state['curvature']
-                wheel_angle = curvature * self.wheel_base / 1000 * math.pi / 180
+                wheel_angle = curvature * self.wheel_base / 1000
                 self.path_prediction.predict(wheel_angle, speed)
 
                 left_p = np.array(list(
