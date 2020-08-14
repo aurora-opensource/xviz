@@ -403,7 +403,7 @@ class CollectorScenario:
         try:
             for target in radar_output['targets'].values():
                 to_path_prediction = False
-                (x, y, z) = self.get_object_xyz(target, 'phi', 'dr', not_radar_ob=False)
+                (x, y, z) = self.get_object_xyz(target, 'phi', 'dr', radar_ob=True)
     
                 if self.radar_filter.is_valid_target(target['targetId'], target):
                     if self.radar_filter.filter_targets_until_path_prediction(target):
@@ -436,7 +436,7 @@ class CollectorScenario:
                 min_hits = 2
                 for track in tracking_output['tracks']:
                     if track['score'] > min_confidence and track['hitStreak'] > min_hits:
-                        (x, y, z) = self.get_object_xyz(track, 'angle', 'distance', not_radar_ob=True)
+                        (x, y, z) = self.get_object_xyz(track, 'angle', 'distance', radar_ob=False)
 
                         if track['radarDistCamFrame'] > 0.1:
                             fill_color = [0, 255, 0] # Green
@@ -455,7 +455,7 @@ class CollectorScenario:
     def _draw_camera_targets(self, camera_output, builder: xviz.XVIZBuilder):
         try:
             for target in camera_output['targets']:
-                (x, y, z) = self.get_object_xyz(target, 'objectAngle', 'objectDistance', not_radar_ob=True)
+                (x, y, z) = self.get_object_xyz(target, 'objectAngle', 'objectDistance', radar_ob=False)
                 fill_color = [0, 255, 255] # Cyan
 
                 builder.primitive('/camera_targets')\
@@ -545,12 +545,12 @@ class CollectorScenario:
             print('Crashed in draw predicted path:', e)
     
 
-    def get_object_xyz(self, ob, angle_key, dist_key, not_radar_ob=False):
+    def get_object_xyz(self, ob, angle_key, dist_key, radar_ob=False):
         x = math.cos(ob[angle_key]) * ob[dist_key]
         y = math.sin(ob[angle_key]) * ob[dist_key]
         z = 0.5
 
-        if not_radar_ob:
+        if not radar_ob:
             nose_to_cab = 3.2131 # meters
             x -= nose_to_cab
 
