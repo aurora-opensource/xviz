@@ -386,7 +386,7 @@ class CollectorScenario:
                     .style({'fill_color': fill_color})\
                     .id('combine')
                 builder.primitive('/combine_region')\
-                    .circle([x, y, z], self.combine_length)\
+                    .circle([x, y, z-.1], self.combine_length)\
                     .id("combine_bubble: " + str(self.combine_length))
 
                 builder.primitive('/combine_heading')\
