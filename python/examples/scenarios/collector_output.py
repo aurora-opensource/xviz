@@ -169,7 +169,7 @@ class CollectorScenario:
         self.distance_threshold = radar_safety_config['distance_threshold']
         self.slowdown_threshold = radar_safety_config['slowdown_threshold']
 
-        pfilter_enabled = True
+        pfilter_enabled = False
         qfilter_enabled = radar_safety_config['enable_queue_filter']
         queue_size = 12
         consecutive_min = radar_safety_config['consecutive_detections']
@@ -185,8 +185,9 @@ class CollectorScenario:
                                         consecutive_min, pf_pexist_min, qf_pexist_min,
                                         pf_dbpower_min, qf_dbpower_min, phi_sdv_max, nan_threshold)
 
+        self.wheel_base = global_config['guidance']['wheel_base']
         prediction_args = {
-            'wheel_base': global_config['guidance']['wheel_base'],
+            'wheel_base': self.wheel_base,
             'machine_width': global_config['navigation']['machine_width']
         }
         self.path_prediction = PathPrediction(prediction_args)
@@ -238,23 +239,21 @@ class CollectorScenario:
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.POLYLINE)
-
             builder.stream("/combine_region")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
                 .stream_style({
                     'stroked': True,
                     'stroke_width': 0.3,
                     'stroke_color': [0, 20, 128, 50],
-                    # 'opacity': 10,
-                    #'stroke_width_min_pixels': 10
                 })\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
 
-            # builder.stream("/predicted_path")\
-            #     .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
-            #     .stream_style({'#048'}\
-            #     .)
+            builder.stream("/predicted_path")\
+                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+                .stream_style({'stroke_color': [200, 0, 70, 128]})\
+                .category(xviz.CATEGORY.PRIMITIVE)\
+                .type(xviz.PRIMITIVE_TYPES.POLYLINE)
 
             builder.stream("/radar_fov")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
@@ -271,19 +270,12 @@ class CollectorScenario:
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
                 .stream_style({
                     'stroked': True,
+                    'filled': False,
                     'stroke_width': 0.3,
-                    'stroke_color': [0, 128, 50, 10],
-                    # 'opacity': 10,
-                    #'stroke_width_min_pixels': 10
+                    'stroke_color': [0, 0, 0, 20],
                 })\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
-
-            builder.stream("/safety_region")\
-                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
-                .category(xviz.CATEGORY.PRIMITIVE)\
-                .type(xviz.PRIMITIVE_TYPES.CIRCLE)
-
 
             builder.stream("/measuring_circles_lbl")\
                 .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
@@ -329,21 +321,23 @@ class CollectorScenario:
 
     def _draw_measuring_references(self, builder: xviz.XVIZBuilder, timestamp):
 
-        builder.primitive('/measuring_circles_lbl').text("30").position([30, 0, 0]).id('30lb')
-        builder.primitive('/measuring_circles_lbl').text("25").position([25, 0, 0]).id('25lb')
-        builder.primitive('/measuring_circles_lbl').text("20").position([20, 0, 0]).id('20lb')
-        builder.primitive('/measuring_circles_lbl').text("15").position([15, 0, 0]).id('15lb')
-        builder.primitive('/measuring_circles_lbl').text("10").position([10, 0, 0]).id('10lb')
-        builder.primitive('/measuring_circles_lbl').text("5").position([5, 0, 0]).id('5lb')
+        builder.primitive('/measuring_circles_lbl').text("30").position([30, 0, .1]).id('30lb')
+        builder.primitive('/measuring_circles_lbl').text("25").position([25, 0, .1]).id('25lb')
+        builder.primitive('/measuring_circles_lbl').text("20").position([20, 0, .1]).id('20lb')
+        builder.primitive('/measuring_circles_lbl').text("15").position([15, 0, .1]).id('15lb')
+        builder.primitive('/measuring_circles_lbl').text("10").position([10, 0, .1]).id('10lb')
+        builder.primitive('/measuring_circles_lbl').text("5").position([5, 0, .1]).id('5lb')
 
-        builder.primitive('/measuring_circles').circle([0, 0, 0], 30).id('30')
+        builder.primitive('/measuring_circles').circle([0, 0, 0], self.slowdown_threshold)\
+                                                .style({'stroke_color': [255, 200, 0, 50]})\
+                                                .id('slowdown:' + str(self.slowdown_threshold))
         builder.primitive('/measuring_circles').circle([0, 0, 0], 25).id('25')
-        builder.primitive('/measuring_circles').circle([0, 0, 0], 20).id('20')
+        builder.primitive('/measuring_circles').circle([0, 0, 0], self.distance_threshold)\
+                                                .style({'stroke_color': [255, 50, 10, 50]})\
+                                                .id('stop:' + str(self.distance_threshold))
         builder.primitive('/measuring_circles').circle([0, 0, 0], 15).id('15')
         builder.primitive('/measuring_circles').circle([0, 0, 0], 10).id('10')
         builder.primitive('/measuring_circles').circle([0, 0, 0], 5).id('5')
-        builder.primitive('/safety_region').circle([0, 0, 0], self.distance_threshold).style({'fill_color': [255, 50, 10, 10]}).id('stop: ' + str(self.distance_threshold))
-        builder.primitive('/safety_region').circle([0, 0, 0], self.slowdown_threshold).style({'fill_color': [255, 153, 51, 10]}).id('slowdown: ' + str(self.slowdown_threshold))
 
         cam_fov = [-28.5, 28.5] # 57 deg
         radar_fov = [-27, -13.5, -6.75, 0, 6.75, 13.5, 27] # 54 degrees
@@ -395,8 +389,8 @@ class CollectorScenario:
                 self._draw_tracking_targets(tracking_output, builder)
 
             if machine_state is not None:
-                self._draw_combine_position(machine_state, builder)
-                self._draw_heading(machine_state, builder)
+                self._draw_machine_state(machine_state, builder)
+                self._draw_predicted_path(machine_state, builder)
 
             # if self.index == 0:
             #     print('start time:', time.gmtime(float(collector_output.timestamp)))
@@ -472,7 +466,7 @@ class CollectorScenario:
             print('Crashed in draw camera targets:', e)
 
     
-    def _draw_combine_position(self, machine_state, builder: xviz.XVIZBuilder):
+    def _draw_machine_state(self, machine_state, builder: xviz.XVIZBuilder):
         try:
             vehicle_states = machine_state['vehicleStates']
             if 'combine' and 'tractor' in vehicle_states:
@@ -487,30 +481,6 @@ class CollectorScenario:
                 z = 0.5
                 fill_color = [128, 0, 128] # Black
 
-                builder.primitive('/combine_position').circle([x, y, z], .5)\
-                        .style({'fill_color': fill_color})\
-                        .id('combine')
-                builder.primitive('/combine_region').circle([x, y, z], self.combine_length).id("combine_bubble: " + str(self.combine_length))
-
-        except Exception as e:
-            print('Crashed in draw combine position:', e)
-
-
-    def _draw_heading(self, machine_state, builder: xviz.XVIZBuilder):
-        try:
-            vehicle_states = machine_state['vehicleStates']
-            if 'combine' and 'tractor' in vehicle_states:
-                combine_state = vehicle_states['combine']
-                tractor_state = vehicle_states['tractor']
-                operation_state = machine_state['opState']
-                if operation_state['refUtmZone']:
-                    utm_zone = operation_state['refUtmZone']
-                else:
-                    utm_zone = None
-                x, y = transform_combine_to_local(combine_state, tractor_state, utm_zone)
-                z = 1.0
-                fill_color = [0, 0, 0] # Black
-
                 combine_heading = (math.pi / 2) - (combine_state["heading"]* math.pi / 180)
                 tractor_heading = (math.pi / 2) - (tractor_state["heading"]* math.pi / 180)
 
@@ -522,6 +492,10 @@ class CollectorScenario:
                 c_r_x, c_r_y, _ = combine_rel_heading_xyz
                 t_r_x, t_r_y, _ = tractor_rel_heading_xyz
 
+                builder.primitive('/combine_position').circle([x, y, z], .5)\
+                        .style({'fill_color': fill_color})\
+                        .id('combine')
+                builder.primitive('/combine_region').circle([x, y, z], self.combine_length).id("combine_bubble: " + str(self.combine_length))
 
                 builder.primitive('/combine_heading')\
                         .polyline([x, y, z, x+c_r_x, y+c_r_y, z])\
@@ -533,11 +507,36 @@ class CollectorScenario:
                         .polyline([0, 0, z, t_r_x, t_r_y, z])\
                         .style({'stroke_width': 0.3, "stroke_color": tractor_color})\
                         .id('vehicle_heading')
-                        
-
 
         except Exception as e:
-            print('Crashed in draw heading:', e)
+            print('Crashed in draw machine state:', e)
+
+    
+    def _draw_predicted_path(self, machine_state, builder: xviz.XVIZBuilder):
+        try:
+            vehicle_states = machine_state['vehicleStates']
+            if 'tractor' in vehicle_states:
+                tractor_state = vehicle_states['tractor']
+                speed = tractor_state['speed']
+                curvature = tractor_state['curvature']
+                wheel_angle = curvature * self.wheel_base / 1000 * math.pi / 180
+                self.path_prediction.predict(wheel_angle, speed)
+
+                left_p = np.array(list(
+                            map(self.get_object_xyz_primitive, self.path_prediction.left_p[:, 0], self.path_prediction.left_p[:, 1])))\
+                            .flatten()
+                right_p = np.flipud(np.array(list(
+                            map(self.get_object_xyz_primitive, self.path_prediction.right_p[:, 0], self.path_prediction.right_p[:, 1]))))\
+                            .flatten()
+                
+                vertices = list(np.concatenate((left_p, right_p)))
+
+                builder.primitive('/predicted_path')\
+                        .polyline(vertices)\
+                        .id('predicted_paths')
+
+        except Exception as e:
+            print('Crashed in draw predicted path:', e)
     
 
     def get_object_xyz(self, ob, angle_key, dist_key, radar_ob=False):
