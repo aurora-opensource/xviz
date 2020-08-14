@@ -527,7 +527,7 @@ class CollectorScenario:
             print('Crashed in draw heading:', e)
     
 
-    def get_object_xyz(self, ob, angle_key, dist_key, radar_ob=False):
+    def get_object_xyz(self, ob, angle_key, dist_key, not_radar_ob=False):
         x = math.cos(ob[angle_key]) * ob[dist_key]
         y = math.sin(ob[angle_key]) * ob[dist_key]
         z = 0.5
