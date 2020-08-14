@@ -404,7 +404,7 @@ class CollectorScenario:
 
     def _draw_radar_targets(self, radar_output, builder: xviz.XVIZBuilder):
         try:
-            for target_id, target in radar_output['targets'].items():
+            for target in radar_output['targets'].values():
                 to_path_prediction = False
                 (x, y, z) = self.get_object_xyz(target, 'phi', 'dr', not_radar_ob=False)
     
