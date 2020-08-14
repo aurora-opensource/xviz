@@ -509,10 +509,10 @@ class CollectorScenario:
 
                 tractor_color = [0,128, 128]
                 builder.primitive('/tractor_heading')\
-                        .polyline([0, 0, z, t_r_x, t_r_y, z])\
-                        .style({'stroke_width': 0.3,
-                                "stroke_color": tractor_color})\
-                        .id('tractor_heading')
+                    .polyline([0, 0, z, t_r_x, t_r_y, z])\
+                    .style({'stroke_width': 0.3,
+                            "stroke_color": tractor_color})\
+                    .id('tractor_heading')
 
         except Exception as e:
             print('Crashed in draw machine state:', e)
