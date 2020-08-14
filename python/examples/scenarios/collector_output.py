@@ -208,12 +208,12 @@ class CollectorScenario:
 
     def _draw_measuring_references(self, builder: xviz.XVIZBuilder, timestamp):
 
-        builder.primitive('/measuring_circles_lbl').text("30").position([30, 0, .1]).id('30lb')
-        builder.primitive('/measuring_circles_lbl').text("25").position([25, 0, .1]).id('25lb')
-        builder.primitive('/measuring_circles_lbl').text("20").position([20, 0, .1]).id('20lb')
-        builder.primitive('/measuring_circles_lbl').text("15").position([15, 0, .1]).id('15lb')
-        builder.primitive('/measuring_circles_lbl').text("10").position([10, 0, .1]).id('10lb')
-        builder.primitive('/measuring_circles_lbl').text("5").position([5, 0, .1]).id('5lb')
+        builder.primitive('/measuring_circles_lbl').text("30").position([30+cab_to_nose, 0, .1]).id('30lb')
+        builder.primitive('/measuring_circles_lbl').text("25").position([25+cab_to_nose, 0, .1]).id('25lb')
+        builder.primitive('/measuring_circles_lbl').text("20").position([20+cab_to_nose, 0, .1]).id('20lb')
+        builder.primitive('/measuring_circles_lbl').text("15").position([15+cab_to_nose, 0, .1]).id('15lb')
+        builder.primitive('/measuring_circles_lbl').text("10").position([10+cab_to_nose, 0, .1]).id('10lb')
+        builder.primitive('/measuring_circles_lbl').text("5").position([5+cab_to_nose, 0, .1]).id('5lb')
 
         builder.primitive('/measuring_circles').circle([cab_to_nose, 0, 0], self.slowdown_threshold)\
                                                 .style({'stroke_color': [255, 200, 0, 70]})\
