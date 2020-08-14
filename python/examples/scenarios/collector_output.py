@@ -138,20 +138,20 @@ class CollectorScenario:
 
             builder.stream("/predicted_path")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
-                .stream_style({'stroke_color': [0,128, 128, 128]})\
+                .stream_style({'stroke_color': [0, 128, 128, 128]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.POLYLINE)
 
             builder.stream("/radar_fov")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
-                .stream_style({'fill_color': [200, 0, 70, 128]})\
+                .stream_style({'stroke_color': [255, 0, 0, 100]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
-                .type(xviz.PRIMITIVE_TYPES.CIRCLE)
+                .type(xviz.PRIMITIVE_TYPES.POLYLINE)
             builder.stream("/camera_fov")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
-                .stream_style({'fill_color': [200, 0, 70, 128]})\
+                .stream_style({'stroke_color': [0, 150, 200, 100]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
-                .type(xviz.PRIMITIVE_TYPES.CIRCLE)
+                .type(xviz.PRIMITIVE_TYPES.POLYLINE)
 
             builder.stream("/measuring_circles")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
@@ -207,46 +207,57 @@ class CollectorScenario:
 
 
     def _draw_measuring_references(self, builder: xviz.XVIZBuilder, timestamp):
+        radial_distances = set([5, 10, 15, 20, 25, 30])
+        radial_distances.add(self.slowdown_threshold)
+        radial_distances.add(self.distance_threshold)
+        radial_distances = sorted(radial_distances, reverse=True)
 
-        builder.primitive('/measuring_circles_lbl').text("30").position([30+cab_to_nose, 0, .1]).id('30lb')
-        builder.primitive('/measuring_circles_lbl').text("25").position([25+cab_to_nose, 0, .1]).id('25lb')
-        builder.primitive('/measuring_circles_lbl').text("20").position([20+cab_to_nose, 0, .1]).id('20lb')
-        builder.primitive('/measuring_circles_lbl').text("15").position([15+cab_to_nose, 0, .1]).id('15lb')
-        builder.primitive('/measuring_circles_lbl').text("10").position([10+cab_to_nose, 0, .1]).id('10lb')
-        builder.primitive('/measuring_circles_lbl').text("5").position([5+cab_to_nose, 0, .1]).id('5lb')
+        for r in radial_distances:
+            builder.primitive('/measuring_circles_lbl')\
+                .text(str(r))\
+                .position([r+cab_to_nose, 0, .1])\
+                .id(f'{r}lb')
 
-        builder.primitive('/measuring_circles').circle([cab_to_nose, 0, 0], self.slowdown_threshold)\
-                                                .style({'stroke_color': [255, 200, 0, 70]})\
-                                                .id('slowdown: ' + str(self.slowdown_threshold))
-        builder.primitive('/measuring_circles').circle([cab_to_nose, 0, 0], 25).id('25')
-        builder.primitive('/measuring_circles').circle([cab_to_nose, 0, 0], self.distance_threshold)\
-                                                .style({'stroke_color': [255, 50, 10, 70]})\
-                                                .id('stop: ' + str(self.distance_threshold))
-        builder.primitive('/measuring_circles').circle([cab_to_nose, 0, 0], 15).id('15')
-        builder.primitive('/measuring_circles').circle([cab_to_nose, 0, 0], 10).id('10')
-        builder.primitive('/measuring_circles').circle([cab_to_nose, 0, 0], 5).id('5')
+            if r == self.slowdown_threshold:
+                builder.primitive('/measuring_circles')\
+                    .circle([cab_to_nose, 0, 0], r)\
+                    .style({'stroke_color': [255, 200, 0, 70]})\
+                    .id('slowdown: ' + str(r))
+            elif r == self.distance_threshold:
+                builder.primitive('/measuring_circles')\
+                    .circle([cab_to_nose, 0, 0], r)\
+                    .style({'stroke_color': [255, 50, 10, 70]})\
+                    .id('stop: ' + str(r))
+            else:
+                builder.primitive('/measuring_circles')\
+                    .circle([cab_to_nose, 0, 0], r)\
+                    .id(str(r))
 
         cam_fov = [-28.5, 28.5] # 57 deg
         radar_fov = [-27, -13.5, -6.75, 0, 6.75, 13.5, 27] # 54 degrees
-        radial_distances = [5, 10, 20, 30, 35, 40]
-        for r in radial_distances:
-            for c_phi in cam_fov:
-                label = (r, c_phi)
-                (x, y, z) = self.get_object_xyz_primitive(r+cab_to_nose, c_phi*math.pi/180)
-                fill_color = [206, 205, 203]
-                builder.primitive('/camera_fov').circle([x, y, z], 0.15)\
-                    .style({'fill_color': fill_color})\
-                    .id("cam_fov: "+str(label))
 
-            for r_phi in radar_fov:
+        for c_phi in cam_fov:
+            r = 40
+            label = (r, c_phi)
+            (x, y, z) = self.get_object_xyz_primitive(r+cab_to_nose, c_phi*math.pi/180)
+            vertices = [0, 0, 0, x, y, z]
+            builder.primitive('/camera_fov')\
+                .polyline(vertices)\
+                .id("cam_fov: "+str(label))
+
+        for r_phi in radar_fov:
+            r = 40
+            (x, y, z) = self.get_object_xyz_primitive(r+cab_to_nose, r_phi*math.pi/180)
+            builder.primitive('/measuring_circles_lbl')\
+                .text(str(r_phi))\
+                .position([x, y, z])\
+                .id(str(r_phi)+'lb')
+            if r_phi == radar_fov[0] or r_phi == radar_fov[-1]:
                 label = (r, r_phi)
-                (x, y, z) = self.get_object_xyz_primitive(r+cab_to_nose, r_phi*math.pi/180)
-                fill_color = [210,105,30]
-                builder.primitive('/radar_fov').circle([x, y, z], 0.15)\
-                    .style({'fill_color': fill_color})\
+                vertices = [0, 0, 0, x, y, z]
+                builder.primitive('/radar_fov')\
+                    .polyline(vertices)\
                     .id("radar_fov: "+str(label))
-                if r == radial_distances[-1]:
-                    builder.primitive('/measuring_circles_lbl').text(str(r_phi)).position([x, y, z]).id(str(r_phi)+'lb')
 
 
     def _draw_collector_output(self, builder: xviz.XVIZBuilder, timestamp):
