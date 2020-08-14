@@ -128,6 +128,7 @@ class CollectorScenario:
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
                 .stream_style({
                     'stroked': True,
+                    'filled': False,
                     'stroke_width': 0.3,
                     'stroke_color': [0, 20, 128, 50],
                 })\
@@ -155,6 +156,7 @@ class CollectorScenario:
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
                 .stream_style({
                     'stroked': True,
+                    'filled': False,
                     'stroke_width': 0.2,
                     'stroke_color': [0, 0, 0, 20],
                 })\
