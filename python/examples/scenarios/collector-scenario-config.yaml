@@ -1,5 +1,5 @@
-collector_output_file: /home/raven.ravenind.net/r103943/Desktop/collector/v2020-25-0-6de872fc781a4edba9139698ec01f5d8-detection-primary-forward-57-smartag-autocart-1597179022815-451.tar
-extract_directory: /home/raven.ravenind.net/r103943/Desktop/collector/extracted
+collector_output_file: /home/r103867/work/camera-collector/nd-data/stops_without_state/radar_stop_headdown_without_state.tar
+extract_directory: /home/r103867/work/camera-collector/nd-data/stop_2/txt_files
 
 radar_filter:
   qfilter_enabled: True
