@@ -115,6 +115,19 @@ class RadarFilter:
             self.target_queues[target_id]['d_bpower_queue'] = deque(maxlen=self.queue_size)
             self.target_queues[target_id]['phi_sdv_queue'] = deque(maxlen=self.queue_size)
 
+    def filter_targets_until_path_prediction(self, target, in_sync=True, is_combine=False, at_sync_point=False):
+        if in_sync and not at_sync_point:
+            if is_combine:
+                dr_threshold = 8
+            else:
+                dr_threshold = 10
+        else:
+            dr_threshold = 20
+        if target['dr'] > dr_threshold:
+            return False
+        else:
+            return True
+
 
 class CollectorScenario:
 
@@ -153,7 +166,7 @@ class CollectorScenario:
         self.distance_threshold = radar_safety_config['distance_threshold']
         self.slowdown_threshold = radar_safety_config['slowdown_threshold']
 
-        pfilter_enabled = True
+        pfilter_enabled = False
         qfilter_enabled = radar_safety_config['enable_queue_filter']
         queue_size = 12
         consecutive_min = radar_safety_config['consecutive_detections']
@@ -183,6 +196,11 @@ class CollectorScenario:
             builder = xviz.XVIZMetadataBuilder()
             builder.stream("/vehicle_pose").category(xviz.CATEGORY.POSE)
             builder.stream("/radar_targets")\
+                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+                .stream_style({'fill_color': [200, 0, 70, 128]})\
+                .category(xviz.CATEGORY.PRIMITIVE)\
+                .type(xviz.PRIMITIVE_TYPES.CIRCLE)
+            builder.stream("/radar_crucial_targets")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
                 .stream_style({'fill_color': [200, 0, 70, 128]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
@@ -371,9 +389,13 @@ class CollectorScenario:
     def _draw_radar_targets(self, radar_output, builder: xviz.XVIZBuilder):
         try:
             for target_id, target in radar_output['targets'].items():
-                (x, y, z) = self.get_object_xyz(target, 'phi', 'dr', radar_ob=True)
-
+                to_path_prediction = False
+                (x, y, z) = self.get_object_xyz(target, 'phi', 'dr', not_radar_ob=False)
+    
                 if self.radar_filter.is_valid_target(target['targetId'], target):
+                    if self.radar_filter.filter_targets_until_path_prediction(target):
+                        to_path_prediction = True
+                 
                     fill_color = [255, 0, 0] # Red
                 else:
                     fill_color = [255, 255, 0] # Yellow
@@ -381,6 +403,11 @@ class CollectorScenario:
                 builder.primitive('/radar_targets').circle([x, y, z], .5)\
                     .style({'fill_color': fill_color})\
                     .id(str(target['targetId']))
+
+                if to_path_prediction:
+                    builder.primitive('/radar_crucial_targets').circle([x, y, z], .5)\
+                        .style({'fill_color': [0, 0, 0]})\
+                        .id(str(target['targetId']))
 
         except Exception as e:
             print('Crashed in draw radar targets:', e)
@@ -393,7 +420,7 @@ class CollectorScenario:
                 min_hits = 2
                 for track in tracking_output['tracks']:
                     if track['score'] > min_confidence and track['hitStreak'] > min_hits:
-                        (x, y, z) = self.get_object_xyz(track, 'angle', 'distance')
+                        (x, y, z) = self.get_object_xyz(track, 'angle', 'distance', not_radar_ob=True)
 
                         if track['radarDistCamFrame'] > 0.1:
                             fill_color = [0, 255, 0] # Green
@@ -411,7 +438,7 @@ class CollectorScenario:
     def _draw_camera_targets(self, camera_output, builder: xviz.XVIZBuilder):
         try:
             for target in camera_output['targets']:
-                (x, y, z) = self.get_object_xyz(target, 'objectAngle', 'objectDistance')
+                (x, y, z) = self.get_object_xyz(target, 'objectAngle', 'objectDistance', not_radar_ob=True)
                 fill_color = [0, 255, 255] # Cyan
 
                 builder.primitive('/camera_targets').circle([x, y, z], .5)\
@@ -435,7 +462,7 @@ class CollectorScenario:
                     utm_zone = None
                 x, y = transform_combine_to_local(combine_state, tractor_state, utm_zone)
                 z = 0.5
-                fill_color = [0, 0, 0] # Black
+                fill_color = [128, 0, 128] # Black
 
                 builder.primitive('/combine_position').circle([x, y, z], .5)\
                         .style({'fill_color': fill_color})\
@@ -446,14 +473,14 @@ class CollectorScenario:
             print('Crashed in draw combine position:', e)
 
 
-    def get_object_xyz(self, ob, angle_key, dist_key, radar_ob=False):
+    def get_object_xyz(self, ob, angle_key, dist_key, not_radar_ob=False):
         x = math.cos(ob[angle_key]) * ob[dist_key]
         y = math.sin(ob[angle_key]) * ob[dist_key]
         z = 0.5
 
-        if radar_ob:
-            radar_offset_inline = 3.2131 # meters
-            x += radar_offset_inline
+        if not_radar_ob:
+            nose_to_cab = 3.2131 # meters
+            x -= nose_to_cab
 
         return (x, y, z)
 
