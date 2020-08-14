@@ -203,7 +203,7 @@ class CollectorScenario:
     def get_metadata(self):
         if not self._metadata:
             builder = xviz.XVIZMetadataBuilder()
-            builder.stream("/tractor_pose").category(xviz.CATEGORY.POSE)
+            builder.stream("/vehicle_pose").category(xviz.CATEGORY.POSE)
             builder.stream("/tractor_heading")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
                 .category(xviz.CATEGORY.PRIMITIVE)\
