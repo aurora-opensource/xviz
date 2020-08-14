@@ -211,7 +211,6 @@ class CollectorScenario:
 
             builder.stream("/radar_targets")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
-                .stream_style({'fill_color': [200, 0, 70, 128]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
             builder.stream("/radar_crucial_targets")\
