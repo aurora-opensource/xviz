@@ -182,6 +182,11 @@ class CollectorScenario:
         if not self._metadata:
             builder = xviz.XVIZMetadataBuilder()
             builder.stream("/vehicle_pose").category(xviz.CATEGORY.POSE)
+            builder.stream("/vehicle_heading")\
+                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+                .category(xviz.CATEGORY.PRIMITIVE)\
+                .type(xviz.PRIMITIVE_TYPES.POLYLINE)
+
             builder.stream("/radar_targets")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
                 .stream_style({'fill_color': [200, 0, 70, 128]})\
@@ -203,6 +208,10 @@ class CollectorScenario:
                 .stream_style({'fill_color': [200, 0, 70, 128]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
+            builder.stream("/combine_heading")\
+                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+                .category(xviz.CATEGORY.PRIMITIVE)\
+                .type(xviz.PRIMITIVE_TYPES.POLYLINE)
 
             builder.stream("/combine_region")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
@@ -356,6 +365,7 @@ class CollectorScenario:
 
             if machine_state is not None:
                 self._draw_combine_position(machine_state, builder)
+                self._draw_heading(machine_state, builder)
 
             # if self.index == 0:
             #     print('start time:', time.gmtime(float(collector_output.timestamp)))
@@ -445,6 +455,50 @@ class CollectorScenario:
         except Exception as e:
             print('Crashed in draw combine position:', e)
 
+
+    def _draw_heading(self, machine_state, builder: xviz.XVIZBuilder):
+        try:
+            vehicle_states = machine_state['vehicleStates']
+            if 'combine' and 'tractor' in vehicle_states:
+                combine_state = vehicle_states['combine']
+                tractor_state = vehicle_states['tractor']
+                operation_state = machine_state['opState']
+                if operation_state['refUtmZone']:
+                    utm_zone = operation_state['refUtmZone']
+                else:
+                    utm_zone = None
+                x, y = transform_combine_to_local(combine_state, tractor_state, utm_zone)
+                z = 1.0
+                fill_color = [0, 0, 0] # Black
+
+                combine_heading = (math.pi / 2) - (combine_state["heading"]* math.pi / 180)
+                tractor_heading = (math.pi / 2) - (tractor_state["heading"]* math.pi / 180)
+
+                combine_heading_relative_to_tractor = combine_heading - tractor_heading
+                combine_rel_heading_xyz = self.get_object_xyz_primitive(radial_dist=3.0, angle_radians=combine_heading_relative_to_tractor)
+                # tractor has a fixed heading
+                tractor_rel_heading_xyz = self.get_object_xyz_primitive(radial_dist=5.0, angle_radians=0.0)
+
+                c_r_x, c_r_y, _ = combine_rel_heading_xyz
+                t_r_x, t_r_y, _ = tractor_rel_heading_xyz
+
+
+                builder.primitive('/combine_heading')\
+                        .polyline([x, y, z, x+c_r_x, y+c_r_y, z])\
+                        .style({'stroke_width': 0.3, "stroke_color": fill_color})\
+                        .id('combine_heading')
+
+                tractor_color = [0,128,128]
+                builder.primitive('/vehicle_heading')\
+                        .polyline([0, 0, z, t_r_x, t_r_y, z])\
+                        .style({'stroke_width': 0.3, "stroke_color": tractor_color})\
+                        .id('vehicle_heading')
+                        
+
+
+        except Exception as e:
+            print('Crashed in draw heading:', e)
+    
 
     def get_object_xyz(self, ob, angle_key, dist_key, radar_ob=False):
         x = math.cos(ob[angle_key]) * ob[dist_key]
