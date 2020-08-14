@@ -215,23 +215,20 @@ class CollectorScenario:
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
             builder.stream("/radar_crucial_targets")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
-                .stream_style({'fill_color': [0, 0, 0]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
+
             builder.stream("/tracking_targets")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
-                .stream_style({'fill_color': [200, 0, 70, 128]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
             builder.stream("/camera_targets")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
-                .stream_style({'fill_color': [200, 0, 70, 128]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
                 
             builder.stream("/combine_position")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
-                .stream_style({'fill_color': [200, 0, 70, 128]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
             builder.stream("/combine_heading")\
@@ -250,7 +247,7 @@ class CollectorScenario:
 
             builder.stream("/predicted_path")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
-                .stream_style({'stroke_color': [200, 0, 70, 128]})\
+                .stream_style({'stroke_color': [255, 0, 70, 128]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.POLYLINE)
 
@@ -422,8 +419,10 @@ class CollectorScenario:
                     .id(str(target['targetId']))
 
                 if to_path_prediction:
+                    fill_color = [0, 0, 0] # Black
                     builder.primitive('/radar_crucial_targets')\
                         .circle([x, y, z], .5)\
+                        .style({'fille_color': fill_color})\
                         .id(str(target['targetId']))
 
         except Exception as e:
@@ -508,7 +507,7 @@ class CollectorScenario:
                             "stroke_color": fill_color})\
                     .id('combine_heading')
 
-                tractor_color = [0,128,128]
+                tractor_color = [0,128, 128]
                 builder.primitive('/vehicle_heading')\
                         .polyline([0, 0, z, t_r_x, t_r_y, z])\
                         .style({'stroke_width': 0.3,
