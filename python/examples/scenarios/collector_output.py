@@ -128,6 +128,7 @@ class CollectorScenario:
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
                 .stream_style({
                     'stroked': True,
+                    'filled': False,
                     'stroke_width': 0.3,
                     'stroke_color': [0, 20, 128, 50],
                 })\
@@ -214,11 +215,11 @@ class CollectorScenario:
         builder.primitive('/measuring_circles_lbl').text("5").position([5, 0, .1]).id('5lb')
 
         builder.primitive('/measuring_circles').circle([0, 0, 0], self.slowdown_threshold)\
-                                                .style({'stroke_color': [255, 200, 0, 50]})\
+                                                .style({'stroke_color': [255, 200, 0, 70]})\
                                                 .id('slowdown: ' + str(self.slowdown_threshold))
         builder.primitive('/measuring_circles').circle([0, 0, 0], 25).id('25')
         builder.primitive('/measuring_circles').circle([0, 0, 0], self.distance_threshold)\
-                                                .style({'stroke_color': [255, 50, 10, 50]})\
+                                                .style({'stroke_color': [255, 50, 10, 70]})\
                                                 .id('stop: ' + str(self.distance_threshold))
         builder.primitive('/measuring_circles').circle([0, 0, 0], 15).id('15')
         builder.primitive('/measuring_circles').circle([0, 0, 0], 10).id('10')
@@ -389,7 +390,7 @@ class CollectorScenario:
                     .style({'fill_color': fill_color})\
                     .id('combine')
                 builder.primitive('/combine_region')\
-                    .circle([x, y, z], self.combine_length)\
+                    .circle([x, y, z-.1], self.combine_length)\
                     .id("combine_bubble: " + str(self.combine_length))
 
                 builder.primitive('/combine_heading')\
