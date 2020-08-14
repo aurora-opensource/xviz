@@ -166,7 +166,7 @@ class CollectorScenario:
         self.distance_threshold = radar_safety_config['distance_threshold']
         self.slowdown_threshold = radar_safety_config['slowdown_threshold']
 
-        pfilter_enabled = False
+        pfilter_enabled = True
         qfilter_enabled = radar_safety_config['enable_queue_filter']
         queue_size = 12
         consecutive_min = radar_safety_config['consecutive_detections']
