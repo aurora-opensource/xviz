@@ -380,10 +380,8 @@ class CollectorScenario:
                 combine_state = vehicle_states['combine']
                 tractor_state = vehicle_states['tractor']
                 operation_state = machine_state['opState']
-                if operation_state['refUtmZone']:
-                    utm_zone = operation_state['refUtmZone']
-                else:
-                    utm_zone = None
+                utm_zone = operation_state['refUtmZone']
+
                 x, y = transform_combine_to_local(combine_state, tractor_state, utm_zone)
                 z = 0.5
                 fill_color = [128, 0, 128] # Black
@@ -432,6 +430,7 @@ class CollectorScenario:
                 speed = tractor_state['speed']
                 curvature = tractor_state['curvature']
                 wheel_angle = curvature * self.wheel_base / 1000
+                
                 self.path_prediction.predict(wheel_angle, speed)
 
                 left_p = np.array(list(
@@ -563,7 +562,7 @@ def transform_combine_to_local(combine_state, tractor_state, utm_zone):
     dx, dy = utm_to_local(combine_x, combine_y, tractor_x, tractor_y, tractor_state['heading'])
     return dx, dy
 
-def latlon_to_utm(lat, lon, zone=None):
+def latlon_to_utm(lat, lon, zone):
     zone_number, zone_letter = parse_utm_zone(zone)
     converted = utm.from_latlon(
         lat, lon,
@@ -573,7 +572,7 @@ def latlon_to_utm(lat, lon, zone=None):
     return converted[0], converted[1]  # only return easting, northing
 
 def parse_utm_zone(zone):
-    if zone is None:
+    if not zone:
         return None, None
     index = 0
     zone_num = ''
