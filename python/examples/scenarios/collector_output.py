@@ -35,7 +35,8 @@ class CollectorScenario:
         self.id_last = 1
         self.data = []
 
-        collector_config = self.load_config(configfile='scenarios/collector-scenario-config.yaml')
+        configfile = Path(__file__).parent / 'collector-scenario-config.yaml'
+        collector_config = self.load_config(str(configfile))
         collector_output_file = collector_config['collector_output_file']
         extract_directory = collector_config['extract_directory']
 
@@ -52,8 +53,9 @@ class CollectorScenario:
         shutil.unpack_archive(str(collector_output_file), str(extract_directory))
 
         self.collector_outputs = sorted(extract_directory.glob('*.txt'))
-
-        global_config = self.load_config(configfile="../../Global-Configs/Tractors/John-Deere/8RIVT_WHEEL.yaml")
+        
+        configfile = Path(__file__).parents[3] / 'Global-Configs' / 'Tractors' / 'John-Deere' / '8RIVT_WHEEL.yaml'
+        global_config = self.load_config(str(configfile))
         radar_safety_config = global_config['safety']['radar']
         self.combine_length = radar_safety_config['combine_length']
         self.distance_threshold = radar_safety_config['distance_threshold']
@@ -430,7 +432,7 @@ class CollectorScenario:
                 speed = tractor_state['speed']
                 curvature = tractor_state['curvature']
                 wheel_angle = curvature * self.wheel_base / 1000
-                
+
                 self.path_prediction.predict(wheel_angle, speed)
 
                 left_p = np.array(list(
