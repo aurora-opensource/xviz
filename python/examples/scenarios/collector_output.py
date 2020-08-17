@@ -307,7 +307,7 @@ class CollectorScenario:
         try:
             for target in radar_output['targets'].values():
                 if abs(target['dr']) < 0.1 and abs(target['phi']) < 0.01:
-                    continue 
+                    continue
                 to_path_prediction = False
                 (x, y, z) = self.get_object_xyz(target, 'phi', 'dr', radar_ob=True)
     
