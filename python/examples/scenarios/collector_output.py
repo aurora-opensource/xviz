@@ -328,7 +328,7 @@ class CollectorScenario:
                     fill_color = [0, 0, 0] # Black
                     builder.primitive('/radar_crucial_targets')\
                         .circle([x, y, z], .5)\
-                        .style({'fille_color': fill_color})\
+                        .style({'fill_color': fill_color})\
                         .id(str(target['targetId']))
 
         except Exception as e:
