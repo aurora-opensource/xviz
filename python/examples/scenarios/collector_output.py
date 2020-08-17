@@ -66,12 +66,13 @@ class CollectorScenario:
         queue_size = 12
         consecutive_min = radar_safety_config['consecutive_detections']
         phi_sdv_max = radar_safety_config['phi_sdv_threshold']
-        pf_pexist_min = radar_safety_config['confidence_threshold']
+        nan_threshold = radar_safety_config['qf_none_ratio_threshold']
 
+        pf_pexist_min = radar_safety_config['confidence_threshold']
         qf_pexist_min = radar_safety_config['qf_confidence_threshold']
+
         pf_dbpower_min = radar_safety_config['d_bpower_threshold']
         qf_dbpower_min = radar_safety_config['qf_d_bpower_threshold']
-        nan_threshold = radar_safety_config['qf_none_ratio_threshold']
 
         self.radar_filter = RadarFilter(pfilter_enabled, qfilter_enabled, queue_size,
                                         consecutive_min, pf_pexist_min, qf_pexist_min,
