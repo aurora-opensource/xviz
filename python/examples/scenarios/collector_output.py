@@ -61,7 +61,7 @@ class CollectorScenario:
         self.distance_threshold = radar_safety_config['distance_threshold']
         self.slowdown_threshold = radar_safety_config['slowdown_threshold']
 
-        pfilter_enabled = False
+        pfilter_enabled = True
         qfilter_enabled = radar_safety_config['enable_queue_filter']
         queue_size = 12
         consecutive_min = radar_safety_config['consecutive_detections']
@@ -243,7 +243,7 @@ class CollectorScenario:
             r = 40
             label = (r, c_phi)
             (x, y, z) = self.get_object_xyz_primitive(r+cab_to_nose, c_phi*math.pi/180)
-            vertices = [0, 0, 0, x, y, z]
+            vertices = [cab_to_nose, 0, 0, x, y, z]
             builder.primitive('/camera_fov')\
                 .polyline(vertices)\
                 .id("cam_fov: "+str(label))
@@ -257,7 +257,7 @@ class CollectorScenario:
                 .id(str(r_phi)+'lb')
             if r_phi == radar_fov[0] or r_phi == radar_fov[-1]:
                 label = (r, r_phi)
-                vertices = [0, 0, 0, x, y, z]
+                vertices = [cab_to_nose, 0, 0, x, y, z]
                 builder.primitive('/radar_fov')\
                     .polyline(vertices)\
                     .id("radar_fov: "+str(label))
