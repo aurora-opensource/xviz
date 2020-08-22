@@ -34,25 +34,30 @@ class CollectorScenario:
         self.id_tracks = {}
         self.id_last = 1
         self.data = []
+        self.track_history = {}
 
         configfile = Path(__file__).parent / 'collector-scenario-config.yaml'
         collector_config = self.load_config(str(configfile))
+
         collector_output_file = collector_config['collector_output_file']
         extract_directory = collector_config['extract_directory']
-
         collector_output_file = Path(collector_output_file)
         print("Using:collector_output_file:", collector_output_file)
         extract_directory = Path(extract_directory)
         print("Using:extract_directory:", extract_directory)
-
         if not collector_output_file.is_file():
             print('collector output file does not exit')
         
         establish_fresh_directory(extract_directory)
-
         shutil.unpack_archive(str(collector_output_file), str(extract_directory))
-
         self.collector_outputs = sorted(extract_directory.glob('*.txt'))
+
+        self.mqtt_enabled = collector_config['mqtt_enabled']
+        if self.mqtt_enabled:
+            from scenarios.utils.com_manager import ComManager, MqttConst
+            self.mqtt_tracking_outputs = []
+            comm = ComManager()
+            comm.subscribe(MqttConst.TRACKS_TOPIC, self.store_tracking_output)
         
         configfile = Path(__file__).parents[3] / 'Global-Configs' / 'Tractors' / 'John-Deere' / '8RIVT_WHEEL.yaml'
         global_config = self.load_config(str(configfile))
@@ -91,6 +96,14 @@ class CollectorScenario:
             config = yaml.safe_load(f)
 
         return config
+
+    
+    def store_tracking_output(self, msg):
+        tracking_output = falconeye_pb2.TrackingOutput()
+        tracking_output.ParseFromString(msg.payload)
+        tracking_output = MessageToDict(tracking_output, including_default_value_fields=True)
+        self.mqtt_tracking_outputs.append(tracking_output)
+        print('tracking outputs received:', len(self.mqtt_tracking_outputs))
 
 
     def get_metadata(self):
@@ -168,6 +181,14 @@ class CollectorScenario:
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
 
             builder.stream("/measuring_circles_lbl")\
+                .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
+                .stream_style({
+                    'fill_color': [0, 0, 0]
+                })\
+                .category(xviz.CATEGORY.PRIMITIVE)\
+                .type(xviz.PRIMITIVE_TYPES.TEXT)
+
+            builder.stream("/tracking_id")\
                 .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
                 .stream_style({
                     'fill_color': [0, 0, 0]
@@ -278,20 +299,27 @@ class CollectorScenario:
 
             if camera_output is not None:
                 self._draw_camera_targets(camera_output, builder)
-                img = self.postprocess(img, camera_output)
-
-            if img is not None:
-                self.show_image(img)
 
             if radar_output is not None:
                 self._draw_radar_targets(radar_output, builder)
 
+            if self.mqtt_enabled:
+                if self.mqtt_tracking_outputs:
+                    tracking_output = self.mqtt_tracking_outputs[self.index]
+                else:
+                    print("mqtt enabled but no mqtt tracking outputs are stored")
+                    tracking_output = None
             if tracking_output is not None:
                 self._draw_tracking_targets(tracking_output, builder)
 
             if machine_state is not None:
                 self._draw_machine_state(machine_state, builder)
                 self._draw_predicted_path(machine_state, builder)
+
+            if img is not None:
+                if camera_output is not None:
+                    img = self.postprocess(img, camera_output)
+                self.show_image(img)
 
             # if self.index == 0:
             #     print('start time:', time.gmtime(float(collector_output.timestamp)))
@@ -338,15 +366,20 @@ class CollectorScenario:
 
     def _draw_tracking_targets(self, tracking_output, builder: xviz.XVIZBuilder):
         try:
-            if 'tracks' in tracking_output:
+            if 'tracks' in tracking_output:            
                 min_confidence = 0.1
                 min_hits = 2
                 for track in tracking_output['tracks']:
                     if track['score'] > min_confidence and track['hitStreak'] > min_hits:
                         (x, y, z) = self.get_object_xyz(track, 'angle', 'distance', radar_ob=False)
 
-                        if track['radarDistCamFrame'] > 0.1:
+                        if track['radarDistCamFrame'] != self.track_history.get(track['trackId'], -1)\
+                            and track['radarDistCamFrame'] > 0.1:
                             fill_color = [0, 255, 0] # Green
+                            builder.primitive('/tracking_id')\
+                                    .text(track['trackId'])\
+                                    .position([x, y, z+.1])\
+                                    .id(track['trackId'])
                         else:
                             fill_color = [0, 0, 255] # Blue
 
@@ -355,6 +388,7 @@ class CollectorScenario:
                             .style({'fill_color': fill_color})\
                             .id(track['trackId'])
 
+                        self.track_history[track['trackId']] = track['radarDistCamFrame']
         except Exception as e:
             print('Crashed in draw tracking targets:', e)
 
@@ -494,6 +528,7 @@ class CollectorScenario:
             camera_output.ParseFromString(collector_output.camera_output)
             camera_output = MessageToDict(camera_output, including_default_value_fields=True)
         else:
+            print('missing camera output from collector output')
             camera_output = None
 
         if collector_output.radar_output:
@@ -527,6 +562,7 @@ class CollectorScenario:
 
 
     def show_image(self, image):
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         image = cv2.resize(image, (0, 0), fx=.7, fy=.7)
         cv2.imshow('collector-scenario', image)
         cv2.moveWindow('collector-scenario', 0, 0)
