@@ -115,7 +115,11 @@ class CollectorScenario:
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.POLYLINE)
 
-            builder.stream("/radar_targets")\
+            builder.stream("/radar_filtered_out_targets")\
+                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+                .category(xviz.CATEGORY.PRIMITIVE)\
+                .type(xviz.PRIMITIVE_TYPES.CIRCLE)
+            builder.stream("/radar_passed_filter_targets")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
@@ -345,13 +349,17 @@ class CollectorScenario:
                         to_path_prediction = True
                  
                     fill_color = [255, 0, 0] # Red
+                    builder.primitive('/radar_passed_filter_targets')\
+                        .circle([x, y, z], .5)\
+                        .style({'fill_color': fill_color})\
+                        .id(str(target['targetId']))
                 else:
                     fill_color = [255, 255, 0] # Yellow
+                    builder.primitive('/radar_filtered_out_targets')\
+                        .circle([x, y, z], .5)\
+                        .style({'fill_color': fill_color})\
+                        .id(str(target['targetId']))
 
-                builder.primitive('/radar_targets')\
-                    .circle([x, y, z], .5)\
-                    .style({'fill_color': fill_color})\
-                    .id(str(target['targetId']))
 
                 if to_path_prediction:
                     fill_color = [0, 0, 0] # Black
