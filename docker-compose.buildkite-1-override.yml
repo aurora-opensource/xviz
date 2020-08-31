@@ -1,0 +1,4 @@
+version: '2'
+services:
+  xviz:
+    image: 027047743804.dkr.ecr.us-east-2.amazonaws.com/uber:xviz-xviz-build-1

@@ -1,0 +1,18 @@
+- move gltf handling from loaders.gl internally as latest main version is not compatible
+  with version we used. Will investigate what it take to use latest loaders.gl/gltf
+  - replaced unmaintained 'text-encoding' with 'fast-text-encoding'
+  - fix image encoding for GLTF based xviz data
+  - upgrade ocular-dev-tools
+
+
+
+gltf
+  options packTypedArrays
+
+xviz
+  options flattenArrays
+
+xviz-binary-writer option: nopack: true
+
+xviz-pack-binary duplicate from builder & io modules
+ - diff sync and clean up
