@@ -79,8 +79,7 @@ class ComManager(object):
 
 
     def on_message(self, client, userdata, msg):
-        simplified_topic = simplify_topic(msg.topic)
-        topic_cbs = self.subscriptions.get(simplified_topic)
+        topic_cbs = self.subscriptions.get(msg.topic)
         if topic_cbs is not None:
             for cb in topic_cbs:
                 cb(msg)
@@ -88,15 +87,3 @@ class ComManager(object):
 
     def on_disconnect(self, client, userdata, rc):
         print("Client  disconnected")
-
-
-def simplify_topic(topic):
-    topic_components = topic.split('/')
-    if len(topic_components[0]) > 25: # first element in topic is a long machine ID
-        simplified_topic = '+/'+'/'.join(topic_components[1:])
-    else:
-        simplified_topic = topic
-    # if len(topic_components) >= 4: # the recieved topic is more specific than what we subscribe to
-    #     simplified_topic = '+/'+'/'.join(topic_components[1:3])+'/#'
-
-    return simplified_topic
