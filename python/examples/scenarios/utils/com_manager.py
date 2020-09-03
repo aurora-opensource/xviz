@@ -2,6 +2,8 @@ import paho.mqtt.client as mqtt
 
 class MqttConst(object):
     TRACKS_TOPIC = 'vision/tracking/targets'
+    RADAR_TOPIC = 'vision/radar/targets'
+    MACHINE_STATE_TOPIC = 'collector/machine_state'
 
 class ComManager(object):
 
