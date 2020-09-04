@@ -31,7 +31,7 @@ def extract_collector_output_slim(collector_ouput):
     
     if 'camera_output' in collector_output.data:
         camera_output = camera_pb2.CameraOutput()
-        camera_output.ParseFromString(collector_output.data['camera_output'])
+        camera_output.ParseFromString(collector_output.data[MqttConst.CAMERA_TOPIC])
         camera_output = MessageToDict(camera_output, including_default_value_fields=True)
     else:
         print('missing camera output from collector output')
@@ -51,9 +51,9 @@ def extract_collector_output_slim(collector_ouput):
     else:
         tracking_output = None
 
-    if MqttConst.MACHINE_STATE_TOPIC in collector_ouput.data:
+    if 'collector/data/machine_state' in collector_ouput.data:
         machine_state = gandalf_pb2.MachineState()
-        machine_state.ParseFromString(collector_output.data[MqttConst.MACHINE_STATE_TOPIC])
+        machine_state.ParseFromString(collector_output.data['collector/data/machine_state'])
         machine_state = MessageToDict(machine_state, including_default_value_fields=True)
     else:
         machine_state = None
