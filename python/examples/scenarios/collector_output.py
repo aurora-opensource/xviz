@@ -160,10 +160,21 @@ class CollectorScenario:
                 })\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
+            
+            builder.stream("/field_definition")\
+                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+                .stream_style({'stroke_color': [165, 42, 42, 128]})\
+                .category(xviz.CATEGORY.PRIMITIVE)\
+                .type(xviz.PRIMITIVE_TYPES.POLYLINE)
 
             builder.stream("/predicted_path")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
                 .stream_style({'stroke_color': [0, 128, 128, 128]})\
+                .category(xviz.CATEGORY.PRIMITIVE)\
+                .type(xviz.PRIMITIVE_TYPES.POLYLINE)
+            builder.stream("/planned_path")\
+                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+                .stream_style({'stroke_color': [128, 0, 128, 128]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.POLYLINE)
 
@@ -305,11 +316,13 @@ class CollectorScenario:
 
             collector_output, is_slim_output = deserialize_collector_output(collector_output)
             if is_slim_output:
-                img, camera_output, radar_output,\
-                    tracking_output, machine_state = extract_collector_output_slim(collector_output)
+                img, camera_output, radar_output, tracking_output,\
+                    machine_state, field_definition, planned_path = extract_collector_output_slim(collector_output)
             else:
                 img, camera_output, radar_output,\
                     tracking_output, machine_state = extract_collector_output(collector_output)
+                field_definition = None
+                planned_path = None
 
             if camera_output is not None:
                 self._draw_camera_targets(camera_output, builder)
@@ -329,6 +342,12 @@ class CollectorScenario:
             if machine_state is not None:
                 self._draw_machine_state(machine_state, builder)
                 self._draw_predicted_path(machine_state, builder)
+
+            if field_definition is not None:
+                self._draw_field_definition(field_definition, builder)
+
+            if planned_path is not None:
+                self._draw_planned_path(planned_path, builder)
 
             if img is not None:
                 if camera_output is not None:
@@ -507,6 +526,14 @@ class CollectorScenario:
 
         except Exception as e:
             print('Crashed in draw predicted path:', e)
+    
+
+    def _draw_field_definition(self, field_definition, builder: xviz.XVIZBuilder):
+        pass
+
+
+    def _draw_planned_path(self, planned_path, builder: xviz.XVIZBuilder):
+        pass
 
 
 def get_object_xyz(ob, angle_key, dist_key, radar_ob=False):

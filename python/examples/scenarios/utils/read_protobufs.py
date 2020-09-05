@@ -57,8 +57,18 @@ def extract_collector_output_slim(collector_ouput):
         machine_state = MessageToDict(machine_state, including_default_value_fields=True)
     else:
         machine_state = None
+    
+    if 'collector/data/field_definition' in collector_ouput.data:
+        field_definition = collector_ouput.data['collector/data/field_definition']
+    else:
+        field_definition = None
 
-    return frame, camera_output, radar_output, tracking_output, machine_state
+    if 'collector/data/planned_path' in collector_ouput.data:
+        planned_path = collector_ouput.data['collector/data/planned_path']
+    else:
+        planned_path = None
+
+    return frame, camera_output, radar_output, tracking_output, machine_state, field_definition, planned_path
 
 
 def extract_collector_output(collector_output):
