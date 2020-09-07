@@ -95,6 +95,11 @@ class CollectorScenario:
         }
         self.path_prediction = PathPrediction(prediction_args)
 
+        self.tractor_state = None
+        self.combine_state = None
+        self.planned_path = None
+        self.field_definition = None
+
 
     def load_config(self, configfile):
         with open(configfile, 'r') as f:
@@ -345,9 +350,13 @@ class CollectorScenario:
 
             if field_definition is not None:
                 self._draw_field_definition(field_definition, builder)
+            elif self.field_definition is not None:
+                self._draw_field_definition(self.field_definition, builder)
 
             if planned_path is not None:
                 self._draw_planned_path(planned_path, builder)
+            elif self.planned_path is not None:
+                self._draw_planned_path(self.planned_path, builder)
 
             if img is not None:
                 if camera_output is not None:
@@ -450,47 +459,59 @@ class CollectorScenario:
     def _draw_machine_state(self, machine_state, builder: xviz.XVIZBuilder):
         try:
             vehicle_states = machine_state['vehicleStates']
-            if 'combine' and 'tractor' in vehicle_states:
-                combine_state = vehicle_states['combine']
-                tractor_state = vehicle_states['tractor']
-                operation_state = machine_state['opState']
-                utm_zone = operation_state['refUtmZone']
+            if vehicle_states:
+                combine_states = []
+                for vehicle, state in vehicle_states.items():
+                    if vehicle == 'tractor':
+                        self.tractor_state = state
+                    if vehicle == 'combine':
+                        self.combine_state = state
+                    else:  # must be non-controlling combine state
+                        combine_states.append(state)
+                
+                if self.tractor_state is None:
+                    return
+                    
+                if self.combine_state is not None:
+                    combine_states.append(self.combine_state)
+                
+                for combine_state in combine_states:
+                    utm_zone = machine_state['opState']['refUtmZone']
+                    x, y = transform_combine_to_local(combine_state, self.tractor_state, utm_zone)
+                    z = 0.5
+                    fill_color = [128, 0, 128] # Black
 
-                x, y = transform_combine_to_local(combine_state, tractor_state, utm_zone)
-                z = 0.5
-                fill_color = [128, 0, 128] # Black
+                    combine_heading = (math.pi / 2) - (combine_state["heading"]* math.pi / 180)
+                    tractor_heading = (math.pi / 2) - (self.tractor_state["heading"]* math.pi / 180)
 
-                combine_heading = (math.pi / 2) - (combine_state["heading"]* math.pi / 180)
-                tractor_heading = (math.pi / 2) - (tractor_state["heading"]* math.pi / 180)
+                    combine_heading_relative_to_tractor = combine_heading - tractor_heading
+                    combine_rel_heading_xyz = get_object_xyz_primitive(radial_dist=3.0, angle_radians=combine_heading_relative_to_tractor)
+                    # tractor has a fixed heading
+                    tractor_rel_heading_xyz = get_object_xyz_primitive(radial_dist=5.0, angle_radians=0.0)
 
-                combine_heading_relative_to_tractor = combine_heading - tractor_heading
-                combine_rel_heading_xyz = get_object_xyz_primitive(radial_dist=3.0, angle_radians=combine_heading_relative_to_tractor)
-                # tractor has a fixed heading
-                tractor_rel_heading_xyz = get_object_xyz_primitive(radial_dist=5.0, angle_radians=0.0)
+                    c_r_x, c_r_y, _ = combine_rel_heading_xyz
+                    t_r_x, t_r_y, _ = tractor_rel_heading_xyz
 
-                c_r_x, c_r_y, _ = combine_rel_heading_xyz
-                t_r_x, t_r_y, _ = tractor_rel_heading_xyz
+                    builder.primitive('/combine_position')\
+                        .circle([x, y, z], .5)\
+                        .style({'fill_color': fill_color})\
+                        .id('combine')
+                    builder.primitive('/combine_region')\
+                        .circle([x, y, z-.1], self.combine_length)\
+                        .id("combine_bubble: " + str(self.combine_length))
 
-                builder.primitive('/combine_position')\
-                    .circle([x, y, z], .5)\
-                    .style({'fill_color': fill_color})\
-                    .id('combine')
-                builder.primitive('/combine_region')\
-                    .circle([x, y, z-.1], self.combine_length)\
-                    .id("combine_bubble: " + str(self.combine_length))
+                    builder.primitive('/combine_heading')\
+                        .polyline([x, y, z, x+c_r_x, y+c_r_y, z])\
+                        .style({'stroke_width': 0.3, 
+                                "stroke_color": fill_color})\
+                        .id('combine_heading')
 
-                builder.primitive('/combine_heading')\
-                    .polyline([x, y, z, x+c_r_x, y+c_r_y, z])\
-                    .style({'stroke_width': 0.3, 
-                            "stroke_color": fill_color})\
-                    .id('combine_heading')
-
-                tractor_color = [0,128, 128]
-                builder.primitive('/tractor_heading')\
-                    .polyline([0, 0, z, t_r_x, t_r_y, z])\
-                    .style({'stroke_width': 0.3,
-                            "stroke_color": tractor_color})\
-                    .id('tractor_heading')
+                    tractor_color = [0,128, 128]
+                    builder.primitive('/tractor_heading')\
+                        .polyline([0, 0, z, t_r_x, t_r_y, z])\
+                        .style({'stroke_width': 0.3,
+                                "stroke_color": tractor_color})\
+                        .id('tractor_heading')
 
         except Exception as e:
             print('Crashed in draw machine state:', e)
@@ -529,11 +550,21 @@ class CollectorScenario:
     
 
     def _draw_field_definition(self, field_definition, builder: xviz.XVIZBuilder):
-        pass
+        try:
+            pass
+        except Exception as e:
+            print('Crashed in draw field definition:', e)
 
 
     def _draw_planned_path(self, planned_path, builder: xviz.XVIZBuilder):
-        pass
+        try:
+            if planned_path.size == 0:
+                self.planned_path = None
+                return
+            else:
+                pass
+        except Exception as e:
+            print('Crashed in draw planned path:', e)
 
 
 def get_object_xyz(ob, angle_key, dist_key, radar_ob=False):
