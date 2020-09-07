@@ -1,3 +1,5 @@
+import json
+import numpy as np
 from pathlib import Path
 
 from google.protobuf.json_format import MessageToDict
@@ -60,11 +62,13 @@ def extract_collector_output_slim(collector_ouput):
     
     if 'collector/data/field_definition' in collector_ouput.data:
         field_definition = collector_ouput.data['collector/data/field_definition']
+        field_definition = json.loads(field_definition.decode('ascii'))
     else:
         field_definition = None
 
     if 'collector/data/planned_path' in collector_ouput.data:
         planned_path = collector_ouput.data['collector/data/planned_path']
+        planned_path = np.frombuffer(planned_path, dtype=np.float_)
     else:
         planned_path = None
 
