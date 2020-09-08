@@ -358,7 +358,10 @@ class CollectorScenario:
                 self.field_definition = field_definition
 
             if planned_path is not None:
-                self.planned_path = planned_path
+                if planned_path.size > 0:
+                    self.planned_path = planned_path.reshape(-1, 2)
+                else:
+                    self.planned_path = None
 
             if self.tractor_state is not None\
                 and not self.state_too_old(self.tractor_state):
@@ -552,18 +555,18 @@ class CollectorScenario:
 
     def _draw_planned_path(self, builder: xviz.XVIZBuilder):
         try:
-            if self.planned_path is None\
-                or self.planned_path.size == 0:
+            if self.planned_path is None:
                 return
 
             _, tractor_state = self.tractor_state
             tractor_x, tractor_y = latlon_to_utm(tractor_state['latitude'], tractor_state['longitude'], self.utm_zone)
-            vertices = [
+            vertices = list(np.array([
                 get_object_xyz_primitive(
                     *utm_to_local(x, y, tractor_x, tractor_y, tractor_state['heading'])
                 )
                 for x, y in self.planned_path
-            ]
+            ]).flatten())
+
             builder.primitive('/planned_path')\
                 .polyline(vertices)\
                 .id('planned_paths')
