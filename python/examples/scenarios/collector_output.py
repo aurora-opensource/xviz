@@ -93,8 +93,6 @@ class CollectorScenario:
         }
         self.path_prediction = PathPrediction(prediction_args)
 
-        self.too_old_threshold = 3
-
         self.utm_zone = ''
         self.tractor_state = None
         self.combine_states = {}
@@ -356,19 +354,18 @@ class CollectorScenario:
             if machine_state is not None:
                 self.update_machine_state(machine_state)
 
-            if not self.tractor_state_too_old():
+            if field_definition is not None:
+                self.field_definition = field_definition
+
+            if planned_path is not None:
+                self.planned_path = planned_path
+
+            if self.tractor_state is not None\
+                and not self.state_too_old(self.tractor_state):
                 self._draw_machine_state(builder)
                 self._draw_predicted_path(builder)
-
-                if field_definition is not None:
-                    self._draw_field_definition(field_definition, builder)
-                elif self.field_definition is not None:
-                    self._draw_field_definition(self.field_definition, builder)
-
-                if planned_path is not None:
-                    self._draw_planned_path(planned_path, builder)
-                elif self.planned_path is not None:
-                    self._draw_planned_path(self.planned_path, builder)
+                self._draw_field_definition(builder)
+                self._draw_planned_path(builder)
 
             if img is not None:
                 if camera_output is not None:
@@ -484,10 +481,11 @@ class CollectorScenario:
                         "stroke_color": tractor_color})\
                 .id('tractor_heading')
             
-            for last_updated_index, combine_state in self.combine_states.values():
-                if self.index - last_updated_index > self.too_old_threshold:
+            for combine_state_tuple in self.combine_states.values():
+                if self.state_too_old(combine_state_tuple):
                     continue
 
+                _, combine_state = combine_state_tuple
                 x, y = transform_combine_to_local(combine_state, tractor_state, self.utm_zone)
                 combine_color = [128, 0, 128] # Black
 
@@ -545,20 +543,16 @@ class CollectorScenario:
             print('Crashed in draw predicted path:', e)
     
 
-    def _draw_field_definition(self, field_definition, builder: xviz.XVIZBuilder):
+    def _draw_field_definition(self, builder: xviz.XVIZBuilder):
         try:
             pass
         except Exception as e:
             print('Crashed in draw field definition:', e)
 
 
-    def _draw_planned_path(self, planned_path, builder: xviz.XVIZBuilder):
+    def _draw_planned_path(self, builder: xviz.XVIZBuilder):
         try:
-            if planned_path.size == 0:
-                self.planned_path = None
-                return
-            else:
-                pass
+            pass
         except Exception as e:
             print('Crashed in draw planned path:', e)
 
@@ -577,11 +571,9 @@ class CollectorScenario:
                     self.combine_states[vehicle] = (self.index, state)
     
 
-    def tractor_state_too_old(self):
-        if self.tractor_state is None:
-            return True
-        tractor_last_idx, _ = self.tractor_state
-        if self.index - tractor_last_idx > self.too_old_threshold:
+    def state_too_old(self, vehicle_state):
+        last_updated_index, _ = vehicle_state
+        if self.index - last_updated_index > 3:
             return True
         return False
 
