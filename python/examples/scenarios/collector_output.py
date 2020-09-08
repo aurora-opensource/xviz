@@ -93,6 +93,8 @@ class CollectorScenario:
         }
         self.path_prediction = PathPrediction(prediction_args)
 
+        self.too_old_threshold = 3
+
         self.utm_zone = ''
         self.tractor_state = None
         self.combine_states = {}
@@ -483,7 +485,7 @@ class CollectorScenario:
                 .id('tractor_heading')
             
             for last_updated_index, combine_state in self.combine_states.values():
-                if self.index - last_updated_index > 2:
+                if self.index - last_updated_index > self.too_old_threshold:
                     continue
 
                 x, y = transform_combine_to_local(combine_state, tractor_state, self.utm_zone)
@@ -565,7 +567,7 @@ class CollectorScenario:
         if not self.utm_zone:
             # only need to set it once
             self.utm_zone = machine_state['opState']['refUtmZone']
-            
+
         vehicle_states = machine_state['vehicleStates']
         if vehicle_states:
             for vehicle, state in vehicle_states.items():
@@ -579,7 +581,7 @@ class CollectorScenario:
         if self.tractor_state is None:
             return True
         tractor_last_idx, _ = self.tractor_state
-        if self.index - tractor_last_idx > 2:
+        if self.index - tractor_last_idx > self.too_old_threshold:
             return True
         return False
 
