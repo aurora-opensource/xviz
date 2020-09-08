@@ -93,6 +93,7 @@ class CollectorScenario:
         }
         self.path_prediction = PathPrediction(prediction_args)
 
+        self.utm_zone = ''
         self.tractor_state = None
         self.combine_states = {}
         self.planned_path = None
@@ -351,18 +352,21 @@ class CollectorScenario:
                 self._draw_tracking_targets(tracking_output, builder)
 
             if machine_state is not None:
-                self._draw_machine_state(machine_state, builder)
-                self._draw_predicted_path(machine_state, builder)
+                self.update_machine_state(machine_state)
 
-            if field_definition is not None:
-                self._draw_field_definition(field_definition, builder)
-            elif self.field_definition is not None:
-                self._draw_field_definition(self.field_definition, builder)
+            if self.tractor_state is not None:
+                self._draw_machine_state(builder)
+                self._draw_predicted_path(builder)
 
-            if planned_path is not None:
-                self._draw_planned_path(planned_path, builder)
-            elif self.planned_path is not None:
-                self._draw_planned_path(self.planned_path, builder)
+                if field_definition is not None:
+                    self._draw_field_definition(field_definition, builder)
+                elif self.field_definition is not None:
+                    self._draw_field_definition(self.field_definition, builder)
+
+                if planned_path is not None:
+                    self._draw_planned_path(planned_path, builder)
+                elif self.planned_path is not None:
+                    self._draw_planned_path(self.planned_path, builder)
 
             if img is not None:
                 if camera_output is not None:
@@ -462,21 +466,12 @@ class CollectorScenario:
             print('Crashed in draw camera targets:', e)
 
     
-    def _draw_machine_state(self, machine_state, builder: xviz.XVIZBuilder):
+    def _draw_machine_state(self, builder: xviz.XVIZBuilder):
         try:
-            vehicle_states = machine_state['vehicleStates']
-            if vehicle_states:
-                for vehicle, state in vehicle_states.items():
-                    if vehicle == 'tractor':
-                        self.tractor_state = (self.index, state)
-                    else:
-                        self.combine_states[vehicle] = (self.index, state)
-                
-            tractor_last_idx, tractor_state = self.tractor_state
-
-            if self.tractor_state is None\
-                or self.index - tractor_last_idx > 2:
+            if self.tractor_state_too_old():
                 return
+            
+            _, tractor_state = self.tractor_state
 
             tractor_heading = (math.pi / 2) - (tractor_state['heading'] * math.pi / 180)
             # tractor heading always drawn as 0 since everything is relative to it
@@ -494,8 +489,7 @@ class CollectorScenario:
                 if self.index - last_updated_index > 2:
                     continue
 
-                utm_zone = machine_state['opState']['refUtmZone']
-                x, y = transform_combine_to_local(combine_state, tractor_state, utm_zone)
+                x, y = transform_combine_to_local(combine_state, tractor_state, self.utm_zone)
                 combine_color = [128, 0, 128] # Black
 
                 combine_heading = (math.pi / 2) - (combine_state['heading'] * math.pi / 180)
@@ -522,33 +516,34 @@ class CollectorScenario:
             print('Crashed in draw machine state:', e)
 
     
-    def _draw_predicted_path(self, machine_state, builder: xviz.XVIZBuilder):
+    def _draw_predicted_path(self, builder: xviz.XVIZBuilder):
         try:
-            vehicle_states = machine_state['vehicleStates']
-            if 'tractor' in vehicle_states:
-                tractor_state = vehicle_states['tractor']
-                speed = tractor_state['speed']
-                curvature = tractor_state['curvature']
-                wheel_angle = curvature * self.wheel_base / 1000
+            if self.tractor_state_too_old():
+                return
+            
+            _, tractor_state = self.tractor_state
+            speed = tractor_state['speed']
+            curvature = tractor_state['curvature']
+            wheel_angle = curvature * self.wheel_base / 1000
 
-                self.path_prediction.predict(wheel_angle, speed)
+            self.path_prediction.predict(wheel_angle, speed)
 
-                left_p = np.array(list(
-                            map(get_object_xyz_primitive,
-                                self.path_prediction.left_p[:, 0],
-                                self.path_prediction.left_p[:, 1])))\
-                            .flatten()
-                right_p = np.flipud(np.array(list(
-                            map(get_object_xyz_primitive,
-                                self.path_prediction.right_p[:, 0],
-                                self.path_prediction.right_p[:, 1]))))\
-                            .flatten()
-                
-                vertices = list(np.concatenate((left_p, right_p)))
+            left_p = np.array(list(
+                        map(get_object_xyz_primitive,
+                            self.path_prediction.left_p[:, 0],
+                            self.path_prediction.left_p[:, 1])))\
+                        .flatten()
+            right_p = np.flipud(np.array(list(
+                        map(get_object_xyz_primitive,
+                            self.path_prediction.right_p[:, 0],
+                            self.path_prediction.right_p[:, 1]))))\
+                        .flatten()
+            
+            vertices = list(np.concatenate((left_p, right_p)))
 
-                builder.primitive('/predicted_path')\
-                        .polyline(vertices)\
-                        .id('predicted_paths')
+            builder.primitive('/predicted_path')\
+                    .polyline(vertices)\
+                    .id('predicted_paths')
 
         except Exception as e:
             print('Crashed in draw predicted path:', e)
@@ -570,6 +565,24 @@ class CollectorScenario:
                 pass
         except Exception as e:
             print('Crashed in draw planned path:', e)
+
+    
+    def update_machine_state(self, machine_state):
+        self.utm_zone = machine_state['opState']['refUtmZone']
+        vehicle_states = machine_state['vehicleStates']
+        if vehicle_states:
+            for vehicle, state in vehicle_states.items():
+                if vehicle == 'tractor':
+                    self.tractor_state = (self.index, state)
+                else:
+                    self.combine_states[vehicle] = (self.index, state)
+    
+
+    def tractor_state_too_old(self):
+        tractor_last_idx, _ = self.tractor_state
+        if self.index - tractor_last_idx > 2:
+            return True
+        return False
 
 
 def get_object_xyz(ob, angle_key, dist_key, radar_ob=False):
