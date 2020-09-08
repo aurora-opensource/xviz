@@ -527,10 +527,10 @@ class CollectorScenario:
                             self.path_prediction.left_p[:, 0],
                             self.path_prediction.left_p[:, 1])))\
                         .flatten()
-            right_p = np.flipud(np.array(list(
+            right_p = np.flipud(list(
                         map(get_object_xyz_primitive,
                             self.path_prediction.right_p[:, 0],
-                            self.path_prediction.right_p[:, 1]))))\
+                            self.path_prediction.right_p[:, 1])))\
                         .flatten()
             
             vertices = list(np.concatenate((left_p, right_p)))
