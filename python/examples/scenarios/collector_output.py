@@ -37,8 +37,6 @@ class CollectorScenario:
         self._live = live
         self._metadata = None
         self.index = 0
-        self.id_tracks = {}
-        self.id_last = 1
         self.data = []
         self.track_history = {}
 
@@ -96,7 +94,7 @@ class CollectorScenario:
         self.path_prediction = PathPrediction(prediction_args)
 
         self.tractor_state = None
-        self.combine_state = None
+        self.combine_states = {}
         self.planned_path = None
         self.field_definition = None
 
@@ -106,6 +104,13 @@ class CollectorScenario:
             config = yaml.safe_load(f)
 
         return config
+
+    
+    def reset_values(self):
+        self.tractor_state = None
+        self.combine_states = {}
+        self.planned_path = None
+        self.field_definition = None
 
     
     def store_tracking_output(self, msg):
@@ -315,6 +320,7 @@ class CollectorScenario:
                 .timestamp(timestamp)
 
             if self.index == len(self.collector_outputs):
+                self.reset_values()
                 self.index = 0
 
             collector_output = self.collector_outputs[self.index]
@@ -460,38 +466,44 @@ class CollectorScenario:
         try:
             vehicle_states = machine_state['vehicleStates']
             if vehicle_states:
-                combine_states = []
                 for vehicle, state in vehicle_states.items():
                     if vehicle == 'tractor':
-                        self.tractor_state = state
-                    if vehicle == 'combine':
-                        self.combine_state = state
-                    else:  # must be non-controlling combine state
-                        combine_states.append(state)
+                        self.tractor_state = (self.index, state)
+                    else:
+                        self.combine_states[vehicle] = (self.index, state)
                 
-                if self.tractor_state is None:
+                tractor_last_idx, tractor_state = self.tractor_state
+
+                if self.tractor_state is None\
+                    or self.index - tractor_last_idx > 2:
                     return
-                    
-                if self.combine_state is not None:
-                    combine_states.append(self.combine_state)
+
+                tractor_heading = (math.pi / 2) - (tractor_state["heading"]* math.pi / 180)
+                # tractor heading always drawn as 0 since everything is relative to it
+                tractor_rel_heading_xyz = get_object_xyz_primitive(radial_dist=5.0, angle_radians=0.0)
+                t_r_x, t_r_y, _ = tractor_rel_heading_xyz
+                z = 0.5
+                tractor_color = [0, 128, 128]
+                builder.primitive('/tractor_heading')\
+                    .polyline([0, 0, z, t_r_x, t_r_y, z])\
+                    .style({'stroke_width': 0.3,
+                            "stroke_color": tractor_color})\
+                    .id('tractor_heading')
                 
-                for combine_state in combine_states:
+                for last_updated_index, combine_state in self.combine_states.values():
+                    if self.index - last_updated_index > 2:
+                        continue
+
                     utm_zone = machine_state['opState']['refUtmZone']
-                    x, y = transform_combine_to_local(combine_state, self.tractor_state, utm_zone)
-                    z = 0.5
+                    x, y = transform_combine_to_local(combine_state, tractor_state, utm_zone)
                     fill_color = [128, 0, 128] # Black
 
                     combine_heading = (math.pi / 2) - (combine_state["heading"]* math.pi / 180)
-                    tractor_heading = (math.pi / 2) - (self.tractor_state["heading"]* math.pi / 180)
-
                     combine_heading_relative_to_tractor = combine_heading - tractor_heading
                     combine_rel_heading_xyz = get_object_xyz_primitive(radial_dist=3.0, angle_radians=combine_heading_relative_to_tractor)
-                    # tractor has a fixed heading
-                    tractor_rel_heading_xyz = get_object_xyz_primitive(radial_dist=5.0, angle_radians=0.0)
 
                     c_r_x, c_r_y, _ = combine_rel_heading_xyz
-                    t_r_x, t_r_y, _ = tractor_rel_heading_xyz
-
+                    
                     builder.primitive('/combine_position')\
                         .circle([x, y, z], .5)\
                         .style({'fill_color': fill_color})\
@@ -505,13 +517,6 @@ class CollectorScenario:
                         .style({'stroke_width': 0.3, 
                                 "stroke_color": fill_color})\
                         .id('combine_heading')
-
-                    tractor_color = [0,128, 128]
-                    builder.primitive('/tractor_heading')\
-                        .polyline([0, 0, z, t_r_x, t_r_y, z])\
-                        .style({'stroke_width': 0.3,
-                                "stroke_color": tractor_color})\
-                        .id('tractor_heading')
 
         except Exception as e:
             print('Crashed in draw machine state:', e)
