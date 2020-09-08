@@ -571,8 +571,8 @@ class CollectorScenario:
                     self.combine_states[vehicle] = (self.index, state)
     
 
-    def state_too_old(self, vehicle_state):
-        last_updated_index, _ = vehicle_state
+    def state_too_old(self, vehicle_state_tuple):
+        last_updated_index, _ = vehicle_state_tuple
         if self.index - last_updated_index > 3:
             return True
         return False
