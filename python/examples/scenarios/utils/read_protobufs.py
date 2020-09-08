@@ -39,35 +39,35 @@ def extract_collector_output_slim(collector_output):
         print('missing camera output from collector output')
         camera_output = None
 
-    if MqttConst.RADAR_TOPIC in collector_ouput.data:
+    if MqttConst.RADAR_TOPIC in collector_output.data:
         radar_output = radar_pb2.RadarOutput()
         radar_output.ParseFromString(collector_output.data[MqttConst.RADAR_TOPIC])
         radar_output = MessageToDict(radar_output, including_default_value_fields=True)
     else:
         radar_output = None
     
-    if MqttConst.TRACKS_TOPIC in collector_ouput.data:
+    if MqttConst.TRACKS_TOPIC in collector_output.data:
         tracking_output = falconeye_pb2.TrackingOutput()
         tracking_output.ParseFromString(collector_output.data[MqttConst.TRACKS_TOPIC])
         tracking_output = MessageToDict(tracking_output, including_default_value_fields=True)
     else:
         tracking_output = None
 
-    if 'collector/data/machine_state' in collector_ouput.data:
+    if 'collector/data/machine_state' in collector_output.data:
         machine_state = gandalf_pb2.MachineState()
         machine_state.ParseFromString(collector_output.data['collector/data/machine_state'])
         machine_state = MessageToDict(machine_state, including_default_value_fields=True)
     else:
         machine_state = None
     
-    if 'collector/data/field_definition' in collector_ouput.data:
-        field_definition = collector_ouput.data['collector/data/field_definition']
+    if 'collector/data/field_definition' in collector_output.data:
+        field_definition = collector_output.data['collector/data/field_definition']
         field_definition = json.loads(field_definition.decode('ascii'))
     else:
         field_definition = None
 
-    if 'collector/data/planned_path' in collector_ouput.data:
-        planned_path = collector_ouput.data['collector/data/planned_path']
+    if 'collector/data/planned_path' in collector_output.data:
+        planned_path = collector_output.data['collector/data/planned_path']
         planned_path = np.frombuffer(planned_path, dtype=np.float_)
     else:
         planned_path = None
