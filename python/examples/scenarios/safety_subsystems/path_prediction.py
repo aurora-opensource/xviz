@@ -81,7 +81,7 @@ class PathPrediction(object):
     def predict(self, steering_angle, speed):
         """Predict path for given speed and steering angle."""
         speed = max(speed, 0.447 * 0.5)
-        horizon = max(30.0 / speed, 10.0)
+        horizon = min(30.0 / speed, 10.0)
 
         U = (speed, steering_angle)
         self.U = U

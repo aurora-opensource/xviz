@@ -1,13 +1,19 @@
 import math
 import time
 import shutil
-import cv2
-import utm
 import yaml
 import numpy as np
 from pathlib import Path
+
 from google.protobuf.json_format import MessageToDict
-from protobuf_APIs import collector_pb2, gandalf_pb2, falconeye_pb2, radar_pb2, camera_pb2
+from protobuf_APIs import falconeye_pb2
+
+from scenarios.utils.com_manager import ComManager, MqttConst
+from scenarios.utils.filesystem import establish_fresh_directory
+from scenarios.utils.gps import transform_combine_to_local, latlon_to_utm, utm_to_local
+from scenarios.utils.image import postprocess, show_image
+from scenarios.utils.read_protobufs import deserialize_collector_output,\
+                                            extract_collector_output, extract_collector_output_slim
 
 from scenarios.safety_subsystems.radar_filter import RadarFilter
 from scenarios.safety_subsystems.path_prediction import PathPrediction
@@ -31,45 +37,50 @@ class CollectorScenario:
         self._live = live
         self._metadata = None
         self.index = 0
-        self.id_tracks = {}
-        self.id_last = 1
         self.data = []
+        self.track_history = {}
 
-        collector_config = self.load_config(configfile='scenarios/collector-scenario-config.yaml')
+        configfile = Path(__file__).parent / 'collector-scenario-config.yaml'
+        collector_config = self.load_config(str(configfile))
+
         collector_output_file = collector_config['collector_output_file']
         extract_directory = collector_config['extract_directory']
-
         collector_output_file = Path(collector_output_file)
         print("Using:collector_output_file:", collector_output_file)
         extract_directory = Path(extract_directory)
         print("Using:extract_directory:", extract_directory)
-
         if not collector_output_file.is_file():
             print('collector output file does not exit')
         
         establish_fresh_directory(extract_directory)
-
         shutil.unpack_archive(str(collector_output_file), str(extract_directory))
-
         self.collector_outputs = sorted(extract_directory.glob('*.txt'))
 
-        global_config = self.load_config(configfile="../../Global-Configs/Tractors/John-Deere/8RIVT_WHEEL.yaml")
+        self.mqtt_enabled = collector_config['mqtt_enabled']
+        if self.mqtt_enabled:
+            self.mqtt_tracking_outputs = []
+            comm = ComManager()
+            comm.subscribe(MqttConst.TRACKS_TOPIC, self.store_tracking_output)
+        
+        configfile = Path(__file__).parents[3] / 'Global-Configs' / 'Tractors' / 'John-Deere' / '8RIVT_WHEEL.yaml'
+        global_config = self.load_config(str(configfile))
         radar_safety_config = global_config['safety']['radar']
         self.combine_length = radar_safety_config['combine_length']
         self.distance_threshold = radar_safety_config['distance_threshold']
         self.slowdown_threshold = radar_safety_config['slowdown_threshold']
 
-        pfilter_enabled = False
+        pfilter_enabled = True
         qfilter_enabled = radar_safety_config['enable_queue_filter']
         queue_size = 12
         consecutive_min = radar_safety_config['consecutive_detections']
         phi_sdv_max = radar_safety_config['phi_sdv_threshold']
-        pf_pexist_min = radar_safety_config['confidence_threshold']
+        nan_threshold = radar_safety_config['qf_none_ratio_threshold']
 
+        pf_pexist_min = radar_safety_config['confidence_threshold']
         qf_pexist_min = radar_safety_config['qf_confidence_threshold']
+
         pf_dbpower_min = radar_safety_config['d_bpower_threshold']
         qf_dbpower_min = radar_safety_config['qf_d_bpower_threshold']
-        nan_threshold = radar_safety_config['qf_none_ratio_threshold']
 
         self.radar_filter = RadarFilter(pfilter_enabled, qfilter_enabled, queue_size,
                                         consecutive_min, pf_pexist_min, qf_pexist_min,
@@ -82,12 +93,34 @@ class CollectorScenario:
         }
         self.path_prediction = PathPrediction(prediction_args)
 
+        self.utm_zone = ''
+        self.tractor_state = None
+        self.combine_states = {}
+        self.planned_path = None
+        self.field_definition = None
+
 
     def load_config(self, configfile):
         with open(configfile, 'r') as f:
             config = yaml.safe_load(f)
 
         return config
+
+    
+    def reset_values(self):
+        self.tractor_state = None
+        self.combine_states = {}
+        self.planned_path = None
+        self.field_definition = None
+        self.index = 0
+
+    
+    def store_tracking_output(self, msg):
+        tracking_output = falconeye_pb2.TrackingOutput()
+        tracking_output.ParseFromString(msg.payload)
+        tracking_output = MessageToDict(tracking_output, including_default_value_fields=True)
+        self.mqtt_tracking_outputs.append(tracking_output)
+        print('tracking outputs received:', len(self.mqtt_tracking_outputs))
 
 
     def get_metadata(self):
@@ -99,7 +132,11 @@ class CollectorScenario:
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.POLYLINE)
 
-            builder.stream("/radar_targets")\
+            builder.stream("/radar_filtered_out_targets")\
+                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+                .category(xviz.CATEGORY.PRIMITIVE)\
+                .type(xviz.PRIMITIVE_TYPES.CIRCLE)
+            builder.stream("/radar_passed_filter_targets")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
@@ -135,10 +172,21 @@ class CollectorScenario:
                 })\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
+            
+            builder.stream("/field_definition")\
+                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+                .stream_style({'stroke_color': [165, 42, 42, 128]})\
+                .category(xviz.CATEGORY.PRIMITIVE)\
+                .type(xviz.PRIMITIVE_TYPES.POLYLINE)
 
             builder.stream("/predicted_path")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
                 .stream_style({'stroke_color': [0, 128, 128, 128]})\
+                .category(xviz.CATEGORY.PRIMITIVE)\
+                .type(xviz.PRIMITIVE_TYPES.POLYLINE)
+            builder.stream("/planned_path")\
+                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+                .stream_style({'stroke_color': [128, 0, 128, 128]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.POLYLINE)
 
@@ -165,6 +213,14 @@ class CollectorScenario:
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
 
             builder.stream("/measuring_circles_lbl")\
+                .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
+                .stream_style({
+                    'fill_color': [0, 0, 0]
+                })\
+                .category(xviz.CATEGORY.PRIMITIVE)\
+                .type(xviz.PRIMITIVE_TYPES.TEXT)
+
+            builder.stream("/tracking_id")\
                 .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
                 .stream_style({
                     'fill_color': [0, 0, 0]
@@ -239,22 +295,22 @@ class CollectorScenario:
         for c_phi in cam_fov:
             r = 40
             label = (r, c_phi)
-            (x, y, z) = self.get_object_xyz_primitive(r+cab_to_nose, c_phi*math.pi/180)
-            vertices = [0, 0, 0, x, y, z]
+            (x, y, z) = get_object_xyz_primitive(r+cab_to_nose, c_phi*math.pi/180)
+            vertices = [cab_to_nose, 0, 0, x, y, z]
             builder.primitive('/camera_fov')\
                 .polyline(vertices)\
                 .id("cam_fov: "+str(label))
 
         for r_phi in radar_fov:
             r = 40
-            (x, y, z) = self.get_object_xyz_primitive(r+cab_to_nose, r_phi*math.pi/180)
+            (x, y, z) = get_object_xyz_primitive(r+cab_to_nose, r_phi*math.pi/180)
             builder.primitive('/measuring_circles_lbl')\
                 .text(str(r_phi))\
                 .position([x, y, z])\
                 .id(str(r_phi)+'lb')
             if r_phi == radar_fov[0] or r_phi == radar_fov[-1]:
                 label = (r, r_phi)
-                vertices = [0, 0, 0, x, y, z]
+                vertices = [cab_to_nose, 0, 0, x, y, z]
                 builder.primitive('/radar_fov')\
                     .polyline(vertices)\
                     .id("radar_fov: "+str(label))
@@ -266,29 +322,58 @@ class CollectorScenario:
                 .timestamp(timestamp)
 
             if self.index == len(self.collector_outputs):
-                self.index = 0
+                self.reset_values()
 
             collector_output = self.collector_outputs[self.index]
 
-            collector_output = self.deserialize_collector_output(collector_output)
-            img, camera_output, radar_output, tracking_output, machine_state = self.extract_collector_output_content(collector_output)
+            collector_output, is_slim_output = deserialize_collector_output(collector_output)
+            if is_slim_output:
+                img, camera_output, radar_output, tracking_output,\
+                    machine_state, field_definition, planned_path = extract_collector_output_slim(collector_output)
+            else:
+                img, camera_output, radar_output,\
+                    tracking_output, machine_state = extract_collector_output(collector_output)
+                field_definition = None
+                planned_path = None
 
             if camera_output is not None:
                 self._draw_camera_targets(camera_output, builder)
-                img = self.postprocess(img, camera_output)
-
-            if img is not None:
-                self.show_image(img)
 
             if radar_output is not None:
                 self._draw_radar_targets(radar_output, builder)
 
+            if self.mqtt_enabled:
+                if self.mqtt_tracking_outputs:
+                    tracking_output = self.mqtt_tracking_outputs[self.index]
+                else:
+                    print("mqtt enabled but no mqtt tracking outputs are stored")
+                    tracking_output = None
             if tracking_output is not None:
                 self._draw_tracking_targets(tracking_output, builder)
 
             if machine_state is not None:
-                self._draw_machine_state(machine_state, builder)
-                self._draw_predicted_path(machine_state, builder)
+                self.update_machine_state(machine_state)
+
+            if field_definition is not None:
+                self.field_definition = field_definition
+
+            if planned_path is not None:
+                if planned_path.size > 0:
+                    self.planned_path = planned_path.reshape(-1, 2)
+                else:
+                    self.planned_path = None
+
+            if self.tractor_state is not None\
+                and not self.state_too_old(self.tractor_state):
+                self._draw_machine_state(builder)
+                self._draw_predicted_path(builder)
+                self._draw_field_definition(builder)
+                self._draw_planned_path(builder)
+
+            if img is not None:
+                if camera_output is not None:
+                    img = postprocess(img, camera_output)
+                show_image(img)
 
             # if self.index == 0:
             #     print('start time:', time.gmtime(float(collector_output.timestamp)))
@@ -298,35 +383,39 @@ class CollectorScenario:
             self.index += 1
 
         except Exception as e:
-            print('Crashed in draw perception outputs:', e)
+            print('Crashed in draw collector output:', e)
 
 
     def _draw_radar_targets(self, radar_output, builder: xviz.XVIZBuilder):
         try:
             for target in radar_output['targets'].values():
                 if abs(target['dr']) < 0.1 and abs(target['phi']) < 0.01:
-                    continue 
+                    continue
                 to_path_prediction = False
-                (x, y, z) = self.get_object_xyz(target, 'phi', 'dr', radar_ob=True)
+                (x, y, z) = get_object_xyz(target, 'phi', 'dr', radar_ob=True)
     
                 if self.radar_filter.is_valid_target(target['targetId'], target):
                     if self.radar_filter.filter_targets_until_path_prediction(target):
                         to_path_prediction = True
                  
                     fill_color = [255, 0, 0] # Red
+                    builder.primitive('/radar_passed_filter_targets')\
+                        .circle([x, y, z], .5)\
+                        .style({'fill_color': fill_color})\
+                        .id(str(target['targetId']))
                 else:
                     fill_color = [255, 255, 0] # Yellow
+                    builder.primitive('/radar_filtered_out_targets')\
+                        .circle([x, y, z], .5)\
+                        .style({'fill_color': fill_color})\
+                        .id(str(target['targetId']))
 
-                builder.primitive('/radar_targets')\
-                    .circle([x, y, z], .5)\
-                    .style({'fill_color': fill_color})\
-                    .id(str(target['targetId']))
 
                 if to_path_prediction:
                     fill_color = [0, 0, 0] # Black
                     builder.primitive('/radar_crucial_targets')\
                         .circle([x, y, z], .5)\
-                        .style({'fille_color': fill_color})\
+                        .style({'fill_color': fill_color})\
                         .id(str(target['targetId']))
 
         except Exception as e:
@@ -335,15 +424,20 @@ class CollectorScenario:
 
     def _draw_tracking_targets(self, tracking_output, builder: xviz.XVIZBuilder):
         try:
-            if 'tracks' in tracking_output:
+            if 'tracks' in tracking_output:            
                 min_confidence = 0.1
                 min_hits = 2
                 for track in tracking_output['tracks']:
                     if track['score'] > min_confidence and track['hitStreak'] > min_hits:
-                        (x, y, z) = self.get_object_xyz(track, 'angle', 'distance', radar_ob=False)
+                        (x, y, z) = get_object_xyz(track, 'angle', 'distance', radar_ob=False)
 
-                        if track['radarDistCamFrame'] > 0.1:
+                        if track['radarDistCamFrame'] != self.track_history.get(track['trackId'], -1)\
+                            and track['radarDistCamFrame'] > 0.1:
                             fill_color = [0, 255, 0] # Green
+                            builder.primitive('/tracking_id')\
+                                    .text(track['trackId'])\
+                                    .position([x, y, z+.1])\
+                                    .id(track['trackId'])
                         else:
                             fill_color = [0, 0, 255] # Blue
 
@@ -352,6 +446,7 @@ class CollectorScenario:
                             .style({'fill_color': fill_color})\
                             .id(track['trackId'])
 
+                        self.track_history[track['trackId']] = track['radarDistCamFrame']
         except Exception as e:
             print('Crashed in draw tracking targets:', e)
 
@@ -359,7 +454,7 @@ class CollectorScenario:
     def _draw_camera_targets(self, camera_output, builder: xviz.XVIZBuilder):
         try:
             for target in camera_output['targets']:
-                (x, y, z) = self.get_object_xyz(target, 'objectAngle', 'objectDistance', radar_ob=False)
+                (x, y, z) = get_object_xyz(target, 'objectAngle', 'objectDistance', radar_ob=False)
                 if target['label'] == 'qrcode':
                     continue
                 fill_color = [0, 255, 255] # Cyan
@@ -373,35 +468,39 @@ class CollectorScenario:
             print('Crashed in draw camera targets:', e)
 
     
-    def _draw_machine_state(self, machine_state, builder: xviz.XVIZBuilder):
+    def _draw_machine_state(self, builder: xviz.XVIZBuilder):
         try:
-            vehicle_states = machine_state['vehicleStates']
-            if 'combine' and 'tractor' in vehicle_states:
-                combine_state = vehicle_states['combine']
-                tractor_state = vehicle_states['tractor']
-                operation_state = machine_state['opState']
-                if operation_state['refUtmZone']:
-                    utm_zone = operation_state['refUtmZone']
-                else:
-                    utm_zone = None
-                x, y = transform_combine_to_local(combine_state, tractor_state, utm_zone)
-                z = 0.5
-                fill_color = [128, 0, 128] # Black
+            _, tractor_state = self.tractor_state
 
-                combine_heading = (math.pi / 2) - (combine_state["heading"]* math.pi / 180)
-                tractor_heading = (math.pi / 2) - (tractor_state["heading"]* math.pi / 180)
+            tractor_heading = (math.pi / 2) - (tractor_state['heading'] * math.pi / 180)
+            # tractor heading always drawn as 0 since everything is relative to it
+            tractor_rel_heading_xyz = get_object_xyz_primitive(radial_dist=5.0, angle_radians=0.0)
+            t_r_x, t_r_y, _ = tractor_rel_heading_xyz
+            z = 0.5
+            tractor_color = [0, 128, 128]
+            builder.primitive('/tractor_heading')\
+                .polyline([0, 0, z, t_r_x, t_r_y, z])\
+                .style({'stroke_width': 0.3,
+                        "stroke_color": tractor_color})\
+                .id('tractor_heading')
+            
+            for combine_state_tuple in self.combine_states.values():
+                if self.state_too_old(combine_state_tuple):
+                    continue
 
+                _, combine_state = combine_state_tuple
+                x, y = transform_combine_to_local(combine_state, tractor_state, self.utm_zone)
+                combine_color = [128, 0, 128] # Black
+
+                combine_heading = (math.pi / 2) - (combine_state['heading'] * math.pi / 180)
                 combine_heading_relative_to_tractor = combine_heading - tractor_heading
-                combine_rel_heading_xyz = self.get_object_xyz_primitive(radial_dist=3.0, angle_radians=combine_heading_relative_to_tractor)
-                # tractor has a fixed heading
-                tractor_rel_heading_xyz = self.get_object_xyz_primitive(radial_dist=5.0, angle_radians=0.0)
+                combine_rel_heading_xyz = get_object_xyz_primitive(radial_dist=3.0, angle_radians=combine_heading_relative_to_tractor)
 
                 c_r_x, c_r_y, _ = combine_rel_heading_xyz
-                t_r_x, t_r_y, _ = tractor_rel_heading_xyz
-
+                
                 builder.primitive('/combine_position')\
                     .circle([x, y, z], .5)\
-                    .style({'fill_color': fill_color})\
+                    .style({'fill_color': combine_color})\
                     .id('combine')
                 builder.primitive('/combine_region')\
                     .circle([x, y, z-.1], self.combine_length)\
@@ -410,192 +509,108 @@ class CollectorScenario:
                 builder.primitive('/combine_heading')\
                     .polyline([x, y, z, x+c_r_x, y+c_r_y, z])\
                     .style({'stroke_width': 0.3, 
-                            "stroke_color": fill_color})\
+                            "stroke_color": combine_color})\
                     .id('combine_heading')
-
-                tractor_color = [0,128, 128]
-                builder.primitive('/tractor_heading')\
-                    .polyline([0, 0, z, t_r_x, t_r_y, z])\
-                    .style({'stroke_width': 0.3,
-                            "stroke_color": tractor_color})\
-                    .id('tractor_heading')
 
         except Exception as e:
             print('Crashed in draw machine state:', e)
 
     
-    def _draw_predicted_path(self, machine_state, builder: xviz.XVIZBuilder):
+    def _draw_predicted_path(self, builder: xviz.XVIZBuilder):
         try:
-            vehicle_states = machine_state['vehicleStates']
-            if 'tractor' in vehicle_states:
-                tractor_state = vehicle_states['tractor']
-                speed = tractor_state['speed']
-                curvature = tractor_state['curvature']
-                wheel_angle = curvature * self.wheel_base / 1000
-                self.path_prediction.predict(wheel_angle, speed)
+            _, tractor_state = self.tractor_state
+            speed = tractor_state['speed']
+            curvature = tractor_state['curvature']
+            wheel_angle = curvature * self.wheel_base / 1000
 
-                left_p = np.array(list(
-                            map(self.get_object_xyz_primitive,
-                                self.path_prediction.left_p[:, 0],
-                                self.path_prediction.left_p[:, 1])))\
-                            .flatten()
-                right_p = np.flipud(np.array(list(
-                            map(self.get_object_xyz_primitive,
-                                self.path_prediction.right_p[:, 0],
-                                self.path_prediction.right_p[:, 1]))))\
-                            .flatten()
-                
-                vertices = list(np.concatenate((left_p, right_p)))
+            self.path_prediction.predict(wheel_angle, speed)
 
-                builder.primitive('/predicted_path')\
-                        .polyline(vertices)\
-                        .id('predicted_paths')
+            left_p = np.array(list(
+                        map(get_object_xyz_primitive,
+                            self.path_prediction.left_p[:, 0],
+                            self.path_prediction.left_p[:, 1])))\
+                        .flatten()
+            right_p = np.flipud(list(
+                        map(get_object_xyz_primitive,
+                            self.path_prediction.right_p[:, 0],
+                            self.path_prediction.right_p[:, 1])))\
+                        .flatten()
+            
+            vertices = list(np.concatenate((left_p, right_p)))
+
+            builder.primitive('/predicted_path')\
+                    .polyline(vertices)\
+                    .id('predicted_paths')
 
         except Exception as e:
             print('Crashed in draw predicted path:', e)
     
 
-    def get_object_xyz(self, ob, angle_key, dist_key, radar_ob=False):
-        x = math.cos(ob[angle_key]) * ob[dist_key]
-        y = math.sin(ob[angle_key]) * ob[dist_key]
-        z = 1.5
-
-        if not radar_ob:
-            nose_to_cab = 3.2131 # meters
-            x -= nose_to_cab
-
-        return (x, y, z)
-
-    def get_object_xyz_primitive(self, radial_dist, angle_radians):
-        x = math.cos(angle_radians) * radial_dist
-        y = math.sin(angle_radians) * radial_dist
-        z = 1.0
-
-        return (x, y, z)
+    def _draw_field_definition(self, builder: xviz.XVIZBuilder):
+        try:
+            pass
+        except Exception as e:
+            print('Crashed in draw field definition:', e)
 
 
-    def deserialize_collector_output(self, file_path):
-        collector_output = collector_pb2.CollectorOutput()
-        collector_output.ParseFromString(Path(file_path).read_bytes())
-        return collector_output
+    def _draw_planned_path(self, builder: xviz.XVIZBuilder):
+        try:
+            if self.planned_path is None:
+                return
+
+            _, tractor_state = self.tractor_state
+            tractor_x, tractor_y = latlon_to_utm(tractor_state['latitude'], tractor_state['longitude'], self.utm_zone)
+            vertices = list(np.array([
+                get_object_xyz_primitive(
+                    *utm_to_local(x, y, tractor_x, tractor_y, tractor_state['heading'])
+                )
+                for x, y in self.planned_path
+            ]).flatten())
+
+            builder.primitive('/planned_path')\
+                .polyline(vertices)\
+                .id('planned_paths')
+
+        except Exception as e:
+            print('Crashed in draw planned path:', e)
+
+    
+    def update_machine_state(self, machine_state):
+        if not self.utm_zone:
+            # only need to set it once
+            self.utm_zone = machine_state['opState']['refUtmZone']
+
+        vehicle_states = machine_state['vehicleStates']
+        if vehicle_states:
+            for vehicle, state in vehicle_states.items():
+                if vehicle == 'tractor':
+                    self.tractor_state = (self.index, state)
+                else:
+                    self.combine_states[vehicle] = (self.index, state)
+    
+
+    def state_too_old(self, vehicle_state_tuple):
+        last_updated_index, _ = vehicle_state_tuple
+        if self.index - last_updated_index > 3:
+            return True
+        return False
 
 
-    def extract_collector_output_content(self, collector_output):
-        if collector_output.frame:
-            frame = self.extract_image(collector_output.frame)
-        else:
-            print('missing frame from collector output')
-            frame = None
+def get_object_xyz(ob, angle_key, dist_key, radar_ob=False):
+    x = math.cos(ob[angle_key]) * ob[dist_key]
+    y = math.sin(ob[angle_key]) * ob[dist_key]
+    z = 1.5
 
-        if collector_output.camera_output:
-            camera_output = camera_pb2.CameraOutput()
-            camera_output.ParseFromString(collector_output.camera_output)
-            camera_output = MessageToDict(camera_output, including_default_value_fields=True)
-        else:
-            camera_output = None
+    if not radar_ob:
+        nose_to_cab = 3.2131 # meters
+        x -= nose_to_cab
 
-        if collector_output.radar_output:
-            radar_output = radar_pb2.RadarOutput()
-            radar_output.ParseFromString(collector_output.radar_output)
-            radar_output = MessageToDict(radar_output, including_default_value_fields=True)
-        else:
-            radar_output = None
-
-        if collector_output.tracking_output:
-            tracking_output = falconeye_pb2.TrackingOutput()
-            tracking_output.ParseFromString(collector_output.tracking_output)
-            tracking_output = MessageToDict(tracking_output, including_default_value_fields=True)
-        else:
-            tracking_output = None
-
-        if collector_output.machine_state:
-            machine_state = gandalf_pb2.MachineState()
-            machine_state.ParseFromString(collector_output.machine_state)
-            machine_state = MessageToDict(machine_state, including_default_value_fields=True)
-        else:
-            machine_state = None
-
-        return frame, camera_output, radar_output, tracking_output, machine_state
+    return (x, y, z)
 
 
-    def extract_image(self, img_bytes):
-        encoded_img = np.frombuffer(img_bytes, dtype=np.uint8) # decode bytes
-        decimg = cv2.imdecode(encoded_img, 1) # uncompress image
-        return decimg
+def get_object_xyz_primitive(radial_dist, angle_radians):
+    x = math.cos(angle_radians) * radial_dist
+    y = math.sin(angle_radians) * radial_dist
+    z = 1.0
 
-
-    def show_image(self, image):
-        image = cv2.resize(image, (0, 0), fx=.7, fy=.7)
-        cv2.imshow('collector-scenario', image)
-        cv2.moveWindow('collector-scenario', 0, 0)
-        cv2.waitKey(1)
-
-
-    def postprocess(self, image, camera_output):
-        for target in camera_output['targets']:
-            tl, br = target['topleft'], target['bottomright']
-            tl['x'], tl['y'] = int(tl['x']), int(tl['y'])
-            br['x'], br['y'] = int(br['x']), int(br['y'])
-
-            label = target['label']
-            conf = str("%.1f" % (target['confidence'] * 100)) + '%'
-
-            thickness = (image.shape[0] + image.shape[1]) // 1000
-            fontFace = cv2.FONT_HERSHEY_SIMPLEX  # 'font/FiraMono-Medium.otf',
-            fontScale = 1
-            label_size = cv2.getTextSize(label, fontFace, fontScale, thickness)
-            if tl['y'] - label_size[1] >= 0:
-                text_origin = (tl['x'], tl['y'] - label_size[1])
-            else:
-                text_origin = (tl['x'], tl['y'] + 1)
-
-            box_color = (241, 240, 236)
-            cv2.rectangle(image, (tl['x'], tl['y']), (br['x'], br['y']),
-                        box_color, thickness)
-            cv2.putText(image, conf, text_origin, fontFace,
-                        fontScale, box_color, 2)
-
-        return image
-
-def transform_combine_to_local(combine_state, tractor_state, utm_zone):
-    combine_x, combine_y = latlon_to_utm(combine_state['latitude'], combine_state['longitude'], utm_zone)
-    tractor_x, tractor_y = latlon_to_utm(tractor_state['latitude'], tractor_state['longitude'], utm_zone)
-    dx, dy = utm_to_local(combine_x, combine_y, tractor_x, tractor_y, tractor_state['heading'])
-    return dx, dy
-
-def latlon_to_utm(lat, lon, zone=None):
-    zone_number, zone_letter = parse_utm_zone(zone)
-    converted = utm.from_latlon(
-        lat, lon,
-        force_zone_number=zone_number,
-        force_zone_letter=zone_letter
-    )
-    return converted[0], converted[1]  # only return easting, northing
-
-def parse_utm_zone(zone):
-    if zone is None:
-        return None, None
-    index = 0
-    zone_num = ''
-    while zone[index].isdigit():
-        zone_num += zone[index]
-        index += 1
-    return int(zone_num), zone[index]
-
-def utm_to_local(translate_x, translate_y, reference_x, reference_y, heading):
-    theta = (math.pi / 2) - (heading * math.pi / 180)
-    dx_a = translate_x - reference_x
-    dy_a = translate_y - reference_y
-    dx = (math.cos(theta) * dx_a) + (math.sin(theta) * dy_a)
-    dy = -(math.sin(theta) * dx_a) + (math.cos(theta) * dy_a)
-    return dx, dy
-
-def establish_fresh_directory(path):
-    if path.is_dir():
-        clear_directory(path)
-    else:
-        path.mkdir(parents=True)
-
-def clear_directory(path):
-    for child in path.glob('*.txt'):
-        child.unlink()
+    return (x, y, z)
