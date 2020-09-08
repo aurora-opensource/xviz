@@ -568,7 +568,9 @@ class CollectorScenario:
 
     
     def update_machine_state(self, machine_state):
-        self.utm_zone = machine_state['opState']['refUtmZone']
+        if not self.utm_zone:
+            # only need to set it once
+            self.utm_zone = machine_state['opState']['refUtmZone']
         vehicle_states = machine_state['vehicleStates']
         if vehicle_states:
             for vehicle, state in vehicle_states.items():
