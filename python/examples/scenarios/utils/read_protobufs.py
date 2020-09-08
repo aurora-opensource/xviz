@@ -31,7 +31,7 @@ def extract_collector_output_slim(collector_output):
         print('missing frame from collector output')
         frame = None
     
-    if 'camera_output' in collector_output.data:
+    if MqttConst.CAMERA_TOPIC in collector_output.data:
         camera_output = camera_pb2.CameraOutput()
         camera_output.ParseFromString(collector_output.data[MqttConst.CAMERA_TOPIC])
         camera_output = MessageToDict(camera_output, including_default_value_fields=True)
