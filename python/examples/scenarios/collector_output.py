@@ -10,7 +10,7 @@ from protobuf_APIs import falconeye_pb2
 
 from scenarios.utils.com_manager import ComManager, MqttConst
 from scenarios.utils.filesystem import establish_fresh_directory
-from scenarios.utils.gps import transform_combine_to_local
+from scenarios.utils.gps import transform_combine_to_local, latlon_to_utm, utm_to_local
 from scenarios.utils.image import postprocess, show_image
 from scenarios.utils.read_protobufs import deserialize_collector_output,\
                                             extract_collector_output, extract_collector_output_slim
@@ -552,7 +552,22 @@ class CollectorScenario:
 
     def _draw_planned_path(self, builder: xviz.XVIZBuilder):
         try:
-            pass
+            if self.planned_path is None\
+                or self.planned_path.size == 0:
+                return
+
+            _, tractor_state = self.tractor_state
+            tractor_x, tractor_y = latlon_to_utm(tractor_state['latitude'], tractor_state['longitude'], self.utm_zone)
+            vertices = [
+                get_object_xyz_primitive(
+                    *utm_to_local(x, y, tractor_x, tractor_y, tractor_state['heading'])
+                )
+                for x, y in self.planned_path
+            ]
+            builder.primitive('/planned_path')\
+                .polyline(vertices)\
+                .id('planned_paths')
+                
         except Exception as e:
             print('Crashed in draw planned path:', e)
 
