@@ -354,7 +354,7 @@ class CollectorScenario:
             if machine_state is not None:
                 self.update_machine_state(machine_state)
 
-            if self.tractor_state is not None:
+            if not self.tractor_state_too_old():
                 self._draw_machine_state(builder)
                 self._draw_predicted_path(builder)
 
@@ -468,9 +468,6 @@ class CollectorScenario:
     
     def _draw_machine_state(self, builder: xviz.XVIZBuilder):
         try:
-            if self.tractor_state_too_old():
-                return
-            
             _, tractor_state = self.tractor_state
 
             tractor_heading = (math.pi / 2) - (tractor_state['heading'] * math.pi / 180)
@@ -518,9 +515,6 @@ class CollectorScenario:
     
     def _draw_predicted_path(self, builder: xviz.XVIZBuilder):
         try:
-            if self.tractor_state_too_old():
-                return
-            
             _, tractor_state = self.tractor_state
             speed = tractor_state['speed']
             curvature = tractor_state['curvature']
@@ -571,6 +565,7 @@ class CollectorScenario:
         if not self.utm_zone:
             # only need to set it once
             self.utm_zone = machine_state['opState']['refUtmZone']
+            
         vehicle_states = machine_state['vehicleStates']
         if vehicle_states:
             for vehicle, state in vehicle_states.items():
@@ -581,6 +576,8 @@ class CollectorScenario:
     
 
     def tractor_state_too_old(self):
+        if self.tractor_state is None:
+            return True
         tractor_last_idx, _ = self.tractor_state
         if self.index - tractor_last_idx > 2:
             return True
