@@ -472,51 +472,51 @@ class CollectorScenario:
                     else:
                         self.combine_states[vehicle] = (self.index, state)
                 
-                tractor_last_idx, tractor_state = self.tractor_state
+            tractor_last_idx, tractor_state = self.tractor_state
 
-                if self.tractor_state is None\
-                    or self.index - tractor_last_idx > 2:
-                    return
+            if self.tractor_state is None\
+                or self.index - tractor_last_idx > 2:
+                return
 
-                tractor_heading = (math.pi / 2) - (tractor_state["heading"]* math.pi / 180)
-                # tractor heading always drawn as 0 since everything is relative to it
-                tractor_rel_heading_xyz = get_object_xyz_primitive(radial_dist=5.0, angle_radians=0.0)
-                t_r_x, t_r_y, _ = tractor_rel_heading_xyz
-                z = 0.5
-                tractor_color = [0, 128, 128]
-                builder.primitive('/tractor_heading')\
-                    .polyline([0, 0, z, t_r_x, t_r_y, z])\
-                    .style({'stroke_width': 0.3,
-                            "stroke_color": tractor_color})\
-                    .id('tractor_heading')
+            tractor_heading = (math.pi / 2) - (tractor_state['heading'] * math.pi / 180)
+            # tractor heading always drawn as 0 since everything is relative to it
+            tractor_rel_heading_xyz = get_object_xyz_primitive(radial_dist=5.0, angle_radians=0.0)
+            t_r_x, t_r_y, _ = tractor_rel_heading_xyz
+            z = 0.5
+            tractor_color = [0, 128, 128]
+            builder.primitive('/tractor_heading')\
+                .polyline([0, 0, z, t_r_x, t_r_y, z])\
+                .style({'stroke_width': 0.3,
+                        "stroke_color": tractor_color})\
+                .id('tractor_heading')
+            
+            for last_updated_index, combine_state in self.combine_states.values():
+                if self.index - last_updated_index > 2:
+                    continue
+
+                utm_zone = machine_state['opState']['refUtmZone']
+                x, y = transform_combine_to_local(combine_state, tractor_state, utm_zone)
+                combine_color = [128, 0, 128] # Black
+
+                combine_heading = (math.pi / 2) - (combine_state['heading'] * math.pi / 180)
+                combine_heading_relative_to_tractor = combine_heading - tractor_heading
+                combine_rel_heading_xyz = get_object_xyz_primitive(radial_dist=3.0, angle_radians=combine_heading_relative_to_tractor)
+
+                c_r_x, c_r_y, _ = combine_rel_heading_xyz
                 
-                for last_updated_index, combine_state in self.combine_states.values():
-                    if self.index - last_updated_index > 2:
-                        continue
+                builder.primitive('/combine_position')\
+                    .circle([x, y, z], .5)\
+                    .style({'fill_color': combine_color})\
+                    .id('combine')
+                builder.primitive('/combine_region')\
+                    .circle([x, y, z-.1], self.combine_length)\
+                    .id("combine_bubble: " + str(self.combine_length))
 
-                    utm_zone = machine_state['opState']['refUtmZone']
-                    x, y = transform_combine_to_local(combine_state, tractor_state, utm_zone)
-                    fill_color = [128, 0, 128] # Black
-
-                    combine_heading = (math.pi / 2) - (combine_state["heading"]* math.pi / 180)
-                    combine_heading_relative_to_tractor = combine_heading - tractor_heading
-                    combine_rel_heading_xyz = get_object_xyz_primitive(radial_dist=3.0, angle_radians=combine_heading_relative_to_tractor)
-
-                    c_r_x, c_r_y, _ = combine_rel_heading_xyz
-                    
-                    builder.primitive('/combine_position')\
-                        .circle([x, y, z], .5)\
-                        .style({'fill_color': fill_color})\
-                        .id('combine')
-                    builder.primitive('/combine_region')\
-                        .circle([x, y, z-.1], self.combine_length)\
-                        .id("combine_bubble: " + str(self.combine_length))
-
-                    builder.primitive('/combine_heading')\
-                        .polyline([x, y, z, x+c_r_x, y+c_r_y, z])\
-                        .style({'stroke_width': 0.3, 
-                                "stroke_color": fill_color})\
-                        .id('combine_heading')
+                builder.primitive('/combine_heading')\
+                    .polyline([x, y, z, x+c_r_x, y+c_r_y, z])\
+                    .style({'stroke_width': 0.3, 
+                            "stroke_color": combine_color})\
+                    .id('combine_heading')
 
         except Exception as e:
             print('Crashed in draw machine state:', e)
