@@ -112,6 +112,7 @@ class CollectorScenario:
         self.combine_states = {}
         self.planned_path = None
         self.field_definition = None
+        self.index = 0
 
     
     def store_tracking_output(self, msg):
@@ -322,7 +323,6 @@ class CollectorScenario:
 
             if self.index == len(self.collector_outputs):
                 self.reset_values()
-                self.index = 0
 
             collector_output = self.collector_outputs[self.index]
 
