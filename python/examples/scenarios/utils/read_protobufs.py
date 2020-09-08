@@ -24,7 +24,7 @@ def deserialize_collector_output(file_path):
     return collector_output, is_slim_output
 
 
-def extract_collector_output_slim(collector_ouput):
+def extract_collector_output_slim(collector_output):
     if 'frame'in collector_output.data:
         frame = extract_image(collector_output.data['frame'])
     else:
