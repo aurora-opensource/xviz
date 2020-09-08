@@ -567,7 +567,7 @@ class CollectorScenario:
             builder.primitive('/planned_path')\
                 .polyline(vertices)\
                 .id('planned_paths')
-                
+
         except Exception as e:
             print('Crashed in draw planned path:', e)
 
