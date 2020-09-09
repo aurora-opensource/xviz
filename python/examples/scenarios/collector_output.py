@@ -553,11 +553,11 @@ class CollectorScenario:
 
             _, tractor_state = self.tractor_state
             xy_array = utm_array_to_local(tractor_state, self.utm_zone, self.planned_path)
-            vertices = list(np.array(list(map(
-                get_object_xyz_primitive,
-                xy_array[:, 0],
-                xy_array[:, 1]
-            ))).flatten())
+            z = 1.0
+
+            vertices = list(np.column_stack(
+                (xy_array, np.full(xy_array.shape[0], z))
+            ).flatten())
 
             builder.primitive('/planned_path')\
                 .polyline(vertices)\
@@ -571,31 +571,29 @@ class CollectorScenario:
         try:
             if self.field_definition is None:
                 return
-            return
+
+            poly = []
             if self.field_definition['type'] == 'MultiPolygon':
-                for polygon in self.field_definition['coordinates']:
-                    poly = np.array(polygon, dtype=np.object)
-                    # if poly.ndim > 2:
-                    #     poly = poly.squeeze()
-                    # else:
-                    #     print(poly.shape)
-                    # _, tractor_state = self.tractor_state
-                    # tractor_x, tractor_y = latlon_to_utm(tractor_state['latitude'], tractor_state['longitude'], self.utm_zone)
-                    # try:
-                    #     vertices = list(np.array([
-                    #         get_object_xyz_primitive(
-                    #             *utm_to_local(x, y, tractor_x, tractor_y, tractor_state['heading'])
-                    #         )
-                    #         for x, y in poly
-                    #     ]).flatten())
-                    # except Exception as e:
-                    #     print(poly.shape)
-                    # print('end')
-                    # builder.primitive('/field_definition')\
-                    # .polyline(vertices)\
-                    # .id('field_definition')
+                for polygons in self.field_definition['coordinates']:
+                    for polygon in polygons:
+                        poly.append(np.array(polygon))
+
             else:
-                pass
+                for polygon in self.field_definition['coordinates']:
+                    poly.append(np.array(polygon))
+
+            _, tractor_state = self.tractor_state
+            for p in poly:
+                xy_array = utm_array_to_local(tractor_state, self.utm_zone, p)
+                z = 1.0
+                vertices = list(np.column_stack(
+                    (xy_array, np.full(xy_array.shape[0], z))
+                ).flatten())
+
+                builder.primitive('/field_definition')\
+                    .polyline(vertices)\
+                    .id('field_definition')
+
         except Exception as e:
             print('Crashed in draw field definition:', e)
 

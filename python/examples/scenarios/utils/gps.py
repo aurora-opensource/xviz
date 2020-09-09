@@ -4,8 +4,19 @@ import utm
 import numpy as np
 
 
-def utm_array_to_local(tractor_state, utm_zone, utm_array):
-    translate_x, translate_y = utm_array[:, 0], utm_array[:, 1]
+def latlon_array_to_local(tractor_state, utm_zone, arr):
+    lat, lon = arr[:, 0], arr[:, 1]
+    utm_array = np.array(list(map(
+        ft.partial(latlon_to_utm, zone=utm_zone),
+        lat,
+        lon
+    )))
+    
+    return utm_array_to_local(tractor_state, utm_zone, utm_array)
+
+
+def utm_array_to_local(tractor_state, utm_zone, arr):
+    translate_x, translate_y = arr[:, 0], arr[:, 1]
     tractor_x, tractor_y = latlon_to_utm(tractor_state['latitude'], tractor_state['longitude'], utm_zone)
     xy_array = np.array(list(map(
         ft.partial(utm_to_local, tractor_x, tractor_y, tractor_state['heading']),
