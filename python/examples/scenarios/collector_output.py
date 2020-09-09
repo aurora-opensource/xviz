@@ -127,21 +127,26 @@ class CollectorScenario:
         if not self._metadata:
             builder = xviz.XVIZMetadataBuilder()
             builder.stream("/vehicle_pose").category(xviz.CATEGORY.POSE)
-            builder.stream("/tractor_heading")\
-                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
-                .category(xviz.CATEGORY.PRIMITIVE)\
-                .type(xviz.PRIMITIVE_TYPES.POLYLINE)
 
             builder.stream("/radar_filtered_out_targets")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+                .stream_style({'fill_color': [255, 255, 0]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
             builder.stream("/radar_passed_filter_targets")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+                .stream_style({'fill_color': [255, 0, 0]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
             builder.stream("/radar_crucial_targets")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+                .stream_style({'fill_color': [0, 0, 0]})\
+                .category(xviz.CATEGORY.PRIMITIVE)\
+                .type(xviz.PRIMITIVE_TYPES.CIRCLE)
+
+            builder.stream("/camera_targets")\
+                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+                .stream_style({'fill_color': [0, 255, 255]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
 
@@ -149,17 +154,24 @@ class CollectorScenario:
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
-            builder.stream("/camera_targets")\
-                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+            builder.stream("/tracking_id")\
+                .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
+                .stream_style({'fill_color': [0, 0, 0]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
-                .type(xviz.PRIMITIVE_TYPES.CIRCLE)
-                
+                .type(xviz.PRIMITIVE_TYPES.TEXT)
+
+            combine_color = [128, 0, 128]
             builder.stream("/combine_position")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+                .stream_style({'fill_color': combine_color})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
             builder.stream("/combine_heading")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+                .stream_style({
+                    'stroke_width': 0.3, 
+                    'stroke_color': combine_color
+                })\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.POLYLINE)
             builder.stream("/combine_region")\
@@ -172,10 +184,10 @@ class CollectorScenario:
                 })\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
-            
+
             builder.stream("/field_definition")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
-                .stream_style({'stroke_color': [165, 42, 42, 128]})\
+                .stream_style({'stroke_color': [40, 150, 40, 128]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.POLYLINE)
 
@@ -186,7 +198,10 @@ class CollectorScenario:
                 .type(xviz.PRIMITIVE_TYPES.POLYLINE)
             builder.stream("/planned_path")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
-                .stream_style({'stroke_color': [128, 0, 128, 128]})\
+                .stream_style({
+                    'stroke_width': 0.3,
+                    'stroke_color': [128, 0, 128, 128]
+                })\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.POLYLINE)
 
@@ -220,13 +235,6 @@ class CollectorScenario:
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.TEXT)
 
-            builder.stream("/tracking_id")\
-                .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
-                .stream_style({
-                    'fill_color': [0, 0, 0]
-                })\
-                .category(xviz.CATEGORY.PRIMITIVE)\
-                .type(xviz.PRIMITIVE_TYPES.TEXT)
 
             self._metadata = builder.get_message()
 
@@ -397,25 +405,19 @@ class CollectorScenario:
                 if self.radar_filter.is_valid_target(target['targetId'], target):
                     if self.radar_filter.filter_targets_until_path_prediction(target):
                         to_path_prediction = True
-                 
-                    fill_color = [255, 0, 0] # Red
+
                     builder.primitive('/radar_passed_filter_targets')\
                         .circle([x, y, z], .5)\
-                        .style({'fill_color': fill_color})\
                         .id(str(target['targetId']))
                 else:
-                    fill_color = [255, 255, 0] # Yellow
                     builder.primitive('/radar_filtered_out_targets')\
                         .circle([x, y, z], .5)\
-                        .style({'fill_color': fill_color})\
                         .id(str(target['targetId']))
 
 
                 if to_path_prediction:
-                    fill_color = [0, 0, 0] # Black
                     builder.primitive('/radar_crucial_targets')\
                         .circle([x, y, z], .5)\
-                        .style({'fill_color': fill_color})\
                         .id(str(target['targetId']))
 
         except Exception as e:
@@ -434,10 +436,6 @@ class CollectorScenario:
                         if track['radarDistCamFrame'] != self.track_history.get(track['trackId'], -1)\
                             and track['radarDistCamFrame'] > 0.1:
                             fill_color = [0, 255, 0] # Green
-                            builder.primitive('/tracking_id')\
-                                    .text(track['trackId'])\
-                                    .position([x, y, z+.1])\
-                                    .id(track['trackId'])
                         else:
                             fill_color = [0, 0, 255] # Blue
 
@@ -445,6 +443,12 @@ class CollectorScenario:
                             .circle([x, y, z], .5)\
                             .style({'fill_color': fill_color})\
                             .id(track['trackId'])
+
+                        text = f"[{track['classId'][0]}]{track['trackId']}"
+                        builder.primitive('/tracking_id')\
+                                .text(text)\
+                                .position([x, y, z+.1])\
+                                .id(track['trackId'])
 
                         self.track_history[track['trackId']] = track['radarDistCamFrame']
         except Exception as e:
@@ -457,11 +461,9 @@ class CollectorScenario:
                 (x, y, z) = get_object_xyz(target, 'objectAngle', 'objectDistance', radar_ob=False)
                 if target['label'] == 'qrcode':
                     continue
-                fill_color = [0, 255, 255] # Cyan
 
                 builder.primitive('/camera_targets')\
                     .circle([x, y, z], .5)\
-                    .style({'fill_color': fill_color})\
                     .id(target['label'])
 
         except Exception as e:
@@ -471,18 +473,7 @@ class CollectorScenario:
     def _draw_machine_state(self, builder: xviz.XVIZBuilder):
         try:
             _, tractor_state = self.tractor_state
-
             tractor_heading = (math.pi / 2) - (tractor_state['heading'] * math.pi / 180)
-            # tractor heading always drawn as 0 since everything is relative to it
-            tractor_rel_heading_xyz = get_object_xyz_primitive(radial_dist=5.0, angle_radians=0.0)
-            t_r_x, t_r_y, _ = tractor_rel_heading_xyz
-            z = 0.5
-            tractor_color = [0, 128, 128]
-            builder.primitive('/tractor_heading')\
-                .polyline([0, 0, z, t_r_x, t_r_y, z])\
-                .style({'stroke_width': 0.3,
-                        "stroke_color": tractor_color})\
-                .id('tractor_heading')
             
             for combine_state_tuple in self.combine_states.values():
                 if self.state_too_old(combine_state_tuple):
@@ -490,26 +481,25 @@ class CollectorScenario:
 
                 _, combine_state = combine_state_tuple
                 x, y = transform_combine_to_local(combine_state, tractor_state, self.utm_zone)
-                combine_color = [128, 0, 128] # Black
+                z = 0.5
 
                 combine_heading = (math.pi / 2) - (combine_state['heading'] * math.pi / 180)
                 combine_heading_relative_to_tractor = combine_heading - tractor_heading
-                combine_rel_heading_xyz = get_object_xyz_primitive(radial_dist=3.0, angle_radians=combine_heading_relative_to_tractor)
+                combine_rel_heading_xyz = get_object_xyz_primitive(radial_dist=3.0,
+                                                                    angle_radians=combine_heading_relative_to_tractor)
 
                 c_r_x, c_r_y, _ = combine_rel_heading_xyz
                 
                 builder.primitive('/combine_position')\
                     .circle([x, y, z], .5)\
-                    .style({'fill_color': combine_color})\
                     .id('combine')
+
                 builder.primitive('/combine_region')\
                     .circle([x, y, z-.1], self.combine_length)\
                     .id("combine_bubble: " + str(self.combine_length))
 
                 builder.primitive('/combine_heading')\
                     .polyline([x, y, z, x+c_r_x, y+c_r_y, z])\
-                    .style({'stroke_width': 0.3, 
-                            "stroke_color": combine_color})\
                     .id('combine_heading')
 
         except Exception as e:
