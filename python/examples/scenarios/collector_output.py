@@ -98,6 +98,7 @@ class CollectorScenario:
         self.combine_states = {}
         self.planned_path = None
         self.field_definition = None
+        self.sync_status = None
 
 
     def load_config(self, configfile):
@@ -112,6 +113,7 @@ class CollectorScenario:
         self.combine_states = {}
         self.planned_path = None
         self.field_definition = None
+        self.sync_status = None
         self.index = 0
 
     
@@ -337,12 +339,14 @@ class CollectorScenario:
             collector_output, is_slim_output = deserialize_collector_output(collector_output)
             if is_slim_output:
                 img, camera_output, radar_output, tracking_output,\
-                    machine_state, field_definition, planned_path = extract_collector_output_slim(collector_output)
+                    machine_state, field_definition, planned_path, sync_status\
+                    = extract_collector_output_slim(collector_output)
             else:
                 img, camera_output, radar_output,\
                     tracking_output, machine_state = extract_collector_output(collector_output)
                 field_definition = None
                 planned_path = None
+                sync_status = None
 
             if camera_output is not None:
                 self._draw_camera_targets(camera_output, builder)
@@ -370,6 +374,9 @@ class CollectorScenario:
                     self.planned_path = planned_path.reshape(-1, 2)
                 else:
                     self.planned_path = None
+            
+            if sync_status is not None:
+                self.sync_status = sync_status
 
             if self.tractor_state is not None\
                 and not self.state_too_old(self.tractor_state):
@@ -377,6 +384,7 @@ class CollectorScenario:
                 self._draw_predicted_path(builder)
                 self._draw_planned_path(builder)
                 self._draw_field_definition(builder)
+                # TODO: draw something with the sync status
 
             if img is not None:
                 if camera_output is not None:
