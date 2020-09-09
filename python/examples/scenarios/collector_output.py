@@ -10,7 +10,7 @@ from protobuf_APIs import falconeye_pb2
 
 from scenarios.utils.com_manager import ComManager, MqttConst
 from scenarios.utils.filesystem import establish_fresh_directory
-from scenarios.utils.gps import transform_combine_to_local, latlon_to_utm, utm_to_local
+from scenarios.utils.gps import transform_combine_to_local, utm_array_to_local
 from scenarios.utils.image import postprocess, show_image
 from scenarios.utils.read_protobufs import deserialize_collector_output,\
                                             extract_collector_output, extract_collector_output_slim
@@ -367,8 +367,8 @@ class CollectorScenario:
                 and not self.state_too_old(self.tractor_state):
                 self._draw_machine_state(builder)
                 self._draw_predicted_path(builder)
-                self._draw_field_definition(builder)
                 self._draw_planned_path(builder)
+                self._draw_field_definition(builder)
 
             if img is not None:
                 if camera_output is not None:
@@ -525,16 +525,16 @@ class CollectorScenario:
 
             self.path_prediction.predict(wheel_angle, speed)
 
-            left_p = np.array(list(
-                        map(get_object_xyz_primitive,
-                            self.path_prediction.left_p[:, 0],
-                            self.path_prediction.left_p[:, 1])))\
-                        .flatten()
-            right_p = np.flipud(list(
-                        map(get_object_xyz_primitive,
-                            self.path_prediction.right_p[:, 0],
-                            self.path_prediction.right_p[:, 1])))\
-                        .flatten()
+            left_p = np.array(list(map(
+                get_object_xyz_primitive,
+                self.path_prediction.left_p[:, 0],
+                self.path_prediction.left_p[:, 1]
+            ))).flatten()
+            right_p = np.flipud(list(map(
+                get_object_xyz_primitive,
+                self.path_prediction.right_p[:, 0],
+                self.path_prediction.right_p[:, 1]
+            ))).flatten()
             
             vertices = list(np.concatenate((left_p, right_p)))
 
@@ -544,13 +544,6 @@ class CollectorScenario:
 
         except Exception as e:
             print('Crashed in draw predicted path:', e)
-    
-
-    def _draw_field_definition(self, builder: xviz.XVIZBuilder):
-        try:
-            pass
-        except Exception as e:
-            print('Crashed in draw field definition:', e)
 
 
     def _draw_planned_path(self, builder: xviz.XVIZBuilder):
@@ -559,20 +552,52 @@ class CollectorScenario:
                 return
 
             _, tractor_state = self.tractor_state
-            tractor_x, tractor_y = latlon_to_utm(tractor_state['latitude'], tractor_state['longitude'], self.utm_zone)
-            vertices = list(np.array([
-                get_object_xyz_primitive(
-                    *utm_to_local(x, y, tractor_x, tractor_y, tractor_state['heading'])
-                )
-                for x, y in self.planned_path
-            ]).flatten())
+            xy_array = utm_array_to_local(tractor_state, self.utm_zone, self.planned_path)
+            vertices = list(np.array(list(map(
+                get_object_xyz_primitive,
+                xy_array[:, 0],
+                xy_array[:, 1]
+            ))).flatten())
 
             builder.primitive('/planned_path')\
                 .polyline(vertices)\
-                .id('planned_paths')
+                .id('planned_path')
 
         except Exception as e:
             print('Crashed in draw planned path:', e)
+    
+
+    def _draw_field_definition(self, builder: xviz.XVIZBuilder):
+        try:
+            if self.field_definition is None:
+                return
+            return
+            if self.field_definition['type'] == 'MultiPolygon':
+                for polygon in self.field_definition['coordinates']:
+                    poly = np.array(polygon, dtype=np.object)
+                    # if poly.ndim > 2:
+                    #     poly = poly.squeeze()
+                    # else:
+                    #     print(poly.shape)
+                    # _, tractor_state = self.tractor_state
+                    # tractor_x, tractor_y = latlon_to_utm(tractor_state['latitude'], tractor_state['longitude'], self.utm_zone)
+                    # try:
+                    #     vertices = list(np.array([
+                    #         get_object_xyz_primitive(
+                    #             *utm_to_local(x, y, tractor_x, tractor_y, tractor_state['heading'])
+                    #         )
+                    #         for x, y in poly
+                    #     ]).flatten())
+                    # except Exception as e:
+                    #     print(poly.shape)
+                    # print('end')
+                    # builder.primitive('/field_definition')\
+                    # .polyline(vertices)\
+                    # .id('field_definition')
+            else:
+                pass
+        except Exception as e:
+            print('Crashed in draw field definition:', e)
 
     
     def update_machine_state(self, machine_state):

@@ -1,11 +1,24 @@
-import utm
 import math
+import functools as ft
+import utm
+import numpy as np
 
+
+def utm_array_to_local(tractor_state, utm_zone, utm_array):
+    translate_x, translate_y = utm_array[:, 0], utm_array[:, 1]
+    tractor_x, tractor_y = latlon_to_utm(tractor_state['latitude'], tractor_state['longitude'], utm_zone)
+    xy_array = np.array(list(map(
+        ft.partial(utm_to_local, tractor_x, tractor_y, tractor_state['heading']),
+        translate_x, translate_y
+    )))
+
+    return xy_array
+    
 
 def transform_combine_to_local(combine_state, tractor_state, utm_zone):
     combine_x, combine_y = latlon_to_utm(combine_state['latitude'], combine_state['longitude'], utm_zone)
     tractor_x, tractor_y = latlon_to_utm(tractor_state['latitude'], tractor_state['longitude'], utm_zone)
-    dx, dy = utm_to_local(combine_x, combine_y, tractor_x, tractor_y, tractor_state['heading'])
+    dx, dy = utm_to_local(tractor_x, tractor_y, tractor_state['heading'], combine_x, combine_y)
 
     return dx, dy
 
@@ -33,7 +46,7 @@ def parse_utm_zone(zone):
     return int(zone_num), zone[index]
 
 
-def utm_to_local(translate_x, translate_y, reference_x, reference_y, heading):
+def utm_to_local(reference_x, reference_y, heading, translate_x, translate_y):
     theta = (math.pi / 2) - (heading * math.pi / 180)
     dx_a = translate_x - reference_x
     dy_a = translate_y - reference_y
