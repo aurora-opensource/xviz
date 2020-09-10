@@ -1,6 +1,5 @@
 import math
 import time
-import shutil
 import yaml
 import numpy as np
 from pathlib import Path
@@ -9,7 +8,7 @@ from google.protobuf.json_format import MessageToDict
 from protobuf_APIs import falconeye_pb2
 
 from scenarios.utils.com_manager import ComManager, MqttConst
-from scenarios.utils.filesystem import establish_fresh_directory
+from scenarios.utils.filesystem import get_collector_instances
 from scenarios.utils.gps import transform_combine_to_local, utm_array_to_local
 from scenarios.utils.image import postprocess, show_image
 from scenarios.utils.read_protobufs import deserialize_collector_output,\
@@ -45,16 +44,7 @@ class CollectorScenario:
 
         collector_output_file = collector_config['collector_output_file']
         extract_directory = collector_config['extract_directory']
-        collector_output_file = Path(collector_output_file)
-        print("Using:collector_output_file:", collector_output_file)
-        extract_directory = Path(extract_directory)
-        print("Using:extract_directory:", extract_directory)
-        if not collector_output_file.is_file():
-            print('collector output file does not exit')
-        
-        establish_fresh_directory(extract_directory)
-        shutil.unpack_archive(str(collector_output_file), str(extract_directory))
-        self.collector_outputs = sorted(extract_directory.glob('*.txt'))
+        self.collector_instances = get_collector_instances(collector_output_file, extract_directory)
 
         self.mqtt_enabled = collector_config['mqtt_enabled']
         if self.mqtt_enabled:
@@ -66,8 +56,8 @@ class CollectorScenario:
         global_config = self.load_config(str(configfile))
         radar_safety_config = global_config['safety']['radar']
         self.combine_length = radar_safety_config['combine_length']
-        self.distance_threshold = radar_safety_config['distance_threshold']
-        self.slowdown_threshold = radar_safety_config['slowdown_threshold']
+        self.stop_distance = radar_safety_config['stop_threshold_default']
+        self.slowdown_distance = radar_safety_config['slowdown_threshold_default']
 
         pfilter_enabled = True
         qfilter_enabled = radar_safety_config['enable_queue_filter']
@@ -91,7 +81,8 @@ class CollectorScenario:
             'wheel_base': self.wheel_base,
             'machine_width': global_config['navigation']['machine_width']
         }
-        self.path_prediction = PathPrediction(prediction_args)
+        min_predictive_speed = global_config['guidance']['safety']['predictive_slowdown_speed_mph']
+        self.path_prediction = PathPrediction(prediction_args, min_predictive_speed)
 
         self.utm_zone = ''
         self.tractor_state = None
@@ -99,7 +90,7 @@ class CollectorScenario:
         self.planned_path = None
         self.field_definition = None
         self.sync_status = None
-
+        self.control_signal = None
 
     def load_config(self, configfile):
         with open(configfile, 'r') as f:
@@ -114,6 +105,7 @@ class CollectorScenario:
         self.planned_path = None
         self.field_definition = None
         self.sync_status = None
+        self.control_signal = None
         self.index = 0
 
     
@@ -193,11 +185,16 @@ class CollectorScenario:
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.POLYLINE)
 
+            # builder.stream("/predicted_path")\
+            #     .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+            #     .stream_style({'stroke_color': [0, 128, 128, 128]})\
+            #     .category(xviz.CATEGORY.PRIMITIVE)\
+            #     .type(xviz.PRIMITIVE_TYPES.POLYLINE)
             builder.stream("/predicted_path")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
-                .stream_style({'stroke_color': [0, 128, 128, 128]})\
+                .stream_style({'fill_color': [0, 128, 128, 128]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
-                .type(xviz.PRIMITIVE_TYPES.POLYLINE)
+                .type(xviz.PRIMITIVE_TYPES.CIRCLE)
             builder.stream("/planned_path")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
                 .stream_style({
@@ -261,7 +258,7 @@ class CollectorScenario:
 
             builder = xviz.XVIZBuilder(metadata=self._metadata)
             self._draw_measuring_references(builder, timestamp)
-            self._draw_collector_output(builder, timestamp)
+            self._draw_collector_instance(builder, timestamp)
             data = builder.get_message()
 
             return {
@@ -274,8 +271,8 @@ class CollectorScenario:
 
     def _draw_measuring_references(self, builder: xviz.XVIZBuilder, timestamp):
         radial_distances = set([5, 10, 15, 20, 25, 30])
-        radial_distances.add(self.slowdown_threshold)
-        radial_distances.add(self.distance_threshold)
+        radial_distances.add(self.slowdown_distance)
+        radial_distances.add(self.stop_distance)
         radial_distances = sorted(radial_distances, reverse=True)
 
         for r in radial_distances:
@@ -284,12 +281,12 @@ class CollectorScenario:
                 .position([r+cab_to_nose, 0, .1])\
                 .id(f'{r}lb')
 
-            if r == self.slowdown_threshold:
+            if r == self.slowdown_distance:
                 builder.primitive('/measuring_circles')\
                     .circle([cab_to_nose, 0, 0], r)\
                     .style({'stroke_color': [255, 200, 0, 70]})\
                     .id('slowdown: ' + str(r))
-            elif r == self.distance_threshold:
+            elif r == self.stop_distance:
                 builder.primitive('/measuring_circles')\
                     .circle([cab_to_nose, 0, 0], r)\
                     .style({'stroke_color': [255, 50, 10, 70]})\
@@ -305,7 +302,8 @@ class CollectorScenario:
         for c_phi in cam_fov:
             r = 40
             label = (r, c_phi)
-            (x, y, z) = get_object_xyz_primitive(r+cab_to_nose, c_phi*math.pi/180)
+            (x, y, z) = get_object_xyz_primitive(r, c_phi*math.pi/180)
+            x += cab_to_nose
             vertices = [cab_to_nose, 0, 0, x, y, z]
             builder.primitive('/camera_fov')\
                 .polyline(vertices)\
@@ -313,7 +311,8 @@ class CollectorScenario:
 
         for r_phi in radar_fov:
             r = 40
-            (x, y, z) = get_object_xyz_primitive(r+cab_to_nose, r_phi*math.pi/180)
+            (x, y, z) = get_object_xyz_primitive(r, r_phi*math.pi/180)
+            x += cab_to_nose
             builder.primitive('/measuring_circles_lbl')\
                 .text(str(r_phi))\
                 .position([x, y, z])\
@@ -326,15 +325,15 @@ class CollectorScenario:
                     .id("radar_fov: "+str(label))
 
 
-    def _draw_collector_output(self, builder: xviz.XVIZBuilder, timestamp):
+    def _draw_collector_instance(self, builder: xviz.XVIZBuilder, timestamp):
         try:
             builder.pose()\
                 .timestamp(timestamp)
 
-            if self.index == len(self.collector_outputs):
+            if self.index == len(self.collector_instances):
                 self.reset_values()
 
-            collector_output = self.collector_outputs[self.index]
+            collector_output = self.collector_instances[self.index]
 
             collector_output, is_slim_output = deserialize_collector_output(collector_output)
             if is_slim_output:
@@ -393,13 +392,13 @@ class CollectorScenario:
 
             # if self.index == 0:
             #     print('start time:', time.gmtime(float(collector_output.timestamp)))
-            # elif self.index == len(self.collector_outputs) - 1:
+            # elif self.index == len(self.collector_instances) - 1:
             #     print('end time:', time.gmtime(float(collector_output.timestamp)))
 
             self.index += 1
 
         except Exception as e:
-            print('Crashed in draw collector output:', e)
+            print('Crashed in draw collector instance:', e)
 
 
     def _draw_radar_targets(self, radar_output, builder: xviz.XVIZBuilder):
@@ -520,25 +519,39 @@ class CollectorScenario:
             speed = tractor_state['speed']
             curvature = tractor_state['curvature']
             wheel_angle = curvature * self.wheel_base / 1000
+            max_path_dr = 30
+            self.path_prediction.predict(wheel_angle, speed, max_path_dr)
 
-            self.path_prediction.predict(wheel_angle, speed)
+            # left = np.array(list(map(
+            #     get_object_xyz_primitive,
+            #     self.path_prediction.left[:, 0],
+            #     self.path_prediction.left[:, 1]
+            # ))).flatten()
+            # right = np.flipud(list(map(
+            #     get_object_xyz_primitive,
+            #     self.path_prediction.right[:, 0],
+            #     self.path_prediction.right[:, 1]
+            # ))).flatten()
+            z = 0.9
+            left = np.column_stack((
+                self.path_prediction.left,
+                np.full(self.path_prediction.left.shape[0], z)
+            ))
+            right = np.column_stack((
+                self.path_prediction.right,
+                np.full(self.path_prediction.right.shape[0], z)
+            ))
+            left[:, 0] += cab_to_nose
+            right[:, 0] += cab_to_nose
 
-            left_p = np.array(list(map(
-                get_object_xyz_primitive,
-                self.path_prediction.left_p[:, 0],
-                self.path_prediction.left_p[:, 1]
-            ))).flatten()
-            right_p = np.flipud(list(map(
-                get_object_xyz_primitive,
-                self.path_prediction.right_p[:, 0],
-                self.path_prediction.right_p[:, 1]
-            ))).flatten()
-            
-            vertices = list(np.concatenate((left_p, right_p)))
+            vertices = list(np.row_stack((left, right)))
+            for v in vertices:
+                builder.primitive('/predicted_path')\
+                    .circle(v, .2)
 
-            builder.primitive('/predicted_path')\
-                    .polyline(vertices)\
-                    .id('predicted_paths')
+            # builder.primitive('/predicted_path')\
+            #         .polyline(vertices)\
+            #         .id('predicted_paths')
 
         except Exception as e:
             print('Crashed in draw predicted path:', e)

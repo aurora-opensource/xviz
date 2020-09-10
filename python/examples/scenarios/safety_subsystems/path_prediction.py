@@ -30,7 +30,7 @@ def predict_position(X, U, C, dt):
     return px_t, py_t, yaw_t
 
 
-def predict_path(X0, U0, C, horizon=10.0, n_steps=20):
+def predict_path(X0, U0, C, horizon=10.0, n_steps=20, max_path_dr=30):
     """Predicts path until given horizon
     U0 - Control vector to use (v, steering_angle)
     tspan - sequence
@@ -40,7 +40,8 @@ def predict_path(X0, U0, C, horizon=10.0, n_steps=20):
     W_half = 0.5 * C['machine_width']
 
     # Don't care for path beyond phi= +/- pi/2
-    path = np.array(list(filter(lambda row: -pi / 2 < atan2(row[1], row[0]) < pi / 2,
+    path = np.array(list(filter(lambda row: -pi / 2 < atan2(row[1], row[0]) < pi / 2
+                                            and euc_dist(row[0], row[1]) <= max_path_dr,
                                 map(ft.partial(predict_position, X0, U0, C), tspan))))
 
     left = np.column_stack([path[:, 0] + W_half * np.cos(path[:, 2] - pi / 2),
@@ -50,9 +51,13 @@ def predict_path(X0, U0, C, horizon=10.0, n_steps=20):
 
     return path, left, right
 
+
+def euc_dist(x, y):
+    return (x**2 + y**2)**0.5
+
 	
 class PathPrediction(object):
-    def __init__(self, C):
+    def __init__(self, C, min_speed):
         """
         C - constants dict
             - wheel_base
@@ -61,6 +66,7 @@ class PathPrediction(object):
         self.X0 = (0, 0, 0)
         self.C = C
         self.steering_history = cl.deque(maxlen=10)
+        self.min_speed = min_speed
 
     def to_polar(self, path):
         r = np.sqrt(path[:, 0]**2 + path[:, 1]**2)
@@ -78,17 +84,21 @@ class PathPrediction(object):
         right_phi = self.get_closest_phi(self.right_p, r)
         return left_phi, right_phi
 
-    def predict(self, steering_angle, speed):
+    def predict(self, steering_angle, speed, max_path_dr):
         """Predict path for given speed and steering angle."""
-        speed = max(speed, 0.447 * 0.5)
-        horizon = min(30.0 / speed, 10.0)
+        speed = max(speed, 0.447 * self.min_speed)
+        # horizon = min(max_path_dr / speed, 10.0)
+        horizon = 10
+
+        step_distance = 1
+        dt = step_distance / speed
+        n_steps = horizon / dt
 
         U = (speed, steering_angle)
         self.U = U
-        n_steps = horizon / 0.5
 
         self.path, self.left, self.right = predict_path(
-            self.X0, U, self.C, horizon=horizon, n_steps=int(n_steps))
+            self.X0, U, self.C, horizon=horizon, n_steps=int(n_steps), max_path_dr=max_path_dr)
         self.left_p = np.column_stack(self.to_polar(self.left))
         self.right_p = np.column_stack(self.to_polar(self.right))
         self.path_p = np.column_stack(self.to_polar(self.path))
