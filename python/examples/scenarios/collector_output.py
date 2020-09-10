@@ -339,8 +339,8 @@ class CollectorScenario:
 
             collector_output, is_slim_output = deserialize_collector_output(collector_output)
             if is_slim_output:
-                img, camera_output, radar_output, tracking_output,\
-                    machine_state, field_definition, planned_path, sync_status\
+                img, camera_output, radar_output, tracking_output, machine_state,\
+                    field_definition, planned_path, sync_status, control_signal\
                     = extract_collector_output_slim(collector_output)
             else:
                 img, camera_output, radar_output,\
@@ -348,6 +348,7 @@ class CollectorScenario:
                 field_definition = None
                 planned_path = None
                 sync_status = None
+                control_signal = None
 
             if camera_output is not None:
                 self._draw_camera_targets(camera_output, builder)
@@ -385,7 +386,7 @@ class CollectorScenario:
                 self._draw_predicted_path(builder)
                 self._draw_planned_path(builder)
                 self._draw_field_definition(builder)
-                # TODO: draw something with the sync status
+                # TODO: draw something with the sync status and control signal
 
             if img is not None:
                 if camera_output is not None:
