@@ -1,8 +1,9 @@
 import math
 import time
 import yaml
-import numpy as np
 from pathlib import Path
+from collections import deque
+import numpy as np
 
 from google.protobuf.json_format import MessageToDict
 from protobuf_APIs import falconeye_pb2
@@ -85,12 +86,13 @@ class CollectorScenario:
         self.path_prediction = PathPrediction(prediction_args, min_predictive_speed)
 
         self.utm_zone = ''
-        self.tractor_state = None
+        self.tractor_state = deque(maxlen=10)
         self.combine_states = {}
         self.planned_path = None
         self.field_definition = None
         self.sync_status = None
         self.control_signal = None
+
 
     def load_config(self, configfile):
         with open(configfile, 'r') as f:
@@ -100,7 +102,7 @@ class CollectorScenario:
 
     
     def reset_values(self):
-        self.tractor_state = None
+        self.tractor_state.clear()
         self.combine_states = {}
         self.planned_path = None
         self.field_definition = None
@@ -185,16 +187,16 @@ class CollectorScenario:
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.POLYLINE)
 
-            # builder.stream("/predicted_path")\
-            #     .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
-            #     .stream_style({'stroke_color': [0, 128, 128, 128]})\
-            #     .category(xviz.CATEGORY.PRIMITIVE)\
-            #     .type(xviz.PRIMITIVE_TYPES.POLYLINE)
             builder.stream("/predicted_path")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
-                .stream_style({'fill_color': [0, 128, 128, 128]})\
+                .stream_style({'stroke_color': [0, 128, 128, 128]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
-                .type(xviz.PRIMITIVE_TYPES.CIRCLE)
+                .type(xviz.PRIMITIVE_TYPES.POLYLINE)
+            # builder.stream("/predicted_path")\
+            #     .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+            #     .stream_style({'fill_color': [0, 128, 128, 128]})\
+            #     .category(xviz.CATEGORY.PRIMITIVE)\
+            #     .type(xviz.PRIMITIVE_TYPES.CIRCLE)
             builder.stream("/planned_path")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
                 .stream_style({
@@ -377,8 +379,8 @@ class CollectorScenario:
             if sync_status is not None:
                 self.sync_status = sync_status
 
-            if self.tractor_state is not None\
-                and not self.state_too_old(self.tractor_state):
+            if self.tractor_state\
+                and not self.state_too_old(self.tractor_state[-1]):
                 self._draw_machine_state(builder)
                 self._draw_predicted_path(builder)
                 self._draw_planned_path(builder)
@@ -479,7 +481,7 @@ class CollectorScenario:
     
     def _draw_machine_state(self, builder: xviz.XVIZBuilder):
         try:
-            _, tractor_state = self.tractor_state
+            _, tractor_state = self.tractor_state[-1]
             tractor_heading = (math.pi / 2) - (tractor_state['heading'] * math.pi / 180)
             
             for combine_state_tuple in self.combine_states.values():
@@ -515,43 +517,34 @@ class CollectorScenario:
     
     def _draw_predicted_path(self, builder: xviz.XVIZBuilder):
         try:
-            _, tractor_state = self.tractor_state
+            _, tractor_state = self.tractor_state[-1]
             speed = tractor_state['speed']
             curvature = tractor_state['curvature']
+            # curvature = get_average_curvature(self.tractor_state)
             wheel_angle = curvature * self.wheel_base / 1000
             max_path_dr = 30
             self.path_prediction.predict(wheel_angle, speed, max_path_dr)
 
-            # left = np.array(list(map(
-            #     get_object_xyz_primitive,
-            #     self.path_prediction.left[:, 0],
-            #     self.path_prediction.left[:, 1]
-            # ))).flatten()
-            # right = np.flipud(list(map(
-            #     get_object_xyz_primitive,
-            #     self.path_prediction.right[:, 0],
-            #     self.path_prediction.right[:, 1]
-            # ))).flatten()
             z = 0.9
             left = np.column_stack((
                 self.path_prediction.left,
                 np.full(self.path_prediction.left.shape[0], z)
             ))
             right = np.column_stack((
-                self.path_prediction.right,
+                np.flipud(self.path_prediction.right),
                 np.full(self.path_prediction.right.shape[0], z)
             ))
             left[:, 0] += cab_to_nose
             right[:, 0] += cab_to_nose
 
-            vertices = list(np.row_stack((left, right)))
-            for v in vertices:
-                builder.primitive('/predicted_path')\
-                    .circle(v, .2)
+            vertices = list(np.concatenate((
+                left.flatten(),
+                right.flatten()
+            )))
 
-            # builder.primitive('/predicted_path')\
-            #         .polyline(vertices)\
-            #         .id('predicted_paths')
+            builder.primitive('/predicted_path')\
+                .polyline(vertices)\
+                .id('predicted_paths')
 
         except Exception as e:
             print('Crashed in draw predicted path:', e)
@@ -562,7 +555,7 @@ class CollectorScenario:
             if self.planned_path is None:
                 return
 
-            _, tractor_state = self.tractor_state
+            _, tractor_state = self.tractor_state[-1]
             xy_array = utm_array_to_local(tractor_state, self.utm_zone, self.planned_path)
             z = 1.0
 
@@ -593,7 +586,7 @@ class CollectorScenario:
                 for polygon in self.field_definition['coordinates']:
                     poly.append(np.array(polygon))
 
-            _, tractor_state = self.tractor_state
+            _, tractor_state = self.tractor_state[-1]
             for p in poly:
                 xy_array = utm_array_to_local(tractor_state, self.utm_zone, p)
                 z = 1.0
@@ -618,7 +611,7 @@ class CollectorScenario:
         if vehicle_states:
             for vehicle, state in vehicle_states.items():
                 if vehicle == 'tractor':
-                    self.tractor_state = (self.index, state)
+                    self.tractor_state.append((self.index, state))
                 else:
                     self.combine_states[vehicle] = (self.index, state)
     
@@ -626,6 +619,8 @@ class CollectorScenario:
     def state_too_old(self, vehicle_state_tuple):
         last_updated_index, _ = vehicle_state_tuple
         if self.index - last_updated_index > 3:
+            print('old tractor state, clearing history')
+            self.tractor_state.clear()
             return True
         return False
 
@@ -648,3 +643,12 @@ def get_object_xyz_primitive(radial_dist, angle_radians):
     z = 1.0
 
     return (x, y, z)
+
+
+def get_average_curvature(tractor_state_history):
+    curvature_sum = 0
+    for i, state_tuple in enumerate(tractor_state_history):
+        _, state = state_tuple
+        curvature_sum += state['curvature']
+
+    return curvature_sum / (i + 1)
