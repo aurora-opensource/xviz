@@ -40,8 +40,7 @@ def predict_path(X0, U0, C, horizon=10.0, n_steps=20, max_path_dr=30):
     W_half = 0.5 * C['machine_width']
 
     # Don't care for path beyond phi= +/- pi/2
-    path = np.array(list(filter(lambda row: -pi / 2 < atan2(row[1], row[0]) < pi / 2
-                                            and euc_dist(row[0], row[1]) <= max_path_dr,
+    path = np.array(list(filter(lambda row: -pi / 2 < atan2(row[1], row[0]) < pi / 2,
                                 map(ft.partial(predict_position, X0, U0, C), tspan))))
 
     left = np.column_stack([path[:, 0] + W_half * np.cos(path[:, 2] - pi / 2),
@@ -52,10 +51,6 @@ def predict_path(X0, U0, C, horizon=10.0, n_steps=20, max_path_dr=30):
     return path, left, right
 
 
-def euc_dist(x, y):
-    return (x**2 + y**2)**0.5
-
-	
 class PathPrediction(object):
     def __init__(self, C, min_speed):
         """
@@ -87,12 +82,8 @@ class PathPrediction(object):
     def predict(self, steering_angle, speed, max_path_dr):
         """Predict path for given speed and steering angle."""
         speed = max(speed, 0.447 * self.min_speed)
-        # horizon = min(max_path_dr / speed, 10.0)
         horizon = 10
-
-        step_distance = 1
-        dt = step_distance / speed
-        n_steps = horizon / dt
+        n_steps = 10
 
         U = (speed, steering_angle)
         self.U = U
