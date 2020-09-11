@@ -30,13 +30,13 @@ def predict_position(X, U, C, dt):
     return px_t, py_t, yaw_t
 
 
-def predict_path(X0, U0, C, horizon=10.0, n_steps=20, max_path_dr=30):
+def predict_path(X0, U0, C, horizon=10.0, n_steps=10, max_path_dr=30):
     """Predicts path until given horizon
     U0 - Control vector to use (v, steering_angle)
     tspan - sequence
         Time steps at which to predict state - [0.0, 0.1, 0.2 ... ]
     """
-    tspan = np.linspace(0, horizon, n_steps, endpoint=True)
+    tspan = np.linspace(0, horizon, n_steps+1, endpoint=True)
     W_half = 0.5 * C['machine_width']
 
     # Don't care for path beyond phi= +/- pi/2
