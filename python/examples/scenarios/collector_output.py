@@ -547,6 +547,13 @@ class CollectorScenario:
                 .polyline(vertices)\
                 .id('predicted_paths')
 
+            # view the discrete points in the predicted path
+            # for i in range(len(vertices) // 3):
+            #     idx = i * 3
+            #     x, y, z = vertices[idx], vertices[idx+1], vertices[idx+2]
+            #     builder.primitive('/predicted_path')\
+            #         .circle([x, y, z], .2)
+            
         except Exception as e:
             print('Crashed in draw predicted path:', e)
 
