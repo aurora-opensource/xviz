@@ -187,16 +187,22 @@ class CollectorScenario:
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.POLYLINE)
 
-            builder.stream("/predicted_path")\
-                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
-                .stream_style({'stroke_color': [0, 128, 128, 128]})\
-                .category(xviz.CATEGORY.PRIMITIVE)\
-                .type(xviz.PRIMITIVE_TYPES.POLYLINE)
             # builder.stream("/predicted_path")\
             #     .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
             #     .stream_style({'fill_color': [0, 128, 128, 128]})\
             #     .category(xviz.CATEGORY.PRIMITIVE)\
             #     .type(xviz.PRIMITIVE_TYPES.CIRCLE)
+            builder.stream("/predicted_path")\
+                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+                .stream_style({'stroke_color': [0, 128, 128, 128]})\
+                .category(xviz.CATEGORY.PRIMITIVE)\
+                .type(xviz.PRIMITIVE_TYPES.POLYLINE)
+            builder.stream("/commanded_path")\
+                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+                .stream_style({'stroke_color': [128, 0, 128, 128]})\
+                .category(xviz.CATEGORY.PRIMITIVE)\
+                .type(xviz.PRIMITIVE_TYPES.POLYLINE)
+
             builder.stream("/planned_path")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
                 .stream_style({
@@ -379,6 +385,9 @@ class CollectorScenario:
             
             if sync_status is not None:
                 self.sync_status = sync_status
+            
+            if control_signal is not None:
+                self.control_signal = control_signal
 
             if self.tractor_state\
                 and not self.state_too_old(self.tractor_state[-1]):
@@ -386,7 +395,8 @@ class CollectorScenario:
                 self._draw_predicted_path(builder)
                 self._draw_planned_path(builder)
                 self._draw_field_definition(builder)
-                # TODO: draw something with the sync status and control signal
+                self._draw_commanded_path(builder)
+                # TODO: draw something with the sync status
 
             if img is not None:
                 if camera_output is not None:
@@ -545,7 +555,7 @@ class CollectorScenario:
 
             builder.primitive('/predicted_path')\
                 .polyline(vertices)\
-                .id('predicted_paths')
+                .id('predicted_path')
 
             # view the discrete points in the predicted path
             # for i in range(len(vertices) // 3):
@@ -556,6 +566,42 @@ class CollectorScenario:
             
         except Exception as e:
             print('Crashed in draw predicted path:', e)
+
+
+    def _draw_commanded_path(self, builder: xviz.XVIZBuilder):
+        try:
+            if self.control_signal is None:
+                return
+
+            max_path_dr = 30
+            speed = self.control_signal['setSpeed']
+            curvature = self.control_signal['commandCurvature']
+            wheel_angle = curvature * self.wheel_base / 1000
+            self.path_prediction.predict(wheel_angle, speed, max_path_dr)
+
+            z = 0.9
+            left = np.column_stack((
+                self.path_prediction.left,
+                np.full(self.path_prediction.left.shape[0], z)
+            ))
+            right = np.column_stack((
+                np.flipud(self.path_prediction.right),
+                np.full(self.path_prediction.right.shape[0], z)
+            ))
+            left[:, 0] += cab_to_nose
+            right[:, 0] += cab_to_nose
+
+            vertices = list(np.concatenate((
+                left.flatten(),
+                right.flatten()
+            )))
+
+            builder.primitive('/commanded_path')\
+                .polyline(vertices)\
+                .id('commanded_path')
+
+        except Exception as e:
+            print('Crashed in draw commanded path:', e)
 
 
     def _draw_planned_path(self, builder: xviz.XVIZBuilder):
@@ -626,7 +672,7 @@ class CollectorScenario:
 
     def state_too_old(self, vehicle_state_tuple):
         last_updated_index, _ = vehicle_state_tuple
-        if self.index - last_updated_index > 3:
+        if self.index - last_updated_index > 5:
             print('old tractor state, clearing history')
             self.tractor_state.clear()
             return True
