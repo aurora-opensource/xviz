@@ -86,7 +86,8 @@ def extract_collector_output_slim(collector_output):
     else:
         control_signal = None
 
-    return frame, camera_output, radar_output, tracking_output, machine_state, field_definition, planned_path, sync_status, control_signal
+    return frame, camera_output, radar_output, tracking_output, \
+            machine_state, field_definition, planned_path, sync_status, control_signal
 
 
 def extract_collector_output(collector_output):
