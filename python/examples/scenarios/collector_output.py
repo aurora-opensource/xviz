@@ -533,8 +533,7 @@ class CollectorScenario:
             curvature = tractor_state['curvature']
             # curvature = get_average_curvature(self.tractor_state)
             wheel_angle = curvature * self.wheel_base / 1000
-            max_path_dr = 30
-            self.path_prediction.predict(wheel_angle, speed, max_path_dr)
+            self.path_prediction.predict(wheel_angle, speed)
 
             z = 0.9
             left = np.column_stack((
@@ -556,7 +555,7 @@ class CollectorScenario:
             builder.primitive('/predicted_path')\
                 .polyline(vertices)\
                 .id('predicted_path')
-
+2
             # view the discrete points in the predicted path
             # for i in range(len(vertices) // 3):
             #     idx = i * 3
@@ -574,11 +573,10 @@ class CollectorScenario:
             if self.control_signal is None:
                 return
 
-            max_path_dr = 30
             speed = self.control_signal['setSpeed']
             curvature = self.control_signal['commandCurvature']
             wheel_angle = curvature * self.wheel_base / 1000
-            self.path_prediction.predict(wheel_angle, speed, max_path_dr)
+            self.path_prediction.predict(wheel_angle, speeds)
 
             z = 0.9
             left = np.column_stack((

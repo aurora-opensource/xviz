@@ -30,7 +30,7 @@ def predict_position(X, U, C, dt):
     return px_t, py_t, yaw_t
 
 
-def predict_path(X0, U0, C, horizon=10.0, n_steps=10, max_path_dr=30):
+def predict_path(X0, U0, C, horizon=10.0, n_steps=10):
     """Predicts path until given horizon
     U0 - Control vector to use (v, steering_angle)
     tspan - sequence
@@ -79,7 +79,7 @@ class PathPrediction(object):
         right_phi = self.get_closest_phi(self.right_p, r)
         return left_phi, right_phi
 
-    def predict(self, steering_angle, speed, max_path_dr):
+    def predict(self, steering_angle, speed):
         """Predict path for given speed and steering angle."""
         speed = max(speed, 0.447 * self.min_speed)
         horizon = 10
@@ -89,7 +89,7 @@ class PathPrediction(object):
         self.U = U
 
         self.path, self.left, self.right = predict_path(
-            self.X0, U, self.C, horizon=horizon, n_steps=int(n_steps), max_path_dr=max_path_dr)
+            self.X0, U, self.C, horizon=horizon, n_steps=int(n_steps))
         self.left_p = np.column_stack(self.to_polar(self.left))
         self.right_p = np.column_stack(self.to_polar(self.right))
         self.path_p = np.column_stack(self.to_polar(self.path))
