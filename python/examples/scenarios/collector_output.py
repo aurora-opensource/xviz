@@ -565,7 +565,6 @@ class CollectorScenario:
             #         .circle([x, y, z], .2)
             #         .id('predicted_path_node')
 
-
         except Exception as e:
             print('Crashed in draw predicted path:', e)
 
