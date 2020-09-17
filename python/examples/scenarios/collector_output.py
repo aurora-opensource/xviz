@@ -80,7 +80,7 @@ class CollectorScenario:
         self.wheel_base = global_config['guidance']['wheel_base']
         prediction_args = {
             'wheel_base': self.wheel_base,
-            'machine_width': global_config['navigation']['machine_width']
+            'machine_width': global_config['safety']['object_tracking']['path_width'] * 1.5
         }
         min_predictive_speed = global_config['guidance']['safety']['predictive_slowdown_speed_mph']
         self.path_prediction = PathPrediction(prediction_args, min_predictive_speed)
