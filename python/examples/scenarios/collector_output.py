@@ -22,6 +22,7 @@ import xviz
 import xviz.builder as xbuilder
 
 cab_to_nose = 3.2131
+gps_to_rear_axle = 1.9304
 
 DEG_1_AS_RAD = math.pi / 180
 DEG_90_AS_RAD = 90 * DEG_1_AS_RAD
@@ -501,7 +502,7 @@ class CollectorScenario:
 
                 _, combine_state = combine_state_tuple
                 x, y = transform_combine_to_local(combine_state, tractor_state, self.utm_zone)
-                x -= (cab_to_nose + 1.9304)
+                x -= (cab_to_nose + gps_to_rear_axle)
                 z = 0.5
 
                 combine_heading = (math.pi / 2) - (combine_state['heading'] * math.pi / 180)
