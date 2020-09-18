@@ -1,4 +1,3 @@
-
 from easydict import EasyDict as edict
 import json
 
@@ -33,12 +32,18 @@ class XVIZBaseWriter:
 
     def _write_message_index(self):
         self._check_valid()
-        
-        times = sorted(self._message_timings.keys())
-        timing = [self._message_timings[t] for t in times]
 
-        self._message_timings['timing'] = timing
-        self._source.write(json.dumps(self._message_timings, separators=(',', ':'))\
+        message_timings = {}
+        start_time = self._message_timings.get('start_time')
+        end_time = self._message_timings.get('end_time')
+        if start_time:
+            message_timings['startTime'] = start_time
+        if end_time:
+            message_timings['endTime'] = end_time
+
+        messages = self._message_timings['messages']
+        message_timings['timing'] = [messages[t] for t in sorted(messages.keys())]
+        self._source.write(json.dumps(message_timings, separators=(',', ':'))\
             .encode('ascii'), '0-frame.json')
 
     def close(self):
@@ -62,7 +67,7 @@ class XVIZBaseWriter:
             times = [update.timestamp for update in xviz_data.updates]
             tmin, tmax = min(times), max(times)
 
-            self._message_timings['messages'][index] = (tmin, tmax, index, "%d-frame" % index)
+            self._message_timings['messages'][index] = (tmin, tmax, index - 2, "%d-frame" % index)
         else: # metadata
             if xviz_data.HasField('log_info'):
                 self._message_timings['start_time'] = xviz_data.log_info.start_time
