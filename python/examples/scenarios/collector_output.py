@@ -501,6 +501,7 @@ class CollectorScenario:
 
                 _, combine_state = combine_state_tuple
                 x, y = transform_combine_to_local(combine_state, tractor_state, self.utm_zone)
+                x -= (cab_to_nose + 1.9304)
                 z = 0.5
 
                 combine_heading = (math.pi / 2) - (combine_state['heading'] * math.pi / 180)
@@ -684,8 +685,7 @@ def get_object_xyz(ob, angle_key, dist_key, radar_ob=False):
     z = 1.5
 
     if not radar_ob:
-        nose_to_cab = 3.2131 # meters
-        x -= nose_to_cab
+        x -= cab_to_nose
 
     return (x, y, z)
 
