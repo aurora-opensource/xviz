@@ -494,7 +494,7 @@ class CollectorScenario:
     def _draw_machine_state(self, builder: xviz.XVIZBuilder):
         try:
             _, tractor_state = self.tractor_state[-1]
-            tractor_heading = (math.pi / 2) - (tractor_state['heading'] * math.pi / 180)
+            tractor_heading = tractor_state['heading']  # degrees
             
             for combine_state_tuple in self.combine_states.values():
                 if self.state_too_old(combine_state_tuple):
@@ -505,8 +505,8 @@ class CollectorScenario:
                 x -= (cab_to_nose + gps_to_rear_axle)
                 z = 0.5
 
-                combine_heading = (math.pi / 2) - (combine_state['heading'] * math.pi / 180)
-                combine_heading_relative_to_tractor = combine_heading - tractor_heading
+                combine_heading = combine_state['heading']  # degrees
+                combine_heading_relative_to_tractor = (tractor_heading - combine_heading) * math.pi / 180
                 combine_rel_heading_xyz = get_object_xyz_primitive(radial_dist=3.0,
                                                                     angle_radians=combine_heading_relative_to_tractor)
 
@@ -644,6 +644,7 @@ class CollectorScenario:
             _, tractor_state = self.tractor_state[-1]
             for p in poly:
                 xy_array = utm_array_to_local(tractor_state, self.utm_zone, p)
+                xy_array[:, 0] -= (cab_to_nose + gps_to_rear_axle)
                 z = 1.0
                 vertices = list(np.column_stack(
                     (xy_array, np.full(xy_array.shape[0], z))
