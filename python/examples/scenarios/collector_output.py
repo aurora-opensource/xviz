@@ -390,14 +390,17 @@ class CollectorScenario:
             if control_signal is not None:
                 self.control_signal = control_signal
 
-            if self.tractor_state\
-                and not self.state_too_old(self.tractor_state[-1]):
-                self._draw_machine_state(builder)
-                self._draw_predicted_path(builder)
-                self._draw_planned_path(builder)
-                self._draw_field_definition(builder)
-                self._draw_commanded_path(builder)
-                # TODO: draw something with the sync status
+            if self.tractor_state:
+                if self.state_too_old(self.tractor_state[-1]):
+                    print('old tractor state')
+                    self.tractor_state.clear()
+                else:
+                    self._draw_machine_state(builder)
+                    self._draw_predicted_path(builder)
+                    self._draw_planned_path(builder)
+                    self._draw_field_definition(builder)
+                    self._draw_commanded_path(builder)
+                    # TODO: draw something with the sync status
 
             if img is not None:
                 if camera_output is not None:
@@ -498,6 +501,7 @@ class CollectorScenario:
             
             for combine_state_tuple in self.combine_states.values():
                 if self.state_too_old(combine_state_tuple):
+                    print('old combine state')
                     continue
 
                 _, combine_state = combine_state_tuple
@@ -674,11 +678,7 @@ class CollectorScenario:
 
     def state_too_old(self, vehicle_state_tuple):
         last_updated_index, _ = vehicle_state_tuple
-        if self.index - last_updated_index > 5:
-            print('old tractor state, clearing history')
-            self.tractor_state.clear()
-            return True
-        return False
+        return self.index - last_updated_index > 5
 
 
 def get_object_xyz(ob, angle_key, dist_key, radar_ob=False):
