@@ -55,21 +55,19 @@ class CircleScenario:
                 .stream_style({
                     'radius_pixels': 6
                 })
+            if not self._live:
+                log_start_time = self._timestamp
+                builder.start_time(log_start_time)\
+                    .end_time(log_start_time + self._duration)
             self._metadata = builder.get_message()
 
-        metadata = {
-            'type': 'xviz/metadata',
-            'data': self._metadata.to_object()
-        }
-
-        if not self._live:
-            log_start_time = self._timestamp
-            metadata['data']['log_info'] = {
-                "log_start_time": log_start_time,
-                "log_end_time": log_start_time + self._duration
+        if self._live:
+            return {
+                'type': 'xviz/metadata',
+                'data': self._metadata.to_object()
             }
-
-        return metadata
+        else:
+            return self._metadata
 
     def get_message(self, time_offset):
         timestamp = self._timestamp + time_offset
@@ -79,10 +77,13 @@ class CircleScenario:
         self._draw_grid(builder)
         data = builder.get_message()
 
-        return {
-            'type': 'xviz/state_update',
-            'data': data.to_object()
-        }
+        if self._live:
+            return {
+                'type': 'xviz/state_update',
+                'data': data.to_object()
+            }
+        else:
+            return data
 
     def _draw_pose(self, builder, timestamp):
         circumference = math.pi * self._radius * 2
