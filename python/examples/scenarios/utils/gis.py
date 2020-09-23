@@ -65,3 +65,33 @@ def utm_to_local(reference_x, reference_y, heading, translate_x, translate_y):
     dy = -(math.sin(theta) * dx_a) + (math.cos(theta) * dy_a)
 
     return dx, dy
+
+
+def get_combine_region(center_x, center_y, theta, length, width):
+    half_length = length / 2
+    half_width = width / 2
+
+    front_left = (
+        center_x + (half_length * math.cos(theta)) - (half_width * math.sin(theta)),
+        center_y + (half_length * math.sin(theta)) + (half_width * math.cos(theta))
+    )
+    front_right = (
+        center_x + (half_length * math.cos(theta)) + (half_width * math.sin(theta)),
+        center_y + (half_length * math.sin(theta)) - (half_width * math.cos(theta))
+    )
+    back_left = (
+        center_x - (half_length * math.cos(theta)) - (half_width * math.sin(theta)),
+        center_y - (half_length * math.sin(theta)) + (half_width * math.cos(theta))
+    )
+    back_right = (
+        center_x - (half_length * math.cos(theta)) + (half_width * math.sin(theta)),
+        center_y - (half_length * math.sin(theta)) - (half_width * math.cos(theta))
+    )
+
+    return np.row_stack((
+        front_left,
+        front_right,
+        back_right,
+        back_left,
+        front_left
+    ))
