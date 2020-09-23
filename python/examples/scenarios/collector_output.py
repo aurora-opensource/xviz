@@ -10,7 +10,7 @@ from protobuf_APIs import falconeye_pb2
 
 from scenarios.utils.com_manager import ComManager, MqttConst
 from scenarios.utils.filesystem import get_collector_instances
-from scenarios.utils.gps import transform_combine_to_local, utm_array_to_local
+from scenarios.utils.gis import transform_combine_to_local, utm_array_to_local, get_combine_region
 from scenarios.utils.image import postprocess, show_image
 from scenarios.utils.read_protobufs import deserialize_collector_output,\
                                             extract_collector_output, extract_collector_output_slim
@@ -21,11 +21,13 @@ from scenarios.safety_subsystems.path_prediction import PathPrediction
 import xviz
 import xviz.builder as xbuilder
 
-cab_to_nose = 3.2131
-gps_to_rear_axle = 1.9304
 
-DEG_1_AS_RAD = math.pi / 180
-DEG_90_AS_RAD = 90 * DEG_1_AS_RAD
+CAB_TO_NOSE = 3.2131
+TRACTOR_GPS_TO_REAR_AXLE = 1.9304
+
+COMBINE_GPS_TO_CENTER = 1.0
+COMBINE_LENGTH = 12.0
+COMBINE_WIDTH = 8.0
 
 
 class CollectorScenario:
@@ -174,13 +176,11 @@ class CollectorScenario:
             builder.stream("/combine_region")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
                 .stream_style({
-                    'stroked': True,
-                    'filled': False,
                     'stroke_width': 0.3,
-                    'stroke_color': [0, 20, 128, 50],
+                    'stroke_color': [0, 20, 128, 50]
                 })\
                 .category(xviz.CATEGORY.PRIMITIVE)\
-                .type(xviz.PRIMITIVE_TYPES.CIRCLE)
+                .type(xviz.PRIMITIVE_TYPES.POLYLINE)
 
             builder.stream("/field_definition")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
@@ -287,22 +287,22 @@ class CollectorScenario:
         for r in radial_distances:
             builder.primitive('/measuring_circles_lbl')\
                 .text(str(r))\
-                .position([r+cab_to_nose, 0, .1])\
+                .position([r+CAB_TO_NOSE, 0, .1])\
                 .id(f'{r}lb')
 
             if r == self.slowdown_distance:
                 builder.primitive('/measuring_circles')\
-                    .circle([cab_to_nose, 0, 0], r)\
+                    .circle([CAB_TO_NOSE, 0, 0], r)\
                     .style({'stroke_color': [255, 200, 0, 70]})\
                     .id('slowdown: ' + str(r))
             elif r == self.stop_distance:
                 builder.primitive('/measuring_circles')\
-                    .circle([cab_to_nose, 0, 0], r)\
+                    .circle([CAB_TO_NOSE, 0, 0], r)\
                     .style({'stroke_color': [255, 50, 10, 70]})\
                     .id('stop: ' + str(r))
             else:
                 builder.primitive('/measuring_circles')\
-                    .circle([cab_to_nose, 0, 0], r)\
+                    .circle([CAB_TO_NOSE, 0, 0], r)\
                     .id(str(r))
 
         cam_fov = [-28.5, 28.5] # 57 deg
@@ -312,8 +312,8 @@ class CollectorScenario:
             r = 40
             label = (r, c_phi)
             (x, y, z) = get_object_xyz_primitive(r, c_phi*math.pi/180)
-            x += cab_to_nose
-            vertices = [cab_to_nose, 0, 0, x, y, z]
+            x += CAB_TO_NOSE
+            vertices = [CAB_TO_NOSE, 0, 0, x, y, z]
             builder.primitive('/camera_fov')\
                 .polyline(vertices)\
                 .id("cam_fov: "+str(label))
@@ -321,14 +321,14 @@ class CollectorScenario:
         for r_phi in radar_fov:
             r = 40
             (x, y, z) = get_object_xyz_primitive(r, r_phi*math.pi/180)
-            x += cab_to_nose
+            x += CAB_TO_NOSE
             builder.primitive('/measuring_circles_lbl')\
                 .text(str(r_phi))\
                 .position([x, y, z])\
                 .id(str(r_phi)+'lb')
             if r_phi == radar_fov[0] or r_phi == radar_fov[-1]:
                 label = (r, r_phi)
-                vertices = [cab_to_nose, 0, 0, x, y, z]
+                vertices = [CAB_TO_NOSE, 0, 0, x, y, z]
                 builder.primitive('/radar_fov')\
                     .polyline(vertices)\
                     .id("radar_fov: "+str(label))
@@ -506,26 +506,41 @@ class CollectorScenario:
 
                 _, combine_state = combine_state_tuple
                 x, y = transform_combine_to_local(combine_state, tractor_state, self.utm_zone)
-                x -= (cab_to_nose + gps_to_rear_axle)
+                x -= (CAB_TO_NOSE + TRACTOR_GPS_TO_REAR_AXLE)
                 z = 0.5
 
                 combine_heading = combine_state['heading']  # degrees
-                combine_heading_relative_to_tractor = (tractor_heading - combine_heading) * math.pi / 180
+                relative_combine_heading = (tractor_heading - combine_heading) * math.pi / 180
                 combine_rel_heading_xyz = get_object_xyz_primitive(radial_dist=3.0,
-                                                                    angle_radians=combine_heading_relative_to_tractor)
-
+                                                                    angle_radians=relative_combine_heading)
                 c_r_x, c_r_y, _ = combine_rel_heading_xyz
+
+                combine_center_x = x - (COMBINE_GPS_TO_CENTER * math.cos(relative_combine_heading))
+                combine_center_y = y - (COMBINE_GPS_TO_CENTER * math.sin(relative_combine_heading))
+
+                combine_region = get_combine_region(
+                    combine_center_x, combine_center_y,
+                    relative_combine_heading, COMBINE_LENGTH, COMBINE_WIDTH
+                )
+
+                vertices = list(np.column_stack((
+                    combine_region,
+                    np.full(combine_region.shape[0], z)
+                )).flatten())
                 
                 builder.primitive('/combine_position')\
-                    .circle([x, y, z], .5)\
+                    .circle([combine_center_x, combine_center_y, z], .5)\
                     .id('combine')
 
                 builder.primitive('/combine_region')\
-                    .circle([x, y, z-.1], self.combine_length)\
-                    .id("combine_bubble: " + str(self.combine_length))
+                    .polyline(vertices)\
+                    .id('combine_region')
 
                 builder.primitive('/combine_heading')\
-                    .polyline([x, y, z, x+c_r_x, y+c_r_y, z])\
+                    .polyline([
+                        combine_center_x, combine_center_y, z,
+                        combine_center_x+c_r_x, combine_center_y+c_r_y, z
+                        ])\
                     .id('combine_heading')
 
         except Exception as e:
@@ -550,8 +565,8 @@ class CollectorScenario:
                 np.flipud(self.path_prediction.right),
                 np.full(self.path_prediction.right.shape[0], z)
             ))
-            left[:, 0] += cab_to_nose
-            right[:, 0] += cab_to_nose
+            left[:, 0] += CAB_TO_NOSE
+            right[:, 0] += CAB_TO_NOSE
 
             vertices = list(np.concatenate((
                 left.flatten(),
@@ -593,8 +608,8 @@ class CollectorScenario:
                 np.flipud(self.path_prediction.right),
                 np.full(self.path_prediction.right.shape[0], z)
             ))
-            left[:, 0] += cab_to_nose
-            right[:, 0] += cab_to_nose
+            left[:, 0] += CAB_TO_NOSE
+            right[:, 0] += CAB_TO_NOSE
 
             vertices = list(np.concatenate((
                 left.flatten(),
@@ -648,7 +663,7 @@ class CollectorScenario:
             _, tractor_state = self.tractor_state[-1]
             for p in poly:
                 xy_array = utm_array_to_local(tractor_state, self.utm_zone, p)
-                xy_array[:, 0] -= (cab_to_nose + gps_to_rear_axle)
+                xy_array[:, 0] -= (CAB_TO_NOSE + TRACTOR_GPS_TO_REAR_AXLE)
                 z = 1.0
                 vertices = list(np.column_stack(
                     (xy_array, np.full(xy_array.shape[0], z))
@@ -687,7 +702,7 @@ def get_object_xyz(ob, angle_key, dist_key, radar_ob=False):
     z = 1.5
 
     if not radar_ob:
-        x -= cab_to_nose
+        x -= CAB_TO_NOSE
 
     return (x, y, z)
 
