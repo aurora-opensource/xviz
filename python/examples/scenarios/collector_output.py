@@ -391,7 +391,7 @@ class CollectorScenario:
                 self.control_signal = control_signal
 
             if self.tractor_state:
-                if self.state_too_old(self.tractor_state[-1]):
+                if self.is_vehicle_state_old(self.tractor_state[-1]):
                     print('old tractor state')
                     self.tractor_state.clear()
                 else:
@@ -500,7 +500,7 @@ class CollectorScenario:
             tractor_heading = tractor_state['heading']  # degrees
             
             for combine_state_tuple in self.combine_states.values():
-                if self.state_too_old(combine_state_tuple):
+                if self.is_vehicle_state_old(combine_state_tuple):
                     print('old combine state')
                     continue
 
@@ -676,7 +676,7 @@ class CollectorScenario:
                     self.combine_states[vehicle] = (self.index, state)
     
 
-    def state_too_old(self, vehicle_state_tuple):
+    def is_vehicle_state_old(self, vehicle_state_tuple):
         last_updated_index, _ = vehicle_state_tuple
         return self.index - last_updated_index > 5
 
