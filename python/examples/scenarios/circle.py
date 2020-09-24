@@ -55,6 +55,18 @@ class CircleScenario:
                 .stream_style({
                     'radius_pixels': 6
                 })
+            builder.stream("/object")\
+                .coordinate(xviz_avs.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+                .stream_style({
+                    'extruded': True,
+                    'fill_color': [0, 200, 70, 128],
+                })\
+                .style_class('Unknown', {
+                    'fill_color': [200, 200, 0, 128],
+                    'stroke_color': [255, 0, 0, 128],
+                })\
+                .category(xviz_avs.CATEGORY.PRIMITIVE)\
+                .type(xviz_avs.PRIMITIVE_TYPES.POLYGON)
             if not self._live:
                 log_start_time = self._timestamp
                 builder.start_time(log_start_time)\
@@ -116,3 +128,12 @@ class CircleScenario:
         builder.primitive('/points').points([3, 0, 0, 0, 3, 0, 0, 0, 3])\
             .colors([200,40,80,128,80,40,200,128,80,200,40,128])\
             .id("indicator")
+        builder.primitive('/object').polygon([
+            5, 5, 5,
+            10, 5, 5,
+            10, 10, 5,
+            5, 10, 5,
+            5, 5, 5,
+        ]).classes(['Unknown'])\
+            .style({'height': 2})\
+            .id('object1')
