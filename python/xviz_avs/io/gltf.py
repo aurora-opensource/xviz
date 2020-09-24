@@ -292,8 +292,7 @@ class XVIZGLBWriter(XVIZBaseWriter):
             for dataobj in dataobjs:
                 if 'primitives' in dataobj:
                     for pdata in dataobj['primitives'].values():
-                        # process point cloud, converting lists into typed arrays to leverage
-                        # binary format
+                        # convert lists into typed arrays to leverage binary format
                         if 'points' in pdata:
                             for pldata in pdata['points']:
                                 num_points = None
@@ -312,6 +311,20 @@ class XVIZGLBWriter(XVIZBaseWriter):
                                     pldata['colors'] = TypedArrayWrapper(
                                         array=color_bytes,
                                         size=size,
+                                    )
+                        if 'polylines' in pdata:
+                            for pldata in pdata['polylines']:
+                                if 'vertices' in pldata:
+                                    pldata['vertices'] = TypedArrayWrapper(
+                                        array=array.array('f', pldata['vertices']),
+                                        size=3,
+                                    )
+                        if 'polygons' in pdata:
+                            for pldata in pdata['polygons']:
+                                if 'vertices' in pldata:
+                                    pldata['vertices'] = TypedArrayWrapper(
+                                        array=array.array('f', pldata['vertices']),
+                                        size=3,
                                     )
 
                         # process images

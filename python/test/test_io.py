@@ -19,7 +19,7 @@ class TestIO:
             .type(xa.PRIMITIVE_TYPES.IMAGE)
         return builder
 
-    def _get_builder(self, circle=False, points=False):
+    def _get_builder(self, circle=False, points=False, polyline=False, polygon=False):
         builder = xb.XVIZBuilder()
         builder.pose()\
             .timestamp(2.000000000001)\
@@ -32,6 +32,13 @@ class TestIO:
             builder.primitive('/test_primitive')\
                 .points([0, 0, 0, 1, 1, 1, 2, 2, 2])\
                 .colors([255, 0, 0, 128, 0, 255, 0, 128, 0, 0, 255, 128])
+        if polyline:
+            builder.primitive('/test_primitive')\
+                .polyline([1, 1, 1, 2, 2, 2])
+        if polygon:
+            builder.primitive('/test_primitive')\
+                .polygon([1, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 4, 1, 1, 1])\
+                .style({'height': 2.0})
         return builder
 
     def test_message_index(self):
@@ -231,6 +238,50 @@ class TestIO:
             b'\x00BIN\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80?\x00\x00'\
             b'\x80?\x00\x00\x80?\x00\x00\x00@\x00\x00\x00@\x00\x00\x00@\xff\x00\x00\x80\x00\xff'\
             b'\x00\x80\x00\x00\xff\x80'
+
+        assert data == expected
+
+    def test_glb_polyline_writer(self):
+        builder = self._get_builder(polyline=True)
+
+        source = xi.MemorySource(latest_only=True)
+        writer = xi.XVIZGLBWriter(source)
+        writer.write_message(builder.get_message())
+        data = source.read()
+
+        expected = b'glTF\x02\x00\x00\x00\xac\x02\x00\x00x\x02\x00\x00JSON{"asset":{"version":"2"'\
+            b'},"buffers":[{"byteLength":24}],"bufferViews":[{"buffer":0,"byteOffset":0,"byteLeng'\
+            b'th":24}],"accessors":[{"bufferView":0,"type":"VEC3","componentType":5126,"count":2}'\
+            b'],"images":[],"meshes":[],"extensions":{"AVS_xviz":{"type":"xviz/state_update","dat'\
+            b'a":{"update_type":"INCREMENTAL","updates":[{"timestamp":2.000000000001,"poses":{"/v'\
+            b'ehicle_pose":{"timestamp":2.000000000001,"map_origin":{"longitude":4.4,"latitude":5'\
+            b'.5,"altitude":6.6},"position":[44.0,55.0,66.0],"orientation":[0.44,0.55,0.66]}},"pr'\
+            b'imitives":{"/test_primitive":{"polylines":[{"vertices":"#/accessors/0"}]}}}]}}},"ex'\
+            b'tensionsUsed":["AVS_xviz"]} \x18\x00\x00\x00BIN\x00\x00\x00\x80?\x00\x00\x80?\x00'\
+            b'\x00\x80?\x00\x00\x00@\x00\x00\x00@\x00\x00\x00@'
+
+        assert data == expected
+
+    def test_glb_polygon_writer(self):
+        builder = self._get_builder(polygon=True)
+
+        source = xi.MemorySource(latest_only=True)
+        writer = xi.XVIZGLBWriter(source)
+        writer.write_message(builder.get_message())
+        data = source.read()
+
+        expected = b'glTF\x02\x00\x00\x00\xf0\x02\x00\x00\x98\x02\x00\x00JSON{"asset":{"version":'\
+            b'"2"},"buffers":[{"byteLength":60}],"bufferViews":[{"buffer":0,"byteOffset":0,"byteL'\
+            b'ength":60}],"accessors":[{"bufferView":0,"type":"VEC3","componentType":5126,"count"'\
+            b':5}],"images":[],"meshes":[],"extensions":{"AVS_xviz":{"type":"xviz/state_update","'\
+            b'data":{"update_type":"INCREMENTAL","updates":[{"timestamp":2.000000000001,"poses":{'\
+            b'"/vehicle_pose":{"timestamp":2.000000000001,"map_origin":{"longitude":4.4,"latitude'\
+            b'":5.5,"altitude":6.6},"position":[44.0,55.0,66.0],"orientation":[0.44,0.55,0.66]}},'\
+            b'"primitives":{"/test_primitive":{"polygons":[{"base":{"style":{"height":2.0}},"vert'\
+            b'ices":"#/accessors/0"}]}}}]}}},"extensionsUsed":["AVS_xviz"]}  <\x00\x00\x00BIN\x00'\
+            b'\x00\x00\x80?\x00\x00\x80?\x00\x00\x80?\x00\x00\x00@\x00\x00\x00@\x00\x00\x00@\x00'\
+            b'\x00@@\x00\x00@@\x00\x00@@\x00\x00\x80@\x00\x00\x80@\x00\x00\x80@\x00\x00\x80?\x00'\
+            b'\x00\x80?\x00\x00\x80?'
 
         assert data == expected
 
