@@ -65,20 +65,19 @@ class CollectorScenario:
 
         pfilter_enabled = True
         qfilter_enabled = radar_safety_config['enable_queue_filter']
-        queue_size = 12
+        queue_size = 3
+        max_distance_step = 2.0
         consecutive_min = radar_safety_config['consecutive_detections']
+        consecutive_min = 0
         phi_sdv_max = radar_safety_config['phi_sdv_threshold']
-        nan_threshold = radar_safety_config['qf_none_ratio_threshold']
+        phi_sdv_max = 0.020 # 0.015
+        pexist_min = radar_safety_config['confidence_threshold']
+        pexist_min = 0.65
+        dbpower_min = radar_safety_config['d_bpower_threshold']
+        dbpower_min = -20.0
 
-        pf_pexist_min = radar_safety_config['confidence_threshold']
-        qf_pexist_min = radar_safety_config['qf_confidence_threshold']
-
-        pf_dbpower_min = radar_safety_config['d_bpower_threshold']
-        qf_dbpower_min = radar_safety_config['qf_d_bpower_threshold']
-
-        self.radar_filter = RadarFilter(pfilter_enabled, qfilter_enabled, queue_size,
-                                        consecutive_min, pf_pexist_min, qf_pexist_min,
-                                        pf_dbpower_min, qf_dbpower_min, phi_sdv_max, nan_threshold)
+        self.radar_filter = RadarFilter(pfilter_enabled, qfilter_enabled, queue_size, consecutive_min,
+                                                pexist_min, dbpower_min, phi_sdv_max, max_distance_step)
 
         self.wheel_base = global_config['guidance']['wheel_base']
         prediction_args = {
@@ -432,7 +431,7 @@ class CollectorScenario:
                 to_path_prediction = False
                 (x, y, z) = get_object_xyz(target, 'phi', 'dr', radar_ob=True)
     
-                if self.radar_filter.is_valid_target(target['targetId'], target):
+                if self.radar_filter.is_valid_target(target):
                     if self.radar_filter.filter_targets_until_path_prediction(target):
                         to_path_prediction = True
 
@@ -447,7 +446,7 @@ class CollectorScenario:
 
                 if to_path_prediction:
                     builder.primitive('/radar_crucial_targets')\
-                        .circle([x, y, z], .5)\
+                        .circle([x, y, z+0.1], .5)\
                         .id(str(target['targetId']))
 
         except Exception as e:
