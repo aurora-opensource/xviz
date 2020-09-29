@@ -26,7 +26,6 @@ CAB_TO_NOSE = 3.2131
 TRACTOR_GPS_TO_REAR_AXLE = 1.9304
 
 COMBINE_GPS_TO_CENTER = 1.0
-COMBINE_LENGTH = 12.0
 COMBINE_WIDTH = 8.0
 
 
@@ -535,7 +534,7 @@ class CollectorScenario:
 
                 combine_region = get_combine_region(
                     combine_center_x, combine_center_y,
-                    relative_combine_heading, COMBINE_LENGTH, COMBINE_WIDTH
+                    relative_combine_heading, self.combine_length, COMBINE_WIDTH
                 )
 
                 vertices = list(np.column_stack((
@@ -553,7 +552,7 @@ class CollectorScenario:
                         .id('combine_region')
                 if self.circular_combine_region:
                     builder.primitive('/combine_region_circle')\
-                        .circle([combine_center_x, combine_center_y, z-.1], self.combine_length)\
+                        .circle([combine_center_x, combine_center_y, z-.1], self.combine_length/2)\
                         .id('combine_region_circle')
 
                 builder.primitive('/combine_heading')\
