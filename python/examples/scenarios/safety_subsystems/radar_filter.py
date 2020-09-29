@@ -6,7 +6,7 @@ class RadarFilter:
     def __init__(self, pfilter_enabled, qfilter_enabled, queue_size, consecutive_min, pf_pexist_min,
                     qf_pexist_min, pf_dbpower_min, qf_dbpower_min, phi_sdv_max, nan_threshold):
 
-        if not pfilter_enabled and not qfilter_enabled:
+        if not (pfilter_enabled or qfilter_enabled):
             print('no filter is enabled')
 
         self.pfilter_enabled = pfilter_enabled
