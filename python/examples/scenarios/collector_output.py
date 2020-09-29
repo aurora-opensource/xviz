@@ -1,6 +1,5 @@
 import math
 import time
-import yaml
 from pathlib import Path
 from collections import deque
 import numpy as np
@@ -9,7 +8,7 @@ from google.protobuf.json_format import MessageToDict
 from protobuf_APIs import falconeye_pb2
 
 from scenarios.utils.com_manager import ComManager, MqttConst
-from scenarios.utils.filesystem import get_collector_instances
+from scenarios.utils.filesystem import get_collector_instances, load_config
 from scenarios.utils.gis import transform_combine_to_local, utm_array_to_local, get_combine_region
 from scenarios.utils.image import postprocess, show_image
 from scenarios.utils.read_protobufs import deserialize_collector_output,\
@@ -43,7 +42,7 @@ class CollectorScenario:
         self.track_history = {}
 
         configfile = Path(__file__).parent / 'collector-scenario-config.yaml'
-        collector_config = self.load_config(str(configfile))
+        collector_config = load_config(str(configfile))
 
         collector_output_file = collector_config['collector_output_file']
         extract_directory = collector_config['extract_directory']
@@ -58,7 +57,7 @@ class CollectorScenario:
             comm.subscribe(MqttConst.TRACKS_TOPIC, self.store_tracking_output)
         
         configfile = Path(__file__).parents[3] / 'Global-Configs' / 'Tractors' / 'John-Deere' / '8RIVT_WHEEL.yaml'
-        global_config = self.load_config(str(configfile))
+        global_config = load_config(str(configfile))
         radar_safety_config = global_config['safety']['radar']
         self.combine_length = radar_safety_config['combine_length']
         self.stop_distance = radar_safety_config['stop_threshold_default']
@@ -96,13 +95,6 @@ class CollectorScenario:
         self.field_definition = None
         self.sync_status = None
         self.control_signal = None
-
-
-    def load_config(self, configfile):
-        with open(configfile, 'r') as f:
-            config = yaml.safe_load(f)
-
-        return config
 
     
     def reset_values(self):

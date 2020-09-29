@@ -1,4 +1,5 @@
 import shutil
+import yaml
 from pathlib import Path
 
 
@@ -26,3 +27,8 @@ def establish_fresh_directory(path):
 def clear_directory(path):
     for child in path.glob('*.txt'):
         child.unlink()
+
+
+def load_config(configfile):
+    with open(configfile, 'r') as f:
+        return yaml.safe_load(f)
