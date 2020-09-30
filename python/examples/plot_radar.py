@@ -1,7 +1,7 @@
 from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
-from scenarios.safety_subsystems.radar_filter import RadarFilter
+from scenarios.safety_subsystems.radar_filter import get_radar_filter
 from scenarios.utils.filesystem import get_collector_instances, load_config
 from scenarios.utils.gis import polar_to_cartesian, euclidean_distance
 from scenarios.utils.read_protobufs import deserialize_collector_output,\
@@ -16,7 +16,7 @@ def get_detected_target_ids(targets):
     return detected_ids
 
 
-def get_targets(collector_instances):
+def get_targets(collector_instances, radar_filter):
     targets = {}
 
     for collector_output in collector_instances:
@@ -81,6 +81,11 @@ def get_targets(collector_instances):
                     targets[tgt_id]['y'].append(curr_y)
                     targets[tgt_id]['step'].append(step)
 
+            if radar_filter.is_valid_target(target):
+                    pass
+                else:
+                    pass
+
     return targets
 
 
@@ -142,7 +147,13 @@ def main():
     extract_directory = collector_config['extract_directory']
     collector_instances = get_collector_instances(collector_output_file, extract_directory)
 
-    targets = get_targets(collector_instances)
+    configfile = Path(__file__).parents[3] / 'Global-Configs' / 'Tractors' / 'John-Deere' / '8RIVT_WHEEL.yaml'
+    global_config = load_config(str(configfile))
+    radar_safety_config = global_config['safety']['radar']
+    
+    radar_filter = get_radar_filter(radar_safety_config)
+
+    targets = get_targets(collector_instances, radar_filter)
 
     detected_target_ids = get_detected_target_ids(targets)
 

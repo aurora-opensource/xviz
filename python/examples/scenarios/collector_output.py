@@ -14,8 +14,8 @@ from scenarios.utils.image import postprocess, show_image
 from scenarios.utils.read_protobufs import deserialize_collector_output,\
                                             extract_collector_output, extract_collector_output_slim
 
-from scenarios.safety_subsystems.radar_filter import RadarFilter
-from scenarios.safety_subsystems.path_prediction import PathPrediction
+from scenarios.safety_subsystems.radar_filter import get_radar_filter
+from scenarios.safety_subsystems.path_prediction import get_path_prediction
 
 import xviz
 import xviz.builder as xbuilder
@@ -58,34 +58,16 @@ class CollectorScenario:
         
         configfile = Path(__file__).parents[3] / 'Global-Configs' / 'Tractors' / 'John-Deere' / '8RIVT_WHEEL.yaml'
         global_config = load_config(str(configfile))
+
+        self.path_prediction = get_path_prediction(global_config)
+
         radar_safety_config = global_config['safety']['radar']
+        self.radar_filter = get_radar_filter(radar_safety_config)
+
         self.combine_length = radar_safety_config['combine_length']
+        self.wheel_base = global_config['guidance']['wheel_base']
         self.stop_distance = radar_safety_config['stop_threshold_default']
         self.slowdown_distance = radar_safety_config['slowdown_threshold_default']
-
-        pfilter_enabled = True
-        qfilter_enabled = radar_safety_config['enable_queue_filter']
-        queue_size = 2
-        max_distance_step = 2.0
-        consecutive_min = radar_safety_config['consecutive_detections']
-        consecutive_min = 0
-        phi_sdv_max = radar_safety_config['phi_sdv_threshold']
-        phi_sdv_max = 0.015 # 0.015
-        pexist_min = radar_safety_config['confidence_threshold']
-        pexist_min = 0.65
-        dbpower_min = radar_safety_config['d_bpower_threshold']
-        dbpower_min = -15.0 # 10.0
-
-        self.radar_filter = RadarFilter(pfilter_enabled, qfilter_enabled, queue_size, consecutive_min,
-                                                pexist_min, dbpower_min, phi_sdv_max, max_distance_step)
-
-        self.wheel_base = global_config['guidance']['wheel_base']
-        prediction_args = {
-            'wheel_base': self.wheel_base,
-            'machine_width': global_config['safety']['object_tracking']['path_width'] * 1.5
-        }
-        min_predictive_speed = global_config['guidance']['safety']['predictive_slowdown_speed_mph']
-        self.path_prediction = PathPrediction(prediction_args, min_predictive_speed)
 
         self.utm_zone = ''
         self.tractor_state = deque(maxlen=10)
