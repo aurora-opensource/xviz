@@ -50,6 +50,7 @@ class CollectorScenario:
 
         self.rectangular_combine_region = collector_config['rectangular_combine_region']
         self.circular_combine_region = collector_config['circular_combine_region']
+
         self.mqtt_enabled = collector_config['mqtt_enabled']
         if self.mqtt_enabled:
             self.mqtt_tracking_outputs = []
