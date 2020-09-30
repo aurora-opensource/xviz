@@ -1,5 +1,8 @@
 import math
+from statistics import mean
 from collections import deque
+from scenarios.utils.gis import polar_to_cartesian, euclidean_distance
+
 
 class RadarFilter:
 
@@ -28,11 +31,10 @@ class RadarFilter:
         
         if self.qfilter_enabled:
             self.make_target_queue_if_nonexistent(target['targetId'])
+            self.update_queues(target)
 
             if is_valid: # only apply the queue filter if the target passed through the passive filter
                 is_valid = self.queue_filter(target)
-
-            self.update_queues(target)
 
         return is_valid
 
@@ -52,31 +54,46 @@ class RadarFilter:
             Returns True if the target is valid.
         '''
         target_id = target['targetId']
-        if not self.target_queues[target_id]['dr']:
+        if len(self.target_queues[target_id]['step']) < self.queue_size:
             return False
 
-        prev_x, prev_y = polar_to_cartesian(
-            self.target_queues[target_id]['phi'][-1],
-            self.target_queues[target_id]['dr'][-1]
-        )
-        curr_x, curr_y = polar_to_cartesian(
-            target['phi'],
-            target['dr']
-        )
-        if target_id == 0:
-            print(euclidean_distance(prev_x, prev_y, curr_x, curr_y))
-        return euclidean_distance(prev_x, prev_y, curr_x, curr_y) < self.max_distance_step
+        is_target_steady = mean(self.target_queues[target_id]['step']) < self.max_distance_step
+
+        # if is_target_steady and target['phi'] > 0:
+        #     print('target id', target_id)
+        #     print('dr', self.target_queues[target_id]['dr'])
+        #     print('phi', self.target_queues[target_id]['phi'])
+        #     print('step', self.target_queues[target_id]['step'])
+        #     print('step mean', mean(self.target_queues[target_id]['step']))
+        #     print('\n')
+
+        return is_target_steady
 
     def update_queues(self, target):
         target_id = target['targetId']
         self.target_queues[target_id]['dr'].append(target['dr'])
         self.target_queues[target_id]['phi'].append(target['phi'])
 
+        if len(self.target_queues[target_id]['dr']) < 2:
+            return
+
+        prev_x, prev_y = polar_to_cartesian(
+            self.target_queues[target_id]['phi'][-2],
+            self.target_queues[target_id]['dr'][-2]
+        )
+        curr_x, curr_y = polar_to_cartesian(
+            self.target_queues[target_id]['phi'][-1],
+            self.target_queues[target_id]['dr'][-1]
+        )
+        step = euclidean_distance(prev_x, prev_y, curr_x, curr_y)
+        self.target_queues[target_id]['step'].append(step)
+
     def make_target_queue_if_nonexistent(self, target_id):
         if target_id not in self.target_queues:
             self.target_queues[target_id] = {}
-            self.target_queues[target_id]['dr'] = deque(maxlen=self.queue_size)
-            self.target_queues[target_id]['phi'] = deque(maxlen=self.queue_size)
+            self.target_queues[target_id]['dr'] = deque(maxlen=self.queue_size+1)
+            self.target_queues[target_id]['phi'] = deque(maxlen=self.queue_size+1)
+            self.target_queues[target_id]['step'] = deque(maxlen=self.queue_size)
 
     def filter_targets_until_path_prediction(self, target, in_sync=True, is_combine=False, at_sync_point=False):
         if in_sync and not at_sync_point:
@@ -90,11 +107,3 @@ class RadarFilter:
             return False
         else:
             return True
-
-
-def polar_to_cartesian(theta, r):
-    return (r * math.cos(theta), r * math.sin(theta))
-
-
-def euclidean_distance(x0, y0, x1, y1):
-    return math.sqrt((x1-x0)**2 + (y1-y0)**2)

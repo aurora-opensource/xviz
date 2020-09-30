@@ -65,16 +65,16 @@ class CollectorScenario:
 
         pfilter_enabled = True
         qfilter_enabled = radar_safety_config['enable_queue_filter']
-        queue_size = 3
+        queue_size = 2
         max_distance_step = 2.0
         consecutive_min = radar_safety_config['consecutive_detections']
         consecutive_min = 0
         phi_sdv_max = radar_safety_config['phi_sdv_threshold']
-        phi_sdv_max = 0.020 # 0.015
+        phi_sdv_max = 0.015 # 0.015
         pexist_min = radar_safety_config['confidence_threshold']
         pexist_min = 0.65
         dbpower_min = radar_safety_config['d_bpower_threshold']
-        dbpower_min = -20.0
+        dbpower_min = -15.0 # 10.0
 
         self.radar_filter = RadarFilter(pfilter_enabled, qfilter_enabled, queue_size, consecutive_min,
                                                 pexist_min, dbpower_min, phi_sdv_max, max_distance_step)
@@ -426,7 +426,7 @@ class CollectorScenario:
     def _draw_radar_targets(self, radar_output, builder: xviz.XVIZBuilder):
         try:
             for target in radar_output['targets'].values():
-                if abs(target['dr']) < 0.1 and abs(target['phi']) < 0.01:
+                if target['consecutive'] < 1:
                     continue
                 to_path_prediction = False
                 (x, y, z) = get_object_xyz(target, 'phi', 'dr', radar_ob=True)
