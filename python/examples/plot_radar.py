@@ -1,10 +1,11 @@
 from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
+from scenarios.safety_subsystems.radar_filter import RadarFilter
 from scenarios.utils.filesystem import get_collector_instances, load_config
+from scenarios.utils.gis import polar_to_cartesian, euclidean_distance
 from scenarios.utils.read_protobufs import deserialize_collector_output,\
                                             extract_collector_output, extract_collector_output_slim
-from scenarios.utils.gis import polar_to_cartesian, euclidean_distance
 
 
 def get_detected_target_ids(targets):
@@ -15,14 +16,7 @@ def get_detected_target_ids(targets):
     return detected_ids
 
 
-def main():
-    configfile = Path(__file__).parent / 'scenarios' / 'collector-scenario-config.yaml'
-    collector_config = load_config(str(configfile))
-
-    collector_output_file = collector_config['collector_output_file']
-    extract_directory = collector_config['extract_directory']
-    collector_instances = get_collector_instances(collector_output_file, extract_directory)
-
+def get_targets(collector_instances):
     targets = {}
 
     for collector_output in collector_instances:
@@ -39,6 +33,7 @@ def main():
         for target in radar_output['targets'].values():
 
             tgt_id = target['targetId']
+
             if tgt_id not in targets:
                 targets[tgt_id] = {}
                 targets[tgt_id]['dr'] = []
@@ -52,6 +47,7 @@ def main():
                 targets[tgt_id]['step'] = []
             
             targets[tgt_id]['timestamp'].append(float(radar_output['timestamp']))
+
             if target['consecutive'] < 1:
                 targets[tgt_id]['dr'].append(np.nan)
                 targets[tgt_id]['phi'].append(np.nan)
@@ -68,7 +64,6 @@ def main():
                 targets[tgt_id]['dBpower'].append(target['dBpower'])
                 targets[tgt_id]['phiSdv'].append(target['phiSdv'])
 
-
                 if np.isnan(targets[tgt_id]['phi'][-2]):
                     targets[tgt_id]['step'].append(np.nan)
                 else:
@@ -81,10 +76,15 @@ def main():
                         targets[tgt_id]['dr'][-1]
                     )
                     step = euclidean_distance(prev_x, prev_y, curr_x, curr_y)
+
                     targets[tgt_id]['x'].append(curr_x)
                     targets[tgt_id]['y'].append(curr_y)
                     targets[tgt_id]['step'].append(step)
-    
+
+    return targets
+
+
+def plot_raw_metadata(targets, detected_target_ids):
     fig, ax = plt.subplots(figsize=(16,10), nrows=3, ncols=2)
     fig.set_tight_layout(True)
     ax[0, 0].set_title('phi')
@@ -93,8 +93,6 @@ def main():
     ax[1, 1].set_title('pexist')
     ax[2, 0].set_title('dBpower')
     ax[2, 1].set_title('phiSdv')
-
-    detected_target_ids = get_detected_target_ids(targets)
 
     for tgt_id, target in targets.items():
         if tgt_id not in detected_target_ids:
@@ -110,6 +108,8 @@ def main():
     plt.show()
     plt.close()
 
+
+def plot_raw_tracking(targets, detected_target_ids):
     fig, ax = plt.subplots(figsize=(14, 10))
     fig.set_tight_layout(True)
     ax.set_title('tracking from target ids')
@@ -124,6 +124,30 @@ def main():
     plt.gca().set_aspect('equal', adjustable='box')
     plt.show()
     plt.close()
+
+
+def plot_filtered_metadata(targets, detected_target_ids):
+    pass
+
+
+def plot_filtered_tracking(targets, detected_target_ids):
+    pass
+
+
+def main():
+    configfile = Path(__file__).parent / 'scenarios' / 'collector-scenario-config.yaml'
+    collector_config = load_config(str(configfile))
+
+    collector_output_file = collector_config['collector_output_file']
+    extract_directory = collector_config['extract_directory']
+    collector_instances = get_collector_instances(collector_output_file, extract_directory)
+
+    targets = get_targets(collector_instances)
+
+    detected_target_ids = get_detected_target_ids(targets)
+
+    plot_raw_metadata(targets, detected_target_ids)
+    plot_raw_tracking(targets, detected_target_ids)
 
 
 if __name__ == '__main__':
