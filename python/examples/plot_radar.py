@@ -147,7 +147,7 @@ def main():
     extract_directory = collector_config['extract_directory']
     collector_instances = get_collector_instances(collector_output_file, extract_directory)
 
-    configfile = Path(__file__).parents[3] / 'Global-Configs' / 'Tractors' / 'John-Deere' / '8RIVT_WHEEL.yaml'
+    configfile = Path(__file__).parents[2] / 'Global-Configs' / 'Tractors' / 'John-Deere' / '8RIVT_WHEEL.yaml'
     global_config = load_config(str(configfile))
     radar_safety_config = global_config['safety']['radar']
     
@@ -158,7 +158,9 @@ def main():
     detected_target_ids = get_detected_target_ids(targets)
 
     plot_raw_metadata(targets, detected_target_ids)
+    plot_filtered_metadata(targets, detected_target_ids)
     plot_raw_tracking(targets, detected_target_ids)
+    plot_filtered_tracking(targets, detected_target_ids)
 
 
 if __name__ == '__main__':
