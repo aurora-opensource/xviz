@@ -95,3 +95,11 @@ def get_combine_region(center_x, center_y, theta, length, width):
         back_left,
         front_left
     ))
+
+
+def polar_to_cartesian(theta, r):
+    return (r * math.cos(theta), r * math.sin(theta))
+
+
+def euclidean_distance(x0, y0, x1, y1):
+    return math.sqrt((x1-x0)**2 + (y1-y0)**2)
