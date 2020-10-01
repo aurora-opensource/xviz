@@ -66,8 +66,8 @@ def get_targets(collector_instances, radar_filter):
         if radar_output is None:
             continue
 
+        # gross for loop
         for target in radar_output['targets'].values():
-            # gross for loop
 
             tgt_id = target['targetId']
 
