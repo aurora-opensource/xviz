@@ -114,9 +114,6 @@ def get_targets(collector_instances, radar_filter):
                 targets[tgt_id]['filtered']['x'].append(curr_x)
                 targets[tgt_id]['filtered']['y'].append(curr_y)
                 targets[tgt_id]['filtered']['step'].append(step)
-                if step > radar_filter.max_distance_step:
-                    print(targets[tgt_id]['filtered']['step'][-2], targets[tgt_id]['filtered']['step'][-1])
-                    print(radar_filter.target_queues[tgt_id]['step'])
             else:
                 append_nan(targets[tgt_id], 'filtered')
                 targets[tgt_id]['filtered']['x'].append(np.nan)
