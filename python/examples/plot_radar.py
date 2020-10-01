@@ -8,12 +8,48 @@ from scenarios.utils.read_protobufs import deserialize_collector_output,\
                                             extract_collector_output, extract_collector_output_slim
 
 
-def get_detected_target_ids(targets):
+def get_detected_target_ids(targets, signal_type):
     detected_ids = []
     for tgt_id, target in targets.items():
-        if np.any(~np.isnan(target['phi'])):
+        if np.any(~np.isnan(target[signal_type]['phi'])):
             detected_ids.append(tgt_id)
     return detected_ids
+
+
+def make_keys(target, signal_type):
+    target[signal_type] = {}
+    target[signal_type]['dr'] = []
+    target[signal_type]['phi'] = []
+    target[signal_type]['pexist'] = []
+    target[signal_type]['dBpower'] = []
+    target[signal_type]['phiSdv'] = []
+    target[signal_type]['x'] = []
+    target[signal_type]['y'] = []
+    target[signal_type]['step'] = []
+
+
+def append_nan(target, signal_type):
+    target[signal_type]['dr'].append(np.nan)
+    target[signal_type]['phi'].append(np.nan)
+    target[signal_type]['pexist'].append(np.nan)
+    target[signal_type]['dBpower'].append(np.nan)
+    target[signal_type]['phiSdv'].append(np.nan)
+
+
+def append_values(target, signal_type, measurement):
+    target[signal_type]['dr'].append(measurement['dr'])
+    target[signal_type]['phi'].append(measurement['phi'])
+    target[signal_type]['pexist'].append(measurement['pexist'])
+    target[signal_type]['dBpower'].append(measurement['dBpower'])
+    target[signal_type]['phiSdv'].append(measurement['phiSdv'])
+
+
+def establish_target_key(tgt_id, targets):
+    if tgt_id not in targets:
+        targets[tgt_id] = {}
+        targets[tgt_id]['timestamp'] = []
+        make_keys(targets[tgt_id], signal_type='raw')
+        make_keys(targets[tgt_id], signal_type='filtered')
 
 
 def get_targets(collector_instances, radar_filter):
@@ -34,63 +70,63 @@ def get_targets(collector_instances, radar_filter):
 
             tgt_id = target['targetId']
 
-            if tgt_id not in targets:
-                targets[tgt_id] = {}
-                targets[tgt_id]['dr'] = []
-                targets[tgt_id]['phi'] = []
-                targets[tgt_id]['pexist'] = []
-                targets[tgt_id]['dBpower'] = []
-                targets[tgt_id]['phiSdv'] = []
-                targets[tgt_id]['timestamp'] = []
-                targets[tgt_id]['x'] = []
-                targets[tgt_id]['y'] = []
-                targets[tgt_id]['step'] = []
+            establish_target_key(tgt_id, targets)
             
             targets[tgt_id]['timestamp'].append(float(radar_output['timestamp']))
 
             if target['consecutive'] < 1:
-                targets[tgt_id]['dr'].append(np.nan)
-                targets[tgt_id]['phi'].append(np.nan)
-                targets[tgt_id]['pexist'].append(np.nan)
-                targets[tgt_id]['dBpower'].append(np.nan)
-                targets[tgt_id]['phiSdv'].append(np.nan)
-                targets[tgt_id]['x'].append(np.nan)
-                targets[tgt_id]['y'].append(np.nan)
-                targets[tgt_id]['step'].append(np.nan)
+                append_nan(targets[tgt_id], 'raw')
+                targets[tgt_id]['raw']['x'].append(np.nan)
+                targets[tgt_id]['raw']['y'].append(np.nan)
+                curr_x, curr_y = 0.0, 0.0
             else:
-                targets[tgt_id]['dr'].append(target['dr'])
-                targets[tgt_id]['phi'].append(target['phi'])
-                targets[tgt_id]['pexist'].append(target['pexist'])
-                targets[tgt_id]['dBpower'].append(target['dBpower'])
-                targets[tgt_id]['phiSdv'].append(target['phiSdv'])
+                append_values(targets[tgt_id], 'raw', target)
 
-                if np.isnan(targets[tgt_id]['phi'][-2]):
-                    targets[tgt_id]['step'].append(np.nan)
+                curr_x, curr_y = polar_to_cartesian(
+                    target['phi'],
+                    target['dr']
+                )
+                targets[tgt_id]['raw']['x'].append(curr_x)
+                targets[tgt_id]['raw']['y'].append(curr_y)
+            
+            if len(targets[tgt_id]['raw']['x']) < 2:
+                targets[tgt_id]['raw']['step'].append(np.nan)
+                step = np.nan
+            else:
+                if np.isnan(targets[tgt_id]['raw']['x'][-2]):
+                    prev_x, prev_y = 0.0, 0.0
                 else:
                     prev_x, prev_y = polar_to_cartesian(
-                        targets[tgt_id]['phi'][-2],
-                        targets[tgt_id]['dr'][-2]
+                        targets[tgt_id]['raw']['phi'][-2],
+                        targets[tgt_id]['raw']['dr'][-2]
                     )
-                    curr_x, curr_y = polar_to_cartesian(
-                        targets[tgt_id]['phi'][-1],
-                        targets[tgt_id]['dr'][-1]
-                    )
-                    step = euclidean_distance(prev_x, prev_y, curr_x, curr_y)
+                
+                step = euclidean_distance(prev_x, prev_y, curr_x, curr_y)
 
-                    targets[tgt_id]['x'].append(curr_x)
-                    targets[tgt_id]['y'].append(curr_y)
-                    targets[tgt_id]['step'].append(step)
+                if int(prev_x) == 0 and int(curr_x) == 0:
+                    targets[tgt_id]['raw']['step'].append(np.nan)
+                else:
+                    targets[tgt_id]['raw']['step'].append(step)
 
             if radar_filter.is_valid_target(target):
-                    pass
-                else:
-                    pass
+                append_values(targets[tgt_id], 'filtered', target)
+                targets[tgt_id]['filtered']['x'].append(curr_x)
+                targets[tgt_id]['filtered']['y'].append(curr_y)
+                targets[tgt_id]['filtered']['step'].append(step)
+                if step > radar_filter.max_distance_step:
+                    print(targets[tgt_id]['filtered']['step'][-2], targets[tgt_id]['filtered']['step'][-1])
+                    print(radar_filter.target_queues[tgt_id]['step'])
+            else:
+                append_nan(targets[tgt_id], 'filtered')
+                targets[tgt_id]['filtered']['x'].append(np.nan)
+                targets[tgt_id]['filtered']['y'].append(np.nan)
+                targets[tgt_id]['filtered']['step'].append(np.nan)
 
     return targets
 
 
-def plot_raw_metadata(targets, detected_target_ids):
-    fig, ax = plt.subplots(figsize=(16,10), nrows=3, ncols=2)
+def prepare_metadata_plot():
+    fig, ax = plt.subplots(nrows=3, ncols=2, figsize=(16,10), sharex=True)
     fig.set_tight_layout(True)
     ax[0, 0].set_title('phi')
     ax[0, 1].set_title('dr')
@@ -99,44 +135,48 @@ def plot_raw_metadata(targets, detected_target_ids):
     ax[2, 0].set_title('dBpower')
     ax[2, 1].set_title('phiSdv')
 
+    return ax
+
+
+def prepare_tracking_plot(signal_type):
+    fig, ax = plt.subplots(figsize=(14, 10))
+    fig.set_tight_layout(True)
+    ax.set_title(f'tracking from target ids: {signal_type}')
+    ax.set_xlim(-20, 20)
+    ax.set_ylim(0, 30)
+
+    return ax
+
+
+def plot_metadata(targets, detected_target_ids, signal_type):
+    ax = prepare_metadata_plot()
+
     for tgt_id, target in targets.items():
         if tgt_id not in detected_target_ids:
             continue
         t = np.array(target['timestamp']) - target['timestamp'][0]
-        ax[0, 0].plot(t, target['phi'])
-        ax[0, 1].plot(t, target['dr'])
-        ax[1, 0].plot(t, target['step'])
-        ax[1, 1].plot(t, target['pexist'])
-        ax[2, 0].plot(t, target['dBpower'])
-        ax[2, 1].plot(t, target['phiSdv'])
+        ax[0, 0].plot(t, target[signal_type]['phi'])
+        ax[0, 1].plot(t, target[signal_type]['dr'])
+        ax[1, 0].plot(t, target[signal_type]['step'])
+        ax[1, 1].plot(t, target[signal_type]['pexist'])
+        ax[2, 0].plot(t, target[signal_type]['dBpower'])
+        ax[2, 1].plot(t, target[signal_type]['phiSdv'])
 
     plt.show()
     plt.close()
 
 
-def plot_raw_tracking(targets, detected_target_ids):
-    fig, ax = plt.subplots(figsize=(14, 10))
-    fig.set_tight_layout(True)
-    ax.set_title('tracking from target ids')
-    ax.set_xlim(-20, 20)
-    ax.set_ylim(0, 30)
+def plot_tracking(targets, detected_target_ids, signal_type):
+    ax = prepare_tracking_plot(signal_type)
 
     for tgt_id, target in targets.items():
         if tgt_id not in detected_target_ids:
             continue
-        ax.plot(np.negative(target['y']), target['x'])
+        ax.plot(np.negative(target[signal_type]['y']), target[signal_type]['x'])
 
     plt.gca().set_aspect('equal', adjustable='box')
     plt.show()
     plt.close()
-
-
-def plot_filtered_metadata(targets, detected_target_ids):
-    pass
-
-
-def plot_filtered_tracking(targets, detected_target_ids):
-    pass
 
 
 def main():
@@ -147,7 +187,7 @@ def main():
     extract_directory = collector_config['extract_directory']
     collector_instances = get_collector_instances(collector_output_file, extract_directory)
 
-    configfile = Path(__file__).parents[2] / 'Global-Configs' / 'Tractors' / 'John-Deere' / '8RIVT_WHEEL.yaml'
+    configfile = Path(__file__).resolve().parents[2] / 'Global-Configs' / 'Tractors' / 'John-Deere' / '8RIVT_WHEEL.yaml'
     global_config = load_config(str(configfile))
     radar_safety_config = global_config['safety']['radar']
     
@@ -155,12 +195,12 @@ def main():
 
     targets = get_targets(collector_instances, radar_filter)
 
-    detected_target_ids = get_detected_target_ids(targets)
+    detected_target_ids = get_detected_target_ids(targets, 'raw')
 
-    plot_raw_metadata(targets, detected_target_ids)
-    plot_filtered_metadata(targets, detected_target_ids)
-    plot_raw_tracking(targets, detected_target_ids)
-    plot_filtered_tracking(targets, detected_target_ids)
+    plot_metadata(targets, detected_target_ids, 'raw')
+    plot_metadata(targets, detected_target_ids, 'filtered')
+    plot_tracking(targets, detected_target_ids, 'raw')
+    plot_tracking(targets, detected_target_ids, 'filtered')
 
 
 if __name__ == '__main__':
