@@ -1,4 +1,5 @@
 import math
+import numpy as np
 from statistics import mean
 from collections import deque
 from scenarios.utils.gis import polar_to_cartesian, euclidean_distance
@@ -10,7 +11,7 @@ def get_radar_filter(config):
     queue_size = 2
     max_distance_step = 2.0
     consecutive_min = config['consecutive_detections']
-    consecutive_min = 0
+    consecutive_min = 1
     phi_sdv_max = config['phi_sdv_threshold']
     phi_sdv_max = 0.015 # 0.015
     pexist_min = config['confidence_threshold']
@@ -75,24 +76,24 @@ class RadarFilter:
         if len(self.target_queues[target_id]['step']) < self.queue_size:
             return False
 
-        is_target_steady = mean(self.target_queues[target_id]['step']) < self.max_distance_step
-
-        # if is_target_steady and target['phi'] > 0:
-        #     print('target id', target_id)
-        #     print('dr', self.target_queues[target_id]['dr'])
-        #     print('phi', self.target_queues[target_id]['phi'])
-        #     print('step', self.target_queues[target_id]['step'])
-        #     print('step mean', mean(self.target_queues[target_id]['step']))
-        #     print('\n')
+        step_arr = np.array(self.target_queues[target_id]['step']).astype(np.float64)
+        is_target_steady = not (
+            np.any(np.isnan(step_arr))
+            or np.any(step_arr > self.max_distance_step)
+        )
 
         return is_target_steady
 
     def update_queues(self, target):
         target_id = target['targetId']
-        self.target_queues[target_id]['dr'].append(target['dr'])
-        self.target_queues[target_id]['phi'].append(target['phi'])
+        if target['consecutive'] < 1:
+            self.target_queues[target_id]['dr'].append(np.nan)
+            self.target_queues[target_id]['phi'].append(np.nan)
+        else:
+            self.target_queues[target_id]['dr'].append(target['dr'])
+            self.target_queues[target_id]['phi'].append(target['phi'])
 
-        if len(self.target_queues[target_id]['dr']) < 2:
+        if len(self.target_queues[target_id]['phi']) < 2:
             return
 
         prev_x, prev_y = polar_to_cartesian(
@@ -103,7 +104,11 @@ class RadarFilter:
             self.target_queues[target_id]['phi'][-1],
             self.target_queues[target_id]['dr'][-1]
         )
-        step = euclidean_distance(prev_x, prev_y, curr_x, curr_y)
+        if np.isnan(prev_x) or np.isnan(curr_x):
+            step = np.nan
+        else:
+            step = euclidean_distance(prev_x, prev_y, curr_x, curr_y)
+
         self.target_queues[target_id]['step'].append(step)
 
     def make_target_queue_if_nonexistent(self, target_id):
