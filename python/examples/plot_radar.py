@@ -126,7 +126,7 @@ def get_targets(collector_instances, radar_filter):
 
 
 def prepare_metadata_plot():
-    fig, ax = plt.subplots(nrows=3, ncols=2, figsize=(16,10), sharex=True)
+    fig, ax = plt.subplots(nrows=3, ncols=2, figsize=(16, 10), sharex=True)
     fig.set_tight_layout(True)
     ax[0, 0].set_title('phi')
     ax[0, 1].set_title('dr')
