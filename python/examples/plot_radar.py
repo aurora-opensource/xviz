@@ -132,6 +132,7 @@ def prepare_metadata_plot():
     ax[1, 1].set_title('step')
     ax[2, 0].set_title('pexist')
     ax[2, 1].set_title('dBpower')
+    # ax[1, 1].set_ylim(0, 5)
 
     return ax
 
