@@ -436,9 +436,15 @@ class CollectorScenario:
                         .id(str(target['targetId']))
 
                 if not target['consecutive'] < 1:
+                    if to_path_prediction:
+                        color = [255, 255, 255]
+                    else:
+                        color = [0, 0, 0]
+
                     builder.primitive('/radar_id')\
                             .text(str(target['targetId']))\
                             .position([x, y, z+.1])\
+                            .style({'fill_color': color})\
                             .id(str(target['targetId']))
 
         except Exception as e:
