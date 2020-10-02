@@ -140,8 +140,8 @@ def prepare_tracking_plot(signal_type):
     fig, ax = plt.subplots(figsize=(14, 10))
     fig.set_tight_layout(True)
     ax.set_title(f'tracking from target ids: {signal_type}')
-    ax.set_xlim(-20, 20)
-    ax.set_ylim(0, 30)
+    # ax.set_xlim(-20, 20)
+    # ax.set_ylim(0, 35)
 
     return ax
 
