@@ -9,7 +9,7 @@ def get_radar_filter(config):
     pfilter_enabled = True
     qfilter_enabled = config['enable_queue_filter']
     queue_size = 2
-    max_distance_step = 2.0
+    step_max = 2.0
     consecutive_min = config['consecutive_detections']
     consecutive_min = 1
     phi_sdv_max = config['phi_sdv_threshold']
@@ -17,16 +17,16 @@ def get_radar_filter(config):
     pexist_min = config['confidence_threshold']
     pexist_min = 0.65
     dbpower_min = config['d_bpower_threshold']
-    dbpower_min = -15.0
+    dbpower_min = -20.0
 
     return RadarFilter(pfilter_enabled, qfilter_enabled, queue_size, consecutive_min,
-                                            pexist_min, dbpower_min, phi_sdv_max, max_distance_step)
+                                            pexist_min, dbpower_min, phi_sdv_max, step_max)
 
 
 class RadarFilter:
 
     def __init__(self, pfilter_enabled, qfilter_enabled, queue_size, consecutive_min,
-                                pexist_min, dbpower_min, phi_sdv_max, max_distance_step):
+                                pexist_min, dbpower_min, phi_sdv_max, step_max):
 
         if not (pfilter_enabled or qfilter_enabled):
             print('no filter is enabled')
@@ -38,7 +38,7 @@ class RadarFilter:
         self.pexist_min = pexist_min
         self.dbpower_min = dbpower_min
         self.phi_sdv_max = phi_sdv_max
-        self.max_distance_step = max_distance_step
+        self.step_max = step_max
 
         self.target_queues = {}
 
@@ -79,7 +79,7 @@ class RadarFilter:
         step_arr = np.array(self.target_queues[target_id]['step']).astype(np.float64)
         is_target_steady = not (
             np.any(np.isnan(step_arr))
-            or np.any(step_arr > self.max_distance_step)
+            or np.any(step_arr > self.step_max)
         )
 
         return is_target_steady
