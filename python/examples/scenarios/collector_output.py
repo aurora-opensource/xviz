@@ -112,11 +112,11 @@ class CollectorScenario:
                 .stream_style({'fill_color': [255, 0, 0]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
-            builder.stream("/radar_crucial_targets")\
-                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
-                .stream_style({'fill_color': [0, 0, 0]})\
-                .category(xviz.CATEGORY.PRIMITIVE)\
-                .type(xviz.PRIMITIVE_TYPES.CIRCLE)
+            # builder.stream("/radar_crucial_targets")\
+            #     .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+            #     .stream_style({'fill_color': [0, 0, 0]})\
+            #     .category(xviz.CATEGORY.PRIMITIVE)\
+            #     .type(xviz.PRIMITIVE_TYPES.CIRCLE)
             builder.stream("/radar_id")\
                 .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
                 .stream_style({'fill_color': [0, 0, 0]})\
@@ -414,12 +414,12 @@ class CollectorScenario:
     def _draw_radar_targets(self, radar_output, builder: xviz.XVIZBuilder):
         try:
             for target in radar_output['targets'].values():
-                to_path_prediction = False
+                # to_path_prediction = False
                 (x, y, z) = get_object_xyz(target, 'phi', 'dr', radar_ob=True)
     
                 if self.radar_filter.is_valid_target(target):
-                    if self.radar_filter.filter_targets_until_path_prediction(target):
-                        to_path_prediction = True
+                    # if self.radar_filter.filter_targets_until_path_prediction(target):
+                    #     to_path_prediction = True
 
                     builder.primitive('/radar_passed_filter_targets')\
                         .circle([x, y, z], .5)\
@@ -430,22 +430,22 @@ class CollectorScenario:
                             .circle([x, y, z], .5)\
                             .id(str(target['targetId']))
 
-                if to_path_prediction:
-                    builder.primitive('/radar_crucial_targets')\
-                        .circle([x, y, z+0.1], .5)\
-                        .id(str(target['targetId']))
+                # if to_path_prediction:
+                #     builder.primitive('/radar_crucial_targets')\
+                #         .circle([x, y, z+0.1], .5)\
+                #         .id(str(target['targetId']))
 
                 if not target['consecutive'] < 1:
-                    if to_path_prediction:
-                        color = [255, 255, 255]
-                    else:
-                        color = [0, 0, 0]
+                    # if to_path_prediction:
+                    #     color = [255, 255, 255]
+                    # else:
+                    #     color = [0, 0, 0]
 
                     builder.primitive('/radar_id')\
-                            .text(str(target['targetId']))\
-                            .position([x, y, z+.1])\
-                            .style({'fill_color': color})\
-                            .id(str(target['targetId']))
+                        .text(str(target['targetId']))\
+                        .position([x, y, z+.1])\
+                        .id(str(target['targetId']))
+                        # .style({'fill_color': color})\
 
         except Exception as e:
             print('Crashed in draw radar targets:', e)
