@@ -128,10 +128,10 @@ def prepare_metadata_plot():
     fig.set_tight_layout(True)
     ax[0, 0].set_title('phi')
     ax[0, 1].set_title('dr')
-    ax[1, 0].set_title('step')
-    ax[1, 1].set_title('pexist')
-    ax[2, 0].set_title('dBpower')
-    ax[2, 1].set_title('phiSdv')
+    ax[1, 0].set_title('phiSdv')
+    ax[1, 1].set_title('step')
+    ax[2, 0].set_title('pexist')
+    ax[2, 1].set_title('dBpower')
 
     return ax
 
@@ -155,10 +155,10 @@ def plot_metadata(targets, detected_target_ids, signal_type):
         t = np.array(target['timestamp']) - target['timestamp'][0]
         ax[0, 0].plot(t, target[signal_type]['phi'])
         ax[0, 1].plot(t, target[signal_type]['dr'])
-        ax[1, 0].plot(t, target[signal_type]['step'])
-        ax[1, 1].plot(t, target[signal_type]['pexist'])
-        ax[2, 0].plot(t, target[signal_type]['dBpower'])
-        ax[2, 1].plot(t, target[signal_type]['phiSdv'])
+        ax[1, 0].plot(t, target[signal_type]['phiSdv'])
+        ax[1, 1].plot(t, target[signal_type]['step'])
+        ax[2, 0].plot(t, target[signal_type]['pexist'])
+        ax[2, 1].plot(t, target[signal_type]['dBpower'])
 
     plt.show()
     plt.close()
