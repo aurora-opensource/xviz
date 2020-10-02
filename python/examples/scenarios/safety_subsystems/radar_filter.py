@@ -13,11 +13,11 @@ def get_radar_filter(config):
     consecutive_min = config['consecutive_detections']
     consecutive_min = 1
     phi_sdv_max = config['phi_sdv_threshold']
-    phi_sdv_max = 0.015 # 0.015
+    phi_sdv_max = 0.015
     pexist_min = config['confidence_threshold']
     pexist_min = 0.65
     dbpower_min = config['d_bpower_threshold']
-    dbpower_min = -15.0 # 10.0
+    dbpower_min = -15.0
 
     return RadarFilter(pfilter_enabled, qfilter_enabled, queue_size, consecutive_min,
                                             pexist_min, dbpower_min, phi_sdv_max, max_distance_step)
