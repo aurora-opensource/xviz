@@ -63,8 +63,8 @@ class RadarFilter:
         '''
         if target['consecutive'] < self.consecutive_min \
             or target['pexist'] < self.pexist_min \
-            or target['dBpower'] <= self.dbpower_min \
-            or target['phiSdv'] >= self.phi_sdv_max:
+            or target['dBpower'] < self.dbpower_min \
+            or target['phiSdv'] > self.phi_sdv_max:
             return False
         return True
 
