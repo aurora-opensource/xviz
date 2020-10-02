@@ -414,8 +414,6 @@ class CollectorScenario:
     def _draw_radar_targets(self, radar_output, builder: xviz.XVIZBuilder):
         try:
             for target in radar_output['targets'].values():
-                if target['consecutive'] < 1:
-                    continue
                 to_path_prediction = False
                 (x, y, z) = get_object_xyz(target, 'phi', 'dr', radar_ob=True)
     
@@ -427,19 +425,21 @@ class CollectorScenario:
                         .circle([x, y, z], .5)\
                         .id(str(target['targetId']))
                 else:
-                    builder.primitive('/radar_filtered_out_targets')\
-                        .circle([x, y, z], .5)\
-                        .id(str(target['targetId']))
+                    if not target['consecutive'] < 1:
+                        builder.primitive('/radar_filtered_out_targets')\
+                            .circle([x, y, z], .5)\
+                            .id(str(target['targetId']))
 
                 if to_path_prediction:
                     builder.primitive('/radar_crucial_targets')\
                         .circle([x, y, z+0.1], .5)\
                         .id(str(target['targetId']))
 
-                builder.primitive('/radar_id')\
-                        .text(str(target['targetId']))\
-                        .position([x, y, z+.1])\
-                        .id(str(target['targetId']))
+                if not target['consecutive'] < 1:
+                    builder.primitive('/radar_id')\
+                            .text(str(target['targetId']))\
+                            .position([x, y, z+.1])\
+                            .id(str(target['targetId']))
 
         except Exception as e:
             print('Crashed in draw radar targets:', e)
