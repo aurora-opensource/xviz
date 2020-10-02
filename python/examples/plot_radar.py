@@ -146,7 +146,7 @@ def prepare_tracking_plot(signal_type):
     return ax
 
 
-def plot_metadata(targets, detected_target_ids, signal_type):
+def plot_metadata(targets, detected_target_ids, signal_type, radar_filter):
     ax = prepare_metadata_plot()
 
     for tgt_id, target in targets.items():
@@ -159,6 +159,11 @@ def plot_metadata(targets, detected_target_ids, signal_type):
         ax[1, 1].plot(t, target[signal_type]['step'])
         ax[2, 0].plot(t, target[signal_type]['pexist'])
         ax[2, 1].plot(t, target[signal_type]['dBpower'])
+
+        ax[1, 0].axhline(radar_filter.phi_sdv_max, color='r', linestyle='--', label='phi sdv max')
+        ax[1, 1].axhline(radar_filter.step_max, color='r', linestyle='--', label='step max')
+        ax[2, 0].axhline(radar_filter.pexist_min, color='r', linestyle='--', label='pexist min')
+        ax[2, 1].axhline(radar_filter.dbpower_min, color='r', linestyle='--', label='dBpower min')
 
     plt.show()
     plt.close()
@@ -195,8 +200,8 @@ def main():
 
     detected_target_ids = get_detected_target_ids(targets, 'raw')
 
-    plot_metadata(targets, detected_target_ids, 'raw')
-    plot_metadata(targets, detected_target_ids, 'filtered')
+    plot_metadata(targets, detected_target_ids, 'raw', radar_filter)
+    plot_metadata(targets, detected_target_ids, 'filtered', radar_filter)
     plot_tracking(targets, detected_target_ids, 'raw')
     plot_tracking(targets, detected_target_ids, 'filtered')
 
