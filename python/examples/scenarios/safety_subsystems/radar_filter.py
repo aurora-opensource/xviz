@@ -8,7 +8,7 @@ from scenarios.utils.gis import polar_to_cartesian, euclidean_distance
 def get_radar_filter(config):
     pfilter_enabled = True
     qfilter_enabled = config['enable_queue_filter']
-    queue_size = 2
+    queue_size = 3
     step_max = 2.0
     consecutive_min = config['consecutive_detections']
     consecutive_min = 1
@@ -17,7 +17,7 @@ def get_radar_filter(config):
     pexist_min = config['confidence_threshold']
     pexist_min = 0.65
     dbpower_min = config['d_bpower_threshold']
-    dbpower_min = -20.0
+    dbpower_min = -15.0
 
     return RadarFilter(pfilter_enabled, qfilter_enabled, queue_size, consecutive_min,
                                             pexist_min, dbpower_min, phi_sdv_max, step_max)
