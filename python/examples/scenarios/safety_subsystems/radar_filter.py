@@ -26,7 +26,7 @@ def get_radar_filter(config):
 class RadarFilter:
 
     def __init__(self, pfilter_enabled, qfilter_enabled, queue_size, consecutive_min,
-                                pexist_min, dbpower_min, phi_sdv_max, step_max):
+                                        pexist_min, dbpower_min, phi_sdv_max, step_max):
 
         if not (pfilter_enabled or qfilter_enabled):
             print('no filter is enabled')
