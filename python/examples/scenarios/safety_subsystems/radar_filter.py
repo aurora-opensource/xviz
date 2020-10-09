@@ -36,8 +36,14 @@ class RadarFilter:
         self.phi_sdv_max = phi_sdv_max
         self.step_max = step_max
 
-        self.target_queues = {}
+        self.queues = {}
         self.target_id_set = set(range(48))
+    
+    def update_queue(self, target_id, target):
+        if target_id not in self.queues:
+            self.queues[target_id] = QState(self.queue_size)
+        q_state = self.queues[target_id]
+        q_state.update_state(target)
 
     def is_valid_target(self, target):
         is_valid = True # start by assuming the target is valid
@@ -46,8 +52,7 @@ class RadarFilter:
             is_valid = self.passive_filter(target)
         
         if self.qfilter_enabled:
-            self.make_target_queue_if_nonexistent(target['targetId'])
-            self.update_queues(target)
+            self.update_queue(target['targetId'], target)
 
             if is_valid: # only apply the queue filter if the target passed through the passive filter
                 is_valid = self.queue_filter(target)
@@ -69,48 +74,12 @@ class RadarFilter:
         ''' Determines if the target is valid or noise based on a given method.
             Returns True if the target is valid.
         '''
-        target_id = target['targetId']
-        if len(self.target_queues[target_id]['step']) < self.queue_size:
-            return False
-
-        step_arr = np.array(self.target_queues[target_id]['step']).astype(np.float64)
-        is_target_steady = not (
-            np.any(np.isnan(step_arr))
-            or np.any(step_arr > self.step_max)
+        q_state = self.queues[target['targetId']]
+        return not any(
+            step is None
+            or step > self.step_max
+            for step in q_state.steps
         )
-
-        return is_target_steady
-
-    def update_queues(self, target):
-        target_id = target['targetId']
-        if target['consecutive'] < 1:
-            self.target_queues[target_id]['dr'].append(np.nan)
-            self.target_queues[target_id]['phi'].append(np.nan)
-        else:
-            self.target_queues[target_id]['dr'].append(target['dr'])
-            self.target_queues[target_id]['phi'].append(target['phi'])
-
-        if len(self.target_queues[target_id]['phi']) < 2:
-            return
-
-        prev_x, prev_y = polar_to_cartesian(
-            self.target_queues[target_id]['phi'][-2],
-            self.target_queues[target_id]['dr'][-2]
-        )
-        curr_x, curr_y = polar_to_cartesian(
-            self.target_queues[target_id]['phi'][-1],
-            self.target_queues[target_id]['dr'][-1]
-        )
-        if np.isnan(prev_x) or np.isnan(curr_x):
-            step = np.nan
-        else:
-            step = euclidean_distance(prev_x, prev_y, curr_x, curr_y)
-
-        self.target_queues[target_id]['step'].append(step)
-
-    def make_target_queue_if_nonexistent(self, target_id):
-        if target_id not in self.target_queues:
-            self.target_queues[target_id] = QState(self.queue_size)
 
     def filter_targets_until_path_prediction(self, target, in_sync=True, is_combine=False, at_sync_point=False):
         if in_sync and not at_sync_point:
@@ -150,8 +119,8 @@ class QState:
         self.steps.append(None)
     
     def update_with_measured_target(self, target):
-        curr_x, curr_y = polar_to_cartesian(target['phi'], target['dr'])
         if self.prev_dr is not None:
+            curr_x, curr_y = polar_to_cartesian(target['phi'], target['dr'])
             prev_x, prev_y = polar_to_cartesian(self.prev_phi, self.prev_dr)
             step = euclidean_distance(prev_x, prev_y, curr_x, curr_y)
             self.steps.append(step)

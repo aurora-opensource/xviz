@@ -5,7 +5,7 @@ from collections import deque
 import numpy as np
 
 from google.protobuf.json_format import MessageToDict
-from protobuf_APIs import falconeye_pb2
+from protobuf_APIs import falconeye_pb2, radar_pb2
 
 from scenarios.utils.com_manager import ComManager, MqttConst
 from scenarios.utils.filesystem import get_collector_instances, load_config
@@ -412,12 +412,9 @@ class CollectorScenario:
     def _draw_radar_targets(self, radar_output, builder: xviz.XVIZBuilder):
         try:
             for target in radar_output['targets'].values():
-                # to_path_prediction = False
                 (x, y, z) = self.get_object_xyz(target, 'phi', 'dr', radar_ob=True)
     
                 if self.radar_filter.is_valid_target(target):
-                    # if self.radar_filter.filter_targets_until_path_prediction(target):
-                    #     to_path_prediction = True
 
                     builder.primitive('/radar_passed_filter_targets')\
                         .circle([x, y, z], .5)\
@@ -428,22 +425,19 @@ class CollectorScenario:
                             .circle([x, y, z], .5)\
                             .id(str(target['targetId']))
 
-                # if to_path_prediction:
-                #     builder.primitive('/radar_crucial_targets')\
-                #         .circle([x, y, z+0.1], .5)\
-                #         .id(str(target['targetId']))
-
                 if not target['consecutive'] < 1:
-                    # if to_path_prediction:
-                    #     color = [255, 255, 255]
-                    # else:
-                    #     color = [0, 0, 0]
 
                     builder.primitive('/radar_id')\
                         .text(str(target['targetId']))\
                         .position([x, y, z+.1])\
                         .id(str(target['targetId']))
-                        # .style({'fill_color': color})\
+
+            if self.radar_filter.qfilter_enabled:
+                for not_received_id in self.radar_filter.target_id_set:
+                    default_target = MessageToDict(radar_pb2.RadarOutput.Target(), including_default_value_fields=True)
+                    self.radar_filter.update_queue(not_received_id, default_target)
+                # reset the target id set for next cycle
+                self.radar_filter.target_id_set = set(range(48))
 
         except Exception as e:
             print('Crashed in draw radar targets:', e)
