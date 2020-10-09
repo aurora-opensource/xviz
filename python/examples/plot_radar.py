@@ -1,6 +1,8 @@
 from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
+from google.protobuf.json_format import MessageToDict
+from protobuf_APIs import radar_pb2
 from scenarios.safety_subsystems.radar_filter import get_radar_filter
 from scenarios.utils.filesystem import get_collector_instances, load_config
 from scenarios.utils.gis import polar_to_cartesian, euclidean_distance
@@ -119,6 +121,13 @@ def get_targets(collector_instances, radar_filter):
                 targets[tgt_id]['filtered']['x'].append(np.nan)
                 targets[tgt_id]['filtered']['y'].append(np.nan)
                 targets[tgt_id]['filtered']['step'].append(np.nan)
+        
+        if radar_filter.qfilter_enabled:
+            for not_received_id in radar_filter.target_id_set:
+                default_target = MessageToDict(radar_pb2.RadarOutput.Target(), including_default_value_fields=True)
+                radar_filter.update_queue(not_received_id, default_target)
+            # reset the target id set for next cycle
+            radar_filter.target_id_set = set(range(48))
 
     return targets
 
