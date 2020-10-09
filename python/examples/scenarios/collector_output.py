@@ -291,8 +291,8 @@ class CollectorScenario:
                     .circle([self.cab_to_nose, 0, 0], r)\
                     .id(str(r))
 
-        cam_fov = [-28.5, 28.5] # 57 deg
-        radar_fov = [-27, -13.5, -6.75, 0, 6.75, 13.5, 27] # 54 degrees
+        cam_fov = [-28.5, 28.5]  # 57 deg
+        radar_fov = [-27, -13.5, -6.75, 0, 6.75, 13.5, 27]  # 54 degrees
 
         for c_phi in cam_fov:
             r = 40
@@ -447,9 +447,9 @@ class CollectorScenario:
 
                         if track['radarDistCamFrame'] != self.track_history.get(track['trackId'], -1)\
                             and track['radarDistCamFrame'] > 0.1:
-                            fill_color = [0, 255, 0] # Green
+                            fill_color = [0, 255, 0]  # Green
                         else:
-                            fill_color = [0, 0, 255] # Blue
+                            fill_color = [0, 0, 255]  # Blue
 
                         builder.primitive('/tracking_targets')\
                             .circle([x, y, z], .5)\
