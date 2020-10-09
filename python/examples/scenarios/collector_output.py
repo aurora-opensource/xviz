@@ -22,7 +22,6 @@ import xviz.builder as xbuilder
 
 TRACTOR_GPS_TO_REAR_AXLE = 1.9304
 COMBINE_GPS_TO_CENTER = 1.0
-COMBINE_WIDTH = 8.0
 
 
 class CollectorScenario:
@@ -64,6 +63,7 @@ class CollectorScenario:
 
         self.cab_to_nose = global_config['safety']['object_tracking']['cabin_to_nose_distance']
         self.combine_length = radar_safety_config['combine_length']
+        self.combine_width = 8.0 # default, gets updated by machine state message
         self.wheel_base = global_config['guidance']['wheel_base']
         self.stop_distance = radar_safety_config['stop_threshold_default']
         self.slowdown_distance = radar_safety_config['slowdown_threshold_default']
@@ -110,11 +110,6 @@ class CollectorScenario:
                 .stream_style({'fill_color': [255, 0, 0]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
-            # builder.stream("/radar_crucial_targets")\
-            #     .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
-            #     .stream_style({'fill_color': [0, 0, 0]})\
-            #     .category(xviz.CATEGORY.PRIMITIVE)\
-            #     .type(xviz.PRIMITIVE_TYPES.CIRCLE)
             builder.stream("/radar_id")\
                 .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
                 .stream_style({'fill_color': [0, 0, 0]})\
@@ -415,7 +410,6 @@ class CollectorScenario:
                 (x, y, z) = self.get_object_xyz(target, 'phi', 'dr', radar_ob=True)
     
                 if self.radar_filter.is_valid_target(target):
-
                     builder.primitive('/radar_passed_filter_targets')\
                         .circle([x, y, z], .5)\
                         .id(str(target['targetId']))
@@ -426,7 +420,6 @@ class CollectorScenario:
                             .id(str(target['targetId']))
 
                 if not target['consecutive'] < 1:
-
                     builder.primitive('/radar_id')\
                         .text(str(target['targetId']))\
                         .position([x, y, z+.1])\
@@ -514,8 +507,11 @@ class CollectorScenario:
                 combine_center_y = y - (COMBINE_GPS_TO_CENTER * math.sin(relative_combine_heading))
 
                 combine_region = get_combine_region(
-                    combine_center_x, combine_center_y,
-                    relative_combine_heading, self.combine_length, COMBINE_WIDTH
+                    combine_center_x,
+                    combine_center_y,
+                    relative_combine_heading,
+                    self.combine_length,
+                    self.combine_width + 1.0
                 )
 
                 vertices = list(np.column_stack((
@@ -682,7 +678,8 @@ class CollectorScenario:
         if not self.utm_zone:
             # only need to set it once
             self.utm_zone = machine_state['opState']['refUtmZone']
-
+        
+        self.combine_width = machine_state['opState']['machineWidth']
         vehicle_states = machine_state['vehicleStates']
         if vehicle_states:
             for vehicle, state in vehicle_states.items():
