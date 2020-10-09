@@ -20,10 +20,7 @@ from scenarios.safety_subsystems.path_prediction import get_path_prediction
 import xviz
 import xviz.builder as xbuilder
 
-
-CAB_TO_NOSE = 3.2131
 TRACTOR_GPS_TO_REAR_AXLE = 1.9304
-
 COMBINE_GPS_TO_CENTER = 1.0
 COMBINE_WIDTH = 8.0
 
@@ -65,6 +62,7 @@ class CollectorScenario:
         radar_safety_config = global_config['safety']['radar']
         self.radar_filter = get_radar_filter(radar_safety_config)
 
+        self.cab_to_nose = global_config['safety']['object_tracking']['cabin_to_nose_distance']
         self.combine_length = radar_safety_config['combine_length']
         self.wheel_base = global_config['guidance']['wheel_base']
         self.stop_distance = radar_safety_config['stop_threshold_default']
@@ -280,22 +278,22 @@ class CollectorScenario:
         for r in radial_distances:
             builder.primitive('/measuring_circles_lbl')\
                 .text(str(r))\
-                .position([r+CAB_TO_NOSE, 0, .1])\
+                .position([r+self.cab_to_nose, 0, .1])\
                 .id(f'{r}lb')
 
             if r == self.slowdown_distance:
                 builder.primitive('/measuring_circles')\
-                    .circle([CAB_TO_NOSE, 0, 0], r)\
+                    .circle([self.cab_to_nose, 0, 0], r)\
                     .style({'stroke_color': [255, 200, 0, 70]})\
                     .id('slowdown: ' + str(r))
             elif r == self.stop_distance:
                 builder.primitive('/measuring_circles')\
-                    .circle([CAB_TO_NOSE, 0, 0], r)\
+                    .circle([self.cab_to_nose, 0, 0], r)\
                     .style({'stroke_color': [255, 50, 10, 70]})\
                     .id('stop: ' + str(r))
             else:
                 builder.primitive('/measuring_circles')\
-                    .circle([CAB_TO_NOSE, 0, 0], r)\
+                    .circle([self.cab_to_nose, 0, 0], r)\
                     .id(str(r))
 
         cam_fov = [-28.5, 28.5] # 57 deg
@@ -304,24 +302,24 @@ class CollectorScenario:
         for c_phi in cam_fov:
             r = 40
             label = (r, c_phi)
-            (x, y, z) = get_object_xyz_primitive(r, c_phi*math.pi/180)
-            x += CAB_TO_NOSE
-            vertices = [CAB_TO_NOSE, 0, 0, x, y, z]
+            (x, y, z) = self.get_object_xyz_primitive(r, c_phi*math.pi/180)
+            x += self.cab_to_nose
+            vertices = [self.cab_to_nose, 0, 0, x, y, z]
             builder.primitive('/camera_fov')\
                 .polyline(vertices)\
                 .id("cam_fov: "+str(label))
 
         for r_phi in radar_fov:
             r = 40
-            (x, y, z) = get_object_xyz_primitive(r, r_phi*math.pi/180)
-            x += CAB_TO_NOSE
+            (x, y, z) = self.get_object_xyz_primitive(r, r_phi*math.pi/180)
+            x += self.cab_to_nose
             builder.primitive('/measuring_circles_lbl')\
                 .text(str(r_phi))\
                 .position([x, y, z])\
                 .id(str(r_phi)+'lb')
             if r_phi == radar_fov[0] or r_phi == radar_fov[-1]:
                 label = (r, r_phi)
-                vertices = [CAB_TO_NOSE, 0, 0, x, y, z]
+                vertices = [self.cab_to_nose, 0, 0, x, y, z]
                 builder.primitive('/radar_fov')\
                     .polyline(vertices)\
                     .id("radar_fov: "+str(label))
@@ -415,7 +413,7 @@ class CollectorScenario:
         try:
             for target in radar_output['targets'].values():
                 # to_path_prediction = False
-                (x, y, z) = get_object_xyz(target, 'phi', 'dr', radar_ob=True)
+                (x, y, z) = self.get_object_xyz(target, 'phi', 'dr', radar_ob=True)
     
                 if self.radar_filter.is_valid_target(target):
                     # if self.radar_filter.filter_targets_until_path_prediction(target):
@@ -458,7 +456,7 @@ class CollectorScenario:
                 min_hits = 2
                 for track in tracking_output['tracks']:
                     if track['score'] > min_confidence and track['hitStreak'] > min_hits:
-                        (x, y, z) = get_object_xyz(track, 'angle', 'distance', radar_ob=False)
+                        (x, y, z) = self.get_object_xyz(track, 'angle', 'distance', radar_ob=False)
 
                         if track['radarDistCamFrame'] != self.track_history.get(track['trackId'], -1)\
                             and track['radarDistCamFrame'] > 0.1:
@@ -485,7 +483,7 @@ class CollectorScenario:
     def _draw_camera_targets(self, camera_output, builder: xviz.XVIZBuilder):
         try:
             for target in camera_output['targets']:
-                (x, y, z) = get_object_xyz(target, 'objectAngle', 'objectDistance', radar_ob=False)
+                (x, y, z) = self.get_object_xyz(target, 'objectAngle', 'objectDistance', radar_ob=False)
                 if target['label'] == 'qrcode':
                     continue
 
@@ -509,12 +507,12 @@ class CollectorScenario:
 
                 _, combine_state = combine_state_tuple
                 x, y = transform_combine_to_local(combine_state, tractor_state, self.utm_zone)
-                x -= (CAB_TO_NOSE + TRACTOR_GPS_TO_REAR_AXLE)
+                x -= (self.cab_to_nose + TRACTOR_GPS_TO_REAR_AXLE)
                 z = 0.5
 
                 combine_heading = combine_state['heading']  # degrees
                 relative_combine_heading = (tractor_heading - combine_heading) * math.pi / 180
-                combine_rel_heading_xyz = get_object_xyz_primitive(radial_dist=3.0,
+                combine_rel_heading_xyz = self.get_object_xyz_primitive(radial_dist=3.0,
                                                                     angle_radians=relative_combine_heading)
                 c_r_x, c_r_y, _ = combine_rel_heading_xyz
 
@@ -574,8 +572,8 @@ class CollectorScenario:
                 np.flipud(self.path_prediction.right),
                 np.full(self.path_prediction.right.shape[0], z)
             ))
-            left[:, 0] += CAB_TO_NOSE
-            right[:, 0] += CAB_TO_NOSE
+            left[:, 0] += self.cab_to_nose
+            right[:, 0] += self.cab_to_nose
 
             vertices = list(np.concatenate((
                 left.flatten(),
@@ -617,8 +615,8 @@ class CollectorScenario:
                 np.flipud(self.path_prediction.right),
                 np.full(self.path_prediction.right.shape[0], z)
             ))
-            left[:, 0] += CAB_TO_NOSE
-            right[:, 0] += CAB_TO_NOSE
+            left[:, 0] += self.cab_to_nose
+            right[:, 0] += self.cab_to_nose
 
             vertices = list(np.concatenate((
                 left.flatten(),
@@ -672,7 +670,7 @@ class CollectorScenario:
             _, tractor_state = self.tractor_state[-1]
             for p in poly:
                 xy_array = utm_array_to_local(tractor_state, self.utm_zone, p)
-                xy_array[:, 0] -= (CAB_TO_NOSE + TRACTOR_GPS_TO_REAR_AXLE)
+                xy_array[:, 0] -= (self.cab_to_nose + TRACTOR_GPS_TO_REAR_AXLE)
                 z = 1.0
                 vertices = list(np.column_stack(
                     (xy_array, np.full(xy_array.shape[0], z))
@@ -705,23 +703,23 @@ class CollectorScenario:
         return self.index - last_updated_index > 5
 
 
-def get_object_xyz(ob, angle_key, dist_key, radar_ob=False):
-    x = math.cos(ob[angle_key]) * ob[dist_key]
-    y = math.sin(ob[angle_key]) * ob[dist_key]
-    z = 1.5
+    def get_object_xyz(self, ob, angle_key, dist_key, radar_ob=False):
+        x = math.cos(ob[angle_key]) * ob[dist_key]
+        y = math.sin(ob[angle_key]) * ob[dist_key]
+        z = 1.5
 
-    if not radar_ob:
-        x -= CAB_TO_NOSE
+        if not radar_ob:
+            x -= self.cab_to_nose
 
-    return (x, y, z)
+        return (x, y, z)
 
 
-def get_object_xyz_primitive(radial_dist, angle_radians):
-    x = math.cos(angle_radians) * radial_dist
-    y = math.sin(angle_radians) * radial_dist
-    z = 1.0
+    def get_object_xyz_primitive(self, radial_dist, angle_radians):
+        x = math.cos(angle_radians) * radial_dist
+        y = math.sin(angle_radians) * radial_dist
+        z = 1.0
 
-    return (x, y, z)
+        return (x, y, z)
 
 
 def get_average_curvature(tractor_state_history):
