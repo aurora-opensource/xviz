@@ -1,3 +1,4 @@
+import argparse
 from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
@@ -54,7 +55,7 @@ def establish_target_key(tgt_id, targets):
         make_keys(targets[tgt_id], signal_type='filtered')
 
 
-def get_targets(collector_instances, radar_filter):
+def get_targets(collector_instances, radar_filter, selected_tgt_ids):
     targets = {}
 
     for collector_output in collector_instances:
@@ -72,6 +73,10 @@ def get_targets(collector_instances, radar_filter):
         for target in radar_output['targets'].values():
 
             tgt_id = target['targetId']
+
+            if selected_target_ids is not None:
+                if tgt_id not in selected_target_ids:
+                    continue
 
             establish_target_key(tgt_id, targets)
             
@@ -192,7 +197,7 @@ def plot_tracking(targets, detected_target_ids, signal_type):
     plt.close()
 
 
-def main():
+def main(selected_tgt_ids):
     configfile = Path(__file__).parent / 'scenarios' / 'collector-scenario-config.yaml'
     collector_config = load_config(str(configfile))
 
@@ -206,7 +211,7 @@ def main():
     
     radar_filter = get_radar_filter(radar_safety_config)
 
-    targets = get_targets(collector_instances, radar_filter)
+    targets = get_targets(collector_instances, radar_filter, selected_tgt_ids)
 
     detected_target_ids = get_detected_target_ids(targets, 'raw')
 
@@ -226,4 +231,8 @@ if __name__ == '__main__':
     plt.rcParams['xtick.color'] = 'white'
     plt.rcParams['ytick.color'] = 'white'
 
-    main()
+    parser = argparse.ArgumentParser(description='Select which target id(s) to plot')
+    parser.add_argument('-i', metavar='target id', nargs='*', type=int, help='target id [0:47]')
+    selected_target_ids = parser.parse_args().i
+
+    main(selected_target_ids)
