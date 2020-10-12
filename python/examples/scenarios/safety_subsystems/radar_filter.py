@@ -60,19 +60,16 @@ class RadarFilter:
 class QState:
 
     def __init__(self, config):
-        self.consecutive_min = config['consecutive_detections']
         self.phi_sdv_max = config['phi_sdv_threshold']
         self.pexist_min = config['confidence_threshold']
         self.dbpower_min = config['d_bpower_threshold']
 
         self.prev_dr = None
         self.prev_phi = None
-        self.prev_consecutive = None
         self.steps = deque(maxlen=QUEUE_LENGTH)
 
     def is_duplicate_target(self, target):
-        if self.prev_consecutive is None \
-                or target['consecutive'] != self.prev_consecutive \
+        if self.prev_dr is None \
                 or target['dr'] != self.prev_dr \
                 or target['phi'] != self.prev_phi:
             return False
@@ -83,8 +80,7 @@ class QState:
         ''' Determines if the target is valid or noise based on simple value checks.
             Returns True if the target is valid.
         '''
-        if target['consecutive'] < self.consecutive_min \
-            or target['pexist'] < self.pexist_min \
+        if target['pexist'] < self.pexist_min \
             or target['dBpower'] < self.dbpower_min \
             or target['phiSdv'] > self.phi_sdv_max:
             return False
@@ -104,12 +100,14 @@ class QState:
             self.steps.append(step)
         self.prev_dr = target['dr']
         self.prev_phi = target['phi']
-        self.prev_consecutive = target['consecutive']
     
     def update_state(self, target):
-        if self.is_duplicate_target(target):
-            return
         if self.target_meets_thresholds(target):
             self.update_with_measured_target(target)
         else:
-            self.update_with_default_target()
+            if target['consecutive'] < 1:
+                self.update_with_default_target()
+            else:
+                self.prev_dr = target['dr']
+                self.prev_phi = target['phi']
+                self.steps.append(None)
