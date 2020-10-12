@@ -406,6 +406,12 @@ class CollectorScenario:
 
     def _draw_radar_targets(self, radar_output, builder: xviz.XVIZBuilder):
         try:
+            if self.radar_filter.prev_target_set is not None:
+                if self.radar_filter.prev_target_set == radar_output['targets']:
+                    print('duplicate radar target set received')
+                    return
+            self.radar_filter.prev_target_set = radar_output['targets']
+
             for target in radar_output['targets'].values():
                 (x, y, z) = self.get_object_xyz(target, 'phi', 'dr', radar_ob=True)
     

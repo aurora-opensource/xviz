@@ -12,6 +12,7 @@ class RadarFilter:
     def __init__(self, config):
         self.config = config
         self.queues = {}
+        self.prev_target_set = None
         self.target_id_set = set(range(48))
     
     def update_queue(self, target_id, target):
