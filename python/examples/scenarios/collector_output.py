@@ -408,7 +408,6 @@ class CollectorScenario:
         try:
             if self.radar_filter.prev_target_set is not None:
                 if self.radar_filter.prev_target_set == radar_output['targets']:
-                    print('duplicate radar target set received')
                     return
             self.radar_filter.prev_target_set = radar_output['targets']
 
