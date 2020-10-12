@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from google.protobuf.json_format import MessageToDict
 from protobuf_APIs import radar_pb2
-from scenarios.safety_subsystems.radar_filter import get_radar_filter
+from scenarios.safety_subsystems.radar_filter import RadarFilter
 from scenarios.utils.filesystem import get_collector_instances, load_config
 from scenarios.utils.gis import polar_to_cartesian, euclidean_distance
 from scenarios.utils.read_protobufs import deserialize_collector_output,\
@@ -127,12 +127,11 @@ def get_targets(collector_instances, radar_filter, selected_tgt_ids):
                 targets[tgt_id]['filtered']['y'].append(np.nan)
                 targets[tgt_id]['filtered']['step'].append(np.nan)
         
-        if radar_filter.qfilter_enabled:
-            for not_received_id in radar_filter.target_id_set:
-                default_target = MessageToDict(radar_pb2.RadarOutput.Target(), including_default_value_fields=True)
-                radar_filter.update_queue(not_received_id, default_target)
-            # reset the target id set for next cycle
-            radar_filter.target_id_set = set(range(48))
+        for not_received_id in radar_filter.target_id_set:
+            default_target = MessageToDict(radar_pb2.RadarOutput.Target(), including_default_value_fields=True)
+            radar_filter.update_queue(not_received_id, default_target)
+        # reset the target id set for next cycle
+        radar_filter.target_id_set = set(range(48))
 
     return targets
 
@@ -175,10 +174,10 @@ def plot_metadata(targets, detected_target_ids, signal_type, radar_filter):
         ax[2, 0].plot(t, target[signal_type]['pexist'])
         ax[2, 1].plot(t, target[signal_type]['dBpower'])
 
-        ax[1, 0].axhline(radar_filter.phi_sdv_max, color='r', linestyle='--', label='phi sdv max')
-        ax[1, 1].axhline(radar_filter.step_max, color='r', linestyle='--', label='step max')
-        ax[2, 0].axhline(radar_filter.pexist_min, color='r', linestyle='--', label='pexist min')
-        ax[2, 1].axhline(radar_filter.dbpower_min, color='r', linestyle='--', label='dBpower min')
+        ax[1, 0].axhline(radar_filter.config['phi_sdv_threshold'], color='r', linestyle='--', label='phi sdv max')
+        ax[1, 1].axhline(radar_filter.config['step_max'], color='r', linestyle='--', label='step max')
+        ax[2, 0].axhline(radar_filter.config['confidence_threshold'], color='r', linestyle='--', label='pexist min')
+        ax[2, 1].axhline(radar_filter.config['d_bpower_threshold'], color='r', linestyle='--', label='dBpower min')
 
     plt.show()
     plt.close()
@@ -209,7 +208,7 @@ def main(selected_tgt_ids):
     global_config = load_config(str(configfile))
     radar_safety_config = global_config['safety']['radar']
     
-    radar_filter = get_radar_filter(radar_safety_config)
+    radar_filter = RadarFilter(radar_safety_config)
 
     targets = get_targets(collector_instances, radar_filter, selected_tgt_ids)
 

@@ -14,7 +14,7 @@ from scenarios.utils.image import postprocess, show_image
 from scenarios.utils.read_protobufs import deserialize_collector_output,\
                                             extract_collector_output, extract_collector_output_slim
 
-from scenarios.safety_subsystems.radar_filter import get_radar_filter
+from scenarios.safety_subsystems.radar_filter import RadarFilter
 from scenarios.safety_subsystems.path_prediction import get_path_prediction
 
 import xviz
@@ -59,7 +59,7 @@ class CollectorScenario:
         self.path_prediction = get_path_prediction(global_config)
 
         radar_safety_config = global_config['safety']['radar']
-        self.radar_filter = get_radar_filter(radar_safety_config)
+        self.radar_filter = RadarFilter(radar_safety_config)
 
         self.cab_to_nose = global_config['safety']['object_tracking']['cabin_to_nose_distance']
         self.combine_length = radar_safety_config['combine_length']
@@ -425,12 +425,11 @@ class CollectorScenario:
                         .position([x, y, z+.1])\
                         .id(str(target['targetId']))
 
-            if self.radar_filter.qfilter_enabled:
-                for not_received_id in self.radar_filter.target_id_set:
-                    default_target = MessageToDict(radar_pb2.RadarOutput.Target(), including_default_value_fields=True)
-                    self.radar_filter.update_queue(not_received_id, default_target)
-                # reset the target id set for next cycle
-                self.radar_filter.target_id_set = set(range(48))
+            for not_received_id in self.radar_filter.target_id_set:
+                default_target = MessageToDict(radar_pb2.RadarOutput.Target(), including_default_value_fields=True)
+                self.radar_filter.update_queue(not_received_id, default_target)
+            # reset the target id set for next cycle
+            self.radar_filter.target_id_set = set(range(48))
 
         except Exception as e:
             print('Crashed in draw radar targets:', e)
