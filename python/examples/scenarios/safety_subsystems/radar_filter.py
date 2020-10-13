@@ -9,15 +9,16 @@ QUEUE_LENGTH = 3
 
 class RadarFilter:
 
-    def __init__(self, config):
+    def __init__(self, config, smooth_dbpower=False):
         self.config = config
+        self.smooth_dbpower = smooth_dbpower
         self.queues = {}
         self.prev_target_set = None
         self.target_id_set = set(range(48))
     
     def update_queue(self, target_id, target):
         if target_id not in self.queues:
-            self.queues[target_id] = QState(self.config)
+            self.queues[target_id] = QState(self.config, self.smooth_dbpower)
         q_state = self.queues[target_id]
         q_state.update_state(target)
 
@@ -59,13 +60,14 @@ class RadarFilter:
 
 class QState:
 
-    def __init__(self, config):
+    def __init__(self, config, smooth_dbpower):
         self.phi_sdv_max = config['phi_sdv_threshold']
         self.pexist_min = config['confidence_threshold']
         self.dbpower_min = config['d_bpower_threshold']
-
+        self.smooth_dbpower = smooth_dbpower
         self.prev_dr = None
         self.prev_phi = None
+        self.prev_dbpower = None
         self.steps = deque(maxlen=QUEUE_LENGTH)
 
     def is_duplicate_target(self, target):
@@ -76,12 +78,16 @@ class QState:
         else:
             return True
     
-    def target_meets_thresholds(self, target):
+    def target_meets_thresholds(self, target, smoothed_dbpower):
         ''' Determines if the target is valid or noise based on simple value checks.
             Returns True if the target is valid.
         '''
+        if smoothed_dbpower is not None:
+            dbpower = smoothed_dbpower
+        else:
+            dbpower = target['dBpower']
         if target['pexist'] < self.pexist_min \
-            or target['dBpower'] < self.dbpower_min \
+            or dbpower < self.dbpower_min \
             or target['phiSdv'] > self.phi_sdv_max:
             return False
         return True
@@ -102,7 +108,15 @@ class QState:
         self.prev_phi = target['phi']
     
     def update_state(self, target):
-        if self.target_meets_thresholds(target):
+        if self.smooth_dbpower:
+            if self.prev_dbpower is None:
+                smoothed_dbpower = target['dBpower']
+            else:
+                smoothed_dbpower = (self.prev_dbpower + target['dBpower']) / 2
+            self.prev_dbpower = target['dBpower']
+        else:
+            smoothed_dbpower = None
+        if self.target_meets_thresholds(target, smoothed_dbpower):
             self.update_with_measured_target(target)
         else:
             if target['consecutive'] < 1:
