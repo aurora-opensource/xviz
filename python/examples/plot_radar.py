@@ -136,6 +136,26 @@ def get_targets(collector_instances, radar_filter, selected_tgt_ids):
     return targets
 
 
+def get_lone_elements_indices(sig):
+    idx = []
+    for i, el in enumerate(sig):
+        if i == 0:
+            if not np.isnan(el) and np.isnan(sig[i+1]):
+                idx.append(i)
+        elif i == len(sig)-1:
+            if not np.isnan(el) and np.isnan(sig[i-1]):
+                idx.append(i)
+        else:
+            if not np.isnan(el) and np.isnan(sig[i-1]) and np.isnan(sig[i+1]):
+                idx.append(i)
+    return idx
+
+
+def plot_line_point_combo(ax, x, y, color_idx, point_idx):
+    ax.plot(x, y, c='C'+str(color_idx))
+    ax.plot(x, y, '.', markevery=point_idx, c='C'+str(color_idx))
+
+
 def prepare_metadata_plot():
     fig, ax = plt.subplots(nrows=3, ncols=2, figsize=(16, 10), sharex=True)
     fig.set_tight_layout(True)
@@ -163,16 +183,23 @@ def prepare_tracking_plot(signal_type):
 def plot_metadata(targets, detected_target_ids, signal_type, radar_filter):
     ax = prepare_metadata_plot()
 
+    cc_idx = 0
     for tgt_id, target in targets.items():
         if tgt_id not in detected_target_ids:
             continue
+
         t = np.array(target['timestamp']) - target['timestamp'][0]
-        ax[0, 0].plot(t, target[signal_type]['phi'])
-        ax[0, 1].plot(t, target[signal_type]['dr'])
-        ax[1, 0].plot(t, target[signal_type]['phiSdv'])
-        ax[1, 1].plot(t, target[signal_type]['step'])
-        ax[2, 0].plot(t, target[signal_type]['pexist'])
-        ax[2, 1].plot(t, target[signal_type]['dBpower'])
+        point_idx = get_lone_elements_indices(target[signal_type]['phi'])
+        step_point_idx = get_lone_elements_indices(target[signal_type]['step'])
+
+        plot_line_point_combo(ax[0, 0], t, target[signal_type]['phi'], cc_idx, point_idx)
+        plot_line_point_combo(ax[0, 1], t, target[signal_type]['dr'], cc_idx, point_idx)
+        plot_line_point_combo(ax[1, 0], t, target[signal_type]['phiSdv'], cc_idx, point_idx)
+        plot_line_point_combo(ax[1, 1], t, target[signal_type]['step'], cc_idx, step_point_idx)
+        plot_line_point_combo(ax[2, 0], t, target[signal_type]['pexist'], cc_idx, point_idx)
+        plot_line_point_combo(ax[2, 1], t, target[signal_type]['dBpower'], cc_idx, point_idx)
+
+        cc_idx += 1
 
         ax[1, 0].axhline(radar_filter.config['phi_sdv_threshold'], color='r', linestyle='--', label='phi sdv max')
         ax[1, 1].axhline(radar_filter.config['step_max'], color='r', linestyle='--', label='step max')
@@ -186,10 +213,15 @@ def plot_metadata(targets, detected_target_ids, signal_type, radar_filter):
 def plot_tracking(targets, detected_target_ids, signal_type):
     ax = prepare_tracking_plot(signal_type)
 
+    cc_idx = 0
     for tgt_id, target in targets.items():
         if tgt_id not in detected_target_ids:
             continue
-        ax.plot(np.negative(target[signal_type]['y']), target[signal_type]['x'])
+
+        point_idx = get_lone_elements_indices(target[signal_type]['y'])
+        plot_line_point_combo(ax, np.negative(target[signal_type]['y']), target[signal_type]['x'], cc_idx, point_idx)
+
+        cc_idx += 1
 
     plt.gca().set_aspect('equal', adjustable='box')
     plt.show()
