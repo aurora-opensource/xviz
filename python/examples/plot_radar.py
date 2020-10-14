@@ -1,5 +1,6 @@
 import argparse
 from pathlib import Path
+from collections import deque
 import matplotlib.pyplot as plt
 import numpy as np
 from google.protobuf.json_format import MessageToDict
@@ -180,7 +181,21 @@ def prepare_tracking_plot(signal_type):
     return ax
 
 
-def plot_metadata(targets, detected_target_ids, signal_type, radar_filter):
+def smooth(signal, N=12):
+    smooth_signal = []
+    prev_values = deque(maxlen=N)
+    for v in signal:
+        prev_values.append(v)
+        if np.isnan(v):
+            smooth_signal.append(np.nan)
+            prev_values.clear()
+        else:
+            smooth_signal.append(np.mean(prev_values))
+    
+    return smooth_signal
+
+
+def plot_metadata(targets, detected_target_ids, signal_type, radar_filter, smooth_dbpower, selected_timespan):
     ax = prepare_metadata_plot()
 
     cc_idx = 0
@@ -189,8 +204,24 @@ def plot_metadata(targets, detected_target_ids, signal_type, radar_filter):
             continue
 
         t = np.array(target['timestamp']) - target['timestamp'][0]
+
+        if selected_timespan is not None:
+            over_start_time = t > selected_timespan[0]
+            before_end_time = t < selected_timespan[1]
+            timespan_idx = np.nonzero(over_start_time & before_end_time)[0]
+            t = t[timespan_idx]
+            target[signal_type]['phi'] = np.array(target[signal_type]['phi'])[timespan_idx]
+            target[signal_type]['dr'] = np.array(target[signal_type]['dr'])[timespan_idx]
+            target[signal_type]['phiSdv'] = np.array(target[signal_type]['phiSdv'])[timespan_idx]
+            target[signal_type]['step'] = np.array(target[signal_type]['step'])[timespan_idx]
+            target[signal_type]['pexist'] = np.array(target[signal_type]['pexist'])[timespan_idx]
+            target[signal_type]['dBpower'] = np.array(target[signal_type]['dBpower'])[timespan_idx]
+
         point_idx = get_lone_elements_indices(target[signal_type]['phi'])
         step_point_idx = get_lone_elements_indices(target[signal_type]['step'])
+
+        if smooth_dbpower:
+            target[signal_type]['dBpower'] = smooth(target[signal_type]['dBpower'])
 
         plot_line_point_combo(ax[0, 0], t, target[signal_type]['phi'], cc_idx, point_idx)
         plot_line_point_combo(ax[0, 1], t, target[signal_type]['dr'], cc_idx, point_idx)
@@ -210,13 +241,21 @@ def plot_metadata(targets, detected_target_ids, signal_type, radar_filter):
     plt.close()
 
 
-def plot_tracking(targets, detected_target_ids, signal_type):
+def plot_tracking(targets, detected_target_ids, signal_type, selected_timespan):
     ax = prepare_tracking_plot(signal_type)
 
     cc_idx = 0
     for tgt_id, target in targets.items():
         if tgt_id not in detected_target_ids:
             continue
+
+        if selected_timespan is not None:
+            t = np.array(target['timestamp']) - target['timestamp'][0]
+            over_start_time = t > selected_timespan[0]
+            before_end_time = t < selected_timespan[1]
+            timespan_idx = np.nonzero(over_start_time & before_end_time)[0]
+            target[signal_type]['y'] = np.array(target[signal_type]['y'])[timespan_idx]
+            target[signal_type]['x'] = np.array(target[signal_type]['x'])[timespan_idx]
 
         point_idx = get_lone_elements_indices(target[signal_type]['y'])
         plot_line_point_combo(ax, np.negative(target[signal_type]['y']), target[signal_type]['x'], cc_idx, point_idx)
@@ -228,7 +267,7 @@ def plot_tracking(targets, detected_target_ids, signal_type):
     plt.close()
 
 
-def main(selected_tgt_ids):
+def main(selected_tgt_ids, selected_timespan, smooth_dbpower):
     configfile = Path(__file__).parent / 'scenarios' / 'collector-scenario-config.yaml'
     collector_config = load_config(str(configfile))
 
@@ -239,17 +278,20 @@ def main(selected_tgt_ids):
     configfile = Path(__file__).resolve().parents[2] / 'Global-Configs' / 'Tractors' / 'John-Deere' / '8RIVT_WHEEL.yaml'
     global_config = load_config(str(configfile))
     radar_safety_config = global_config['safety']['radar']
+    # radar_safety_config['d_bpower_threshold'] = -8.0
+    # radar_safety_config['phi_sdv_threshold'] = 0.01
+    # radar_safety_config['confidence_threshold'] = 0.9
     
-    radar_filter = RadarFilter(radar_safety_config)
+    radar_filter = RadarFilter(radar_safety_config, smooth_dbpower=smooth_dbpower)
 
     targets = get_targets(collector_instances, radar_filter, selected_tgt_ids)
 
     detected_target_ids = get_detected_target_ids(targets, 'raw')
 
-    plot_metadata(targets, detected_target_ids, 'raw', radar_filter)
-    plot_metadata(targets, detected_target_ids, 'filtered', radar_filter)
-    plot_tracking(targets, detected_target_ids, 'raw')
-    plot_tracking(targets, detected_target_ids, 'filtered')
+    plot_metadata(targets, detected_target_ids, 'raw', radar_filter, smooth_dbpower, selected_timespan)
+    plot_metadata(targets, detected_target_ids, 'filtered', radar_filter, smooth_dbpower, selected_timespan)
+    plot_tracking(targets, detected_target_ids, 'raw', selected_timespan)
+    plot_tracking(targets, detected_target_ids, 'filtered', selected_timespan)
 
 
 if __name__ == '__main__':
@@ -264,6 +306,14 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Select which target id(s) to plot')
     parser.add_argument('-i', metavar='target id', nargs='*', type=int, help='target id [0:47]')
+    parser.add_argument('-t', metavar='time span', nargs='*', type=int, help='timespan [0:T]')
     selected_target_ids = parser.parse_args().i
+    selected_timespan = parser.parse_args().t
 
-    main(selected_target_ids)
+    if selected_timespan is not None:
+        if len(selected_timespan) != 2:
+            print('selected invalid timespand: must give start and end times')
+
+    smooth_dbpower = False
+
+    main(selected_target_ids, selected_timespan, smooth_dbpower)
