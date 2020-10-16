@@ -72,6 +72,9 @@ def get_targets(collector_instances, radar_filter, selected_tgt_ids):
 
         # gross for loop
         for target in radar_output['targets'].values():
+            if radar_filter.prev_target_set is not None:
+                if radar_filter.prev_target_set == radar_output['targets']:
+                    continue
 
             tgt_id = target['targetId']
 
@@ -116,8 +119,16 @@ def get_targets(collector_instances, radar_filter, selected_tgt_ids):
                     targets[tgt_id]['raw']['step'].append(np.nan)
                 else:
                     targets[tgt_id]['raw']['step'].append(step)
+            
+            duplicate_target = False
+            if tgt_id in radar_filter.queues:
+                prev_target = radar_filter.queues[tgt_id].prev_target
+                if prev_target is not None:
+                    if prev_target == target:
+                        duplicate_target = True
 
-            if radar_filter.is_valid_target(target):
+            if radar_filter.is_valid_target(target) \
+                    and not duplicate_target:
                 append_values(targets[tgt_id], 'filtered', target)
                 targets[tgt_id]['filtered']['x'].append(curr_x)
                 targets[tgt_id]['filtered']['y'].append(curr_y)
@@ -195,7 +206,7 @@ def smooth(signal, N=12):
     return smooth_signal
 
 
-def plot_metadata(targets, detected_target_ids, signal_type, radar_filter, smooth_dbpower, selected_timespan):
+def plot_metadata(targets, detected_target_ids, signal_type, radar_filter, selected_timespan):
     ax = prepare_metadata_plot()
 
     cc_idx = 0
@@ -219,9 +230,6 @@ def plot_metadata(targets, detected_target_ids, signal_type, radar_filter, smoot
 
         point_idx = get_lone_elements_indices(target[signal_type]['phi'])
         step_point_idx = get_lone_elements_indices(target[signal_type]['step'])
-
-        if smooth_dbpower:
-            target[signal_type]['dBpower'] = smooth(target[signal_type]['dBpower'])
 
         plot_line_point_combo(ax[0, 0], t, target[signal_type]['phi'], cc_idx, point_idx)
         plot_line_point_combo(ax[0, 1], t, target[signal_type]['dr'], cc_idx, point_idx)
@@ -267,7 +275,7 @@ def plot_tracking(targets, detected_target_ids, signal_type, selected_timespan):
     plt.close()
 
 
-def main(selected_tgt_ids, selected_timespan, smooth_dbpower):
+def main(selected_tgt_ids, selected_timespan):
     configfile = Path(__file__).parent / 'scenarios' / 'collector-scenario-config.yaml'
     collector_config = load_config(str(configfile))
 
@@ -278,18 +286,18 @@ def main(selected_tgt_ids, selected_timespan, smooth_dbpower):
     configfile = Path(__file__).resolve().parents[2] / 'Global-Configs' / 'Tractors' / 'John-Deere' / '8RIVT_WHEEL.yaml'
     global_config = load_config(str(configfile))
     radar_safety_config = global_config['safety']['radar']
-    # radar_safety_config['d_bpower_threshold'] = -8.0
-    # radar_safety_config['phi_sdv_threshold'] = 0.01
-    # radar_safety_config['confidence_threshold'] = 0.9
+    radar_safety_config['d_bpower_threshold'] = -8.0
+    radar_safety_config['phi_sdv_threshold'] = 0.01
+    radar_safety_config['confidence_threshold'] = 0.9
     
-    radar_filter = RadarFilter(radar_safety_config, smooth_dbpower=smooth_dbpower)
+    radar_filter = RadarFilter(radar_safety_config)
 
     targets = get_targets(collector_instances, radar_filter, selected_tgt_ids)
 
     detected_target_ids = get_detected_target_ids(targets, 'raw')
 
-    plot_metadata(targets, detected_target_ids, 'raw', radar_filter, smooth_dbpower, selected_timespan)
-    plot_metadata(targets, detected_target_ids, 'filtered', radar_filter, smooth_dbpower, selected_timespan)
+    plot_metadata(targets, detected_target_ids, 'raw', radar_filter, selected_timespan)
+    plot_metadata(targets, detected_target_ids, 'filtered', radar_filter, selected_timespan)
     plot_tracking(targets, detected_target_ids, 'raw', selected_timespan)
     plot_tracking(targets, detected_target_ids, 'filtered', selected_timespan)
 
@@ -314,6 +322,4 @@ if __name__ == '__main__':
         if len(selected_timespan) != 2:
             print('selected invalid timespand: must give start and end times')
 
-    smooth_dbpower = False
-
-    main(selected_target_ids, selected_timespan, smooth_dbpower)
+    main(selected_target_ids, selected_timespan)
