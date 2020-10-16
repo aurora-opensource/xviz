@@ -4,21 +4,20 @@ from statistics import mean
 from collections import deque
 from scenarios.utils.gis import polar_to_cartesian, euclidean_distance
 
-QUEUE_LENGTH = 3
+QUEUE_LENGTH = 6
 
 
 class RadarFilter:
 
-    def __init__(self, config, smooth_dbpower=False):
+    def __init__(self, config):
         self.config = config
-        self.smooth_dbpower = smooth_dbpower
         self.queues = {}
         self.prev_target_set = None
         self.target_id_set = set(range(48))
     
     def update_queue(self, target_id, target):
         if target_id not in self.queues:
-            self.queues[target_id] = QState(self.config, self.smooth_dbpower)
+            self.queues[target_id] = QState(self.config)
         q_state = self.queues[target_id]
         q_state.update_state(target)
 
@@ -60,68 +59,49 @@ class RadarFilter:
 
 class QState:
 
-    def __init__(self, config, smooth_dbpower):
+    def __init__(self, config):
         self.phi_sdv_max = config['phi_sdv_threshold']
         self.pexist_min = config['confidence_threshold']
         self.dbpower_min = config['d_bpower_threshold']
-        self.smooth_dbpower = smooth_dbpower
-        self.prev_dr = None
-        self.prev_phi = None
-        self.prev_dbpower = None
+        self.prev_target = None
         self.steps = deque(maxlen=QUEUE_LENGTH)
 
     def is_duplicate_target(self, target):
-        if self.prev_dr is None \
-                or target['dr'] != self.prev_dr \
-                or target['phi'] != self.prev_phi:
-            return False
-        else:
+        if self.prev_target is not None \
+                and self.prev_target == target:
             return True
+        return False
     
-    def target_meets_thresholds(self, target, smoothed_dbpower):
+    def target_meets_thresholds(self, target):
         ''' Determines if the target is valid or noise based on simple value checks.
             Returns True if the target is valid.
         '''
-        if smoothed_dbpower is not None:
-            dbpower = smoothed_dbpower
-        else:
-            dbpower = target['dBpower']
         if target['pexist'] < self.pexist_min \
-            or dbpower < self.dbpower_min \
+            or target['dBpower'] < self.dbpower_min \
             or target['phiSdv'] > self.phi_sdv_max:
             return False
         return True
     
     def update_with_default_target(self):
-        self.prev_dr = None
-        self.prev_phi = None
-        self.prev_consecutive = None
+        self.prev_target = None
         self.steps.append(None)
     
     def update_with_measured_target(self, target):
-        if self.prev_dr is not None:
+        if self.prev_target is not None:
             curr_x, curr_y = polar_to_cartesian(target['phi'], target['dr'])
-            prev_x, prev_y = polar_to_cartesian(self.prev_phi, self.prev_dr)
+            prev_x, prev_y = polar_to_cartesian(self.prev_target['phi'], self.prev_target['dr'])
             step = euclidean_distance(prev_x, prev_y, curr_x, curr_y)
             self.steps.append(step)
-        self.prev_dr = target['dr']
-        self.prev_phi = target['phi']
+        self.prev_target = target
     
     def update_state(self, target):
-        if self.smooth_dbpower:
-            if self.prev_dbpower is None:
-                smoothed_dbpower = target['dBpower']
-            else:
-                smoothed_dbpower = (self.prev_dbpower + target['dBpower']) / 2
-            self.prev_dbpower = target['dBpower']
-        else:
-            smoothed_dbpower = None
-        if self.target_meets_thresholds(target, smoothed_dbpower):
+        if self.is_duplicate_target(target):
+            return
+        if self.target_meets_thresholds(target):
             self.update_with_measured_target(target)
         else:
             if target['consecutive'] < 1:
                 self.update_with_default_target()
             else:
-                self.prev_dr = target['dr']
-                self.prev_phi = target['phi']
+                self.prev_target = target
                 self.steps.append(None)
