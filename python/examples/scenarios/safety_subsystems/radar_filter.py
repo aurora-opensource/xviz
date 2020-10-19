@@ -34,13 +34,9 @@ class RadarFilter:
             Returns True if the target is valid.
         '''
         q_state = self.queues[target['targetId']]
-        queue_count = 0
         for step in q_state.steps:
             if step is None or step > self.config['step_max']:
                 return False
-            queue_count += 1
-        if queue_count < QUEUE_LENGTH:
-            return False
         return True
 
     def filter_targets_until_path_prediction(self, target, in_sync=True, is_combine=False, at_sync_point=False):
