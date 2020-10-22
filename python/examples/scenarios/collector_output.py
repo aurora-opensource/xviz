@@ -59,9 +59,6 @@ class CollectorScenario:
         self.path_prediction = get_path_prediction(global_config)
 
         radar_safety_config = global_config['safety']['radar']
-        radar_safety_config['d_bpower_threshold'] = -8.0
-        radar_safety_config['phi_sdv_threshold'] = 0.01
-        radar_safety_config['confidence_threshold'] = 0.9
         self.radar_filter = RadarFilter(radar_safety_config)
 
         self.cab_to_nose = global_config['safety']['object_tracking']['cabin_to_nose_distance']
