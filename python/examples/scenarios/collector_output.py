@@ -44,9 +44,6 @@ class CollectorScenario:
         extract_directory = collector_config['extract_directory']
         self.collector_instances = get_collector_instances(collector_output_file, extract_directory)
 
-        self.rectangular_combine_region = collector_config['rectangular_combine_region']
-        self.circular_combine_region = collector_config['circular_combine_region']
-
         self.mqtt_enabled = collector_config['mqtt_enabled']
         if self.mqtt_enabled:
             self.mqtt_tracking_outputs = []
@@ -147,26 +144,14 @@ class CollectorScenario:
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.POLYLINE)
             
-            if self.rectangular_combine_region:
-                builder.stream("/combine_region")\
-                    .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
-                    .stream_style({
-                        'stroke_width': 0.3,
-                        'stroke_color': [0, 20, 128, 50]
-                    })\
-                    .category(xviz.CATEGORY.PRIMITIVE)\
-                    .type(xviz.PRIMITIVE_TYPES.POLYLINE)
-            if self.circular_combine_region:
-                builder.stream("/combine_region_circle")\
-                    .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
-                    .stream_style({
-                        'stroked': True,
-                        'filled': False,
-                        'stroke_width': 0.3,
-                        'stroke_color': [0, 20, 128, 50],
-                    })\
-                    .category(xviz.CATEGORY.PRIMITIVE)\
-                    .type(xviz.PRIMITIVE_TYPES.CIRCLE)
+            builder.stream("/combine_region")\
+                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+                .stream_style({
+                    'stroke_width': 0.3,
+                    'stroke_color': [0, 20, 128, 50]
+                })\
+                .category(xviz.CATEGORY.PRIMITIVE)\
+                .type(xviz.PRIMITIVE_TYPES.POLYLINE)
 
             builder.stream("/field_definition")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
@@ -527,15 +512,9 @@ class CollectorScenario:
                     .circle([combine_center_x, combine_center_y, z], .5)\
                     .id('combine')
 
-                if self.rectangular_combine_region:
-                    builder.primitive('/combine_region')\
-                        .polyline(vertices)\
-                        .id('combine_region')
-                if self.circular_combine_region:
-                    builder.primitive('/combine_region_circle')\
-                        .circle([combine_center_x, combine_center_y, z-.1], self.combine_length/2)\
-                        .id('combine_region_circle')
-
+                builder.primitive('/combine_region')\
+                    .polyline(vertices)\
+                    .id('combine_region')
                 builder.primitive('/combine_heading')\
                     .polyline([
                         combine_center_x, combine_center_y, z,
