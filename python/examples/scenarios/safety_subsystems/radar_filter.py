@@ -1,6 +1,3 @@
-import math
-import numpy as np
-from statistics import mean
 from collections import deque
 from scenarios.utils.gis import polar_to_cartesian, euclidean_distance
 
