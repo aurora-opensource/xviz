@@ -36,7 +36,7 @@ class ScenarioSession(XVIZBaseSession):
                 t += 0.5
                 await asyncio.sleep(s)
             except KeyboardInterrupt:
-                s = 1
+                s = 0.2
 
 class ScenarioHandler:
     def __init__(self):

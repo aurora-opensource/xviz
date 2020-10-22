@@ -5,7 +5,7 @@ from collections import deque
 import numpy as np
 
 from google.protobuf.json_format import MessageToDict
-from protobuf_APIs import falconeye_pb2
+from protobuf_APIs import falconeye_pb2, radar_pb2
 
 from scenarios.utils.com_manager import ComManager, MqttConst
 from scenarios.utils.filesystem import get_collector_instances, load_config
@@ -15,17 +15,13 @@ from scenarios.utils.read_protobufs import deserialize_collector_output,\
                                             extract_collector_output, extract_collector_output_slim
 
 from scenarios.safety_subsystems.radar_filter import RadarFilter
-from scenarios.safety_subsystems.path_prediction import PathPrediction
+from scenarios.safety_subsystems.path_prediction import get_path_prediction
 
 import xviz
 import xviz.builder as xbuilder
 
-
-CAB_TO_NOSE = 3.2131
 TRACTOR_GPS_TO_REAR_AXLE = 1.9304
-
 COMBINE_GPS_TO_CENTER = 1.0
-COMBINE_WIDTH = 8.0
 
 
 class CollectorScenario:
@@ -50,6 +46,7 @@ class CollectorScenario:
 
         self.rectangular_combine_region = collector_config['rectangular_combine_region']
         self.circular_combine_region = collector_config['circular_combine_region']
+
         self.mqtt_enabled = collector_config['mqtt_enabled']
         if self.mqtt_enabled:
             self.mqtt_tracking_outputs = []
@@ -58,35 +55,18 @@ class CollectorScenario:
         
         configfile = Path(__file__).parents[3] / 'Global-Configs' / 'Tractors' / 'John-Deere' / '8RIVT_WHEEL.yaml'
         global_config = load_config(str(configfile))
+
+        self.path_prediction = get_path_prediction(global_config)
+
         radar_safety_config = global_config['safety']['radar']
+        self.radar_filter = RadarFilter(radar_safety_config)
+
+        self.cab_to_nose = global_config['safety']['object_tracking']['cabin_to_nose_distance']
         self.combine_length = radar_safety_config['combine_length']
+        self.combine_width = 8.0 # default, gets updated by machine state message
+        self.wheel_base = global_config['guidance']['wheel_base']
         self.stop_distance = radar_safety_config['stop_threshold_default']
         self.slowdown_distance = radar_safety_config['slowdown_threshold_default']
-
-        pfilter_enabled = True
-        qfilter_enabled = radar_safety_config['enable_queue_filter']
-        queue_size = 12
-        consecutive_min = radar_safety_config['consecutive_detections']
-        phi_sdv_max = radar_safety_config['phi_sdv_threshold']
-        nan_threshold = radar_safety_config['qf_none_ratio_threshold']
-
-        pf_pexist_min = radar_safety_config['confidence_threshold']
-        qf_pexist_min = radar_safety_config['qf_confidence_threshold']
-
-        pf_dbpower_min = radar_safety_config['d_bpower_threshold']
-        qf_dbpower_min = radar_safety_config['qf_d_bpower_threshold']
-
-        self.radar_filter = RadarFilter(pfilter_enabled, qfilter_enabled, queue_size,
-                                        consecutive_min, pf_pexist_min, qf_pexist_min,
-                                        pf_dbpower_min, qf_dbpower_min, phi_sdv_max, nan_threshold)
-
-        self.wheel_base = global_config['guidance']['wheel_base']
-        prediction_args = {
-            'wheel_base': self.wheel_base,
-            'machine_width': global_config['safety']['object_tracking']['path_width'] * 1.5
-        }
-        min_predictive_speed = global_config['guidance']['safety']['predictive_slowdown_speed_mph']
-        self.path_prediction = PathPrediction(prediction_args, min_predictive_speed)
 
         self.utm_zone = ''
         self.tractor_state = deque(maxlen=10)
@@ -130,11 +110,11 @@ class CollectorScenario:
                 .stream_style({'fill_color': [255, 0, 0]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
-            builder.stream("/radar_crucial_targets")\
-                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+            builder.stream("/radar_id")\
+                .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
                 .stream_style({'fill_color': [0, 0, 0]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
-                .type(xviz.PRIMITIVE_TYPES.CIRCLE)
+                .type(xviz.PRIMITIVE_TYPES.TEXT)
 
             builder.stream("/camera_targets")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
@@ -293,48 +273,48 @@ class CollectorScenario:
         for r in radial_distances:
             builder.primitive('/measuring_circles_lbl')\
                 .text(str(r))\
-                .position([r+CAB_TO_NOSE, 0, .1])\
+                .position([r+self.cab_to_nose, 0, .1])\
                 .id(f'{r}lb')
 
             if r == self.slowdown_distance:
                 builder.primitive('/measuring_circles')\
-                    .circle([CAB_TO_NOSE, 0, 0], r)\
+                    .circle([self.cab_to_nose, 0, 0], r)\
                     .style({'stroke_color': [255, 200, 0, 70]})\
                     .id('slowdown: ' + str(r))
             elif r == self.stop_distance:
                 builder.primitive('/measuring_circles')\
-                    .circle([CAB_TO_NOSE, 0, 0], r)\
+                    .circle([self.cab_to_nose, 0, 0], r)\
                     .style({'stroke_color': [255, 50, 10, 70]})\
                     .id('stop: ' + str(r))
             else:
                 builder.primitive('/measuring_circles')\
-                    .circle([CAB_TO_NOSE, 0, 0], r)\
+                    .circle([self.cab_to_nose, 0, 0], r)\
                     .id(str(r))
 
-        cam_fov = [-28.5, 28.5] # 57 deg
-        radar_fov = [-27, -13.5, -6.75, 0, 6.75, 13.5, 27] # 54 degrees
+        cam_fov = [-28.5, 28.5]  # 57 deg
+        radar_fov = [-27, -13.5, -6.75, 0, 6.75, 13.5, 27]  # 54 degrees
 
         for c_phi in cam_fov:
             r = 40
             label = (r, c_phi)
-            (x, y, z) = get_object_xyz_primitive(r, c_phi*math.pi/180)
-            x += CAB_TO_NOSE
-            vertices = [CAB_TO_NOSE, 0, 0, x, y, z]
+            (x, y, z) = self.get_object_xyz_primitive(r, c_phi*math.pi/180)
+            x += self.cab_to_nose
+            vertices = [self.cab_to_nose, 0, 0, x, y, z]
             builder.primitive('/camera_fov')\
                 .polyline(vertices)\
                 .id("cam_fov: "+str(label))
 
         for r_phi in radar_fov:
             r = 40
-            (x, y, z) = get_object_xyz_primitive(r, r_phi*math.pi/180)
-            x += CAB_TO_NOSE
+            (x, y, z) = self.get_object_xyz_primitive(r, r_phi*math.pi/180)
+            x += self.cab_to_nose
             builder.primitive('/measuring_circles_lbl')\
                 .text(str(r_phi))\
                 .position([x, y, z])\
                 .id(str(r_phi)+'lb')
             if r_phi == radar_fov[0] or r_phi == radar_fov[-1]:
                 label = (r, r_phi)
-                vertices = [CAB_TO_NOSE, 0, 0, x, y, z]
+                vertices = [self.cab_to_nose, 0, 0, x, y, z]
                 builder.primitive('/radar_fov')\
                     .polyline(vertices)\
                     .id("radar_fov: "+str(label))
@@ -426,29 +406,35 @@ class CollectorScenario:
 
     def _draw_radar_targets(self, radar_output, builder: xviz.XVIZBuilder):
         try:
-            for target in radar_output['targets'].values():
-                if abs(target['dr']) < 0.1 and abs(target['phi']) < 0.01:
-                    continue
-                to_path_prediction = False
-                (x, y, z) = get_object_xyz(target, 'phi', 'dr', radar_ob=True)
-    
-                if self.radar_filter.is_valid_target(target['targetId'], target):
-                    if self.radar_filter.filter_targets_until_path_prediction(target):
-                        to_path_prediction = True
+            if self.radar_filter.prev_target_set is not None:
+                if self.radar_filter.prev_target_set == radar_output['targets']:
+                    return
+            self.radar_filter.prev_target_set = radar_output['targets']
 
+            for target in radar_output['targets'].values():
+                (x, y, z) = self.get_object_xyz(target, 'phi', 'dr', radar_ob=True)
+    
+                if self.radar_filter.is_valid_target(target):
                     builder.primitive('/radar_passed_filter_targets')\
-                        .circle([x, y, z], .5)\
+                        .circle([x, y, z+.1], .5)\
                         .id(str(target['targetId']))
                 else:
-                    builder.primitive('/radar_filtered_out_targets')\
-                        .circle([x, y, z], .5)\
+                    if not target['consecutive'] < 1:
+                        builder.primitive('/radar_filtered_out_targets')\
+                            .circle([x, y, z], .5)\
+                            .id(str(target['targetId']))
+
+                if not target['consecutive'] < 1:
+                    builder.primitive('/radar_id')\
+                        .text(str(target['targetId']))\
+                        .position([x, y, z+.2])\
                         .id(str(target['targetId']))
 
-
-                if to_path_prediction:
-                    builder.primitive('/radar_crucial_targets')\
-                        .circle([x, y, z], .5)\
-                        .id(str(target['targetId']))
+            for not_received_id in self.radar_filter.target_id_set:
+                default_target = MessageToDict(radar_pb2.RadarOutput.Target(), including_default_value_fields=True)
+                self.radar_filter.update_queue(not_received_id, default_target)
+            # reset the target id set for next cycle
+            self.radar_filter.target_id_set = set(range(48))
 
         except Exception as e:
             print('Crashed in draw radar targets:', e)
@@ -461,13 +447,13 @@ class CollectorScenario:
                 min_hits = 2
                 for track in tracking_output['tracks']:
                     if track['score'] > min_confidence and track['hitStreak'] > min_hits:
-                        (x, y, z) = get_object_xyz(track, 'angle', 'distance', radar_ob=False)
+                        (x, y, z) = self.get_object_xyz(track, 'angle', 'distance', radar_ob=False)
 
                         if track['radarDistCamFrame'] != self.track_history.get(track['trackId'], -1)\
                             and track['radarDistCamFrame'] > 0.1:
-                            fill_color = [0, 255, 0] # Green
+                            fill_color = [0, 255, 0]  # Green
                         else:
-                            fill_color = [0, 0, 255] # Blue
+                            fill_color = [0, 0, 255]  # Blue
 
                         builder.primitive('/tracking_targets')\
                             .circle([x, y, z], .5)\
@@ -488,7 +474,7 @@ class CollectorScenario:
     def _draw_camera_targets(self, camera_output, builder: xviz.XVIZBuilder):
         try:
             for target in camera_output['targets']:
-                (x, y, z) = get_object_xyz(target, 'objectAngle', 'objectDistance', radar_ob=False)
+                (x, y, z) = self.get_object_xyz(target, 'objectAngle', 'objectDistance', radar_ob=False)
                 if target['label'] == 'qrcode':
                     continue
 
@@ -512,12 +498,12 @@ class CollectorScenario:
 
                 _, combine_state = combine_state_tuple
                 x, y = transform_combine_to_local(combine_state, tractor_state, self.utm_zone)
-                x -= (CAB_TO_NOSE + TRACTOR_GPS_TO_REAR_AXLE)
+                x -= (self.cab_to_nose + TRACTOR_GPS_TO_REAR_AXLE)
                 z = 0.5
 
                 combine_heading = combine_state['heading']  # degrees
                 relative_combine_heading = (tractor_heading - combine_heading) * math.pi / 180
-                combine_rel_heading_xyz = get_object_xyz_primitive(radial_dist=3.0,
+                combine_rel_heading_xyz = self.get_object_xyz_primitive(radial_dist=3.0,
                                                                     angle_radians=relative_combine_heading)
                 c_r_x, c_r_y, _ = combine_rel_heading_xyz
 
@@ -525,8 +511,11 @@ class CollectorScenario:
                 combine_center_y = y - (COMBINE_GPS_TO_CENTER * math.sin(relative_combine_heading))
 
                 combine_region = get_combine_region(
-                    combine_center_x, combine_center_y,
-                    relative_combine_heading, self.combine_length, COMBINE_WIDTH
+                    combine_center_x,
+                    combine_center_y,
+                    relative_combine_heading,
+                    self.combine_length,
+                    self.combine_width + 1.0
                 )
 
                 vertices = list(np.column_stack((
@@ -577,8 +566,8 @@ class CollectorScenario:
                 np.flipud(self.path_prediction.right),
                 np.full(self.path_prediction.right.shape[0], z)
             ))
-            left[:, 0] += CAB_TO_NOSE
-            right[:, 0] += CAB_TO_NOSE
+            left[:, 0] += self.cab_to_nose
+            right[:, 0] += self.cab_to_nose
 
             vertices = list(np.concatenate((
                 left.flatten(),
@@ -620,8 +609,8 @@ class CollectorScenario:
                 np.flipud(self.path_prediction.right),
                 np.full(self.path_prediction.right.shape[0], z)
             ))
-            left[:, 0] += CAB_TO_NOSE
-            right[:, 0] += CAB_TO_NOSE
+            left[:, 0] += self.cab_to_nose
+            right[:, 0] += self.cab_to_nose
 
             vertices = list(np.concatenate((
                 left.flatten(),
@@ -675,7 +664,7 @@ class CollectorScenario:
             _, tractor_state = self.tractor_state[-1]
             for p in poly:
                 xy_array = utm_array_to_local(tractor_state, self.utm_zone, p)
-                xy_array[:, 0] -= (CAB_TO_NOSE + TRACTOR_GPS_TO_REAR_AXLE)
+                xy_array[:, 0] -= (self.cab_to_nose + TRACTOR_GPS_TO_REAR_AXLE)
                 z = 1.0
                 vertices = list(np.column_stack(
                     (xy_array, np.full(xy_array.shape[0], z))
@@ -693,7 +682,8 @@ class CollectorScenario:
         if not self.utm_zone:
             # only need to set it once
             self.utm_zone = machine_state['opState']['refUtmZone']
-
+        
+        self.combine_width = machine_state['opState']['machineWidth']
         vehicle_states = machine_state['vehicleStates']
         if vehicle_states:
             for vehicle, state in vehicle_states.items():
@@ -708,23 +698,23 @@ class CollectorScenario:
         return self.index - last_updated_index > 5
 
 
-def get_object_xyz(ob, angle_key, dist_key, radar_ob=False):
-    x = math.cos(ob[angle_key]) * ob[dist_key]
-    y = math.sin(ob[angle_key]) * ob[dist_key]
-    z = 1.5
+    def get_object_xyz(self, ob, angle_key, dist_key, radar_ob=False):
+        x = math.cos(ob[angle_key]) * ob[dist_key]
+        y = math.sin(ob[angle_key]) * ob[dist_key]
+        z = 1.5
 
-    if not radar_ob:
-        x -= CAB_TO_NOSE
+        if not radar_ob:
+            x -= self.cab_to_nose
 
-    return (x, y, z)
+        return (x, y, z)
 
 
-def get_object_xyz_primitive(radial_dist, angle_radians):
-    x = math.cos(angle_radians) * radial_dist
-    y = math.sin(angle_radians) * radial_dist
-    z = 1.0
+    def get_object_xyz_primitive(self, radial_dist, angle_radians):
+        x = math.cos(angle_radians) * radial_dist
+        y = math.sin(angle_radians) * radial_dist
+        z = 1.0
 
-    return (x, y, z)
+        return (x, y, z)
 
 
 def get_average_curvature(tractor_state_history):

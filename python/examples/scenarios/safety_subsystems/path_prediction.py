@@ -4,6 +4,16 @@ import collections as cl
 import functools as ft
 
 
+def get_path_prediction(config):
+    prediction_args = {
+        'wheel_base': config['guidance']['wheel_base'],
+        'machine_width': config['safety']['object_tracking']['path_width']
+    }
+    min_predictive_speed = config['guidance']['safety']['predictive_slowdown_speed_mph']
+
+    return PathPrediction(prediction_args, min_predictive_speed)
+
+
 def predict_position(X, U, C, dt):
     """Predicts position of vehicle based on CTRV model
     X - state (x, y, yaw)
