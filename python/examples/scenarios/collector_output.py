@@ -107,7 +107,7 @@ class CollectorScenario:
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
             builder.stream("/radar_id")\
-                .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
+                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
                 .stream_style({'fill_color': [0, 0, 0]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.TEXT)
@@ -123,7 +123,7 @@ class CollectorScenario:
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
             builder.stream("/tracking_id")\
-                .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
+                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
                 .stream_style({'fill_color': [0, 0, 0]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.TEXT)
@@ -135,7 +135,7 @@ class CollectorScenario:
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
             builder.stream("/combine_heading")\
-                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+                .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
                 .stream_style({
                     'stroke_width': 0.3, 
                     'stroke_color': combine_color
@@ -214,7 +214,7 @@ class CollectorScenario:
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
 
             builder.stream("/measuring_circles_lbl")\
-                .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
+                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
                 .stream_style({
                     'fill_color': [0, 0, 0]
                 })\
@@ -338,17 +338,17 @@ class CollectorScenario:
             if self.tractor_state:
                 _, tractor_state = self.tractor_state[-1]
                 self.easting, self.northing = latlon_to_utm(tractor_state['latitude'], tractor_state['longitude'], self.utm_zone)
+                tractor_heading_utm = (90 - tractor_state['heading']) * math.pi / 180
 
                 builder.pose("/vehicle_pose")\
                     .timestamp(timestamp)\
                     .position(0, 0, 0)\
-                    .orientation(tractor_state['roll'], tractor_state['pitch'], tractor_state['heading'] * math.pi / 180)
-                    # .map_origin(tractor_state['longitude'], tractor_state['latitude'], tractor_state['altitude'])\
+                    .orientation(tractor_state['roll'], tractor_state['pitch'], tractor_heading_utm)
 
                 # if self.is_vehicle_state_old(self.tractor_state[-1]):
                 #     print('old tractor state')
                 #     self.tractor_state.clear()
-                # else:
+
                 self._draw_machine_state(builder)
                 self._draw_predicted_paths(builder)
                 self._draw_planned_path(builder)
@@ -357,9 +357,6 @@ class CollectorScenario:
             else:
                 builder.pose("/vehicle_pose")\
                     .timestamp(timestamp)\
-                    # .orientation(tractor_state['roll'], tractor_state['pitch'], tractor_state['heading'] * math.pi / 180)
-                    # .position(easting, northing, 0)\
-                    # .map_origin(tractor_state['longitude'], tractor_state['latitude'], tractor_state['altitude'])\
 
             if camera_output is not None:
                 self._draw_camera_targets(camera_output, builder)
@@ -579,7 +576,7 @@ class CollectorScenario:
                 .polyline(vertices)\
                 .id('predicted_path')
 
-            heading = tractor_state['heading']
+            heading = 90 - tractor_state['heading']
             avg_curvature = get_average_curvature(self.tractor_state)
             avg_wheel_angle = avg_curvature * self.wheel_base / 1000
             self.path_prediction.predict(avg_wheel_angle, speed, heading, vision_sub=False)
@@ -613,42 +610,6 @@ class CollectorScenario:
 
         except Exception as e:
             print('Crashed in draw predicted path:', e)
-
-    
-    def draw_predictive_sub_path(self, builder: xviz.XVIZBuilder):
-        try:
-            _, tractor_state = self.tractor_state[-1]
-            speed = tractor_state['speed']
-            heading = tractor_state['heading']
-            curvature = get_average_curvature(self.tractor_state)
-
-            wheel_angle = curvature * self.wheel_base / 1000
-            self.path_prediction.predict(wheel_angle, speed, heading)
-
-            z = 2.1
-
-            left = np.column_stack((
-                self.path_prediction.left,
-                np.full(self.path_prediction.left.shape[0], z)
-            ))
-            right = np.column_stack((
-                np.flipud(self.path_prediction.right),
-                np.full(self.path_prediction.right.shape[0], z)
-            ))
-            # left[:, 0] += self.cab_to_nose
-            # right[:, 0] += self.cab_to_nose
-
-            vertices = list(np.concatenate((
-                left.flatten(),
-                right.flatten()
-            )))
-
-            builder.primitive('/predictive_sub_path')\
-                .polyline(vertices)\
-                .id('predictive_sub_path')
-
-        except Exception as e:
-            print('Crashed in draw predictive sub path:', e)
 
 
     def _draw_commanded_path(self, builder: xviz.XVIZBuilder):
@@ -722,7 +683,6 @@ class CollectorScenario:
                 for polygon in self.field_definition['coordinates']:
                     poly.append(np.array(polygon))
 
-            _, tractor_state = self.tractor_state[-1]
             for p in poly:
                 xy_array = np.array(p)
                 xy_array[:, 0] -= self.easting

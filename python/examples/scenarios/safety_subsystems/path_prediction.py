@@ -11,8 +11,8 @@ def get_path_prediction(config):
         'path_width_predictive': config['navigation']['machine_width']
     }
     min_speed = {}
-    min_speed['predictive'] = config['guidance']['safety']['predictive_slowdown_speed_mph']
-    min_speed['vision'] = 0.5  # mph
+    min_speed['predictive'] = 0.5  # mph
+    min_speed['vision'] = config['guidance']['safety']['predictive_slowdown_speed_mph']
     min_distance = config['safety']['object_tracking']['stop_threshold_default']
 
     return PathPrediction(prediction_args, min_speed, min_distance)
