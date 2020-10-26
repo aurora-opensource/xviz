@@ -7,11 +7,15 @@ import functools as ft
 def get_path_prediction(config):
     prediction_args = {
         'wheel_base': config['guidance']['wheel_base'],
-        'machine_width': config['safety']['object_tracking']['path_width']
+        'path_width_vision': config['safety']['object_tracking']['path_width'],
+        'path_width_predictive': config['navigation']['machine_width']
     }
-    min_predictive_speed = config['guidance']['safety']['predictive_slowdown_speed_mph']
+    min_speed = {}
+    min_speed['predictive'] = config['guidance']['safety']['predictive_slowdown_speed_mph']
+    min_speed['vision'] = 0.5  # mph
+    min_distance = config['safety']['object_tracking']['stop_threshold_default']
 
-    return PathPrediction(prediction_args, min_predictive_speed)
+    return PathPrediction(prediction_args, min_speed, min_distance)
 
 
 def predict_position(X, U, C, dt):
@@ -63,7 +67,7 @@ def predict_path(X0, U0, C, horizon=10.0, n_steps=10):
 
 
 class PathPrediction(object):
-    def __init__(self, C, min_speed):
+    def __init__(self, C, min_speed, min_distance):
         """
         C - constants dict
             - wheel_base
@@ -73,27 +77,22 @@ class PathPrediction(object):
         self.C = C
         self.steering_history = cl.deque(maxlen=10)
         self.min_speed = min_speed
+        self.min_distance = min_distance
 
-    def to_polar(self, path):
-        r = np.sqrt(path[:, 0]**2 + path[:, 1]**2)
-        theta = np.arctan2(path[:, 1], path[:, 0])
-        return r, theta
-
-    def get_closest_phi(self, path, r):
-        # Find row of vector with 'r' value closest to target
-        closest_row = np.argmin(np.abs(path[:, 0] - r))
-        closest_phi = path[closest_row, 1]
-        return closest_phi
-
-    def get_phi_bounds(self, r):
-        left_phi = self.get_closest_phi(self.left_p, r)
-        right_phi = self.get_closest_phi(self.right_p, r)
-        return left_phi, right_phi
-
-    def predict(self, steering_angle, speed, heading):
+    def predict(self, steering_angle, speed, heading, vision_sub=True):
         """Predict path for given speed and steering angle."""
-        speed = max(speed, 0.447 * self.min_speed)
-        horizon = 10
+
+        if vision_sub:
+            self.C['machine_width'] = self.C['path_width_vision']
+            speed = max(speed, 0.447 * self.min_speed['vision'])
+            horizon = max(self.min_distance / speed, 10.0)
+        else:
+            self.C['machine_width'] = self.C['path_width_predictive']
+            speed = max(speed, 0.447 * self.min_speed['predictive'])
+            accel = -0.5
+            stopping_distance = - speed * speed / (2.0 * accel)
+            horizon = stopping_distance / speed * 1.1
+        
         n_steps = 10
 
         U = (speed, steering_angle)
@@ -102,13 +101,3 @@ class PathPrediction(object):
 
         self.path, self.left, self.right = predict_path(
             self.X0, U, self.C, horizon=horizon, n_steps=int(n_steps))
-        self.left_p = np.column_stack(self.to_polar(self.left))
-        self.right_p = np.column_stack(self.to_polar(self.right))
-        self.path_p = np.column_stack(self.to_polar(self.path))
-
-    def is_unsafe(self, r, phi):
-        """Checks if the given target in polar coordinates is inside the predicted path"""
-        l_phi, r_phi = self.get_phi_bounds(r)
-        if abs(self.U[0]) < 0.01:
-            return True
-        return l_phi <= atan2(sin(phi), cos(phi)) <= r_phi

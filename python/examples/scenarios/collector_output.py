@@ -167,15 +167,20 @@ class CollectorScenario:
             #     .category(xviz.CATEGORY.PRIMITIVE)\
             #     .type(xviz.PRIMITIVE_TYPES.CIRCLE)
             builder.stream("/predicted_path")\
-                .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
+                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
                 .stream_style({'stroke_color': [0, 128, 128, 128]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.POLYLINE)
-            builder.stream("/commanded_path")\
-                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
-                .stream_style({'stroke_color': [128, 0, 128, 128]})\
+            builder.stream("/predictive_sub_path")\
+                .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
+                .stream_style({'stroke_color': [128, 128, 0, 128]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.POLYLINE)
+            # builder.stream("/commanded_path")\
+            #     .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
+            #     .stream_style({'stroke_color': [128, 0, 128, 128]})\
+            #     .category(xviz.CATEGORY.PRIMITIVE)\
+            #     .type(xviz.PRIMITIVE_TYPES.POLYLINE)
 
             builder.stream("/planned_path")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
@@ -345,10 +350,9 @@ class CollectorScenario:
                 #     self.tractor_state.clear()
                 # else:
                 self._draw_machine_state(builder)
-                self._draw_predicted_path(builder)
+                self._draw_predicted_paths(builder)
                 self._draw_planned_path(builder)
                 self._draw_field_definition(builder)
-                # self._draw_commanded_path(builder)
                 # TODO: draw something with the sync status
             else:
                 builder.pose("/vehicle_pose")\
@@ -544,24 +548,17 @@ class CollectorScenario:
             print('Crashed in draw machine state:', e)
 
     
-    def _draw_predicted_path(self, builder: xviz.XVIZBuilder):
+    def _draw_predicted_paths(self, builder: xviz.XVIZBuilder):
         try:
             _, tractor_state = self.tractor_state[-1]
             speed = tractor_state['speed']
             curvature = tractor_state['curvature']
-            heading = tractor_state['heading']
-            # easting, northing = latlon_to_utm(tractor_state['latitude'], tractor_state['longitude'], self.utm_zone)
-            # curvature = get_average_curvature(self.tractor_state)
+            heading = 0.0
 
             wheel_angle = curvature * self.wheel_base / 1000
-            self.path_prediction.predict(wheel_angle, speed, heading)
+            self.path_prediction.predict(wheel_angle, speed, heading, vision_sub=True)
 
             z = 2
-            # self.path_prediction.left[:, 0] += self.easting
-            # self.path_prediction.left[:, 1] += self.northing
-            # self.path_prediction.right[:, 0] += self.easting
-            # self.path_prediction.right[:, 1] += self.northing
-
             left = np.column_stack((
                 self.path_prediction.left,
                 np.full(self.path_prediction.left.shape[0], z)
@@ -582,6 +579,30 @@ class CollectorScenario:
                 .polyline(vertices)\
                 .id('predicted_path')
 
+            heading = tractor_state['heading']
+            avg_curvature = get_average_curvature(self.tractor_state)
+            avg_wheel_angle = avg_curvature * self.wheel_base / 1000
+            self.path_prediction.predict(avg_wheel_angle, speed, heading, vision_sub=False)
+
+            left = np.column_stack((
+                self.path_prediction.left,
+                np.full(self.path_prediction.left.shape[0], z)
+            ))
+            right = np.column_stack((
+                np.flipud(self.path_prediction.right),
+                np.full(self.path_prediction.right.shape[0], z)
+            ))
+
+            vertices = list(np.concatenate((
+                left.flatten(),
+                right.flatten()
+            )))
+
+
+            builder.primitive('/predictive_sub_path')\
+                .polyline(vertices)\
+                .id('predictive_sub_path')
+
             # view the discrete points in the predicted path
             # for i in range(len(vertices) // 3):
             #     idx = i * 3
@@ -592,6 +613,42 @@ class CollectorScenario:
 
         except Exception as e:
             print('Crashed in draw predicted path:', e)
+
+    
+    def draw_predictive_sub_path(self, builder: xviz.XVIZBuilder):
+        try:
+            _, tractor_state = self.tractor_state[-1]
+            speed = tractor_state['speed']
+            heading = tractor_state['heading']
+            curvature = get_average_curvature(self.tractor_state)
+
+            wheel_angle = curvature * self.wheel_base / 1000
+            self.path_prediction.predict(wheel_angle, speed, heading)
+
+            z = 2.1
+
+            left = np.column_stack((
+                self.path_prediction.left,
+                np.full(self.path_prediction.left.shape[0], z)
+            ))
+            right = np.column_stack((
+                np.flipud(self.path_prediction.right),
+                np.full(self.path_prediction.right.shape[0], z)
+            ))
+            # left[:, 0] += self.cab_to_nose
+            # right[:, 0] += self.cab_to_nose
+
+            vertices = list(np.concatenate((
+                left.flatten(),
+                right.flatten()
+            )))
+
+            builder.primitive('/predictive_sub_path')\
+                .polyline(vertices)\
+                .id('predictive_sub_path')
+
+        except Exception as e:
+            print('Crashed in draw predictive sub path:', e)
 
 
     def _draw_commanded_path(self, builder: xviz.XVIZBuilder):
