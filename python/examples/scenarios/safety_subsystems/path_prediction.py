@@ -50,8 +50,9 @@ def predict_path(X0, U0, C, horizon=10.0, n_steps=10):
     W_half = 0.5 * C['machine_width']
 
     # Don't care for path beyond phi= +/- pi/2
-    path = np.array(list(filter(lambda row: -pi / 2 < atan2(row[1], row[0]) < pi / 2,
-                                map(ft.partial(predict_position, X0, U0, C), tspan))))
+    path = np.array(list(
+        map(ft.partial(predict_position, X0, U0, C), tspan)
+    ))
 
     left = np.column_stack([path[:, 0] + W_half * np.cos(path[:, 2] + pi / 2),
                             path[:, 1] + W_half * np.sin(path[:, 2] + pi / 2)])

@@ -162,7 +162,7 @@ class CollectorScenario:
                 .type(xviz.PRIMITIVE_TYPES.POLYLINE)
 
             builder.stream("/predicted_path_discrete")\
-                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+                .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
                 .stream_style({'fill_color': [0, 128, 128, 128]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
