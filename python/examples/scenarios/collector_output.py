@@ -9,7 +9,7 @@ from protobuf_APIs import falconeye_pb2, radar_pb2
 
 from scenarios.utils.com_manager import ComManager, MqttConst
 from scenarios.utils.filesystem import get_collector_instances, load_config
-from scenarios.utils.gis import transform_combine_to_local, utm_array_to_local, get_combine_region
+from scenarios.utils.gis import transform_combine_to_local, utm_array_to_local, get_combine_region, latlon_to_utm
 from scenarios.utils.image import postprocess, show_image
 from scenarios.utils.read_protobufs import deserialize_collector_output,\
                                             extract_collector_output, extract_collector_output_slim
@@ -26,11 +26,9 @@ COMBINE_GPS_TO_CENTER = 1.0
 
 class CollectorScenario:
 
-    def __init__(self, live=True, radius=30, duration=10, speed=10):
+    def __init__(self, live=True, duration=10):
         self._timestamp = time.time()
-        self._radius = radius
         self._duration = duration
-        self._speed = speed
         self._live = live
         self._metadata = None
         self.index = 0
@@ -95,7 +93,8 @@ class CollectorScenario:
     def get_metadata(self):
         if not self._metadata:
             builder = xviz.XVIZMetadataBuilder()
-            builder.stream("/vehicle_pose").category(xviz.CATEGORY.POSE)
+            builder.stream("/vehicle_pose")\
+                .category(xviz.CATEGORY.POSE)
 
             builder.stream("/radar_filtered_out_targets")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
@@ -131,7 +130,7 @@ class CollectorScenario:
 
             combine_color = [128, 0, 128]
             builder.stream("/combine_position")\
-                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+                .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
                 .stream_style({'fill_color': combine_color})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
@@ -145,7 +144,7 @@ class CollectorScenario:
                 .type(xviz.PRIMITIVE_TYPES.POLYLINE)
             
             builder.stream("/combine_region")\
-                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+                .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
                 .stream_style({
                     'stroke_width': 0.3,
                     'stroke_color': [0, 20, 128, 50]
@@ -154,18 +153,21 @@ class CollectorScenario:
                 .type(xviz.PRIMITIVE_TYPES.POLYLINE)
 
             builder.stream("/field_definition")\
-                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
-                .stream_style({'stroke_color': [40, 150, 40, 128]})\
+                .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
+                .stream_style({
+                    'stroke_color': [40, 150, 40, 128],
+                    'stroke_width': 0.3,
+                })\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.POLYLINE)
 
-            # builder.stream("/predicted_path_discrete")\
-            #     .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
-            #     .stream_style({'fill_color': [0, 128, 128, 128]})\
-            #     .category(xviz.CATEGORY.PRIMITIVE)\
-            #     .type(xviz.PRIMITIVE_TYPES.CIRCLE)
-            builder.stream("/predicted_path")\
+            builder.stream("/predicted_path_discrete")\
                 .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+                .stream_style({'fill_color': [0, 128, 128, 128]})\
+                .category(xviz.CATEGORY.PRIMITIVE)\
+                .type(xviz.PRIMITIVE_TYPES.CIRCLE)
+            builder.stream("/predicted_path")\
+                .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
                 .stream_style({'stroke_color': [0, 128, 128, 128]})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.POLYLINE)
@@ -307,9 +309,6 @@ class CollectorScenario:
 
     def _draw_collector_instance(self, builder: xviz.XVIZBuilder, timestamp):
         try:
-            builder.pose()\
-                .timestamp(timestamp)
-
             if self.index == len(self.collector_instances):
                 self.reset_values()
 
@@ -328,6 +327,36 @@ class CollectorScenario:
                 sync_status = None
                 control_signal = None
 
+            if machine_state is not None:
+                self.update_machine_state(machine_state)
+            
+            if self.tractor_state:
+                _, tractor_state = self.tractor_state[-1]
+                self.easting, self.northing = latlon_to_utm(tractor_state['latitude'], tractor_state['longitude'], self.utm_zone)
+
+                builder.pose("/vehicle_pose")\
+                    .timestamp(timestamp)\
+                    .position(0, 0, 0)\
+                    .orientation(tractor_state['roll'], tractor_state['pitch'], tractor_state['heading'] * math.pi / 180)
+                    # .map_origin(tractor_state['longitude'], tractor_state['latitude'], tractor_state['altitude'])\
+
+                # if self.is_vehicle_state_old(self.tractor_state[-1]):
+                #     print('old tractor state')
+                #     self.tractor_state.clear()
+                # else:
+                self._draw_machine_state(builder)
+                self._draw_predicted_path(builder)
+                self._draw_planned_path(builder)
+                self._draw_field_definition(builder)
+                # self._draw_commanded_path(builder)
+                # TODO: draw something with the sync status
+            else:
+                builder.pose("/vehicle_pose")\
+                    .timestamp(timestamp)\
+                    # .orientation(tractor_state['roll'], tractor_state['pitch'], tractor_state['heading'] * math.pi / 180)
+                    # .position(easting, northing, 0)\
+                    # .map_origin(tractor_state['longitude'], tractor_state['latitude'], tractor_state['altitude'])\
+
             if camera_output is not None:
                 self._draw_camera_targets(camera_output, builder)
 
@@ -343,9 +372,6 @@ class CollectorScenario:
             if tracking_output is not None:
                 self._draw_tracking_targets(tracking_output, builder)
 
-            if machine_state is not None:
-                self.update_machine_state(machine_state)
-
             if field_definition is not None:
                 self.field_definition = field_definition
 
@@ -360,18 +386,6 @@ class CollectorScenario:
             
             if control_signal is not None:
                 self.control_signal = control_signal
-
-            if self.tractor_state:
-                if self.is_vehicle_state_old(self.tractor_state[-1]):
-                    print('old tractor state')
-                    self.tractor_state.clear()
-                else:
-                    self._draw_machine_state(builder)
-                    self._draw_predicted_path(builder)
-                    self._draw_planned_path(builder)
-                    self._draw_field_definition(builder)
-                    self._draw_commanded_path(builder)
-                    # TODO: draw something with the sync status
 
             if img is not None:
                 if camera_output is not None:
@@ -508,9 +522,12 @@ class CollectorScenario:
                     np.full(combine_region.shape[0], z)
                 )).flatten())
                 
+                easting, northing = latlon_to_utm(combine_state['latitude'], combine_state['longitude'], self.utm_zone)
+                easting -= self.easting
+                northing -= self.northing
                 builder.primitive('/combine_position')\
-                    .circle([combine_center_x, combine_center_y, z], .5)\
-                    .id('combine')
+                    .circle([easting, northing, 0], .5)\
+                    .id('combine')\
 
                 builder.primitive('/combine_region')\
                     .polyline(vertices)\
@@ -532,11 +549,19 @@ class CollectorScenario:
             _, tractor_state = self.tractor_state[-1]
             speed = tractor_state['speed']
             curvature = tractor_state['curvature']
+            heading = tractor_state['heading']
+            # easting, northing = latlon_to_utm(tractor_state['latitude'], tractor_state['longitude'], self.utm_zone)
             # curvature = get_average_curvature(self.tractor_state)
-            wheel_angle = curvature * self.wheel_base / 1000
-            self.path_prediction.predict(wheel_angle, speed)
 
-            z = 0.9
+            wheel_angle = curvature * self.wheel_base / 1000
+            self.path_prediction.predict(wheel_angle, speed, heading)
+
+            z = 2
+            # self.path_prediction.left[:, 0] += self.easting
+            # self.path_prediction.left[:, 1] += self.northing
+            # self.path_prediction.right[:, 0] += self.easting
+            # self.path_prediction.right[:, 1] += self.northing
+
             left = np.column_stack((
                 self.path_prediction.left,
                 np.full(self.path_prediction.left.shape[0], z)
@@ -545,8 +570,8 @@ class CollectorScenario:
                 np.flipud(self.path_prediction.right),
                 np.full(self.path_prediction.right.shape[0], z)
             ))
-            left[:, 0] += self.cab_to_nose
-            right[:, 0] += self.cab_to_nose
+            # left[:, 0] += self.cab_to_nose
+            # right[:, 0] += self.cab_to_nose
 
             vertices = list(np.concatenate((
                 left.flatten(),
@@ -558,12 +583,12 @@ class CollectorScenario:
                 .id('predicted_path')
 
             # view the discrete points in the predicted path
-            # for i in range(len(vertices) // 3):
-            #     idx = i * 3
-            #     x, y, z = vertices[idx], vertices[idx+1], vertices[idx+2]
-            #     builder.primitive('/predicted_path_discrete')\
-            #         .circle([x, y, z], .2)
-            #         .id('predicted_path_node')
+            for i in range(len(vertices) // 3):
+                idx = i * 3
+                x, y, z = vertices[idx], vertices[idx+1], vertices[idx+2]
+                builder.primitive('/predicted_path_discrete')\
+                    .circle([x, y, z], .2)\
+                    .id('predicted_path_node')
 
         except Exception as e:
             print('Crashed in draw predicted path:', e)
@@ -642,8 +667,9 @@ class CollectorScenario:
 
             _, tractor_state = self.tractor_state[-1]
             for p in poly:
-                xy_array = utm_array_to_local(tractor_state, self.utm_zone, p)
-                xy_array[:, 0] -= (self.cab_to_nose + TRACTOR_GPS_TO_REAR_AXLE)
+                xy_array = np.array(p)
+                xy_array[:, 0] -= self.easting
+                xy_array[:, 1] -= self.northing
                 z = 1.0
                 vertices = list(np.column_stack(
                     (xy_array, np.full(xy_array.shape[0], z))

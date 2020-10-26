@@ -89,7 +89,7 @@ class PathPrediction(object):
         right_phi = self.get_closest_phi(self.right_p, r)
         return left_phi, right_phi
 
-    def predict(self, steering_angle, speed):
+    def predict(self, steering_angle, speed, heading):
         """Predict path for given speed and steering angle."""
         speed = max(speed, 0.447 * self.min_speed)
         horizon = 10
@@ -97,6 +97,7 @@ class PathPrediction(object):
 
         U = (speed, steering_angle)
         self.U = U
+        self.X0 = 0, 0, heading * pi / 180
 
         self.path, self.left, self.right = predict_path(
             self.X0, U, self.C, horizon=horizon, n_steps=int(n_steps))
