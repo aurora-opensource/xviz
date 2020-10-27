@@ -256,7 +256,7 @@ class CollectorScenario:
             self._draw_planned_path(builder)
             self._draw_field_definition(builder)
             self._draw_control_signal(builder)
-            # TODO: draw something with the sync status
+            self._draw_sync_status(builder)
 
             if img is not None:
                 if camera_output is not None:
@@ -568,6 +568,16 @@ class CollectorScenario:
 
         except Exception as e:
             print('Crashed in draw field definition:', e)
+    
+
+    def _draw_sync_status(self, builder: xviz.XVIZBuilder):
+        if self.sync_status is None:
+            return
+        try:
+            #TODO: draw sync status
+            pass
+        except Exception as e:
+            print('Crashed in draw sync status:', e)
 
     
     def update_machine_state(self, machine_state):
