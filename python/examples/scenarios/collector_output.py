@@ -63,9 +63,12 @@ class CollectorScenario:
         self.stop_distance = radar_safety_config['stop_threshold_default']
         self.slowdown_distance = radar_safety_config['slowdown_threshold_default']
 
-        self.utm_zone = ''
         self.tractor_state = deque(maxlen=10)
+        self.tractor_easting = None
+        self.tractor_northing = None
+        self.tractor_theta = None
         self.combine_states = {}
+        self.utm_zone = ''
         self.planned_path = None
         self.field_definition = None
         self.sync_status = None
@@ -130,24 +133,23 @@ class CollectorScenario:
 
             combine_color = [128, 0, 128]
             builder.stream("/combine_position")\
-                .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
+                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
                 .stream_style({'fill_color': combine_color})\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.CIRCLE)
             builder.stream("/combine_heading")\
-                .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
+                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
                 .stream_style({
                     'stroke_width': 0.3, 
                     'stroke_color': combine_color
                 })\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.POLYLINE)
-            
             builder.stream("/combine_region")\
-                .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
+                .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
                 .stream_style({
                     'stroke_width': 0.3,
-                    'stroke_color': [0, 20, 128, 50]
+                    'stroke_color': combine_color
                 })\
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.POLYLINE)
@@ -337,23 +339,23 @@ class CollectorScenario:
             
             if self.tractor_state:
                 _, tractor_state = self.tractor_state[-1]
-                self.easting, self.northing = latlon_to_utm(tractor_state['latitude'], tractor_state['longitude'], self.utm_zone)
-                tractor_heading_utm = (90 - tractor_state['heading']) * math.pi / 180
+                self.tractor_theta = (90 - tractor_state['heading']) * math.pi / 180
+                self.tractor_easting, self.tractor_northing = latlon_to_utm(
+                                                                tractor_state['latitude'],
+                                                                tractor_state['longitude'],
+                                                                self.utm_zone)
 
                 builder.pose("/vehicle_pose")\
                     .timestamp(timestamp)\
                     .position(0, 0, 0)\
-                    .orientation(tractor_state['roll'], tractor_state['pitch'], tractor_heading_utm)
-
-                # if self.is_vehicle_state_old(self.tractor_state[-1]):
-                #     print('old tractor state')
-                #     self.tractor_state.clear()
+                    .orientation(tractor_state['roll'], tractor_state['pitch'], self.tractor_theta)
 
                 self._draw_machine_state(builder)
                 self._draw_predicted_paths(builder)
                 self._draw_planned_path(builder)
                 self._draw_field_definition(builder)
                 # TODO: draw something with the sync status
+
             else:
                 builder.pose("/vehicle_pose")\
                     .timestamp(timestamp)\
@@ -492,11 +494,8 @@ class CollectorScenario:
             tractor_heading = tractor_state['heading']  # degrees
             
             for combine_state_tuple in self.combine_states.values():
-                if self.is_vehicle_state_old(combine_state_tuple):
-                    print('old combine state')
-                    continue
-
                 _, combine_state = combine_state_tuple
+
                 x, y = transform_combine_to_local(combine_state, tractor_state, self.utm_zone)
                 x -= (self.cab_to_nose + TRACTOR_GPS_TO_REAR_AXLE)
                 z = 0.5
@@ -523,13 +522,9 @@ class CollectorScenario:
                     np.full(combine_region.shape[0], z)
                 )).flatten())
                 
-                easting, northing = latlon_to_utm(combine_state['latitude'], combine_state['longitude'], self.utm_zone)
-                easting -= self.easting
-                northing -= self.northing
                 builder.primitive('/combine_position')\
-                    .circle([easting, northing, 0], .5)\
-                    .id('combine')\
-
+                    .circle([combine_center_x, combine_center_y, 0], .5)\
+                    .id('combine')
                 builder.primitive('/combine_region')\
                     .polyline(vertices)\
                     .id('combine_region')
@@ -537,9 +532,8 @@ class CollectorScenario:
                     .polyline([
                         combine_center_x, combine_center_y, z,
                         combine_center_x+c_r_x, combine_center_y+c_r_y, z
-                        ])\
+                    ])\
                     .id('combine_heading')
-                
 
         except Exception as e:
             print('Crashed in draw machine state:', e)
@@ -564,8 +558,8 @@ class CollectorScenario:
                 np.flipud(self.path_prediction.right),
                 np.full(self.path_prediction.right.shape[0], z)
             ))
-            # left[:, 0] += self.cab_to_nose
-            # right[:, 0] += self.cab_to_nose
+            left[:, 0] += self.cab_to_nose
+            right[:, 0] += self.cab_to_nose
 
             vertices = list(np.concatenate((
                 left.flatten(),
@@ -590,11 +584,15 @@ class CollectorScenario:
                 np.full(self.path_prediction.right.shape[0], z)
             ))
 
+            left[:, 0] += self.cab_to_nose * math.cos(self.tractor_theta)
+            left[:, 1] += self.cab_to_nose * math.sin(self.tractor_theta)
+            right[:, 0] += self.cab_to_nose * math.cos(self.tractor_theta)
+            right[:, 1] += self.cab_to_nose * math.sin(self.tractor_theta)
+
             vertices = list(np.concatenate((
                 left.flatten(),
                 right.flatten()
             )))
-
 
             builder.primitive('/predictive_sub_path')\
                 .polyline(vertices)\
@@ -684,12 +682,17 @@ class CollectorScenario:
                     poly.append(np.array(polygon))
 
             for p in poly:
-                xy_array = np.array(p)
-                xy_array[:, 0] -= self.easting
-                xy_array[:, 1] -= self.northing
+                utm_coords = np.array(p)
+                utm_coords[:, 0] -= self.tractor_easting
+                utm_coords[:, 1] -= self.tractor_northing
+
+                # show the field definition relative to the nose of the tractor
+                utm_coords[:, 0] -= (self.cab_to_nose + TRACTOR_GPS_TO_REAR_AXLE) * math.cos(self.tractor_theta)
+                utm_coords[:, 1] -= (self.cab_to_nose + TRACTOR_GPS_TO_REAR_AXLE) * math.sin(self.tractor_theta)
+
                 z = 1.0
                 vertices = list(np.column_stack(
-                    (xy_array, np.full(xy_array.shape[0], z))
+                    (utm_coords, np.full(utm_coords.shape[0], z))
                 ).flatten())
 
                 builder.primitive('/field_definition')\
@@ -715,7 +718,7 @@ class CollectorScenario:
                     self.combine_states[vehicle] = (self.index, state)
     
 
-    def is_vehicle_state_old(self, vehicle_state_tuple):
+    def _is_vehicle_state_old(self, vehicle_state_tuple):
         last_updated_index, _ = vehicle_state_tuple
         return self.index - last_updated_index > 5
 
