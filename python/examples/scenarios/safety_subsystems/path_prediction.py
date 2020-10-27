@@ -54,7 +54,6 @@ def predict_path(X0, U0, C, horizon=10.0, n_steps=10):
     tspan = np.linspace(0, horizon, n_steps+1, endpoint=True)
     W_half = 0.5 * C['machine_width']
 
-    # Don't care for path beyond phi= +/- pi/2
     path = np.array(list(
         map(ft.partial(predict_position, X0, U0, C), tspan)
     ))
@@ -80,19 +79,21 @@ class PathPrediction(object):
         self.min_speed = min_speed
         self.min_distance = min_distance
 
-    def predict(self, steering_angle, speed, heading, vision_sub=True):
+    def predict(self, steering_angle, speed, heading, subsystem):
         """Predict path for given speed and steering angle."""
 
-        if vision_sub:
+        if subsystem == "vision":
             self.C['machine_width'] = self.C['path_width_vision']
             speed = max(speed, 0.447 * self.min_speed['vision'])
             horizon = max(self.min_distance / speed, 10.0)
-        else:
+        elif subsystem == "predictive":
             self.C['machine_width'] = self.C['path_width_predictive']
             speed = max(speed, 0.447 * self.min_speed['predictive'])
             accel = -0.5
             stopping_distance = - speed * speed / (2.0 * accel)
             horizon = stopping_distance / speed * 1.1
+        elif subsystem == "control":
+            horizon = 10.0
         
         n_steps = 10
 

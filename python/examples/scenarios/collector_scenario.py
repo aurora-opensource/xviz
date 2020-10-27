@@ -249,7 +249,8 @@ class CollectorScenario:
             self._draw_camera_targets(camera_output, builder)
             self._draw_radar_targets(radar_output, builder)
             self._draw_machine_state(builder)
-            self._draw_predicted_paths(builder)
+            self._draw_predicted_path(builder)
+            self._draw_predictive_sub_path(builder)
             self._draw_planned_path(builder)
             self._draw_field_definition(builder)
             self._draw_control_signal(builder)
@@ -415,19 +416,19 @@ class CollectorScenario:
             print('Crashed in draw machine state:', e)
 
     
-    def _draw_predicted_paths(self, builder: xviz.XVIZBuilder):
+    def _draw_predicted_path(self, builder: xviz.XVIZBuilder):
         if not self.tractor_state:
             return
         try:
             _, tractor_state = self.tractor_state[-1]
             speed = tractor_state['speed']
             curvature = tractor_state['curvature']
-            heading = 0.0
+            heading = 0.
 
             wheel_angle = curvature * self.wheel_base / 1000
-            self.path_prediction.predict(wheel_angle, speed, heading, vision_sub=True)
+            self.path_prediction.predict(wheel_angle, speed, heading, "vision")
 
-            z = 2
+            z = 0.9
             left = np.column_stack((
                 self.path_prediction.left,
                 np.full(self.path_prediction.left.shape[0], z)
@@ -446,11 +447,31 @@ class CollectorScenario:
                 .polyline(vertices)\
                 .id('predicted_path')
 
+            # view the discrete points in the predicted path
+            # for i in range(len(vertices) // 3):
+            #     idx = i * 3
+            #     x, y, z = vertices[idx], vertices[idx+1], vertices[idx+2]
+            #     builder.primitive('/predicted_path_discrete')\
+            #         .circle([x, y, z], .2)\
+            #         .id('predicted_path_node')
+
+        except Exception as e:
+            print('Crashed in draw predicted path:', e)
+
+    
+    def _draw_predictive_sub_path(self, builder: xviz.XVIZBuilder):
+        if not self.tractor_state:
+            return
+        try:
+            _, tractor_state = self.tractor_state[-1]
+            speed = tractor_state['speed']
             heading = 90 - tractor_state['heading']
             avg_curvature = get_average_curvature(self.tractor_state)
             avg_wheel_angle = avg_curvature * self.wheel_base / 1000
-            self.path_prediction.predict(avg_wheel_angle, speed, heading, vision_sub=False)
 
+            self.path_prediction.predict(avg_wheel_angle, speed, heading, "predictive")
+
+            z = 0.9
             left = np.column_stack((
                 self.path_prediction.left,
                 np.full(self.path_prediction.left.shape[0], z)
@@ -469,16 +490,8 @@ class CollectorScenario:
                 .polyline(vertices)\
                 .id('predictive_sub_path')
 
-            # view the discrete points in the predicted path
-            # for i in range(len(vertices) // 3):
-            #     idx = i * 3
-            #     x, y, z = vertices[idx], vertices[idx+1], vertices[idx+2]
-            #     builder.primitive('/predicted_path_discrete')\
-            #         .circle([x, y, z], .2)\
-            #         .id('predicted_path_node')
-
         except Exception as e:
-            print('Crashed in draw predicted path:', e)
+            print('Crashed in draw predictive sub path:', e)
 
 
     def _draw_control_signal(self, builder: xviz.XVIZBuilder):
@@ -488,22 +501,12 @@ class CollectorScenario:
             speed = self.control_signal['setSpeed']
             curvature = self.control_signal['commandCurvature']
             wheel_angle = curvature * self.wheel_base / 1000
-            self.path_prediction.predict(wheel_angle, speed)
+            heading = 0.
+            self.path_prediction.predict(wheel_angle, speed, heading, "control")
 
             z = 0.9
-            left = np.column_stack((
-                self.path_prediction.left,
-                np.full(self.path_prediction.left.shape[0], z)
-            ))
-            right = np.column_stack((
-                np.flipud(self.path_prediction.right),
-                np.full(self.path_prediction.right.shape[0], z)
-            ))
-
-            vertices = list(np.concatenate((
-                left.flatten(),
-                right.flatten()
-            )))
+            self.path_prediction.path[:, 2] = z
+            vertices = list(self.path_prediction.path.flatten())
 
             builder.primitive('/control_signal')\
                 .polyline(vertices)\

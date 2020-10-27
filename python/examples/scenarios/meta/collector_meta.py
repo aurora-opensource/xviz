@@ -95,11 +95,11 @@ def get_builder():
         .category(xviz.CATEGORY.PRIMITIVE)\
         .type(xviz.PRIMITIVE_TYPES.POLYLINE)
 
-    # builder.stream("/control_signal")\
-    #     .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
-    #     .stream_style({'stroke_color': [128, 0, 128, 128]})\
-    #     .category(xviz.CATEGORY.PRIMITIVE)\
-    #     .type(xviz.PRIMITIVE_TYPES.POLYLINE)
+    builder.stream("/control_signal")\
+        .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+        .stream_style({'stroke_color': [128, 0, 128, 128]})\
+        .category(xviz.CATEGORY.PRIMITIVE)\
+        .type(xviz.PRIMITIVE_TYPES.POLYLINE)
 
     builder.stream("/radar_fov")\
         .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
