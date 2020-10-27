@@ -230,21 +230,21 @@ class CollectorScenario:
                     print("mqtt enabled but no mqtt tracking outputs are stored")
                     tracking_output = None
 
-            if field_definition is not None:
-                self.field_definition = field_definition
-
             if planned_path is not None:
                 if planned_path.size > 0:
                     self.planned_path = planned_path.reshape(-1, 2)
                 else:
                     self.planned_path = None
+
+            if field_definition is not None:
+                self.field_definition = field_definition
+
+            if control_signal is not None:
+                self.control_signal = control_signal
             
             if sync_status is not None:
                 self.sync_status = sync_status
             
-            if control_signal is not None:
-                self.control_signal = control_signal
-
             self._draw_tracking_targets(tracking_output, builder)
             self._draw_camera_targets(camera_output, builder)
             self._draw_radar_targets(radar_output, builder)
@@ -252,6 +252,7 @@ class CollectorScenario:
             self._draw_predicted_paths(builder)
             self._draw_planned_path(builder)
             self._draw_field_definition(builder)
+            self._draw_control_signal(builder)
             # TODO: draw something with the sync status
 
             if img is not None:
