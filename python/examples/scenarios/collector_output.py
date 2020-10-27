@@ -223,7 +223,6 @@ class CollectorScenario:
                 .category(xviz.CATEGORY.PRIMITIVE)\
                 .type(xviz.PRIMITIVE_TYPES.TEXT)
 
-
             self._metadata = builder.get_message()
 
         metadata = {
