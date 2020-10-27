@@ -66,6 +66,7 @@ class CollectorScenario:
         self.tractor_state = deque(maxlen=10)
         self.tractor_easting = None
         self.tractor_northing = None
+        self.tractor_theta = None
         self.combine_states = {}
         self.utm_zone = ''
         self.planned_path = None
@@ -78,6 +79,7 @@ class CollectorScenario:
         self.tractor_state.clear()
         self.tractor_easting = None
         self.tractor_northing = None
+        self.tractor_theta = None
         self.combine_states = {}
         self.planned_path = None
         self.field_definition = None
@@ -97,7 +99,6 @@ class CollectorScenario:
     def get_metadata(self):
         if not self._metadata:
             builder = get_builder()
-
             self._metadata = builder.get_message()
 
         metadata = {
@@ -212,7 +213,7 @@ class CollectorScenario:
             
             if self.tractor_state:
                 _, tractor_state = self.tractor_state[-1]
-                tractor_theta = (90 - tractor_state['heading']) * math.pi / 180
+                self.tractor_theta = (90 - tractor_state['heading']) * math.pi / 180
                 self.tractor_easting, self.tractor_northing = latlon_to_utm(
                                                                 tractor_state['latitude'],
                                                                 tractor_state['longitude'],
@@ -220,7 +221,7 @@ class CollectorScenario:
                 builder.pose("/vehicle_pose")\
                     .timestamp(timestamp)\
                     .position(0., 0., 0.)\
-                    .orientation(tractor_state['roll'], tractor_state['pitch'], tractor_theta)
+                    .orientation(tractor_state['roll'], tractor_state['pitch'], self.tractor_theta)
             else:
                 builder.pose("/vehicle_pose")\
                     .timestamp(timestamp)\
@@ -539,7 +540,7 @@ class CollectorScenario:
     
 
     def _draw_field_definition(self, builder: xviz.XVIZBuilder):
-        if self.field_definition is None:
+        if self.field_definition is None or self.tractor_easting is None:
             return
         try:
             poly = []
