@@ -267,22 +267,22 @@ class CollectorScenario:
         for r in radial_distances:
             builder.primitive('/measuring_circles_lbl')\
                 .text(str(r))\
-                .position([r+self.cab_to_nose, 0, .1])\
+                .position([r, 0, .1])\
                 .id(f'{r}lb')
 
             if r == self.slowdown_distance:
                 builder.primitive('/measuring_circles')\
-                    .circle([self.cab_to_nose, 0, 0], r)\
+                    .circle([0, 0, 0], r)\
                     .style({'stroke_color': [255, 200, 0, 70]})\
                     .id('slowdown: ' + str(r))
             elif r == self.stop_distance:
                 builder.primitive('/measuring_circles')\
-                    .circle([self.cab_to_nose, 0, 0], r)\
+                    .circle([0, 0, 0], r)\
                     .style({'stroke_color': [255, 50, 10, 70]})\
                     .id('stop: ' + str(r))
             else:
                 builder.primitive('/measuring_circles')\
-                    .circle([self.cab_to_nose, 0, 0], r)\
+                    .circle([0, 0, 0], r)\
                     .id(str(r))
 
         cam_fov = [-28.5, 28.5]  # 57 deg
@@ -292,8 +292,7 @@ class CollectorScenario:
             r = 40
             label = (r, c_phi)
             (x, y, z) = self.get_object_xyz_primitive(r, c_phi*math.pi/180)
-            x += self.cab_to_nose
-            vertices = [self.cab_to_nose, 0, 0, x, y, z]
+            vertices = [0, 0, 0, x, y, z]
             builder.primitive('/camera_fov')\
                 .polyline(vertices)\
                 .id("cam_fov: "+str(label))
@@ -497,8 +496,7 @@ class CollectorScenario:
                 _, combine_state = combine_state_tuple
 
                 x, y = transform_combine_to_local(combine_state, tractor_state, self.utm_zone)
-                # x -= (self.cab_to_nose + TRACTOR_GPS_TO_REAR_AXLE)
-                x += self.cab_to_nose
+                x -= TRACTOR_GPS_TO_REAR_AXLE
                 z = 0.5
 
                 combine_heading = combine_state['heading']  # degrees
@@ -559,8 +557,6 @@ class CollectorScenario:
                 np.flipud(self.path_prediction.right),
                 np.full(self.path_prediction.right.shape[0], z)
             ))
-            left[:, 0] += self.cab_to_nose
-            right[:, 0] += self.cab_to_nose
 
             vertices = list(np.concatenate((
                 left.flatten(),
@@ -584,11 +580,6 @@ class CollectorScenario:
                 np.flipud(self.path_prediction.right),
                 np.full(self.path_prediction.right.shape[0], z)
             ))
-
-            left[:, 0] += self.cab_to_nose * math.cos(self.tractor_theta)
-            left[:, 1] += self.cab_to_nose * math.sin(self.tractor_theta)
-            right[:, 0] += self.cab_to_nose * math.cos(self.tractor_theta)
-            right[:, 1] += self.cab_to_nose * math.sin(self.tractor_theta)
 
             vertices = list(np.concatenate((
                 left.flatten(),
@@ -630,8 +621,6 @@ class CollectorScenario:
                 np.flipud(self.path_prediction.right),
                 np.full(self.path_prediction.right.shape[0], z)
             ))
-            left[:, 0] += self.cab_to_nose
-            right[:, 0] += self.cab_to_nose
 
             vertices = list(np.concatenate((
                 left.flatten(),
@@ -687,10 +676,6 @@ class CollectorScenario:
                 utm_coords[:, 0] -= self.tractor_easting
                 utm_coords[:, 1] -= self.tractor_northing
 
-                # show the field definition relative to the nose of the tractor
-                utm_coords[:, 0] += self.cab_to_nose * math.cos(self.tractor_theta)
-                utm_coords[:, 1] += self.cab_to_nose * math.sin(self.tractor_theta)
-
                 z = 1.0
                 vertices = list(np.column_stack(
                     (utm_coords, np.full(utm_coords.shape[0], z))
@@ -729,8 +714,8 @@ class CollectorScenario:
         y = math.sin(ob[angle_key]) * ob[dist_key]
         z = 1.5
 
-        if not radar_ob:
-            x -= self.cab_to_nose
+        if radar_ob:
+            x += self.cab_to_nose
 
         return (x, y, z)
 
