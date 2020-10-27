@@ -215,27 +215,13 @@ class CollectorScenario:
                                                                 tractor_state['latitude'],
                                                                 tractor_state['longitude'],
                                                                 self.utm_zone)
-
                 builder.pose("/vehicle_pose")\
                     .timestamp(timestamp)\
                     .position(0., 0., 0.)\
                     .orientation(tractor_state['roll'], tractor_state['pitch'], tractor_theta)
-
-                self._draw_machine_state(builder)
-                self._draw_predicted_paths(builder)
-                self._draw_planned_path(builder)
-                self._draw_field_definition(builder)
-                # TODO: draw something with the sync status
-
             else:
                 builder.pose("/vehicle_pose")\
                     .timestamp(timestamp)\
-
-            if camera_output is not None:
-                self._draw_camera_targets(camera_output, builder)
-
-            if radar_output is not None:
-                self._draw_radar_targets(radar_output, builder)
 
             if self.mqtt_enabled:
                 if self.mqtt_tracking_outputs:
@@ -243,8 +229,6 @@ class CollectorScenario:
                 else:
                     print("mqtt enabled but no mqtt tracking outputs are stored")
                     tracking_output = None
-            if tracking_output is not None:
-                self._draw_tracking_targets(tracking_output, builder)
 
             if field_definition is not None:
                 self.field_definition = field_definition
@@ -260,6 +244,15 @@ class CollectorScenario:
             
             if control_signal is not None:
                 self.control_signal = control_signal
+
+            self._draw_tracking_targets(tracking_output, builder)
+            self._draw_camera_targets(camera_output, builder)
+            self._draw_radar_targets(radar_output, builder)
+            self._draw_machine_state(builder)
+            self._draw_predicted_paths(builder)
+            self._draw_planned_path(builder)
+            self._draw_field_definition(builder)
+            # TODO: draw something with the sync status
 
             if img is not None:
                 if camera_output is not None:
@@ -278,6 +271,8 @@ class CollectorScenario:
 
 
     def _draw_radar_targets(self, radar_output, builder: xviz.XVIZBuilder):
+        if radar_output is None:
+            return
         try:
             if self.radar_filter.prev_target_set is not None:
                 if self.radar_filter.prev_target_set == radar_output['targets']:
@@ -314,37 +309,44 @@ class CollectorScenario:
 
 
     def _draw_tracking_targets(self, tracking_output, builder: xviz.XVIZBuilder):
+        if tracking_output is None:
+            return
         try:
             if 'tracks' in tracking_output:            
                 min_confidence = 0.1
                 min_hits = 2
                 for track in tracking_output['tracks']:
-                    if track['score'] > min_confidence and track['hitStreak'] > min_hits:
-                        (x, y, z) = self.get_object_xyz(track, 'angle', 'distance', radar_ob=False)
+                    if not track['score'] > min_confidence \
+                            or not track['hitStreak'] > min_hits:
+                        continue
 
-                        if track['radarDistCamFrame'] != self.track_history.get(track['trackId'], -1)\
+                    (x, y, z) = self.get_object_xyz(track, 'angle', 'distance', radar_ob=False)
+
+                    if track['radarDistCamFrame'] != self.track_history.get(track['trackId'], -1) \
                             and track['radarDistCamFrame'] > 0.1:
-                            fill_color = [0, 255, 0]  # Green
-                        else:
-                            fill_color = [0, 0, 255]  # Blue
+                        fill_color = [0, 255, 0]  # Green
+                    else:
+                        fill_color = [0, 0, 255]  # Blue
 
-                        builder.primitive('/tracking_targets')\
-                            .circle([x, y, z], .5)\
-                            .style({'fill_color': fill_color})\
+                    builder.primitive('/tracking_targets')\
+                        .circle([x, y, z], .5)\
+                        .style({'fill_color': fill_color})\
+                        .id(track['trackId'])
+
+                    text = f"[{track['classId'][0]}]{track['trackId']}"
+                    builder.primitive('/tracking_id')\
+                            .text(text)\
+                            .position([x, y, z+.1])\
                             .id(track['trackId'])
 
-                        text = f"[{track['classId'][0]}]{track['trackId']}"
-                        builder.primitive('/tracking_id')\
-                                .text(text)\
-                                .position([x, y, z+.1])\
-                                .id(track['trackId'])
-
-                        self.track_history[track['trackId']] = track['radarDistCamFrame']
+                    self.track_history[track['trackId']] = track['radarDistCamFrame']
         except Exception as e:
             print('Crashed in draw tracking targets:', e)
 
 
     def _draw_camera_targets(self, camera_output, builder: xviz.XVIZBuilder):
+        if camera_output is None:
+            return
         try:
             for target in camera_output['targets']:
                 (x, y, z) = self.get_object_xyz(target, 'objectAngle', 'objectDistance', radar_ob=False)
@@ -360,6 +362,8 @@ class CollectorScenario:
 
     
     def _draw_machine_state(self, builder: xviz.XVIZBuilder):
+        if not self.tractor_state or not self.combine_states:
+            return
         try:
             _, tractor_state = self.tractor_state[-1]
             tractor_heading = tractor_state['heading']  # degrees
@@ -411,6 +415,8 @@ class CollectorScenario:
 
     
     def _draw_predicted_paths(self, builder: xviz.XVIZBuilder):
+        if not self.tractor_state:
+            return
         try:
             _, tractor_state = self.tractor_state[-1]
             speed = tractor_state['speed']
@@ -474,11 +480,10 @@ class CollectorScenario:
             print('Crashed in draw predicted path:', e)
 
 
-    def _draw_commanded_path(self, builder: xviz.XVIZBuilder):
+    def _draw_control_signal(self, builder: xviz.XVIZBuilder):
+        if self.control_signal is None:
+            return
         try:
-            if self.control_signal is None:
-                return
-
             speed = self.control_signal['setSpeed']
             curvature = self.control_signal['commandCurvature']
             wheel_angle = curvature * self.wheel_base / 1000
@@ -499,19 +504,18 @@ class CollectorScenario:
                 right.flatten()
             )))
 
-            builder.primitive('/commanded_path')\
+            builder.primitive('/control_signal')\
                 .polyline(vertices)\
-                .id('commanded_path')
+                .id('control_signal')
 
         except Exception as e:
             print('Crashed in draw commanded path:', e)
 
 
     def _draw_planned_path(self, builder: xviz.XVIZBuilder):
+        if self.planned_path is None:
+            return
         try:
-            if self.planned_path is None:
-                return
-
             _, tractor_state = self.tractor_state[-1]
             xy_array = utm_array_to_local(tractor_state, self.utm_zone, self.planned_path)
             z = 1.0
@@ -529,10 +533,9 @@ class CollectorScenario:
     
 
     def _draw_field_definition(self, builder: xviz.XVIZBuilder):
+        if self.field_definition is None:
+            return
         try:
-            if self.field_definition is None:
-                return
-
             poly = []
             if self.field_definition['type'] == 'MultiPolygon':
                 for polygons in self.field_definition['coordinates']:
