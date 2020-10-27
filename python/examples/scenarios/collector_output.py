@@ -347,7 +347,7 @@ class CollectorScenario:
 
                 builder.pose("/vehicle_pose")\
                     .timestamp(timestamp)\
-                    .position(0, 0, 0)\
+                    .position(0., 0., 0.)\
                     .orientation(tractor_state['roll'], tractor_state['pitch'], self.tractor_theta)
 
                 self._draw_machine_state(builder)
@@ -497,7 +497,8 @@ class CollectorScenario:
                 _, combine_state = combine_state_tuple
 
                 x, y = transform_combine_to_local(combine_state, tractor_state, self.utm_zone)
-                x -= (self.cab_to_nose + TRACTOR_GPS_TO_REAR_AXLE)
+                # x -= (self.cab_to_nose + TRACTOR_GPS_TO_REAR_AXLE)
+                x += self.cab_to_nose
                 z = 0.5
 
                 combine_heading = combine_state['heading']  # degrees
@@ -523,7 +524,7 @@ class CollectorScenario:
                 )).flatten())
                 
                 builder.primitive('/combine_position')\
-                    .circle([combine_center_x, combine_center_y, 0], .5)\
+                    .circle([combine_center_x, combine_center_y, z], .5)\
                     .id('combine')
                 builder.primitive('/combine_region')\
                     .polyline(vertices)\
@@ -687,8 +688,8 @@ class CollectorScenario:
                 utm_coords[:, 1] -= self.tractor_northing
 
                 # show the field definition relative to the nose of the tractor
-                utm_coords[:, 0] -= (self.cab_to_nose + TRACTOR_GPS_TO_REAR_AXLE) * math.cos(self.tractor_theta)
-                utm_coords[:, 1] -= (self.cab_to_nose + TRACTOR_GPS_TO_REAR_AXLE) * math.sin(self.tractor_theta)
+                utm_coords[:, 0] += self.cab_to_nose * math.cos(self.tractor_theta)
+                utm_coords[:, 1] += self.cab_to_nose * math.sin(self.tractor_theta)
 
                 z = 1.0
                 vertices = list(np.column_stack(
