@@ -76,6 +76,8 @@ class CollectorScenario:
     
     def reset_values(self):
         self.tractor_state.clear()
+        self.tractor_easting = None
+        self.tractor_northing = None
         self.combine_states = {}
         self.planned_path = None
         self.field_definition = None
