@@ -66,7 +66,6 @@ class CollectorScenario:
         self.tractor_state = deque(maxlen=10)
         self.tractor_easting = None
         self.tractor_northing = None
-        self.tractor_theta = None
         self.combine_states = {}
         self.utm_zone = ''
         self.planned_path = None
@@ -211,7 +210,7 @@ class CollectorScenario:
             
             if self.tractor_state:
                 _, tractor_state = self.tractor_state[-1]
-                self.tractor_theta = (90 - tractor_state['heading']) * math.pi / 180
+                tractor_theta = (90 - tractor_state['heading']) * math.pi / 180
                 self.tractor_easting, self.tractor_northing = latlon_to_utm(
                                                                 tractor_state['latitude'],
                                                                 tractor_state['longitude'],
@@ -220,7 +219,7 @@ class CollectorScenario:
                 builder.pose("/vehicle_pose")\
                     .timestamp(timestamp)\
                     .position(0., 0., 0.)\
-                    .orientation(tractor_state['roll'], tractor_state['pitch'], self.tractor_theta)
+                    .orientation(tractor_state['roll'], tractor_state['pitch'], tractor_theta)
 
                 self._draw_machine_state(builder)
                 self._draw_predicted_paths(builder)
