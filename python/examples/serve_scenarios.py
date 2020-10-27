@@ -7,7 +7,7 @@ import xviz
 from xviz.builder import XVIZBuilder, XVIZMetadataBuilder
 from xviz.server import XVIZServer, XVIZBaseSession
 
-from scenarios.collector_output import CollectorScenario
+from scenarios.collector_scenario import CollectorScenario
 
 
 class ScenarioSession(XVIZBaseSession):
