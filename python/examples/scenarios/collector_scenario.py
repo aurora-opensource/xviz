@@ -434,9 +434,9 @@ class CollectorScenario:
 
             if self.sync_status is not None \
                     and self.sync_status['runningSync']:
-                threshold_list = self.radar_safety_config['waypoint_stop_threshold']
-            else:
                 threshold_list = self.radar_safety_config['sync_stop_threshold']
+            else:
+                threshold_list = self.radar_safety_config['waypoint_stop_threshold']
             
             self.path_prediction.set_min_distance(speed, threshold_list)
             self.path_prediction.predict(wheel_angle, speed, heading, "vision")
