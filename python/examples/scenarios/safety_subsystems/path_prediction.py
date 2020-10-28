@@ -96,7 +96,7 @@ class PathPrediction(object):
     def predict(self, steering_angle, speed, heading, subsystem):
         """Predict path for given speed and steering angle."""
 
-        if subsystem == "vision" or subsystem == "control":
+        if subsystem == "vision":
             self.C['machine_width'] = self.C['path_width_vision']
             speed = max(speed, 0.447 * self.min_speed['vision'])
             horizon = max(self.min_distance / speed, 10.0)
@@ -106,6 +106,13 @@ class PathPrediction(object):
             accel = -0.5
             stopping_distance = - speed * speed / (2.0 * accel)
             horizon = stopping_distance / speed * 1.1
+        elif subsystem == "control":
+            if speed != 0:
+                speed = max(speed, 0.447 * self.min_speed['vision'])
+                horizon = max(self.min_distance / speed, 10.0)
+            else:
+                horizon = 0
+
         else:
             print('path prediction recieved unrecognized subsystem argument')
         
