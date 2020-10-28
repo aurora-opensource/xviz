@@ -7,7 +7,7 @@ import xviz
 from xviz.builder import XVIZBuilder, XVIZMetadataBuilder
 from xviz.server import XVIZServer, XVIZBaseSession
 
-from scenarios.collector_output import CollectorScenario
+from scenarios.collector_scenario import CollectorScenario
 
 
 class ScenarioSession(XVIZBaseSession):
@@ -36,7 +36,7 @@ class ScenarioSession(XVIZBaseSession):
                 t += 0.5
                 await asyncio.sleep(s)
             except KeyboardInterrupt:
-                s = 1
+                s = 0.2
 
 class ScenarioHandler:
     def __init__(self):

@@ -4,6 +4,21 @@ import collections as cl
 import functools as ft
 
 
+def get_path_prediction(config):
+    prediction_args = {
+        'wheel_base': config['guidance']['wheel_base'],
+        'path_width_vision': config['safety']['radar']['path_width'],
+        'path_width_predictive': config['navigation']['machine_width']
+    }
+    min_speed = {}
+    min_speed['predictive'] = 0.5  # mph
+    min_speed['vision'] = config['guidance']['safety']['predictive_slowdown_speed_mph']
+    cabin_to_nose = config['safety']['object_tracking']['cabin_to_nose_distance']
+    min_distance = config['safety']['radar']['stop_threshold_default']
+
+    return PathPrediction(prediction_args, min_speed, min_distance, cabin_to_nose)
+
+
 def predict_position(X, U, C, dt):
     """Predicts position of vehicle based on CTRV model
     X - state (x, y, yaw)
@@ -30,29 +45,29 @@ def predict_position(X, U, C, dt):
     return px_t, py_t, yaw_t
 
 
-def predict_path(X0, U0, C, horizon=10.0, n_steps=20):
+def predict_path(X0, U0, C, horizon=10.0, n_steps=10):
     """Predicts path until given horizon
     U0 - Control vector to use (v, steering_angle)
     tspan - sequence
         Time steps at which to predict state - [0.0, 0.1, 0.2 ... ]
     """
-    tspan = np.linspace(0, horizon, n_steps, endpoint=True)
+    tspan = np.linspace(0, horizon, n_steps+1, endpoint=True)
     W_half = 0.5 * C['machine_width']
 
-    # Don't care for path beyond phi= +/- pi/2
-    path = np.array(list(filter(lambda row: -pi / 2 < atan2(row[1], row[0]) < pi / 2,
-                                map(ft.partial(predict_position, X0, U0, C), tspan))))
+    path = np.array(list(
+        map(ft.partial(predict_position, X0, U0, C), tspan)
+    ))
 
-    left = np.column_stack([path[:, 0] + W_half * np.cos(path[:, 2] - pi / 2),
-                            path[:, 1] + W_half * np.sin(path[:, 2] - pi / 2)])
-    right = np.column_stack([path[:, 0] + W_half * np.cos(path[:, 2] + pi / 2),
-                             path[:, 1] + W_half * np.sin(path[:, 2] + pi / 2)])
+    left = np.column_stack([path[:, 0] + W_half * np.cos(path[:, 2] + pi / 2),
+                            path[:, 1] + W_half * np.sin(path[:, 2] + pi / 2)])
+    right = np.column_stack([path[:, 0] + W_half * np.cos(path[:, 2] - pi / 2),
+                             path[:, 1] + W_half * np.sin(path[:, 2] - pi / 2)])
 
     return path, left, right
 
-	
+
 class PathPrediction(object):
-    def __init__(self, C):
+    def __init__(self, C, min_speed, min_distance_default, cabin_to_nose):
         """
         C - constants dict
             - wheel_base
@@ -61,41 +76,44 @@ class PathPrediction(object):
         self.X0 = (0, 0, 0)
         self.C = C
         self.steering_history = cl.deque(maxlen=10)
+        self.min_speed = min_speed
+        self.min_distance_default = min_distance_default # default value, gets updated from threshold_list
+        self.min_distance = None
+        self.cabin_to_nose = cabin_to_nose
 
-    def to_polar(self, path):
-        r = np.sqrt(path[:, 0]**2 + path[:, 1]**2)
-        theta = np.arctan2(path[:, 1], path[:, 0])
-        return r, theta
+    def get_threshold(self, speed, threshold_list):
+        speed /= 0.447
+        threshold = self.min_distance_default
+        for val in threshold_list:
+            if val['min_speed'] <= speed <= val['max_speed']:
+                threshold = val['threshold']
+                break
+        return threshold
 
-    def get_closest_phi(self, path, r):
-        # Find row of vector with 'r' value closest to target
-        closest_row = np.argmin(np.abs(path[:, 0] - r))
-        closest_phi = path[closest_row, 1]
-        return closest_phi
+    def set_min_distance(self, veh_speed, threshold_list):
+        self.min_distance = self.get_threshold(veh_speed, threshold_list) + self.cabin_to_nose
 
-    def get_phi_bounds(self, r):
-        left_phi = self.get_closest_phi(self.left_p, r)
-        right_phi = self.get_closest_phi(self.right_p, r)
-        return left_phi, right_phi
-
-    def predict(self, steering_angle, speed):
+    def predict(self, steering_angle, speed, heading, subsystem):
         """Predict path for given speed and steering angle."""
-        speed = max(speed, 0.447 * 0.5)
-        horizon = min(30.0 / speed, 10.0)
+
+        if subsystem == "vision" or subsystem == "control":
+            self.C['machine_width'] = self.C['path_width_vision']
+            speed = max(speed, 0.447 * self.min_speed['vision'])
+            horizon = max(self.min_distance / speed, 10.0)
+        elif subsystem == "predictive":
+            self.C['machine_width'] = self.C['path_width_predictive']
+            speed = max(speed, 0.447 * self.min_speed['predictive'])
+            accel = -0.5
+            stopping_distance = - speed * speed / (2.0 * accel)
+            horizon = stopping_distance / speed * 1.1
+        else:
+            print('path prediction recieved unrecognized subsystem argument')
+        
+        n_steps = 10
 
         U = (speed, steering_angle)
         self.U = U
-        n_steps = horizon / 0.5
+        self.X0 = 0, 0, heading * pi / 180
 
         self.path, self.left, self.right = predict_path(
             self.X0, U, self.C, horizon=horizon, n_steps=int(n_steps))
-        self.left_p = np.column_stack(self.to_polar(self.left))
-        self.right_p = np.column_stack(self.to_polar(self.right))
-        self.path_p = np.column_stack(self.to_polar(self.path))
-
-    def is_unsafe(self, r, phi):
-        """Checks if the given target in polar coordinates is inside the predicted path"""
-        l_phi, r_phi = self.get_phi_bounds(r)
-        if abs(self.U[0]) < 0.01:
-            return True
-        return l_phi <= atan2(sin(phi), cos(phi)) <= r_phi

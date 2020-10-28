@@ -4,7 +4,7 @@ from pathlib import Path
 
 from google.protobuf.json_format import MessageToDict
 from google.protobuf.message import DecodeError
-from protobuf_APIs import collector_pb2, gandalf_pb2, falconeye_pb2, radar_pb2, camera_pb2
+from protobuf_APIs import collector_pb2, gandalf_pb2, falconeye_pb2, radar_pb2, camera_pb2, smarthp_pb2
 
 from .image import extract_image
 from .com_manager import MqttConst
@@ -72,7 +72,22 @@ def extract_collector_output_slim(collector_output):
     else:
         planned_path = None
 
-    return frame, camera_output, radar_output, tracking_output, machine_state, field_definition, planned_path
+    if 'collector/data/sync_status' in collector_output.data:
+        sync_status = smarthp_pb2.SyncStatus()
+        sync_status.ParseFromString(collector_output.data['collector/data/sync_status'])
+        sync_status = MessageToDict(sync_status, including_default_value_fields=True)
+    else:
+        sync_status = None
+
+    if 'collector/data/control_signal' in collector_output.data:
+        control_signal = gandalf_pb2.ControlSignal()
+        control_signal.ParseFromString(collector_output.data['collector/data/control_signal'])
+        control_signal = MessageToDict(control_signal, including_default_value_fields=True)
+    else:
+        control_signal = None
+
+    return frame, camera_output, radar_output, tracking_output, \
+            machine_state, field_definition, planned_path, sync_status, control_signal
 
 
 def extract_collector_output(collector_output):
