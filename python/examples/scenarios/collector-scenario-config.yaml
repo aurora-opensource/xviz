@@ -1,3 +1,4 @@
 collector_output_file:
 extract_directory:
 mqtt_enabled: False
+IVT: True
