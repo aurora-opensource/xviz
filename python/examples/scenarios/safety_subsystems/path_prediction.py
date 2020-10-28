@@ -13,10 +13,10 @@ def get_path_prediction(config):
     min_speed = {}
     min_speed['predictive'] = 0.5  # mph
     min_speed['vision'] = config['guidance']['safety']['predictive_slowdown_speed_mph']
-    min_distance = config['safety']['radar']['stop_threshold_default'] \
-                    + config['safety']['object_tracking']['cabin_to_nose_distance']
+    cabin_to_nose = config['safety']['object_tracking']['cabin_to_nose_distance']
+    min_distance = config['safety']['radar']['stop_threshold_default']
 
-    return PathPrediction(prediction_args, min_speed, min_distance)
+    return PathPrediction(prediction_args, min_speed, min_distance, cabin_to_nose)
 
 
 def predict_position(X, U, C, dt):
@@ -67,7 +67,7 @@ def predict_path(X0, U0, C, horizon=10.0, n_steps=10):
 
 
 class PathPrediction(object):
-    def __init__(self, C, min_speed, min_distance_default):
+    def __init__(self, C, min_speed, min_distance_default, cabin_to_nose):
         """
         C - constants dict
             - wheel_base
@@ -79,6 +79,7 @@ class PathPrediction(object):
         self.min_speed = min_speed
         self.min_distance_default = min_distance_default # default value, gets updated from threshold_list
         self.min_distance = None
+        self.cabin_to_nose = cabin_to_nose
 
     def get_threshold(self, speed, threshold_list):
         speed /= 0.447
@@ -90,7 +91,7 @@ class PathPrediction(object):
         return threshold
 
     def set_min_distance(self, veh_speed, threshold_list):
-        self.min_distance = self.get_threshold(veh_speed, threshold_list)
+        self.min_distance = self.get_threshold(veh_speed, threshold_list) + self.cabin_to_nose
 
     def predict(self, steering_angle, speed, heading, subsystem):
         """Predict path for given speed and steering angle."""
