@@ -112,12 +112,10 @@ class PathPrediction(object):
                 horizon = max(self.min_distance / speed, 10.0)
             else:
                 horizon = 0
-
         else:
             print('path prediction recieved unrecognized subsystem argument')
         
         n_steps = 10
-
         U = (speed, steering_angle)
         self.U = U
         self.X0 = 0, 0, heading * pi / 180
