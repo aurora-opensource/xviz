@@ -48,20 +48,23 @@ class CollectorScenario:
             comm = ComManager()
             comm.subscribe(MqttConst.TRACKS_TOPIC, self.store_tracking_output)
         
-        configfile = Path(__file__).parents[3] / 'Global-Configs' / 'Tractors' / 'John-Deere' / '8RIVT_WHEEL.yaml'
+        if collector_config['IVT']:
+            configfile = Path(__file__).parents[3] / 'Global-Configs' / 'Tractors' / 'John-Deere' / '8RIVT_WHEEL.yaml'
+        else:
+            configfile = Path(__file__).parents[3] / 'Global-Configs' / 'Tractors' / 'John-Deere' / '8RPST_WHEEL.yaml'
         global_config = load_config(str(configfile))
 
         self.path_prediction = get_path_prediction(global_config)
 
-        radar_safety_config = global_config['safety']['radar']
-        self.radar_filter = RadarFilter(radar_safety_config)
+        self.radar_safety_config = global_config['safety']['radar']
+        self.radar_filter = RadarFilter(self.radar_safety_config)
 
         self.cab_to_nose = global_config['safety']['object_tracking']['cabin_to_nose_distance']
-        self.combine_length = radar_safety_config['combine_length']
+        self.combine_length = self.radar_safety_config['combine_length']
         self.combine_width = 8.0 # default, gets updated by machine state message
         self.wheel_base = global_config['guidance']['wheel_base']
-        self.stop_distance = radar_safety_config['stop_threshold_default']
-        self.slowdown_distance = radar_safety_config['slowdown_threshold_default']
+        self.stop_distance = self.radar_safety_config['stop_threshold_default']
+        self.slowdown_distance = self.radar_safety_config['slowdown_threshold_default']
 
         self.tractor_state = deque(maxlen=10)
         self.tractor_easting = None
@@ -427,8 +430,15 @@ class CollectorScenario:
             speed = tractor_state['speed']
             curvature = tractor_state['curvature']
             heading = 0.
-
             wheel_angle = curvature * self.wheel_base / 1000
+
+            if self.sync_status is not None \
+                    and self.sync_status['runningSync']:
+                threshold_list = self.radar_safety_config['waypoint_stop_threshold']
+            else:
+                threshold_list = self.radar_safety_config['sync_stop_threshold']
+            
+            self.path_prediction.set_min_distance(speed, threshold_list)
             self.path_prediction.predict(wheel_angle, speed, heading, "vision")
 
             z = 0.9

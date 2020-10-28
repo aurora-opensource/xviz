@@ -7,13 +7,13 @@ import functools as ft
 def get_path_prediction(config):
     prediction_args = {
         'wheel_base': config['guidance']['wheel_base'],
-        'path_width_vision': config['safety']['object_tracking']['path_width'],
+        'path_width_vision': config['safety']['radar']['path_width'],
         'path_width_predictive': config['navigation']['machine_width']
     }
     min_speed = {}
     min_speed['predictive'] = 0.5  # mph
     min_speed['vision'] = config['guidance']['safety']['predictive_slowdown_speed_mph']
-    min_distance = config['safety']['object_tracking']['stop_threshold_default'] \
+    min_distance = config['safety']['radar']['stop_threshold_default'] \
                     + config['safety']['object_tracking']['cabin_to_nose_distance']
 
     return PathPrediction(prediction_args, min_speed, min_distance)
@@ -67,7 +67,7 @@ def predict_path(X0, U0, C, horizon=10.0, n_steps=10):
 
 
 class PathPrediction(object):
-    def __init__(self, C, min_speed, min_distance):
+    def __init__(self, C, min_speed, min_distance_default):
         """
         C - constants dict
             - wheel_base
@@ -77,12 +77,25 @@ class PathPrediction(object):
         self.C = C
         self.steering_history = cl.deque(maxlen=10)
         self.min_speed = min_speed
-        self.min_distance = min_distance
+        self.min_distance_default = min_distance_default # default value, gets updated from threshold_list
+        self.min_distance = None
+
+    def get_threshold(self, speed, threshold_list):
+        speed /= 0.447
+        threshold = self.min_distance_default
+        for val in threshold_list:
+            if val['min_speed'] <= speed <= val['max_speed']:
+                threshold = val['threshold']
+                break
+        return threshold
+
+    def set_min_distance(self, veh_speed, threshold_list):
+        self.min_distance = self.get_threshold(veh_speed, threshold_list)
 
     def predict(self, steering_angle, speed, heading, subsystem):
         """Predict path for given speed and steering angle."""
 
-        if subsystem == "vision":
+        if subsystem == "vision" or subsystem == "control":
             self.C['machine_width'] = self.C['path_width_vision']
             speed = max(speed, 0.447 * self.min_speed['vision'])
             horizon = max(self.min_distance / speed, 10.0)
@@ -92,8 +105,8 @@ class PathPrediction(object):
             accel = -0.5
             stopping_distance = - speed * speed / (2.0 * accel)
             horizon = stopping_distance / speed * 1.1
-        elif subsystem == "control":
-            horizon = 10.0
+        else:
+            print('path prediction recieved unrecognized subsystem argument')
         
         n_steps = 10
 
