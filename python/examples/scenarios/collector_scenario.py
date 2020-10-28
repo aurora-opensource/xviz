@@ -47,7 +47,7 @@ class CollectorScenario:
             self.mqtt_tracking_outputs = []
             comm = ComManager()
             comm.subscribe(MqttConst.TRACKS_TOPIC, self.store_tracking_output)
-        
+
         if collector_config['IVT']:
             configfile = Path(__file__).parents[3] / 'Global-Configs' / 'Tractors' / 'John-Deere' / '8RIVT_WHEEL.yaml'
         else:
@@ -77,7 +77,7 @@ class CollectorScenario:
         self.sync_status = None
         self.control_signal = None
 
-    
+
     def reset_values(self):
         self.tractor_state.clear()
         self.tractor_easting = None
@@ -90,7 +90,7 @@ class CollectorScenario:
         self.control_signal = None
         self.index = 0
 
-    
+
     def store_tracking_output(self, msg):
         tracking_output = falconeye_pb2.TrackingOutput()
         tracking_output.ParseFromString(msg.payload)
@@ -213,7 +213,7 @@ class CollectorScenario:
 
             if machine_state is not None:
                 self.update_machine_state(machine_state)
-            
+
             if self.tractor_state:
                 _, tractor_state = self.tractor_state[-1]
                 self.tractor_theta = (90 - tractor_state['heading']) * math.pi / 180
@@ -247,10 +247,10 @@ class CollectorScenario:
 
             if control_signal is not None:
                 self.control_signal = control_signal
-            
+
             if sync_status is not None:
                 self.sync_status = sync_status
-            
+
             self._draw_tracking_targets(tracking_output, builder)
             self._draw_camera_targets(camera_output, builder)
             self._draw_radar_targets(radar_output, builder)
@@ -368,7 +368,7 @@ class CollectorScenario:
         except Exception as e:
             print('Crashed in draw camera targets:', e)
 
-    
+
     def _draw_machine_state(self, builder: xviz.XVIZBuilder):
         if not self.tractor_state or not self.combine_states:
             return
@@ -421,7 +421,7 @@ class CollectorScenario:
         except Exception as e:
             print('Crashed in draw machine state:', e)
 
-    
+
     def _draw_predicted_path(self, builder: xviz.XVIZBuilder):
         if not self.tractor_state:
             return
@@ -437,7 +437,7 @@ class CollectorScenario:
                 threshold_list = self.radar_safety_config['sync_stop_threshold']
             else:
                 threshold_list = self.radar_safety_config['waypoint_stop_threshold']
-            
+
             self.path_prediction.set_min_distance(speed, threshold_list)
             self.path_prediction.predict(wheel_angle, speed, heading, "vision")
 
@@ -471,7 +471,7 @@ class CollectorScenario:
         except Exception as e:
             print('Crashed in draw predicted path:', e)
 
-    
+
     def _draw_predictive_sub_path(self, builder: xviz.XVIZBuilder):
         if not self.tractor_state:
             return
@@ -547,7 +547,7 @@ class CollectorScenario:
 
         except Exception as e:
             print('Crashed in draw planned path:', e)
-    
+
 
     def _draw_field_definition(self, builder: xviz.XVIZBuilder):
         if self.field_definition is None or self.tractor_easting is None:
@@ -579,7 +579,7 @@ class CollectorScenario:
 
         except Exception as e:
             print('Crashed in draw field definition:', e)
-    
+
 
     def _draw_sync_status(self, builder: xviz.XVIZBuilder):
         if self.sync_status is None:
@@ -590,7 +590,7 @@ class CollectorScenario:
         except Exception as e:
             print('Crashed in draw sync status:', e)
 
-    
+
     def update_machine_state(self, machine_state):
         if not self.utm_zone:
             # only need to set it once
@@ -604,7 +604,7 @@ class CollectorScenario:
                     self.tractor_state.append((self.index, state))
                 else:
                     self.combine_states[vehicle] = (self.index, state)
-    
+
 
     def _is_vehicle_state_old(self, vehicle_state_tuple):
         last_updated_index, _ = vehicle_state_tuple
