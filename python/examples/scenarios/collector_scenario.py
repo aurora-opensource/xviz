@@ -462,6 +462,8 @@ class CollectorScenario:
                 np.flipud(self.path_prediction.right),
                 np.full(self.path_prediction.right.shape[0], z)
             ))
+            left[:, 0] -= TRACTOR_GPS_TO_REAR_AXLE
+            right[:, 0] -= TRACTOR_GPS_TO_REAR_AXLE
 
             vertices = list(np.concatenate((
                 left.flatten(),
@@ -505,6 +507,11 @@ class CollectorScenario:
                 np.flipud(self.path_prediction.right),
                 np.full(self.path_prediction.right.shape[0], z)
             ))
+
+            left[:, 0] -= TRACTOR_GPS_TO_REAR_AXLE * math.cos(self.tractor_theta)
+            left[:, 1] -= TRACTOR_GPS_TO_REAR_AXLE * math.sin(self.tractor_theta)
+            right[:, 0] -= TRACTOR_GPS_TO_REAR_AXLE * math.cos(self.tractor_theta)
+            right[:, 1] -= TRACTOR_GPS_TO_REAR_AXLE * math.sin(self.tractor_theta)
 
             vertices = list(np.concatenate((
                 left.flatten(),
@@ -577,8 +584,8 @@ class CollectorScenario:
 
             for p in poly:
                 utm_coords = np.array(p)
-                utm_coords[:, 0] -= self.tractor_easting
-                utm_coords[:, 1] -= self.tractor_northing
+                utm_coords[:, 0] -= (self.tractor_easting + TRACTOR_GPS_TO_REAR_AXLE * math.cos(self.tractor_theta))
+                utm_coords[:, 1] -= (self.tractor_northing + TRACTOR_GPS_TO_REAR_AXLE * math.sin(self.tractor_theta))
 
                 z = 1.0
                 vertices = list(np.column_stack(
