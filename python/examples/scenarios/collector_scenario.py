@@ -601,7 +601,7 @@ class CollectorScenario:
 
         except Exception as e:
             print('Crashed in draw sync status:', e)
-    
+
 
     def _draw_sync_params(self, builder: xviz.XVIZBuilder):
         if self.sync_params is None:
