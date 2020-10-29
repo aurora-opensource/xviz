@@ -224,7 +224,11 @@ class CollectorScenario:
                 builder.pose("/vehicle_pose")\
                     .timestamp(timestamp)\
                     .position(0., 0., 0.)\
-                    .orientation(tractor_state['roll'], tractor_state['pitch'], self.tractor_theta)
+                    .orientation(
+                        tractor_state['roll'],
+                        tractor_state['pitch'],
+                        self.tractor_theta
+                    )
             else:
                 builder.pose("/vehicle_pose")\
                     .timestamp(timestamp)\
