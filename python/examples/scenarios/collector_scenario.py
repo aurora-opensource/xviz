@@ -326,7 +326,10 @@ class CollectorScenario:
                         .id(str(target['targetId']))
 
             for not_received_id in self.radar_filter.target_id_set:
-                default_target = MessageToDict(radar_pb2.RadarOutput.Target(), including_default_value_fields=True)
+                default_target = MessageToDict(
+                    radar_pb2.RadarOutput.Target(),
+                    including_default_value_fields=True
+                )
                 self.radar_filter.update_queue(not_received_id, default_target)
             # reset the target id set for next cycle
             self.radar_filter.target_id_set = set(range(48))
@@ -376,7 +379,12 @@ class CollectorScenario:
             return
         try:
             for target in camera_output['targets']:
-                (x, y, z) = self.get_object_xyz(target, 'objectAngle', 'objectDistance', radar_ob=False)
+                (x, y, z) = self.get_object_xyz(
+                    target,
+                    'objectAngle',
+                    'objectDistance',
+                    radar_ob=False
+                )
                 if target['label'] == 'qrcode':
                     continue
 
@@ -596,8 +604,14 @@ class CollectorScenario:
 
             for p in poly:
                 utm_coords = np.array(p)
-                utm_coords[:, 0] -= (self.tractor_easting + TRACTOR_GPS_TO_REAR_AXLE * math.cos(self.tractor_theta))
-                utm_coords[:, 1] -= (self.tractor_northing + TRACTOR_GPS_TO_REAR_AXLE * math.sin(self.tractor_theta))
+                utm_coords[:, 0] -= (
+                    self.tractor_easting
+                    + TRACTOR_GPS_TO_REAR_AXLE * math.cos(self.tractor_theta)
+                )
+                utm_coords[:, 1] -= (
+                    self.tractor_northing
+                    + TRACTOR_GPS_TO_REAR_AXLE * math.sin(self.tractor_theta)
+                )
 
                 z = 1.0
                 vertices = list(np.column_stack(
