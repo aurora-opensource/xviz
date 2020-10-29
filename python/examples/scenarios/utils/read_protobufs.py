@@ -86,8 +86,14 @@ def extract_collector_output_slim(collector_output):
     else:
         control_signal = None
 
-    return frame, camera_output, radar_output, tracking_output, \
-            machine_state, field_definition, planned_path, sync_status, control_signal
+    if 'collector/data/sync_params' in collector_output.data:
+        sync_params = collector_output.data['collector/data/sync_params']
+        sync_params = json.load(sync_params.decode('ascii'))
+    else:
+        sync_params = None
+
+    return frame, camera_output, radar_output, tracking_output, machine_state, \
+            field_definition, planned_path, sync_status, control_signal, sync_params
 
 
 def extract_collector_output(collector_output):

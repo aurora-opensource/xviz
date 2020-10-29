@@ -76,6 +76,7 @@ class CollectorScenario:
         self.field_definition = None
         self.sync_status = None
         self.control_signal = None
+        self.sync_params = None
 
 
     def reset_values(self):
@@ -88,6 +89,7 @@ class CollectorScenario:
         self.field_definition = None
         self.sync_status = None
         self.control_signal = None
+        self.sync_params = None
         self.index = 0
 
 
@@ -201,7 +203,7 @@ class CollectorScenario:
             collector_output, is_slim_output = deserialize_collector_output(collector_output)
             if is_slim_output:
                 img, camera_output, radar_output, tracking_output, machine_state,\
-                    field_definition, planned_path, sync_status, control_signal\
+                    field_definition, planned_path, sync_status, control_signal, sync_params \
                     = extract_collector_output_slim(collector_output)
             else:
                 img, camera_output, radar_output,\
@@ -210,6 +212,7 @@ class CollectorScenario:
                 planned_path = None
                 sync_status = None
                 control_signal = None
+                sync_params = None
 
             if machine_state is not None:
                 self.update_machine_state(machine_state)
@@ -254,6 +257,9 @@ class CollectorScenario:
 
             if sync_status is not None:
                 self.sync_status = sync_status
+            
+            if sync_params is not None:
+                self.sync_params = sync_params
 
             self._draw_tracking_targets(tracking_output, builder)
             self._draw_camera_targets(camera_output, builder)
@@ -265,6 +271,7 @@ class CollectorScenario:
             self._draw_field_definition(builder)
             self._draw_control_signal(builder)
             self._draw_sync_status(builder)
+            self._draw_sync_params(builder)
 
             if img is not None:
                 if camera_output is not None:
@@ -591,8 +598,20 @@ class CollectorScenario:
         try:
             #TODO: draw sync status
             pass
+
         except Exception as e:
             print('Crashed in draw sync status:', e)
+    
+
+    def _draw_sync_params(self, builder: xviz.XVIZBuilder):
+        if self.sync_params is None:
+            return
+
+        try:
+            pass
+
+        except Exception as e:
+            print('Crashed in draw sync params:', e)
 
 
     def update_machine_state(self, machine_state):
