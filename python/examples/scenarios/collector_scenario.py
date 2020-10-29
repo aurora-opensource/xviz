@@ -462,8 +462,6 @@ class CollectorScenario:
                 np.flipud(self.path_prediction.right),
                 np.full(self.path_prediction.right.shape[0], z)
             ))
-            left[:, 0] -= TRACTOR_GPS_TO_REAR_AXLE
-            right[:, 0] -= TRACTOR_GPS_TO_REAR_AXLE
 
             vertices = list(np.concatenate((
                 left.flatten(),
