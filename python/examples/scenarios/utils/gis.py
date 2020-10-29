@@ -4,20 +4,19 @@ import utm
 import numpy as np
 
 
-def latlon_array_to_local(tractor_state, utm_zone, arr):
-    lat, lon = arr[:, 0], arr[:, 1]
+def lonlat_array_to_local(tractor_state, utm_zone, arr):
+    lon, lat = arr[:, 0], arr[:, 1]
     utm_array = np.array(list(map(
-        ft.partial(latlon_to_utm, zone=utm_zone),
-        lat,
-        lon
+        ft.partial(lonlat_to_utm, zone=utm_zone),
+        lon, lat
     )))
-    
+
     return utm_array_to_local(tractor_state, utm_zone, utm_array)
 
 
 def utm_array_to_local(tractor_state, utm_zone, arr):
     translate_x, translate_y = arr[:, 0], arr[:, 1]
-    tractor_x, tractor_y = latlon_to_utm(tractor_state['latitude'], tractor_state['longitude'], utm_zone)
+    tractor_x, tractor_y = lonlat_to_utm(tractor_state['longitude'], tractor_state['latitude'], utm_zone)
     xy_array = np.array(list(map(
         ft.partial(utm_to_local, tractor_x, tractor_y, tractor_state['heading']),
         translate_x, translate_y
@@ -27,14 +26,14 @@ def utm_array_to_local(tractor_state, utm_zone, arr):
     
 
 def transform_combine_to_local(combine_state, tractor_state, utm_zone):
-    combine_x, combine_y = latlon_to_utm(combine_state['latitude'], combine_state['longitude'], utm_zone)
-    tractor_x, tractor_y = latlon_to_utm(tractor_state['latitude'], tractor_state['longitude'], utm_zone)
+    combine_x, combine_y = lonlat_to_utm(combine_state['longitude'], combine_state['latitude'], utm_zone)
+    tractor_x, tractor_y = lonlat_to_utm(tractor_state['longitude'], tractor_state['latitude'], utm_zone)
     dx, dy = utm_to_local(tractor_x, tractor_y, tractor_state['heading'], combine_x, combine_y)
 
     return dx, dy
 
 
-def latlon_to_utm(lat, lon, zone):
+def lonlat_to_utm(lon, lat, zone):
     zone_number, zone_letter = parse_utm_zone(zone)
     converted = utm.from_latlon(
         lat, lon,
