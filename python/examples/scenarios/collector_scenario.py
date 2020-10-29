@@ -10,7 +10,8 @@ from protobuf_APIs import falconeye_pb2, radar_pb2
 from scenarios.meta.collector_meta import get_builder
 from scenarios.utils.com_manager import ComManager, MqttConst
 from scenarios.utils.filesystem import get_collector_instances, load_config
-from scenarios.utils.gis import transform_combine_to_local, utm_array_to_local, get_combine_region, latlon_to_utm
+from scenarios.utils.gis import transform_combine_to_local, get_combine_region, \
+                                utm_array_to_local, lonlat_array_to_local, lonlat_to_utm
 from scenarios.utils.image import postprocess, show_image
 from scenarios.utils.read_protobufs import deserialize_collector_output,\
                                             extract_collector_output, extract_collector_output_slim
@@ -71,6 +72,9 @@ class CollectorScenario:
         self.tractor_northing = None
         self.tractor_theta = None
         self.combine_states = {}
+        self.combine_x = None
+        self.combine_y = None
+        self.combine_relative_theta = None
         self.utm_zone = ''
         self.planned_path = None
         self.field_definition = None
@@ -85,6 +89,9 @@ class CollectorScenario:
         self.tractor_northing = None
         self.tractor_theta = None
         self.combine_states = {}
+        self.combine_x = None
+        self.combine_y = None
+        self.combine_relative_theta = None
         self.planned_path = None
         self.field_definition = None
         self.sync_status = None
@@ -220,9 +227,9 @@ class CollectorScenario:
             if self.tractor_state:
                 _, tractor_state = self.tractor_state[-1]
                 self.tractor_theta = (90 - tractor_state['heading']) * math.pi / 180
-                self.tractor_easting, self.tractor_northing = latlon_to_utm(
-                    tractor_state['latitude'],
+                self.tractor_easting, self.tractor_northing = lonlat_to_utm(
                     tractor_state['longitude'],
+                    tractor_state['latitude'],
                     self.utm_zone
                 )
                 builder.pose("/vehicle_pose")\
@@ -262,10 +269,10 @@ class CollectorScenario:
             if sync_params is not None:
                 self.sync_params = sync_params
 
+            self._draw_machine_state(builder)
             self._draw_tracking_targets(tracking_output, builder)
             self._draw_camera_targets(camera_output, builder)
             self._draw_radar_targets(radar_output, builder)
-            self._draw_machine_state(builder)
             self._draw_predicted_path(builder)
             self._draw_predictive_sub_path(builder)
             self._draw_planned_path(builder)
@@ -388,26 +395,33 @@ class CollectorScenario:
             _, tractor_state = self.tractor_state[-1]
             tractor_heading = tractor_state['heading']  # degrees
             
-            for combine_state_tuple in self.combine_states.values():
+            for combine_id, combine_state_tuple in self.combine_states.items():
                 _, combine_state = combine_state_tuple
+                combine_heading = combine_state['heading']  # degrees
+                combine_relative_theta = (tractor_heading - combine_heading) * math.pi / 180
 
                 x, y = transform_combine_to_local(combine_state, tractor_state, self.utm_zone)
+
+                if combine_id == "combine":  # controlling combine
+                    self.combine_x = x
+                    self.combine_y = y
+                    self.combine_relative_theta = combine_relative_theta
+
                 x -= TRACTOR_GPS_TO_REAR_AXLE
                 z = 0.5
 
-                combine_heading = combine_state['heading']  # degrees
-                relative_combine_heading = (tractor_heading - combine_heading) * math.pi / 180
-                combine_rel_heading_xyz = self.get_object_xyz_primitive(radial_dist=3.0,
-                                                                    angle_radians=relative_combine_heading)
-                c_r_x, c_r_y, _ = combine_rel_heading_xyz
+                c_r_x, c_r_y, _ = self.get_object_xyz_primitive(
+                    radial_dist=3.0,
+                    angle_radians=combine_relative_theta
+                )
 
-                combine_center_x = x - (COMBINE_GPS_TO_CENTER * math.cos(relative_combine_heading))
-                combine_center_y = y - (COMBINE_GPS_TO_CENTER * math.sin(relative_combine_heading))
+                combine_center_x = x - (COMBINE_GPS_TO_CENTER * math.cos(combine_relative_theta))
+                combine_center_y = y - (COMBINE_GPS_TO_CENTER * math.sin(combine_relative_theta))
 
                 combine_region = get_combine_region(
                     combine_center_x,
                     combine_center_y,
-                    relative_combine_heading,
+                    combine_relative_theta,
                     self.combine_length,
                     self.combine_width + 1.0
                 )
@@ -416,7 +430,7 @@ class CollectorScenario:
                     combine_region,
                     np.full(combine_region.shape[0], z)
                 )).flatten())
-                
+
                 builder.primitive('/combine_position')\
                     .circle([combine_center_x, combine_center_y, z], .5)\
                     .id('combine')
@@ -610,11 +624,38 @@ class CollectorScenario:
 
 
     def _draw_sync_params(self, builder: xviz.XVIZBuilder):
-        if self.sync_params is None:
+        if self.sync_params is None \
+                or self.combine_x is None:
             return
 
         try:
-            pass
+            sync_x_rel_combine = self.sync_params['sync_point'][0] + self.sync_params['sync_dx']
+            sync_y_rel_combine = self.sync_params['sync_point'][1] + self.sync_params['sync_dy']
+            sync_x = self.combine_x \
+                + sync_x_rel_combine * math.cos(self.combine_relative_theta) \
+                - sync_y_rel_combine * math.sin(self.combine_relative_theta)
+            sync_y = self.combine_y \
+                + sync_x_rel_combine * math.sin(self.combine_relative_theta) \
+                + sync_y_rel_combine * math.cos(self.combine_relative_theta)
+            z = 2.0
+
+            builder.primitive('/sync_point')\
+                .circle([sync_x, sync_y, z], .3)\
+                .id('sync point')
+
+            if self.sync_params['breadcrumbs']:
+                breadcrumbs_xy = lonlat_array_to_local(
+                    self.tractor_state[-1],
+                    self.utm_zone,
+                    np.array(self.sync_params['breadcrumbs'])
+                )
+                vertices = list(np.column_stack(
+                    (breadcrumbs_xy, np.full(breadcrumbs_xy.shape[0], z-.1))
+                ).flatten())
+
+                builder.primitive('/breadcrumbs')\
+                    .polyline(vertices)\
+                    .id('breadcrumbs')
 
         except Exception as e:
             print('Crashed in draw sync params:', e)
