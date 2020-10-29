@@ -221,9 +221,10 @@ class CollectorScenario:
                 _, tractor_state = self.tractor_state[-1]
                 self.tractor_theta = (90 - tractor_state['heading']) * math.pi / 180
                 self.tractor_easting, self.tractor_northing = latlon_to_utm(
-                                                                tractor_state['latitude'],
-                                                                tractor_state['longitude'],
-                                                                self.utm_zone)
+                    tractor_state['latitude'],
+                    tractor_state['longitude'],
+                    self.utm_zone
+                )
                 builder.pose("/vehicle_pose")\
                     .timestamp(timestamp)\
                     .position(0., 0., 0.)\
