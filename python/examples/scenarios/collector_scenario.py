@@ -643,6 +643,7 @@ class CollectorScenario:
                 .text(text)\
                 .position([-(TRACTOR_GPS_TO_REAR_AXLE+1.), 0., 1.])\
                 .id('sync status')
+
         except Exception as e:
             print('Crashed in draw sync status:', e)
 
