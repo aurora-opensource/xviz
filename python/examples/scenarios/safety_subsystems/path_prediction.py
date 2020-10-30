@@ -8,7 +8,8 @@ def get_path_prediction(config):
     prediction_args = {
         'wheel_base': config['guidance']['wheel_base'],
         'path_width_vision': config['safety']['radar']['path_width'],
-        'path_width_predictive': config['navigation']['machine_width']
+        'path_width_predictive': config['navigation']['machine_width'],
+        'path_width_sync': config['safety']['radar']['sync_path_width'],
     }
     min_speed = {}
     min_speed['predictive'] = 0.5  # mph
@@ -82,7 +83,6 @@ class PathPrediction(object):
         self.steering_history = cl.deque(maxlen=10)
         self.min_speed = min_speed
         self.min_distance_default = min_distance_default # default value, gets updated from threshold_list
-        self.min_distance = None
         self.cabin_to_nose = cabin_to_nose
 
     def get_threshold(self, speed, threshold_list):
@@ -94,16 +94,17 @@ class PathPrediction(object):
                 break
         return threshold
 
-    def set_min_distance(self, veh_speed, threshold_list):
-        self.min_distance = self.get_threshold(veh_speed, threshold_list) + self.cabin_to_nose
-
-    def predict(self, steering_angle, speed, heading, subsystem):
+    def predict(self, steering_angle, speed, heading, subsystem, running_sync=False, threshold_list=None):
         """Predict path for given speed and steering angle."""
 
         if subsystem == "vision":
-            self.C['machine_width'] = self.C['path_width_vision']
+            if running_sync:
+                self.C['machine_width'] = self.C['path_width_sync']
+            else:
+                self.C['machine_width'] = self.C['path_width_vision']
+            min_distance = self.get_threshold(speed, threshold_list) + self.cabin_to_nose
             speed = max(speed, 0.447 * self.min_speed['vision'])
-            horizon = max(self.min_distance / speed, 10.0)
+            horizon = max(min_distance / speed, 10.0)
         elif subsystem == "predictive":
             self.C['machine_width'] = self.C['path_width_predictive']
             speed = max(speed, 0.447 * self.min_speed['predictive'])

@@ -469,11 +469,15 @@ class CollectorScenario:
             if self.sync_status is not None \
                     and self.sync_status['runningSync']:
                 threshold_list = self.radar_safety_config['sync_stop_threshold']
+                running_sync = True
             else:
                 threshold_list = self.radar_safety_config['waypoint_stop_threshold']
+                running_sync = False
 
-            self.path_prediction.set_min_distance(speed, threshold_list)
-            self.path_prediction.predict(wheel_angle, speed, heading, "vision")
+            self.path_prediction.predict(
+                wheel_angle, speed, heading, "vision",
+                running_sync=running_sync, threshold_list=threshold_list
+            )
 
             z = 0.9
             left = np.column_stack((
