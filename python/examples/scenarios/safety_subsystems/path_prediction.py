@@ -108,7 +108,7 @@ class PathPrediction(object):
             self.C['machine_width'] = self.C['path_width_predictive']
             speed = max(speed, 0.447 * self.min_speed['predictive'])
             accel = -0.5
-            stopping_distance = - speed * speed / (2.0 * accel)
+            stopping_distance = - speed**2 / (2.0 * accel)
             horizon = stopping_distance / speed * 1.1
         elif subsystem == "control":
             horizon = 10.0
