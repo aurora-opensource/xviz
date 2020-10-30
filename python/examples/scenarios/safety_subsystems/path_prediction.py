@@ -111,10 +111,7 @@ class PathPrediction(object):
             stopping_distance = - speed * speed / (2.0 * accel)
             horizon = stopping_distance / speed * 1.1
         elif subsystem == "control":
-            if speed != 0:
-                horizon = max(self.min_distance / speed, 10.0)
-            else:
-                horizon = 0
+            horizon = 10.0
         else:
             print('path prediction recieved unrecognized subsystem argument')
         
