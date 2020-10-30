@@ -658,8 +658,9 @@ class CollectorScenario:
                 .id('sync point')
 
             if self.sync_params['breadcrumbs']:
+                _, tractor_state = self.tractor_state[-1]
                 breadcrumbs_xy = lonlat_array_to_local(
-                    self.tractor_state[-1],
+                    tractor_state,
                     self.utm_zone,
                     np.array(self.sync_params['breadcrumbs'])
                 )
