@@ -1,3 +1,4 @@
+import math
 from collections import deque
 from scenarios.utils.gis import polar_to_cartesian, euclidean_distance
 
@@ -18,13 +19,16 @@ class RadarFilter:
         q_state = self.queues[target_id]
         q_state.update_state(target)
 
-    def is_valid_target(self, target):        
+    def is_valid_target(self, target, sync_status=None):        
         self.update_queue(target['targetId'], target)
         self.target_id_set.remove(target['targetId'])
 
-        is_valid = self.queue_filter(target)
-
-        return is_valid
+        if sync_status is not None \
+                and sync_status['inSync'] \
+                and target['phi'] * math.pi / 180 > self.config['left_fov_cutoff']:
+            return False
+        
+        return self.queue_filter(target)
 
     def queue_filter(self, target):
         ''' Determines if the target is valid or noise based on a given method.

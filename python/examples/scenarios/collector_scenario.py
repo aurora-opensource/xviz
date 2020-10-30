@@ -308,8 +308,8 @@ class CollectorScenario:
 
             for target in radar_output['targets'].values():
                 (x, y, z) = self.get_object_xyz(target, 'phi', 'dr', radar_ob=True)
-    
-                if self.radar_filter.is_valid_target(target):
+
+                if self.radar_filter.is_valid_target(target, sync_status=self.sync_status):
                     builder.primitive('/radar_passed_filter_targets')\
                         .circle([x, y, z+.1], .5)\
                         .id(str(target['targetId']))
