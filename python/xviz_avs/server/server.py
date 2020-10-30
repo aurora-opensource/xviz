@@ -3,6 +3,7 @@ import asyncio
 import logging
 import websockets
 from websockets.exceptions import ConnectionClosed
+import traceback
 
 class XVIZServer:
     def __init__(self, handlers, port=3000, per_message_deflate=True):
@@ -46,6 +47,8 @@ class XVIZServer:
                 except ConnectionClosed:
                     self._logger.info("[> Disconnected]")
                     session.on_disconnect()
+                except:
+                    traceback.print_exc()
                 finally:
                     return
 

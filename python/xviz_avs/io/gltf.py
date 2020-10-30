@@ -15,7 +15,7 @@ from xviz_avs.message import XVIZMessage, XVIZEnvelope, StateUpdate
 
 bufferView_t = namedtuple("bufferViewItem", ("buffer", "byteOffset", "byteLength"))
 accessor_t = namedtuple("accessorItem", ("bufferView", "type", "componentType", "count"))
-image_t = namedtuple("imageItem", ("bufferView", "mimetype", "width", "height"))
+image_t = namedtuple("imageItem", ("bufferView", "mimeType", "width", "height"))
 
 component_type_d = {
   'b' : 5120,
@@ -39,6 +39,11 @@ class ImageWrapper:
         self.width = width
         self.height = height
 
+TypedArrayWrapper = namedtuple("TypedArray", (
+    "array",  # flattened array
+    "size",  # original size of each vector (e.g. 3 for points, 3 or 4 for colors)
+))
+
 class GLTFBuilder:
     """
     # Reference
@@ -60,7 +65,7 @@ class GLTFBuilder:
             buffers=[],
             bufferViews=[],
             accessors=[],
-            image=[],
+            images=[],
             meshes=[]
         )
         self._source_buffers = []
@@ -111,21 +116,28 @@ class GLTFBuilder:
 
         return len(self._json.bufferViews) - 1
 
-    def add_buffer(self, buffer: array.array):
+    def add_buffer(self, buffer: Union[array.array, bytes], size: int = 3):
         '''
         Add a binary buffer. Builds glTF "JSON metadata" and saves buffer reference.
         Buffer will be copied into BIN chunk during "pack".
         Currently encodes buffers as glTF accessors, but this could be optimized.
 
-        :param buffer: flattened array
+        :param buffer: flattened array or byte string
         :param size: XXX
         :param component_type: XXX
         :param count: XXX
         :return: accessor_index: Index of added buffer in "accessors" list
         '''
-        buffer_view_index = self.add_buffer_view(buffer.tobytes())
-        return self.add_accessor(buffer_view_index, size=buffer.itemsize,
-            component_type=component_type_d[buffer.typecode], count=len(buffer))
+        if isinstance(buffer, array.array):
+            buffer_view_index = self.add_buffer_view(buffer.tobytes())
+            return self.add_accessor(
+                buffer_view_index, size=size,
+                component_type=component_type_d[buffer.typecode], count=len(buffer) // size)
+        else:
+            buffer_view_index = self.add_buffer_view(buffer)
+            return self.add_accessor(
+                buffer_view_index, size=size,
+                component_type=component_type_d['B'], count=len(buffer) // size)
 
     def add_application_data(self, key: str, data):
         '''
@@ -169,7 +181,7 @@ class GLTFBuilder:
         if not isinstance(obj, ImageWrapper):
             raise ValueError("Image should be wrapped with ImageWrapper")
 
-        buffer_view_index = self.add_buffer_view(obj)
+        buffer_view_index = self.add_buffer_view(obj.data)
         self._json.images.append(image_t(
             bufferView=buffer_view_index,
             mimeType=obj.mime_type,
@@ -183,7 +195,7 @@ class GLTFBuilder:
     def flush(self, file):
         '''
         Encode the full glTF file as a binary GLB file
-        
+
         :param file: file-like object. The stream to write data into.
             It could be a file opened in binary mode or BytesIO object
         '''
@@ -201,12 +213,12 @@ class GLTFBuilder:
         file.write(struct.pack("<I", self.MAGIC_glTF))
         file.write(struct.pack("<I", self._version))
         file.write(struct.pack("<I", 28 + jsonlen + binlen))
-        
+
         # Write Json
         file.write(struct.pack("<I", jsonlen))
         file.write(struct.pack("<I", self.MAGIC_JSON))
         file.write(jsonstr)
-        file.write(b"\x00" * (jsonlen - len(jsonstr))) # pad
+        file.write(b" " * (jsonlen - len(jsonstr))) # pad json with spaces
 
         # Write Binary
         file.write(struct.pack("<I", binlen))
@@ -218,7 +230,7 @@ class GLTFBuilder:
 
     def pack_binary_json(self, data):
         # Check if string has same syntax as our "JSON pointers", if so "escape it".
-        if isinstance(data, str) and data.find("#/") == -1:
+        if isinstance(data, str) and data.find("#/") == 0:
             return '#' + data
 
         # Recursively deal with containers
@@ -229,15 +241,15 @@ class GLTFBuilder:
 
         # Pack specific data to binary
         if isinstance(data, ImageWrapper):
-            image_index = self.add_image(data.data)
+            image_index = self.add_image(data)
             return "#/images/{}".format(image_index)
-        if isinstance(data, array.array):
-            buffer_index = self.add_buffer(data)
+        if isinstance(data, TypedArrayWrapper):
+            buffer_index = self.add_buffer(data.array, size=data.size)
             return "#/accessors/{}".format(buffer_index)
 
         # Else return original
         return data
-    
+
     def add_point_cloud(self, obj):
         raise NotImplementedError()
 
@@ -273,26 +285,57 @@ class XVIZGLBWriter(XVIZBaseWriter):
         if isinstance(message.data, StateUpdate):
             # Wrap image data and point cloud
             if self._wrap_envelop:
-                dataobj = obj['data']['updates']
+                dataobjs = obj['data']['updates']
             else:
-                dataobj = obj['updates']
-            if 'primitives' in dataobj:
-                for pdata in dataobj['primitives'].values():
-                    # process point cloud
-                    if 'points' in pdata:
-                        for pldata in pdata['points']:
-                            if 'points' in pldata:
-                                pldata['points'] = array.array('f', pldata['points'])
+                dataobjs = obj['updates']
 
-                    # process images
-                    if 'images' in pdata:
-                        for imdata in pdata['points']:
-                            imdata['data'] = ImageWrapper(
-                                image=base64.b64decode(imdata['data']),
-                                width=imdata['width_px'],
-                                height=imdata['height_px'],
-                                mime_type='image/png', # FIXME: use Pillow to detect type
-                            )
+            for dataobj in dataobjs:
+                if 'primitives' in dataobj:
+                    for pdata in dataobj['primitives'].values():
+                        # convert lists into typed arrays to leverage binary format
+                        if 'points' in pdata:
+                            for pldata in pdata['points']:
+                                num_points = None
+                                if 'points' in pldata:
+                                    num_points = len(pldata['points']) // 3
+                                    pldata['points'] = TypedArrayWrapper(
+                                        array=array.array('f', pldata['points']),
+                                        size=3,
+                                    )
+                                if 'colors' in pldata:
+                                    # infer size from num_points
+                                    assert num_points is not None
+                                    color_bytes = bytes(pldata['colors'])
+                                    size = len(color_bytes) // num_points
+                                    assert size in (3, 4), 'expecting size to be 3 or 4, got %s' % size
+                                    pldata['colors'] = TypedArrayWrapper(
+                                        array=color_bytes,
+                                        size=size,
+                                    )
+                        if 'polylines' in pdata:
+                            for pldata in pdata['polylines']:
+                                if 'vertices' in pldata:
+                                    pldata['vertices'] = TypedArrayWrapper(
+                                        array=array.array('f', pldata['vertices']),
+                                        size=3,
+                                    )
+                        if 'polygons' in pdata:
+                            for pldata in pdata['polygons']:
+                                if 'vertices' in pldata:
+                                    pldata['vertices'] = TypedArrayWrapper(
+                                        array=array.array('f', pldata['vertices']),
+                                        size=3,
+                                    )
+
+                        # process images
+                        if 'images' in pdata:
+                            for imdata in pdata['images']:
+                                imdata['data'] = ImageWrapper(
+                                    image=base64.b64decode(imdata['data']),
+                                    width=imdata['width_px'],
+                                    height=imdata['height_px'],
+                                    mime_type='image/png', # FIXME: use Pillow to detect type
+                                )
 
         # Encode GLB into file
         packed_data = builder.pack_binary_json(obj)
@@ -301,5 +344,5 @@ class XVIZGLBWriter(XVIZBaseWriter):
         else:
             builder.add_application_data('xviz', packed_data)
 
-        with self._source.open(fname) as fout:
+        with self._source.open(fname, mode='w') as fout:
             builder.flush(fout)
