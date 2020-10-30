@@ -16,7 +16,7 @@ def deserialize_collector_output(file_path):
         collector_output.ParseFromString(Path(file_path).read_bytes())
         is_slim_output = True
         
-    except DecodeError as e:
+    except DecodeError:
         collector_output = collector_pb2.CollectorOutput()
         collector_output.ParseFromString(Path(file_path).read_bytes())
         is_slim_output = False
