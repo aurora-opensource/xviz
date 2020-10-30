@@ -479,7 +479,7 @@ class CollectorScenario:
                 running_sync=running_sync, threshold_list=threshold_list
             )
 
-            z = 0.9
+            z = 1.1
             left = np.column_stack((
                 self.path_prediction.left,
                 np.full(self.path_prediction.left.shape[0], z)
@@ -522,7 +522,7 @@ class CollectorScenario:
 
             self.path_prediction.predict(avg_wheel_angle, speed, heading, "predictive")
 
-            z = 0.9
+            z = 1.1
             left = np.column_stack((
                 self.path_prediction.left,
                 np.full(self.path_prediction.left.shape[0], z)
@@ -561,7 +561,7 @@ class CollectorScenario:
 
             self.path_prediction.predict(wheel_angle, speed, heading, "control")
 
-            z = 0.9
+            z = 1.1
             self.path_prediction.path[:, 2] = z
             vertices = list(self.path_prediction.path.flatten())
 

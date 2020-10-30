@@ -89,8 +89,8 @@ def get_builder():
     builder.stream("/planned_path")\
         .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
         .stream_style({
-            'stroke_width': 0.3,
-            'stroke_color': [128, 0, 128, 128]
+            'stroke_width': 0.2,
+            'stroke_color': [0, 170, 220, 200]
         })\
         .category(xviz.CATEGORY.PRIMITIVE)\
         .type(xviz.PRIMITIVE_TYPES.POLYLINE)
@@ -113,7 +113,10 @@ def get_builder():
         .type(xviz.PRIMITIVE_TYPES.CIRCLE)
     builder.stream("/breadcrumbs")\
         .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
-        .stream_style({'stroke_color': [100, 75, 80, 128]})\
+        .stream_style({
+            'stroke_width': 0.2,
+            'stroke_color': [255, 50, 20, 200]
+        })\
         .category(xviz.CATEGORY.PRIMITIVE)\
         .type(xviz.PRIMITIVE_TYPES.POLYLINE)
 
