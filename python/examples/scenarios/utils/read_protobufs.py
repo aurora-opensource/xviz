@@ -61,7 +61,8 @@ def extract_collector_output_slim(collector_output):
         else:
             machine_state = None
         
-        if 'collector/data/field_definition' in collector_output.data:
+        if 'collector/data/field_def' in collector_output.data \
+                or 'collector/data/field_definition' in collector_output.data:
             field_definition = collector_output.data['collector/data/field_definition']
             field_definition = json.loads(field_definition.decode('ascii'))
         else:
@@ -73,7 +74,8 @@ def extract_collector_output_slim(collector_output):
         else:
             planned_path = None
 
-        if 'collector/data/sync_status' in collector_output.data:
+        if 'collector/data/sync' in collector_output.data \
+                or 'collector/data/sync_status' in collector_output.data:
             sync_status = smarthp_pb2.SyncStatus()
             sync_status.ParseFromString(collector_output.data['collector/data/sync_status'])
             sync_status = MessageToDict(sync_status, including_default_value_fields=True)
