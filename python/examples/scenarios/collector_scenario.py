@@ -630,9 +630,19 @@ class CollectorScenario:
         if self.sync_status is None:
             return
         try:
-            #TODO: draw sync status
-            pass
+            if self.sync_status['atSyncPoint']:
+                text = "at sync point"
+            elif self.sync_status['inSync']:
+                text = "in sync"
+            elif self.sync_status['runningSync']:
+                text = "running sync"
+            else:
+                text = ""
 
+            builder.primitive('/sync_status')\
+                .text(text)\
+                .position([-(TRACTOR_GPS_TO_REAR_AXLE+1.), 0., 1.])\
+                .id('sync status')
         except Exception as e:
             print('Crashed in draw sync status:', e)
 
