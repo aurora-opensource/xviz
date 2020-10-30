@@ -52,16 +52,20 @@ def predict_path(X0, U0, C, horizon=10.0, n_steps=10):
         Time steps at which to predict state - [0.0, 0.1, 0.2 ... ]
     """
     tspan = np.linspace(0, horizon, n_steps+1, endpoint=True)
-    W_half = 0.5 * C['machine_width']
 
     path = np.array(list(
         map(ft.partial(predict_position, X0, U0, C), tspan)
     ))
 
-    left = np.column_stack([path[:, 0] + W_half * np.cos(path[:, 2] + pi / 2),
-                            path[:, 1] + W_half * np.sin(path[:, 2] + pi / 2)])
-    right = np.column_stack([path[:, 0] + W_half * np.cos(path[:, 2] - pi / 2),
-                             path[:, 1] + W_half * np.sin(path[:, 2] - pi / 2)])
+    if 'machine_width' in C:
+        W_half = 0.5 * C['machine_width']
+        left = np.column_stack([path[:, 0] + W_half * np.cos(path[:, 2] + pi / 2),
+                                path[:, 1] + W_half * np.sin(path[:, 2] + pi / 2)])
+        right = np.column_stack([path[:, 0] + W_half * np.cos(path[:, 2] - pi / 2),
+                                path[:, 1] + W_half * np.sin(path[:, 2] - pi / 2)])
+    else:
+        left = None
+        right = None
 
     return path, left, right
 
@@ -108,7 +112,6 @@ class PathPrediction(object):
             horizon = stopping_distance / speed * 1.1
         elif subsystem == "control":
             if speed != 0:
-                speed = max(speed, 0.447 * self.min_speed['vision'])
                 horizon = max(self.min_distance / speed, 10.0)
             else:
                 horizon = 0
