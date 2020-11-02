@@ -69,38 +69,15 @@ def utm_to_local(reference_x, reference_y, heading, translate_x, translate_y):
 def get_combine_region(gps_x, gps_y, theta, gps_to_front, gps_to_head, gps_to_back, head_width, body_width):
     half_head_width = head_width / 2.0
     half_body_width = body_width / 2.0
-    front_head_left = (
-        gps_x + (gps_to_front * math.cos(theta)) - (half_head_width * math.sin(theta)),
-        gps_y + (gps_to_front * math.sin(theta)) + (half_head_width * math.cos(theta))
-    )
-    front_head_right = (
-        gps_x + (gps_to_front * math.cos(theta)) + (half_head_width * math.sin(theta)),
-        gps_y + (gps_to_front * math.sin(theta)) - (half_head_width * math.cos(theta))
-    )
-    back_head_left = (
-        gps_x + (gps_to_head * math.cos(theta)) - (half_head_width * math.sin(theta)),
-        gps_y + (gps_to_head * math.sin(theta)) + (half_head_width * math.cos(theta))
-    )
-    back_head_right = (
-        gps_x + (gps_to_head * math.cos(theta)) + (half_head_width * math.sin(theta)),
-        gps_y + (gps_to_head * math.sin(theta)) - (half_head_width * math.cos(theta))
-    )
-    front_body_left = (
-        gps_x + (gps_to_head * math.cos(theta)) - (half_body_width * math.sin(theta)),
-        gps_y + (gps_to_head * math.sin(theta)) + (half_body_width * math.cos(theta))
-    )
-    front_body_right = (
-        gps_x + (gps_to_head * math.cos(theta)) + (half_body_width * math.sin(theta)),
-        gps_y + (gps_to_head * math.sin(theta)) - (half_body_width * math.cos(theta))
-    )
-    back_left = (
-        gps_x - (gps_to_back * math.cos(theta)) - (half_body_width * math.sin(theta)),
-        gps_y - (gps_to_back * math.sin(theta)) + (half_body_width * math.cos(theta))
-    )
-    back_right = (
-        gps_x - (gps_to_back * math.cos(theta)) + (half_body_width * math.sin(theta)),
-        gps_y - (gps_to_back * math.sin(theta)) - (half_body_width * math.cos(theta))
-    )
+
+    front_head_left = get_relative_cartesian_point(gps_x, gps_y, gps_to_front, half_head_width, theta)
+    front_head_right = get_relative_cartesian_point(gps_x, gps_y, gps_to_front, -half_head_width, theta)
+    back_head_left = get_relative_cartesian_point(gps_x, gps_y, gps_to_head, half_head_width, theta)
+    back_head_right = get_relative_cartesian_point(gps_x, gps_y, gps_to_head, -half_head_width, theta)
+    front_body_left = get_relative_cartesian_point(gps_x, gps_y, gps_to_head, half_body_width, theta)
+    front_body_right = get_relative_cartesian_point(gps_x, gps_y, gps_to_head, -half_body_width, theta)
+    back_left = get_relative_cartesian_point(gps_x, gps_y, -gps_to_back, half_body_width, theta)
+    back_right = get_relative_cartesian_point(gps_x, gps_y, -gps_to_back, -half_body_width, theta)
 
     return np.row_stack((
         front_head_left,
@@ -113,6 +90,10 @@ def get_combine_region(gps_x, gps_y, theta, gps_to_front, gps_to_head, gps_to_ba
         back_head_left,
         front_head_left
     ))
+
+def get_relative_cartesian_point(x, y, dx, dy, theta):
+    return (x + dx*math.cos(theta) - dy*math.sin(theta),
+            y + dx*math.sin(theta) + dy*math.cos(theta))
 
 
 def polar_to_cartesian(theta, r):
