@@ -267,7 +267,10 @@ class CollectorScenario:
                 self.sync_status = sync_status
             
             if sync_params is not None:
-                self.sync_params = sync_params
+                if sync_params:
+                    self.sync_params = sync_params
+                else:
+                    self.sync_params = None
 
             self._draw_machine_state(builder)
             self._draw_tracking_targets(tracking_output, builder)
