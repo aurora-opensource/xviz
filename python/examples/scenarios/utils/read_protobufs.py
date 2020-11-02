@@ -65,7 +65,11 @@ def extract_collector_output_slim(collector_output):
             field_definition = collector_output.data['collector/data/field_def']
             field_definition = json.loads(field_definition.decode('ascii'))
         else:
-            field_definition = None
+            if 'collector/data/field_definition' in collector_output.data:
+                field_definition = collector_output.data['collector/data/field_definition']
+                field_definition = json.loads(field_definition.decode('ascii'))
+            else:
+                field_definition = None
 
         if 'collector/data/planned_path' in collector_output.data:
             planned_path = collector_output.data['collector/data/planned_path']
@@ -78,7 +82,12 @@ def extract_collector_output_slim(collector_output):
             sync_status.ParseFromString(collector_output.data['collector/data/sync'])
             sync_status = MessageToDict(sync_status, including_default_value_fields=True)
         else:
-            sync_status = None
+            if 'collector/data/sync_status' in collector_output.data:
+                sync_status = smarthp_pb2.SyncStatus()
+                sync_status.ParseFromString(collector_output.data['collector/data/sync_status'])
+                sync_status = MessageToDict(sync_status, including_default_value_fields=True)
+            else:
+                sync_status = None
 
         if 'collector/data/control_signal' in collector_output.data:
             control_signal = gandalf_pb2.ControlSignal()
