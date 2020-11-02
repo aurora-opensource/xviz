@@ -23,6 +23,10 @@ import xviz
 
 TRACTOR_GPS_TO_REAR_AXLE = 1.9304
 COMBINE_GPS_TO_CENTER = 1.0
+COMBINE_GPS_TO_FRONT = 7.0
+COMBINE_GPS_TO_HEAD = 4.0
+COMBINE_GPS_TO_BACK = 7.0
+COMBINE_BODY_WIDTH = 5.0
 
 
 class CollectorScenario:
@@ -411,14 +415,14 @@ class CollectorScenario:
                 combine_heading = combine_state['heading']  # degrees
                 combine_relative_theta = (tractor_heading - combine_heading) * math.pi / 180
 
-                x, y = transform_combine_to_local(combine_state, tractor_state, self.utm_zone)
+                gps_x, gps_y = transform_combine_to_local(combine_state, tractor_state, self.utm_zone)
 
                 if combine_id == "combine":  # controlling combine
-                    self.combine_x = x
-                    self.combine_y = y
+                    self.combine_x = gps_x
+                    self.combine_y = gps_y
                     self.combine_relative_theta = combine_relative_theta
 
-                x -= TRACTOR_GPS_TO_REAR_AXLE
+                gps_x -= TRACTOR_GPS_TO_REAR_AXLE
                 z = 0.5
 
                 c_r_x, c_r_y, _ = self.get_object_xyz_primitive(
@@ -426,15 +430,18 @@ class CollectorScenario:
                     angle_radians=combine_relative_theta
                 )
 
-                combine_center_x = x - (COMBINE_GPS_TO_CENTER * math.cos(combine_relative_theta))
-                combine_center_y = y - (COMBINE_GPS_TO_CENTER * math.sin(combine_relative_theta))
+                combine_center_x = gps_x - (COMBINE_GPS_TO_CENTER * math.cos(combine_relative_theta))
+                combine_center_y = gps_y - (COMBINE_GPS_TO_CENTER * math.sin(combine_relative_theta))
 
                 combine_region = get_combine_region(
-                    combine_center_x,
-                    combine_center_y,
+                    gps_x,
+                    gps_y,
                     combine_relative_theta,
-                    self.combine_length,
-                    self.combine_width + 1.0
+                    COMBINE_GPS_TO_FRONT,
+                    COMBINE_GPS_TO_HEAD,
+                    COMBINE_GPS_TO_BACK,
+                    self.combine_width + 1.0,
+                    COMBINE_BODY_WIDTH
                 )
 
                 vertices = list(np.column_stack((

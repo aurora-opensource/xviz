@@ -57,7 +57,7 @@ def parse_utm_zone(zone):
 
 
 def utm_to_local(reference_x, reference_y, heading, translate_x, translate_y):
-    theta = (math.pi / 2) - (heading * math.pi / 180)
+    theta = (math.pi / 2.0) - (heading * math.pi / 180.0)
     dx_a = translate_x - reference_x
     dy_a = translate_y - reference_y
     dx = (math.cos(theta) * dx_a) + (math.sin(theta) * dy_a)
@@ -66,33 +66,52 @@ def utm_to_local(reference_x, reference_y, heading, translate_x, translate_y):
     return dx, dy
 
 
-def get_combine_region(center_x, center_y, theta, length, width):
-    half_length = length / 2
-    half_width = width / 2
-
-    front_left = (
-        center_x + (half_length * math.cos(theta)) - (half_width * math.sin(theta)),
-        center_y + (half_length * math.sin(theta)) + (half_width * math.cos(theta))
+def get_combine_region(gps_x, gps_y, theta, gps_to_front, gps_to_head, gps_to_back, head_width, body_width):
+    half_head_width = head_width / 2.0
+    half_body_width = body_width / 2.0
+    front_head_left = (
+        gps_x + (gps_to_front * math.cos(theta)) - (half_head_width * math.sin(theta)),
+        gps_y + (gps_to_front * math.sin(theta)) + (half_head_width * math.cos(theta))
     )
-    front_right = (
-        center_x + (half_length * math.cos(theta)) + (half_width * math.sin(theta)),
-        center_y + (half_length * math.sin(theta)) - (half_width * math.cos(theta))
+    front_head_right = (
+        gps_x + (gps_to_front * math.cos(theta)) + (half_head_width * math.sin(theta)),
+        gps_y + (gps_to_front * math.sin(theta)) - (half_head_width * math.cos(theta))
+    )
+    back_head_left = (
+        gps_x + (gps_to_head * math.cos(theta)) - (half_head_width * math.sin(theta)),
+        gps_y + (gps_to_head * math.sin(theta)) + (half_head_width * math.cos(theta))
+    )
+    back_head_right = (
+        gps_x + (gps_to_head * math.cos(theta)) + (half_head_width * math.sin(theta)),
+        gps_y + (gps_to_head * math.sin(theta)) - (half_head_width * math.cos(theta))
+    )
+    front_body_left = (
+        gps_x + (gps_to_head * math.cos(theta)) - (half_body_width * math.sin(theta)),
+        gps_y + (gps_to_head * math.sin(theta)) + (half_body_width * math.cos(theta))
+    )
+    front_body_right = (
+        gps_x + (gps_to_head * math.cos(theta)) + (half_body_width * math.sin(theta)),
+        gps_y + (gps_to_head * math.sin(theta)) - (half_body_width * math.cos(theta))
     )
     back_left = (
-        center_x - (half_length * math.cos(theta)) - (half_width * math.sin(theta)),
-        center_y - (half_length * math.sin(theta)) + (half_width * math.cos(theta))
+        gps_x - (gps_to_back * math.cos(theta)) - (half_body_width * math.sin(theta)),
+        gps_y - (gps_to_back * math.sin(theta)) + (half_body_width * math.cos(theta))
     )
     back_right = (
-        center_x - (half_length * math.cos(theta)) + (half_width * math.sin(theta)),
-        center_y - (half_length * math.sin(theta)) - (half_width * math.cos(theta))
+        gps_x - (gps_to_back * math.cos(theta)) + (half_body_width * math.sin(theta)),
+        gps_y - (gps_to_back * math.sin(theta)) - (half_body_width * math.cos(theta))
     )
 
     return np.row_stack((
-        front_left,
-        front_right,
+        front_head_left,
+        front_head_right,
+        back_head_right,
+        front_body_right,
         back_right,
         back_left,
-        front_left
+        front_body_left,
+        back_head_left,
+        front_head_left
     ))
 
 
