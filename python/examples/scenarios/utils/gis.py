@@ -69,8 +69,8 @@ def utm_to_local(reference_x, reference_y, heading, translate_x, translate_y):
 def get_combine_region(center_x, center_y, theta, combine_length,
                        combine_width, header_length, header_width):
     half_combine_length = combine_length / 2.0
-    half_header_width = header_width / 2.0
     half_combine_width = combine_width / 2.0
+    half_header_width = header_width / 2.0
     center_to_header_front = half_combine_length + header_length
 
     front_head_left = get_relative_xy(center_x, center_y, center_to_header_front, half_header_width, theta)
