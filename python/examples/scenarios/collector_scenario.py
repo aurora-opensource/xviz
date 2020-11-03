@@ -23,10 +23,9 @@ import xviz
 
 TRACTOR_GPS_TO_REAR_AXLE = 1.9304
 COMBINE_GPS_TO_CENTER = 1.0
-COMBINE_GPS_TO_FRONT = 6.0
-COMBINE_GPS_TO_HEAD = 3.0
-COMBINE_GPS_TO_BACK = 8.0
-COMBINE_BODY_WIDTH = 5.0
+COMBINE_LENGTH = 10.5
+COMBINE_WIDTH = 4.0
+HEADER_LENGTH = 3.5
 
 
 class CollectorScenario:
@@ -66,7 +65,7 @@ class CollectorScenario:
 
         self.cab_to_nose = global_config['safety']['object_tracking']['cabin_to_nose_distance']
         self.combine_length = self.radar_safety_config['combine_length']
-        self.combine_width = 8.0 # default, gets updated by machine state message
+        self.header_width = 8.0 # default, gets updated by machine state message
         self.wheel_base = global_config['guidance']['wheel_base']
         self.stop_distance = self.radar_safety_config['stop_threshold_default']
         self.slowdown_distance = self.radar_safety_config['slowdown_threshold_default']
@@ -434,14 +433,13 @@ class CollectorScenario:
                 combine_center_y = gps_y - (COMBINE_GPS_TO_CENTER * math.sin(combine_relative_theta))
 
                 combine_region = get_combine_region(
-                    gps_x,
-                    gps_y,
+                    combine_center_x,
+                    combine_center_y,
                     combine_relative_theta,
-                    COMBINE_GPS_TO_FRONT,
-                    COMBINE_GPS_TO_HEAD,
-                    COMBINE_GPS_TO_BACK,
-                    self.combine_width + 1.0,
-                    COMBINE_BODY_WIDTH
+                    COMBINE_LENGTH,
+                    COMBINE_WIDTH,
+                    HEADER_LENGTH,
+                    self.header_width + 1.0,
                 )
 
                 vertices = list(np.column_stack((
@@ -707,7 +705,7 @@ class CollectorScenario:
             # only need to set it once
             self.utm_zone = machine_state['opState']['refUtmZone']
         
-        self.combine_width = machine_state['opState']['machineWidth']
+        self.header_width = machine_state['opState']['machineWidth']
         vehicle_states = machine_state['vehicleStates']
         if vehicle_states:
             for vehicle, state in vehicle_states.items():

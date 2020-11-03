@@ -66,18 +66,20 @@ def utm_to_local(reference_x, reference_y, heading, translate_x, translate_y):
     return dx, dy
 
 
-def get_combine_region(gps_x, gps_y, theta, gps_to_front, gps_to_head, gps_to_back, head_width, body_width):
-    half_head_width = head_width / 2.0
-    half_body_width = body_width / 2.0
+def get_combine_region(center_x, center_y, theta, combine_length, combine_width, header_length, header_width):
+    half_combine_length = combine_length / 2.0
+    half_header_width = header_width / 2.0
+    half_combine_width = combine_width / 2.0
+    center_to_header_front = half_combine_length + header_length
 
-    front_head_left = get_relative_cartesian_point(gps_x, gps_y, gps_to_front, half_head_width, theta)
-    front_head_right = get_relative_cartesian_point(gps_x, gps_y, gps_to_front, -half_head_width, theta)
-    back_head_left = get_relative_cartesian_point(gps_x, gps_y, gps_to_head, half_head_width, theta)
-    back_head_right = get_relative_cartesian_point(gps_x, gps_y, gps_to_head, -half_head_width, theta)
-    front_body_left = get_relative_cartesian_point(gps_x, gps_y, gps_to_head, half_body_width, theta)
-    front_body_right = get_relative_cartesian_point(gps_x, gps_y, gps_to_head, -half_body_width, theta)
-    back_left = get_relative_cartesian_point(gps_x, gps_y, -gps_to_back, half_body_width, theta)
-    back_right = get_relative_cartesian_point(gps_x, gps_y, -gps_to_back, -half_body_width, theta)
+    front_head_left = get_relative_xy(center_x, center_y, center_to_header_front, half_header_width, theta)
+    front_head_right = get_relative_xy(center_x, center_y, center_to_header_front, -half_header_width, theta)
+    back_head_left = get_relative_xy(center_x, center_y, half_combine_length, half_header_width, theta)
+    back_head_right = get_relative_xy(center_x, center_y, half_combine_length, -half_header_width, theta)
+    front_body_left = get_relative_xy(center_x, center_y, half_combine_length, half_combine_width, theta)
+    front_body_right = get_relative_xy(center_x, center_y, half_combine_length, -half_combine_width, theta)
+    back_left = get_relative_xy(center_x, center_y, -half_combine_length, half_combine_width, theta)
+    back_right = get_relative_xy(center_x, center_y, -half_combine_length, -half_combine_width, theta)
 
     return np.row_stack((
         front_head_left,
@@ -91,9 +93,10 @@ def get_combine_region(gps_x, gps_y, theta, gps_to_front, gps_to_head, gps_to_ba
         front_head_left
     ))
 
-def get_relative_cartesian_point(x, y, dx, dy, theta):
-    return (x + dx*math.cos(theta) - dy*math.sin(theta),
-            y + dx*math.sin(theta) + dy*math.cos(theta))
+
+def get_relative_xy(X, Y, dx, dy, theta):
+    return (X + dx*math.cos(theta) - dy*math.sin(theta),
+            Y + dx*math.sin(theta) + dy*math.cos(theta))
 
 
 def polar_to_cartesian(theta, r):
