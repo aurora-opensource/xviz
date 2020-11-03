@@ -422,12 +422,6 @@ class CollectorScenario:
                     self.combine_relative_theta = combine_relative_theta
 
                 gps_x -= TRACTOR_GPS_TO_REAR_AXLE
-                z = 0.5
-
-                c_r_x, c_r_y, _ = self.get_object_xyz_primitive(
-                    radial_dist=3.0,
-                    angle_radians=combine_relative_theta
-                )
 
                 combine_center_x = gps_x - (COMBINE_GPS_TO_CENTER * math.cos(combine_relative_theta))
                 combine_center_y = gps_y - (COMBINE_GPS_TO_CENTER * math.sin(combine_relative_theta))
@@ -442,23 +436,15 @@ class CollectorScenario:
                     self.header_width + 1.0,
                 )
 
+                z = 0.5
                 vertices = list(np.column_stack((
                     combine_region,
                     np.full(combine_region.shape[0], z)
                 )).flatten())
 
-                builder.primitive('/combine_position')\
-                    .circle([combine_center_x, combine_center_y, z], .5)\
-                    .id('combine')
-                builder.primitive('/combine_region')\
+                builder.primitive('/combine')\
                     .polyline(vertices)\
-                    .id('combine_region')
-                builder.primitive('/combine_heading')\
-                    .polyline([
-                        combine_center_x, combine_center_y, z,
-                        combine_center_x+c_r_x, combine_center_y+c_r_y, z
-                    ])\
-                    .id('combine_heading')
+                    .id('combine')
 
         except Exception as e:
             print('Crashed in draw machine state:', e)
