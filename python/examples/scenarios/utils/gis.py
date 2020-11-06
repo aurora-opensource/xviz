@@ -124,3 +124,7 @@ def polar_to_cartesian(theta, r):
 
 def euclidean_distance(x0, y0, x1, y1):
     return math.sqrt((x1-x0)**2 + (y1-y0)**2)
+
+
+def get_wheel_angle(curvature, wheel_base):
+    return math.atan(curvature * wheel_base / 1000)
