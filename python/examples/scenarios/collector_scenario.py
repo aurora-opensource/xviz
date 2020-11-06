@@ -11,7 +11,7 @@ from scenarios.meta.collector_meta import get_builder
 from scenarios.utils.com_manager import ComManager, MqttConst
 from scenarios.utils.filesystem import get_collector_instances, load_config
 from scenarios.utils.gis import transform_combine_to_local, get_combine_region, \
-                                utm_array_to_local, lonlat_array_to_local, lonlat_to_utm
+                                utm_array_to_local, lonlat_array_to_local, lonlat_to_utm, get_wheel_angle
 from scenarios.utils.image import postprocess, show_image
 from scenarios.utils.read_protobufs import deserialize_collector_output,\
                                             extract_collector_output, extract_collector_output_slim
@@ -455,7 +455,7 @@ class CollectorScenario:
             speed = tractor_state['speed']
             curvature = tractor_state['curvature']
             heading = 0.
-            wheel_angle = curvature * self.wheel_base / 1000
+            wheel_angle = get_wheel_angle(curvature, self.wheel_base)
 
             if self.sync_status is not None \
                     and self.sync_status['runningSync']:
@@ -547,7 +547,7 @@ class CollectorScenario:
         try:
             speed = self.control_signal['setSpeed']
             curvature = self.control_signal['commandCurvature']
-            wheel_angle = curvature * self.wheel_base / 1000
+            wheel_angle = get_wheel_angle(curvature, self.wheel_base)
             heading = 0.
 
             self.path_prediction.predict(wheel_angle, speed, heading, "control")
