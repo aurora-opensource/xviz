@@ -33,6 +33,22 @@ def transform_combine_to_local(combine_state, tractor_state, utm_zone):
     return dx, dy
 
 
+def utm_to_lonlat(utm_coordinates, zone):
+    """
+    utm: tuple (x, y)
+    Returns
+    ------
+    tuple
+        (lon, lat)
+    """
+    zone_number, zone_letter = parse_utm_zone(zone)
+    lat, lon = utm.to_latlon(easting=utm_coordinates[0],
+                             northing=utm_coordinates[1],
+                             zone_number=zone_number,
+                             zone_letter=zone_letter)
+    return tuple([lon, lat])
+
+
 def lonlat_to_utm(lon, lat, zone):
     zone_number, zone_letter = parse_utm_zone(zone)
     converted = utm.from_latlon(
