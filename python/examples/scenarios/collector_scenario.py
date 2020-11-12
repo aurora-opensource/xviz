@@ -63,6 +63,7 @@ class CollectorScenario:
         self.header_length = global_config['safety']['header_length']
         self.combine_gps_to_center = global_config['safety']['combine_gps_to_center']
         self.tractor_gps_to_rear_axle = global_config['safety']['tractor_gps_to_rear_axle']
+        self.combine_center_to_auger = global_config['safety']['combine_center_to_auger']
         self.auger_length = global_config['safety']['auger_length']
         self.auger_width = global_config['safety']['auger_width']
         self.header_width = 8.0 # default, gets updated by machine state message
@@ -459,10 +460,11 @@ class CollectorScenario:
                 combine_gps_x,
                 combine_gps_y,
                 self.combine_relative_theta,
-                self.auger_width,
+                self.combine_width,
                 self.auger_length,
                 self.auger_width,
                 self.combine_gps_to_center,
+                self.combine_center_to_auger,
             )
 
             z = 0.5

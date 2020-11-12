@@ -89,7 +89,7 @@ def get_combine_region(gps_x, gps_y, theta, combine_length, combine_width,
     half_header_width = header_width / 2.0
     center_to_header_front = half_combine_length + header_length
 
-    center_x, center_y = get_relative_xy(gps_x, gps_y, -combine_gps_to_center, 0.0, theta)
+    center_x, center_y = get_relative_xy(gps_x, gps_y, -combine_gps_to_center, 0., theta)
 
     front_head_left = get_relative_xy(center_x, center_y, center_to_header_front, half_header_width, theta)
     front_head_right = get_relative_xy(center_x, center_y, center_to_header_front, -half_header_width, theta)
@@ -113,18 +113,18 @@ def get_combine_region(gps_x, gps_y, theta, combine_length, combine_width,
     ))
 
 
-def get_auger_region(gps_x, gps_y, theta, combine_width,
-                     auger_length, auger_width, combine_gps_to_center):
+def get_auger_region(gps_x, gps_y, theta, combine_width, auger_length,
+                     auger_width, combine_gps_to_center, combine_center_to_auger):
     half_combine_width = combine_width / 2.0
     half_auger_width = auger_width / 2.0
-    center_to_auger_tip = half_combine_width + auger_length
 
-    center_x, center_y = get_relative_xy(gps_x, gps_y, -combine_gps_to_center, 0.0, theta)
+    combine_center_x, combine_center_y = get_relative_xy(gps_x, gps_y, -combine_gps_to_center, 0., theta)
+    auger_pivot_x, auger_pivot_y = get_relative_xy(combine_center_x, combine_center_y, combine_center_to_auger, half_combine_width, theta)
 
-    front_left = get_relative_xy(center_x, center_y, half_auger_width, center_to_auger_tip, theta)
-    front_right = get_relative_xy(center_x, center_y, half_auger_width, half_combine_width, theta)
-    back_left = get_relative_xy(center_x, center_y, -half_auger_width, center_to_auger_tip, theta)
-    back_right = get_relative_xy(center_x, center_y, -half_auger_width, half_combine_width, theta)
+    front_left = get_relative_xy(auger_pivot_x, auger_pivot_y, half_auger_width, auger_length, theta)
+    front_right = get_relative_xy(auger_pivot_x, auger_pivot_y, half_auger_width, 0, theta)
+    back_left = get_relative_xy(auger_pivot_x, auger_pivot_y, -half_auger_width, auger_length, theta)
+    back_right = get_relative_xy(auger_pivot_x, auger_pivot_y, -half_auger_width, 0., theta)
 
     return np.row_stack((
         front_left,
