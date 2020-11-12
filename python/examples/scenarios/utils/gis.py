@@ -109,7 +109,29 @@ def get_combine_region(gps_x, gps_y, theta, combine_length, combine_width,
         back_left,
         front_body_left,
         back_head_left,
-        front_head_left
+        front_head_left,
+    ))
+
+
+def get_auger_region(gps_x, gps_y, theta, combine_width,
+                     auger_length, auger_width, combine_gps_to_center):
+    half_combine_width = combine_width / 2.0
+    half_auger_width = auger_width / 2.0
+    center_to_auger_tip = half_combine_width + auger_length
+
+    center_x, center_y = get_relative_xy(gps_x, gps_y, -combine_gps_to_center, 0.0, theta)
+
+    front_left = get_relative_xy(center_x, center_y, half_auger_width, center_to_auger_tip, theta)
+    front_right = get_relative_xy(center_x, center_y, half_auger_width, half_combine_width, theta)
+    back_left = get_relative_xy(center_x, center_y, -half_auger_width, center_to_auger_tip, theta)
+    back_right = get_relative_xy(center_x, center_y, -half_auger_width, half_combine_width, theta)
+
+    return np.row_stack((
+        front_left,
+        front_right,
+        back_right,
+        back_left,
+        front_left,
     ))
 
 

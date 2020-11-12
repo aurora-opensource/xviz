@@ -42,7 +42,15 @@ def get_builder():
         .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
         .stream_style({
             'stroke_width': 0.3,
-            'stroke_color': [128, 0, 128]
+            'stroke_color': [128, 0, 128],
+        })\
+        .category(xviz.CATEGORY.PRIMITIVE)\
+        .type(xviz.PRIMITIVE_TYPES.POLYLINE)
+    builder.stream("/auger")\
+        .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+        .stream_style({
+            'stroke_width': 0.3,
+            'stroke_color': [255, 269, 0],
         })\
         .category(xviz.CATEGORY.PRIMITIVE)\
         .type(xviz.PRIMITIVE_TYPES.POLYLINE)

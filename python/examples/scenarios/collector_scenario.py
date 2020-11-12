@@ -10,7 +10,7 @@ from protobuf_APIs import falconeye_pb2, radar_pb2
 from scenarios.meta.collector_meta import get_builder
 from scenarios.utils.com_manager import ComManager, MqttConst
 from scenarios.utils.filesystem import get_collector_instances, load_config
-from scenarios.utils.gis import transform_combine_to_local, get_combine_region, \
+from scenarios.utils.gis import transform_combine_to_local, get_combine_region, get_auger_region, \
                                 utm_array_to_local, lonlat_array_to_local, lonlat_to_utm, get_wheel_angle
 from scenarios.utils.image import postprocess, show_image
 from scenarios.utils.read_protobufs import deserialize_collector_output,\
@@ -57,13 +57,14 @@ class CollectorScenario:
 
         self.radar_safety_config = global_config['safety']['radar']
         self.radar_filter = RadarFilter(self.radar_safety_config)
-
         self.cab_to_nose = global_config['safety']['object_tracking']['cabin_to_nose_distance']
         self.combine_length = global_config['safety']['combine_length']
         self.combine_width = global_config['safety']['combine_width']
         self.header_length = global_config['safety']['header_length']
         self.combine_gps_to_center = global_config['safety']['combine_gps_to_center']
         self.tractor_gps_to_rear_axle = global_config['safety']['tractor_gps_to_rear_axle']
+        self.auger_length = global_config['safety']['auger_length']
+        self.auger_width = global_config['safety']['auger_width']
         self.header_width = 8.0 # default, gets updated by machine state message
         self.wheel_base = global_config['guidance']['wheel_base']
         self.stop_distance = self.radar_safety_config['stop_threshold_default']
@@ -275,6 +276,7 @@ class CollectorScenario:
                     self.sync_params = None
 
             self._draw_combine(builder)
+            self._draw_auger(builder)
             self._draw_tracking_targets(tracking_output, builder)
             self._draw_camera_targets(camera_output, builder)
             self._draw_radar_targets(radar_output, builder)
@@ -445,6 +447,36 @@ class CollectorScenario:
 
         except Exception as e:
             print('Crashed in draw machine state:', e)
+    
+
+    def _draw_auger(self, builder: xviz.XVIZBuilder):
+        if self.combine_x is None:
+            return
+        try:
+            combine_gps_x = self.combine_x - self.tractor_gps_to_rear_axle
+            combine_gps_y = self.combine_y
+            auger_region = get_auger_region(
+                combine_gps_x,
+                combine_gps_y,
+                self.combine_relative_theta,
+                self.auger_width,
+                self.auger_length,
+                self.auger_width,
+                self.combine_gps_to_center,
+            )
+
+            z = 0.5
+            vertices = list(np.column_stack((
+                auger_region,
+                np.full(auger_region.shape[0], z)
+            )).flatten())
+
+            builder.primitive('/auger')\
+                .polyline(vertices)\
+                .id('auger')
+
+        except Exception as e:
+            print('Crashed in draw auger:', e)
 
 
     def _draw_predicted_path(self, builder: xviz.XVIZBuilder):
