@@ -649,7 +649,7 @@ class CollectorScenario:
 
             builder.primitive('/sync_status')\
                 .text(text)\
-                .position([-(TRACTOR_GPS_TO_REAR_AXLE+1.), 0., 1.])\
+                .position([-(TRACTOR_GPS_TO_REAR_AXLE+3.), 0., 1.])\
                 .id('sync status')
 
         except Exception as e:
