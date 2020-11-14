@@ -58,14 +58,8 @@ class CollectorScenario:
         self.radar_safety_config = global_config['safety']['radar']
         self.radar_filter = RadarFilter(self.radar_safety_config)
         self.cab_to_nose = global_config['safety']['object_tracking']['cabin_to_nose_distance']
-        self.combine_length = global_config['safety']['combine_length']
-        self.combine_width = global_config['safety']['combine_width']
-        self.header_length = global_config['safety']['header_length']
-        self.combine_gps_to_center = global_config['safety']['combine_gps_to_center']
-        self.tractor_gps_to_rear_axle = global_config['safety']['tractor_gps_to_rear_axle']
-        self.combine_center_to_auger = global_config['safety']['combine_center_to_auger']
-        self.auger_length = global_config['safety']['auger_length']
-        self.auger_width = global_config['safety']['auger_width']
+        self.combine_dimensions = global_config['safety']['combine_dimensions']
+        self.tractor_gps_to_rear_axle = global_config['safety']['tractor_dimensions']['gps_to_rear_axle']
         self.header_width = 8.0 # default, gets updated by machine state message
         self.wheel_base = global_config['guidance']['wheel_base']
         self.stop_distance = self.radar_safety_config['stop_threshold_default']
@@ -425,15 +419,18 @@ class CollectorScenario:
 
                 gps_x -= self.tractor_gps_to_rear_axle
 
+                combine_width = self.combine_dimensions['body_width']
+
+
                 combine_region = get_combine_region(
                     gps_x,
                     gps_y,
                     combine_relative_theta,
-                    self.combine_length,
-                    self.combine_width,
-                    self.header_length,
+                    self.combine_dimensions['body_width'],
+                    self.combine_dimensions['header_length'],
                     self.header_width + 1.0,
-                    self.combine_gps_to_center,
+                    self.combine_dimensions['gps_to_header'],
+                    self.combine_dimensions['gps_to_back'],
                 )
 
                 z = 0.5
@@ -460,11 +457,10 @@ class CollectorScenario:
                 combine_gps_x,
                 combine_gps_y,
                 self.combine_relative_theta,
-                self.combine_width,
-                self.auger_length,
-                self.auger_width,
-                self.combine_gps_to_center,
-                self.combine_center_to_auger,
+                self.combine_dimensions['body_width'],
+                self.combine_dimensions['auger_length'],
+                self.combine_dimensions['auger_width'],
+                self.combine_dimensions['gps_to_auger'],
             )
 
             z = 0.5
@@ -671,7 +667,7 @@ class CollectorScenario:
 
             builder.primitive('/sync_status')\
                 .text(text)\
-                .position([-(self.tractor_gps_to_rear_axle+1.), 0., 1.])\
+                .position([-self.tractor_gps_to_rear_axle-3., 0., 1.])\
                 .id('sync status')
 
         except Exception as e:
