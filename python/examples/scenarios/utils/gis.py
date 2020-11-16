@@ -33,6 +33,22 @@ def transform_combine_to_local(combine_state, tractor_state, utm_zone):
     return dx, dy
 
 
+def utm_to_lonlat(utm_coordinates, zone):
+    """
+    utm: tuple (x, y)
+    Returns
+    ------
+    tuple
+        (lon, lat)
+    """
+    zone_number, zone_letter = parse_utm_zone(zone)
+    lat, lon = utm.to_latlon(easting=utm_coordinates[0],
+                             northing=utm_coordinates[1],
+                             zone_number=zone_number,
+                             zone_letter=zone_letter)
+    return tuple([lon, lat])
+
+
 def lonlat_to_utm(lon, lat, zone):
     zone_number, zone_letter = parse_utm_zone(zone)
     converted = utm.from_latlon(
@@ -57,7 +73,7 @@ def parse_utm_zone(zone):
 
 
 def utm_to_local(reference_x, reference_y, heading, translate_x, translate_y):
-    theta = (math.pi / 2) - (heading * math.pi / 180)
+    theta = (math.pi / 2.0) - (heading * math.pi / 180.0)
     dx_a = translate_x - reference_x
     dy_a = translate_y - reference_y
     dx = (math.cos(theta) * dx_a) + (math.sin(theta) * dy_a)
@@ -66,34 +82,58 @@ def utm_to_local(reference_x, reference_y, heading, translate_x, translate_y):
     return dx, dy
 
 
-def get_combine_region(center_x, center_y, theta, length, width):
-    half_length = length / 2
-    half_width = width / 2
+def get_combine_region(combine_gps_x, combine_gps_y, combine_theta, combine_width,
+                            header_length, header_width, gps_to_header, gps_to_back):
+    half_combine_width = combine_width / 2.0
+    half_header_width = header_width / 2.0
+    gps_to_header_front = gps_to_header + header_length
 
-    front_left = (
-        center_x + (half_length * math.cos(theta)) - (half_width * math.sin(theta)),
-        center_y + (half_length * math.sin(theta)) + (half_width * math.cos(theta))
-    )
-    front_right = (
-        center_x + (half_length * math.cos(theta)) + (half_width * math.sin(theta)),
-        center_y + (half_length * math.sin(theta)) - (half_width * math.cos(theta))
-    )
-    back_left = (
-        center_x - (half_length * math.cos(theta)) - (half_width * math.sin(theta)),
-        center_y - (half_length * math.sin(theta)) + (half_width * math.cos(theta))
-    )
-    back_right = (
-        center_x - (half_length * math.cos(theta)) + (half_width * math.sin(theta)),
-        center_y - (half_length * math.sin(theta)) - (half_width * math.cos(theta))
-    )
+    front_head_left = get_relative_xy(combine_gps_x, combine_gps_y, gps_to_header_front, half_header_width, combine_theta)
+    front_head_right = get_relative_xy(combine_gps_x, combine_gps_y, gps_to_header_front, -half_header_width, combine_theta)
+    back_head_left = get_relative_xy(combine_gps_x, combine_gps_y, gps_to_header, half_header_width, combine_theta)
+    back_head_right = get_relative_xy(combine_gps_x, combine_gps_y, gps_to_header, -half_header_width, combine_theta)
+    front_body_left = get_relative_xy(combine_gps_x, combine_gps_y, gps_to_header, half_combine_width, combine_theta)
+    front_body_right = get_relative_xy(combine_gps_x, combine_gps_y, gps_to_header, -half_combine_width, combine_theta)
+    back_left = get_relative_xy(combine_gps_x, combine_gps_y, -gps_to_back, half_combine_width, combine_theta)
+    back_right = get_relative_xy(combine_gps_x, combine_gps_y, -gps_to_back, -half_combine_width, combine_theta)
+
+    return np.row_stack((
+        front_head_left,
+        front_head_right,
+        back_head_right,
+        front_body_right,
+        back_right,
+        back_left,
+        front_body_left,
+        back_head_left,
+        front_head_left,
+    ))
+
+
+def get_auger_region(combine_gps_x, combine_gps_y, combine_theta,
+                        combine_width, auger_length, auger_width, gps_to_auger):
+    half_combine_width = combine_width / 2.0
+    half_auger_width = auger_width / 2.0
+
+    auger_pivot_x, auger_pivot_y = get_relative_xy(combine_gps_x, combine_gps_y, gps_to_auger, half_combine_width, combine_theta)
+
+    front_left = get_relative_xy(auger_pivot_x, auger_pivot_y, half_auger_width, auger_length, combine_theta)
+    front_right = get_relative_xy(auger_pivot_x, auger_pivot_y, half_auger_width, 0, combine_theta)
+    back_left = get_relative_xy(auger_pivot_x, auger_pivot_y, -half_auger_width, auger_length, combine_theta)
+    back_right = get_relative_xy(auger_pivot_x, auger_pivot_y, -half_auger_width, 0., combine_theta)
 
     return np.row_stack((
         front_left,
         front_right,
         back_right,
         back_left,
-        front_left
+        front_left,
     ))
+
+
+def get_relative_xy(X, Y, dx, dy, theta):
+    return (X + dx*math.cos(theta) - dy*math.sin(theta),
+            Y + dx*math.sin(theta) + dy*math.cos(theta))
 
 
 def polar_to_cartesian(theta, r):
@@ -102,3 +142,7 @@ def polar_to_cartesian(theta, r):
 
 def euclidean_distance(x0, y0, x1, y1):
     return math.sqrt((x1-x0)**2 + (y1-y0)**2)
+
+
+def get_wheel_angle(curvature, wheel_base):
+    return math.atan(curvature * wheel_base / 1000)

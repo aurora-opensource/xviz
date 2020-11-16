@@ -10,8 +10,8 @@ from protobuf_APIs import falconeye_pb2, radar_pb2
 from scenarios.meta.collector_meta import get_builder
 from scenarios.utils.com_manager import ComManager, MqttConst
 from scenarios.utils.filesystem import get_collector_instances, load_config
-from scenarios.utils.gis import transform_combine_to_local, get_combine_region, \
-                                utm_array_to_local, lonlat_array_to_local, lonlat_to_utm
+from scenarios.utils.gis import transform_combine_to_local, get_combine_region, get_auger_region, \
+                                utm_array_to_local, lonlat_array_to_local, lonlat_to_utm, get_wheel_angle
 from scenarios.utils.image import postprocess, show_image
 from scenarios.utils.read_protobufs import deserialize_collector_output,\
                                             extract_collector_output, extract_collector_output_slim
@@ -20,9 +20,6 @@ from scenarios.safety_subsystems.radar_filter import RadarFilter
 from scenarios.safety_subsystems.path_prediction import get_path_prediction
 
 import xviz
-
-TRACTOR_GPS_TO_REAR_AXLE = 1.9304
-COMBINE_GPS_TO_CENTER = 1.0
 
 
 class CollectorScenario:
@@ -53,16 +50,17 @@ class CollectorScenario:
             configfile = Path(__file__).parents[3] / 'Global-Configs' / 'Tractors' / 'John-Deere' / '8RIVT_WHEEL.yaml'
         else:
             configfile = Path(__file__).parents[3] / 'Global-Configs' / 'Tractors' / 'John-Deere' / '8RPST_WHEEL.yaml'
+
         global_config = load_config(str(configfile))
 
         self.path_prediction = get_path_prediction(global_config)
 
         self.radar_safety_config = global_config['safety']['radar']
         self.radar_filter = RadarFilter(self.radar_safety_config)
-
         self.cab_to_nose = global_config['safety']['object_tracking']['cabin_to_nose_distance']
-        self.combine_length = self.radar_safety_config['combine_length']
-        self.combine_width = 8.0 # default, gets updated by machine state message
+        self.combine_dimensions = global_config['safety']['combine_dimensions']
+        self.tractor_gps_to_rear_axle = global_config['safety']['tractor_dimensions']['gps_to_rear_axle']
+        self.header_width = 8.0 # default, gets updated by machine state message
         self.wheel_base = global_config['guidance']['wheel_base']
         self.stop_distance = self.radar_safety_config['stop_threshold_default']
         self.slowdown_distance = self.radar_safety_config['slowdown_threshold_default']
@@ -272,7 +270,8 @@ class CollectorScenario:
                 else:
                     self.sync_params = None
 
-            self._draw_machine_state(builder)
+            self._draw_combine(builder)
+            self._draw_auger(builder)
             self._draw_tracking_targets(tracking_output, builder)
             self._draw_camera_targets(camera_output, builder)
             self._draw_radar_targets(radar_output, builder)
@@ -399,7 +398,7 @@ class CollectorScenario:
             print('Crashed in draw camera targets:', e)
 
 
-    def _draw_machine_state(self, builder: xviz.XVIZBuilder):
+    def _draw_combine(self, builder: xviz.XVIZBuilder):
         if not self.tractor_state or not self.combine_states:
             return
         try:
@@ -411,52 +410,71 @@ class CollectorScenario:
                 combine_heading = combine_state['heading']  # degrees
                 combine_relative_theta = (tractor_heading - combine_heading) * math.pi / 180
 
-                x, y = transform_combine_to_local(combine_state, tractor_state, self.utm_zone)
+                gps_x, gps_y = transform_combine_to_local(combine_state, tractor_state, self.utm_zone)
 
                 if combine_id == "combine":  # controlling combine
-                    self.combine_x = x
-                    self.combine_y = y
+                    self.combine_x = gps_x
+                    self.combine_y = gps_y
                     self.combine_relative_theta = combine_relative_theta
 
-                x -= TRACTOR_GPS_TO_REAR_AXLE
-                z = 0.5
+                gps_x -= self.tractor_gps_to_rear_axle
 
-                c_r_x, c_r_y, _ = self.get_object_xyz_primitive(
-                    radial_dist=3.0,
-                    angle_radians=combine_relative_theta
-                )
+                combine_width = self.combine_dimensions['body_width']
 
-                combine_center_x = x - (COMBINE_GPS_TO_CENTER * math.cos(combine_relative_theta))
-                combine_center_y = y - (COMBINE_GPS_TO_CENTER * math.sin(combine_relative_theta))
 
                 combine_region = get_combine_region(
-                    combine_center_x,
-                    combine_center_y,
+                    gps_x,
+                    gps_y,
                     combine_relative_theta,
-                    self.combine_length,
-                    self.combine_width + 1.0
+                    self.combine_dimensions['body_width'],
+                    self.combine_dimensions['header_length'],
+                    self.header_width + 1.0,
+                    self.combine_dimensions['gps_to_header'],
+                    self.combine_dimensions['gps_to_back'],
                 )
 
+                z = 0.5
                 vertices = list(np.column_stack((
                     combine_region,
                     np.full(combine_region.shape[0], z)
                 )).flatten())
 
-                builder.primitive('/combine_position')\
-                    .circle([combine_center_x, combine_center_y, z], .5)\
-                    .id('combine')
-                builder.primitive('/combine_region')\
+                builder.primitive('/combine')\
                     .polyline(vertices)\
-                    .id('combine_region')
-                builder.primitive('/combine_heading')\
-                    .polyline([
-                        combine_center_x, combine_center_y, z,
-                        combine_center_x+c_r_x, combine_center_y+c_r_y, z
-                    ])\
-                    .id('combine_heading')
+                    .id('combine')
 
         except Exception as e:
             print('Crashed in draw machine state:', e)
+    
+
+    def _draw_auger(self, builder: xviz.XVIZBuilder):
+        if self.combine_x is None:
+            return
+        try:
+            combine_gps_x = self.combine_x - self.tractor_gps_to_rear_axle
+            combine_gps_y = self.combine_y
+            auger_region = get_auger_region(
+                combine_gps_x,
+                combine_gps_y,
+                self.combine_relative_theta,
+                self.combine_dimensions['body_width'],
+                self.combine_dimensions['auger_length'],
+                self.combine_dimensions['auger_width'],
+                self.combine_dimensions['gps_to_auger'],
+            )
+
+            z = 0.5
+            vertices = list(np.column_stack((
+                auger_region,
+                np.full(auger_region.shape[0], z)
+            )).flatten())
+
+            builder.primitive('/auger')\
+                .polyline(vertices)\
+                .id('auger')
+
+        except Exception as e:
+            print('Crashed in draw auger:', e)
 
 
     def _draw_predicted_path(self, builder: xviz.XVIZBuilder):
@@ -467,7 +485,7 @@ class CollectorScenario:
             speed = tractor_state['speed']
             curvature = tractor_state['curvature']
             heading = 0.
-            wheel_angle = curvature * self.wheel_base / 1000
+            wheel_angle = get_wheel_angle(curvature, self.wheel_base)
 
             if self.sync_status is not None \
                     and self.sync_status['runningSync']:
@@ -535,10 +553,10 @@ class CollectorScenario:
                 np.full(self.path_prediction.right.shape[0], z)
             ))
 
-            left[:, 0] -= TRACTOR_GPS_TO_REAR_AXLE * math.cos(self.tractor_theta)
-            left[:, 1] -= TRACTOR_GPS_TO_REAR_AXLE * math.sin(self.tractor_theta)
-            right[:, 0] -= TRACTOR_GPS_TO_REAR_AXLE * math.cos(self.tractor_theta)
-            right[:, 1] -= TRACTOR_GPS_TO_REAR_AXLE * math.sin(self.tractor_theta)
+            left[:, 0] -= self.tractor_gps_to_rear_axle * math.cos(self.tractor_theta)
+            left[:, 1] -= self.tractor_gps_to_rear_axle * math.sin(self.tractor_theta)
+            right[:, 0] -= self.tractor_gps_to_rear_axle * math.cos(self.tractor_theta)
+            right[:, 1] -= self.tractor_gps_to_rear_axle * math.sin(self.tractor_theta)
 
             vertices = list(np.concatenate((
                 left.flatten(),
@@ -559,7 +577,7 @@ class CollectorScenario:
         try:
             speed = self.control_signal['setSpeed']
             curvature = self.control_signal['commandCurvature']
-            wheel_angle = curvature * self.wheel_base / 1000
+            wheel_angle = get_wheel_angle(curvature, self.wheel_base)
             heading = 0.
 
             self.path_prediction.predict(wheel_angle, speed, heading, "control")
@@ -614,11 +632,11 @@ class CollectorScenario:
                 utm_coords = np.array(p)
                 utm_coords[:, 0] -= (
                     self.tractor_easting
-                    + TRACTOR_GPS_TO_REAR_AXLE * math.cos(self.tractor_theta)
+                    + self.tractor_gps_to_rear_axle * math.cos(self.tractor_theta)
                 )
                 utm_coords[:, 1] -= (
                     self.tractor_northing
-                    + TRACTOR_GPS_TO_REAR_AXLE * math.sin(self.tractor_theta)
+                    + self.tractor_gps_to_rear_axle * math.sin(self.tractor_theta)
                 )
 
                 z = 1.0
@@ -649,7 +667,7 @@ class CollectorScenario:
 
             builder.primitive('/sync_status')\
                 .text(text)\
-                .position([-(TRACTOR_GPS_TO_REAR_AXLE+3.), 0., 1.])\
+                .position([-self.tractor_gps_to_rear_axle-3., 0., 1.])\
                 .id('sync status')
 
         except Exception as e:
@@ -700,7 +718,7 @@ class CollectorScenario:
             # only need to set it once
             self.utm_zone = machine_state['opState']['refUtmZone']
         
-        self.combine_width = machine_state['opState']['machineWidth']
+        self.header_width = machine_state['opState']['machineWidth']
         vehicle_states = machine_state['vehicleStates']
         if vehicle_states:
             for vehicle, state in vehicle_states.items():

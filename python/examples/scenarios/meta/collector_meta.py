@@ -38,25 +38,19 @@ def get_builder():
         .category(xviz.CATEGORY.PRIMITIVE)\
         .type(xviz.PRIMITIVE_TYPES.TEXT)
 
-    combine_color = [128, 0, 128]
-    builder.stream("/combine_position")\
-        .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
-        .stream_style({'fill_color': combine_color})\
-        .category(xviz.CATEGORY.PRIMITIVE)\
-        .type(xviz.PRIMITIVE_TYPES.CIRCLE)
-    builder.stream("/combine_heading")\
-        .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
-        .stream_style({
-            'stroke_width': 0.3, 
-            'stroke_color': combine_color
-        })\
-        .category(xviz.CATEGORY.PRIMITIVE)\
-        .type(xviz.PRIMITIVE_TYPES.POLYLINE)
-    builder.stream("/combine_region")\
+    builder.stream("/combine")\
         .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
         .stream_style({
             'stroke_width': 0.3,
-            'stroke_color': combine_color
+            'stroke_color': [128, 0, 128],
+        })\
+        .category(xviz.CATEGORY.PRIMITIVE)\
+        .type(xviz.PRIMITIVE_TYPES.POLYLINE)
+    builder.stream("/auger")\
+        .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+        .stream_style({
+            'stroke_width': 0.3,
+            'stroke_color': [255, 69, 0],
         })\
         .category(xviz.CATEGORY.PRIMITIVE)\
         .type(xviz.PRIMITIVE_TYPES.POLYLINE)
