@@ -448,7 +448,9 @@ class CollectorScenario:
     
 
     def _draw_auger(self, builder: xviz.XVIZBuilder):
-        if self.combine_x is None:
+        if self.combine_x is None\
+                or self.sync_status is None \
+                or not self.sync_status['runningSync']:
             return
         try:
             combine_gps_x = self.combine_x - self.tractor_gps_to_rear_axle
