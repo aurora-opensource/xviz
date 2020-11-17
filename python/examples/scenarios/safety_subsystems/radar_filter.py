@@ -25,7 +25,7 @@ class RadarFilter:
 
         if sync_status is not None \
                 and sync_status['inSync'] \
-                and target['phi'] * 180 / math.pi > self.config['left_fov_cutoff']:
+                and target['phi'] * 180.0 / math.pi > self.config['left_fov_cutoff']:
             return False
         
         return self.queue_filter(target)
