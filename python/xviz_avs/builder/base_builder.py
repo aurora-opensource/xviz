@@ -111,7 +111,7 @@ class XVIZBaseBuilder:
         self._stream_id = None
 
     def _validate_has_prop(self, name):
-        if not hasattr(self, name) or not getattr(self, name):
+        if not hasattr(self, name) or (getattr(self, name) == None):
             self._logger.warning("Stream %s: %s is missing", self.stream_id, name)
 
     def _validate_prop_set_once(self, prop, msg=None):
