@@ -62,8 +62,9 @@ class CollectorScenario:
         self.tractor_gps_to_rear_axle = global_config['safety']['tractor_dimensions']['gps_to_rear_axle']
         self.header_width = 8.0 # default, gets updated by machine state message
         self.wheel_base = global_config['guidance']['wheel_base']
-        self.stop_distance = self.radar_safety_config['stop_threshold_default']
-        self.slowdown_distance = self.radar_safety_config['slowdown_threshold_default']
+        self.shared_speed_thresholds = global_config['safety']['shared_speed_thresholds']
+        self.stop_distance = self.shared_speed_thresholds['stop_threshold_default']
+        self.slowdown_distance = self.shared_speed_thresholds['slowdown_threshold_default']
 
         self.tractor_state = deque(maxlen=10)
         self.tractor_easting = None
@@ -419,9 +420,6 @@ class CollectorScenario:
 
                 gps_x -= self.tractor_gps_to_rear_axle
 
-                combine_width = self.combine_dimensions['body_width']
-
-
                 combine_region = get_combine_region(
                     gps_x,
                     gps_y,
@@ -491,10 +489,10 @@ class CollectorScenario:
 
             if self.sync_status is not None \
                     and self.sync_status['runningSync']:
-                threshold_list = self.radar_safety_config['sync_stop_threshold']
+                threshold_list = self.shared_speed_thresholds['sync_stop_threshold']
                 running_sync = True
             else:
-                threshold_list = self.radar_safety_config['waypoint_stop_threshold']
+                threshold_list = self.shared_speed_thresholds['waypoint_stop_threshold']
                 running_sync = False
 
             self.path_prediction.predict(
