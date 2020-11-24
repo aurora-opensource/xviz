@@ -483,8 +483,8 @@ class CollectorScenario:
         try:
             _, tractor_state = self.tractor_state[-1]
             speed = tractor_state['speed']
-            curvature = tractor_state['curvature']
             heading = 0.
+            curvature = tractor_state['curvature']
             wheel_angle = get_wheel_angle(curvature, self.wheel_base)
 
             if self.sync_status is not None \
@@ -538,8 +538,8 @@ class CollectorScenario:
             _, tractor_state = self.tractor_state[-1]
             speed = tractor_state['speed']
             heading = 90 - tractor_state['heading']
-            avg_curvature = get_average_curvature(self.tractor_state)
-            avg_wheel_angle = avg_curvature * self.wheel_base / 1000
+            curvature = tractor_state['curvature']
+            wheel_angle = get_wheel_angle(curvature, self.wheel_base)
 
             self.path_prediction.predict(avg_wheel_angle, speed, heading, "predictive")
 
@@ -750,12 +750,3 @@ class CollectorScenario:
         z = 1.0
 
         return (x, y, z)
-
-
-def get_average_curvature(tractor_state_history):
-    curvature_sum = 0
-    for i, state_tuple in enumerate(tractor_state_history):
-        _, state = state_tuple
-        curvature_sum += state['curvature']
-
-    return curvature_sum / (i + 1)
