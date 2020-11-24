@@ -94,7 +94,8 @@ class PathPrediction(object):
                 break
         return threshold
 
-    def predict(self, steering_angle, speed, heading, subsystem, running_sync=False, threshold_list=None):
+    def predict(self, steering_angle, speed, x0, y0, theta,
+                subsystem, running_sync=False, threshold_list=None):
         """Predict path for given speed and steering angle."""
 
         if subsystem == "vision":
@@ -107,6 +108,7 @@ class PathPrediction(object):
             horizon = path_distance / speed
         elif subsystem == "predictive":
             self.C['machine_width'] = self.C['path_width_predictive']
+            path_distance = self.get_threshold(speed, threshold_list) + self.cabin_to_nose
             speed = max(speed, 0.447 * 0.5)
             horizon = path_distance / speed
         elif subsystem == "control":
@@ -117,7 +119,7 @@ class PathPrediction(object):
         n_steps = 10
         U = (speed, steering_angle)
         self.U = U
-        self.X0 = 0, 0, heading * pi / 180
+        self.X0 = x0, y0, theta
 
         self.path, self.left, self.right = predict_path(
             self.X0, U, self.C, horizon=horizon, n_steps=int(n_steps))

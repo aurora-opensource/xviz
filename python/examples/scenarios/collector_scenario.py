@@ -496,8 +496,14 @@ class CollectorScenario:
                 running_sync = False
 
             self.path_prediction.predict(
-                wheel_angle, speed, heading, "vision",
-                running_sync=running_sync, threshold_list=threshold_list
+                wheel_angle,
+                speed,
+                heading,
+                0.,
+                0.,
+                "vision",
+                running_sync=running_sync,
+                threshold_list=threshold_list,
             )
 
             z = 1.1
@@ -537,11 +543,30 @@ class CollectorScenario:
         try:
             _, tractor_state = self.tractor_state[-1]
             speed = tractor_state['speed']
-            heading = 90 - tractor_state['heading']
             curvature = tractor_state['curvature']
             wheel_angle = get_wheel_angle(curvature, self.wheel_base)
 
-            self.path_prediction.predict(avg_wheel_angle, speed, heading, "predictive")
+            if self.sync_status is not None \
+                    and self.sync_status['runningSync']:
+                threshold_list = self.shared_speed_thresholds['sync_stop_threshold']
+                running_sync = True
+            else:
+                threshold_list = self.shared_speed_thresholds['waypoint_stop_threshold']
+                running_sync = False
+
+            x0 = self.tractor_easting + self.tractor_gps_to_rear_axle * math.cos(self.tractor_theta)
+            y0 = self.tractor_northing + self.tractor_gps_to_rear_axle * math.sin(self.tractor_theta)
+
+            self.path_prediction.predict(
+                wheel_angle,
+                speed,
+                x0,
+                y0,
+                self.tractor_theta,
+                "predictive",
+                running_sync=running_sync,
+                threshold_list=threshold_list,
+            )
 
             z = 1.1
             left = np.column_stack((
@@ -553,10 +578,22 @@ class CollectorScenario:
                 np.full(self.path_prediction.right.shape[0], z)
             ))
 
-            left[:, 0] -= self.tractor_gps_to_rear_axle * math.cos(self.tractor_theta)
-            left[:, 1] -= self.tractor_gps_to_rear_axle * math.sin(self.tractor_theta)
-            right[:, 0] -= self.tractor_gps_to_rear_axle * math.cos(self.tractor_theta)
-            right[:, 1] -= self.tractor_gps_to_rear_axle * math.sin(self.tractor_theta)
+            left[:, 0] -= (
+                self.tractor_easting
+                + self.tractor_gps_to_rear_axle * math.cos(self.tractor_theta)
+            )
+            left[:, 1] -= (
+                self.tractor_northing
+                + self.tractor_gps_to_rear_axle * math.sin(self.tractor_theta)
+            )
+            right[:, 0] -= (
+                self.tractor_easting
+                + self.tractor_gps_to_rear_axle * math.cos(self.tractor_theta)
+            )
+            right[:, 1] -= (
+                self.tractor_northing
+                + self.tractor_gps_to_rear_axle * math.sin(self.tractor_theta)
+            )
 
             vertices = list(np.concatenate((
                 left.flatten(),
@@ -630,14 +667,8 @@ class CollectorScenario:
 
             for p in poly:
                 utm_coords = np.array(p)
-                utm_coords[:, 0] -= (
-                    self.tractor_easting
-                    + self.tractor_gps_to_rear_axle * math.cos(self.tractor_theta)
-                )
-                utm_coords[:, 1] -= (
-                    self.tractor_northing
-                    + self.tractor_gps_to_rear_axle * math.sin(self.tractor_theta)
-                )
+                utm_coords[:, 0] -= self.tractor_easting
+                utm_coords[:, 1] -= self.tractor_northing
 
                 z = 1.0
                 vertices = list(np.column_stack(
