@@ -483,7 +483,6 @@ class CollectorScenario:
         try:
             _, tractor_state = self.tractor_state[-1]
             speed = tractor_state['speed']
-            heading = 0.
             curvature = tractor_state['curvature']
             wheel_angle = get_wheel_angle(curvature, self.wheel_base)
 
@@ -498,7 +497,7 @@ class CollectorScenario:
             self.path_prediction.predict(
                 wheel_angle,
                 speed,
-                heading,
+                0.,
                 0.,
                 0.,
                 "vision",
@@ -615,9 +614,15 @@ class CollectorScenario:
             speed = self.control_signal['setSpeed']
             curvature = self.control_signal['commandCurvature']
             wheel_angle = get_wheel_angle(curvature, self.wheel_base)
-            heading = 0.
 
-            self.path_prediction.predict(wheel_angle, speed, heading, "control")
+            self.path_prediction.predict(
+                wheel_angle,
+                speed,
+                0.,
+                0.,
+                0.,
+                "control"
+            )
 
             z = 1.1
             self.path_prediction.path[:, 2] = z
