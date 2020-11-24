@@ -7,7 +7,7 @@ import functools as ft
 def get_path_prediction(config):
     prediction_args = {
         'wheel_base': config['guidance']['wheel_base'],
-        'path_width_vision': config['safety']['radar']['path_width'],
+        'path_width_waypoint': config['safety']['radar']['path_width'],
         'path_width_predictive': config['navigation']['machine_width'],
         'path_width_sync': config['safety']['radar']['sync_path_width'],
     }
@@ -72,7 +72,7 @@ def predict_path(X0, U0, C, horizon=10.0, n_steps=10):
 
 
 class PathPrediction(object):
-    def __init__(self, C, min_speed, min_distance_default, cabin_to_nose):
+    def __init__(self, C, min_speed, path_distance_default, cabin_to_nose):
         """
         C - constants dict
             - wheel_base
@@ -82,12 +82,12 @@ class PathPrediction(object):
         self.C = C
         self.steering_history = cl.deque(maxlen=10)
         self.min_speed = min_speed
-        self.min_distance_default = min_distance_default # default value, gets updated from threshold_list
+        self.path_distance_default = path_distance_default # default value, gets updated from threshold_list
         self.cabin_to_nose = cabin_to_nose
 
     def get_threshold(self, speed, threshold_list):
         speed /= 0.447
-        threshold = self.min_distance_default
+        threshold = self.path_distance_default
         for val in threshold_list:
             if val['min_speed'] <= speed <= val['max_speed']:
                 threshold = val['threshold']
@@ -101,16 +101,14 @@ class PathPrediction(object):
             if running_sync:
                 self.C['machine_width'] = self.C['path_width_sync']
             else:
-                self.C['machine_width'] = self.C['path_width_vision']
-            min_distance = self.get_threshold(speed, threshold_list) + self.cabin_to_nose
-            speed = max(speed, 0.447 * self.min_speed['vision'])
-            horizon = max(min_distance / speed, 10.0)
+                self.C['machine_width'] = self.C['path_width_waypoint']
+            path_distance = self.get_threshold(speed, threshold_list) + self.cabin_to_nose
+            speed = max(speed, 0.447 * 0.5)
+            horizon = path_distance / speed
         elif subsystem == "predictive":
             self.C['machine_width'] = self.C['path_width_predictive']
-            speed = max(speed, 0.447 * self.min_speed['predictive'])
-            accel = -0.8
-            stopping_distance = - speed**2 / (2.0 * accel)
-            horizon = stopping_distance / speed * 1.1
+            speed = max(speed, 0.447 * 0.5)
+            horizon = path_distance / speed
         elif subsystem == "control":
             horizon = 10.0
         else:
