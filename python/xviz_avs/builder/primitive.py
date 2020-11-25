@@ -1,4 +1,7 @@
 import numpy as np
+from io import BytesIO
+from PIL import Image as pImage
+from collections import defaultdict
 
 from xviz_avs.builder.base_builder import XVIZBaseBuilder, build_object_style, CATEGORY, PRIMITIVE_TYPES, PRIMITIVE_STYLE_MAP
 from xviz_avs.v2.core_pb2 import PrimitiveState
@@ -15,7 +18,8 @@ class XVIZPrimitiveBuilder(XVIZBaseBuilder):
     def __init__(self, metadata, logger=None):
         super().__init__(CATEGORY.PRIMITIVE, metadata, logger)
 
-        self._primitives = {}
+        self._primitives = defaultdict(PrimitiveState)
+        self._buffers = defaultdict(list) # direct storage of large float array, stream_id -> list of buffers in numpy
         self.reset()
 
     def image(self, data):
@@ -25,13 +29,17 @@ class XVIZPrimitiveBuilder(XVIZBaseBuilder):
         if self._type:
             self._flush()
 
-        if not isinstance(data, (bytes, np.ndarray, str)):
-            # TODO: support PILLOW and other image types
-            # should save raw data and preserve mimetype?
-            self._logger.error("An image data must be a string or numpy array")
         self._validate_prop_set_once("_image")
         self._type = PRIMITIVE_TYPES.IMAGE
-        self._image = Image(data=data)
+
+        if isinstance(data, bytes):
+            self._image = Image(data=data)
+        elif isinstance(data, pImage.Image):
+            buffer = BytesIO()
+            data.save(buffer, format='PNG') # TODO: slower than jpeg
+            self._image = Image(data=buffer.getvalue())
+        else:
+            self._logger.error("An image data must be numpy array or pillow Image")
 
         return self
 
@@ -41,9 +49,9 @@ class XVIZPrimitiveBuilder(XVIZBaseBuilder):
         '''
         if not self._image:
             self._logger.error("An image needs to be set first")
-
-        self._image.width_px = width_pixel
-        self._image.height_px = height_pixel
+        else:
+            self._image.width_px = width_pixel
+            self._image.height_px = height_pixel
 
         return self
 
@@ -71,8 +79,8 @@ class XVIZPrimitiveBuilder(XVIZBaseBuilder):
         if self._type:
             self._flush()
 
-        self._validate_prop_set_once("_vertices")
-        self._vertices = vertices
+        self._validate_prop_set_once("_vertices_buffer")
+        self._vertices_buffer = np.asarray(vertices, dtype='f4').flatten()
         self._type = PRIMITIVE_TYPES.POINT
 
         return self
@@ -107,7 +115,6 @@ class XVIZPrimitiveBuilder(XVIZBaseBuilder):
         return self
 
     def text(self, message):
-        # XXX: is not actually defined yet
         if self._type:
             self._flush()
 
@@ -129,7 +136,7 @@ class XVIZPrimitiveBuilder(XVIZBaseBuilder):
 
     def colors(self, color_array):
         self._validate_prop_set_once('_colors')
-        self._colors = color_array
+        self._colors = np.asarray(color_array, dtype='u1').flatten() # convert to bytes here
 
         return self
 
@@ -172,29 +179,24 @@ class XVIZPrimitiveBuilder(XVIZBaseBuilder):
         if self._type:
             self._flush()
 
-        if len(self._primitives) == 0:
-            return None
-
-        return self._primitives
+        return self._primitives, self._buffers
 
     def _validate_prerequisite(self):
         if not self._type:
             self._logger.error("Start from a primitive first, e.g polygon(), image(), etc.")
 
     def _flush_primitives(self):
-        if self._stream_id not in self._primitives.keys():
-            self._primitives[self._stream_id] = PrimitiveState()
         stream = self._primitives[self._stream_id]
 
         array_field_name = PRIMITIVE_TYPES.Name(self._type).lower() + 's'
         array = getattr(stream, array_field_name)
 
-        obj = self._format_primitive()
+        obj = self._format_primitive(len(array))
         array.append(obj)
 
         self.reset()
 
-    def _format_primitive(self):
+    def _format_primitive(self, stream_pos):
         # XXX: Need to flatten arrays, TODO: need more elegant way
         # flatten_vertices = [item for sublist in self._vertices for item in sublist]
 
@@ -204,9 +206,11 @@ class XVIZPrimitiveBuilder(XVIZBaseBuilder):
         elif self._type == PRIMITIVE_TYPES.POLYLINE:
             obj = Polyline(vertices=self._vertices)
         elif self._type == PRIMITIVE_TYPES.POINT:
-            obj = Point(points=self._vertices)
-            if self._colors:
-                obj.colors = bytes(self._colors)
+            obj = Point()
+            assert len(self._buffers[self._stream_id]) == stream_pos
+            self._buffers[self._stream_id].append(self._vertices_buffer)
+            if self._colors is not None:
+                obj.colors = self._colors.tobytes()
         elif self._type == PRIMITIVE_TYPES.TEXT:
             obj = Text(position=self._vertices[0], text=self._text)
         elif self._type == PRIMITIVE_TYPES.CIRCLE:
@@ -259,3 +263,5 @@ class XVIZPrimitiveBuilder(XVIZBaseBuilder):
         self._id = None
         self._style = None
         self._classes = None
+
+        self._vertices_buffer = None

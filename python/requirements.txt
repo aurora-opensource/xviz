@@ -3,3 +3,4 @@ protobuf
 numpy
 websockets
 pytest
+pillow

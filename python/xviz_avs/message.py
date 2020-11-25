@@ -7,14 +7,6 @@ from xviz_avs.v2.options_pb2 import xviz_json_schema
 from xviz_avs.v2.envelope_pb2 import Envelope
 from google.protobuf.json_format import MessageToDict
 
-def _unravel_list(list_: list, width: int) -> List[list]: # XXX: This is actually not used
-    if len(list_) % width != 0:
-        raise ValueError("The shape of the list is incorrect!")
-
-    new_list = []
-    for i in range(len(list_) // width):
-        new_list.append(list_[i*width:(i+1)*width])
-    return new_list
 
 def _unravel_style_object(style: dict):
     # TODO: support `#FFFFFFFF` style packing
@@ -27,48 +19,86 @@ class XVIZFrame:
     '''
     This class is basically a wrapper around protobuf message `StreamSet`. It represent a frame of update.
     '''
-    def __init__(self, data: StreamSet = None):
+    def __init__(self, data: StreamSet = None, buffers: dict = {}):
         if data and not isinstance(data, StreamSet):
             raise ValueError("The data input must be structured (using StreamSet class)")
-        self._data = data
+        self._data = data or StreamSet()
+        self._buffers = buffers
 
     def to_object(self, unravel: bool = True) -> Dict:
         '''
         Serialize this data to primitive objects (with dict and list). Flattened arrays will
         be restored in this process.
+        
+        :param unravel: convert packed binary data to readable objects
         '''
         dataobj = MessageToDict(self._data, preserving_proto_field_name=True)
         if not unravel:
             return dataobj
 
         if 'primitives' in dataobj:
-            for pdata in dataobj['primitives'].values():
-                # process colors
+            for stream_id, pdata in dataobj['primitives'].items():
+                # process point array and colors
                 if 'points' in pdata:
-                    for pldata in pdata['points']:
+                    for pldata, buffer in zip(pdata['points'], self._buffers[stream_id]):
+                        pldata['points'] = buffer.tolist()
                         if 'colors' in pldata:
                             pldata['colors'] = list(base64.b64decode(pldata['colors']))
 
                 # process styles
                 for pcats in pdata.values():
                     for pldata in pcats:
-                        if 'base' in pldata and 'style' in pldata['base']:
+                        if isinstance(pldata, dict) and 'base' in pldata and 'style' in pldata['base']:
                             _unravel_style_object(pldata['base']['style'])
-                    
+
+        if 'future_instances' in dataobj:
+            for stream_id, pdata in dataobj['future_instances'].items():
+                for fts, fdata in zip(pdata['timestamps'], pdata['primitives']):
+                    # process point array and colors
+                    if 'points' in fdata:
+                        for pldata, buffer in zip(fdata['points'], self._buffers[(stream_id, fts)]):
+                            pldata['points'] = buffer.tolist()
+                            if 'colors' in pldata:
+                                pldata['colors'] = list(base64.b64decode(pldata['colors']))
+
+                    # process styles
+                    for pcats in fdata.values():
+                        for pldata in pcats:
+                            if isinstance(pldata, dict) and 'base' in pldata and 'style' in pldata['base']:
+                                _unravel_style_object(pldata['base']['style'])
+   
         return dataobj
 
-    @property
-    def data(self) -> StreamSet:
-        return self._data
+    def to_proto(self) -> StreamSet:
+        # apply buffer to proper location, this could take some time
+        data = StreamSet()
+        data.CopyFrom(self._data)
+
+        # flush primitives data
+        for stream_id, pdata in data.primitives.items():
+            if stream_id in self._buffers:
+                for ptdata, ptbuffer in zip(pdata.points, self._buffers[stream_id]):
+                    ptdata.points = ptbuffer.tolist()
+
+        # flush future primitives data
+        for stream_id, pdata in data.future_instances.items():
+            for fts, fdata in zip(pdata.timestamps, pdata.primitives):
+                if (stream_id, fts) in self._buffers:
+                    for ptdata, ptbuffer in zip(fdata.points, self._buffers[(stream_id, fts)]):
+                        ptdata.points = ptbuffer.tolist()
+
+        return data
 
 AllDataType = Union[StateUpdate, Metadata]
 
 class XVIZMessage:
     def __init__(self,
         update: StateUpdate = None,
-        metadata: Metadata = None
+        metadata: Metadata = None,
+        buffers: dict = {}
     ):
         self._data = None
+        self._buffers = buffers
 
         if update:
             if not isinstance(update, StateUpdate):
@@ -87,9 +117,16 @@ class XVIZMessage:
     def get_schema(self) -> str:
         return type(self._data).DESCRIPTOR.GetOptions().Extensions[xviz_json_schema]
 
-    @property
-    def data(self) -> AllDataType:
-        return self._data
+    def to_proto(self) -> AllDataType:
+        # apply buffer to state update message
+        if isinstance(self._data, StateUpdate):
+            data = StateUpdate()
+            data.update_type = self._data.update_type
+            for frame, buffer in zip(self._data.updates, self._buffers):
+                data.updates.append(XVIZFrame(frame, buffer).to_proto())
+            return data
+        else:
+            return self._data
 
     def to_object(self, unravel: bool = True) -> Dict:
         if not unravel:
@@ -98,7 +135,8 @@ class XVIZMessage:
         if isinstance(self._data, StateUpdate):
             return {
                 'update_type': StateUpdate.UpdateType.Name(self._data.update_type),
-                'updates': [XVIZFrame(frame).to_object() for frame in self._data.updates]
+                'updates': [XVIZFrame(frame, buffer).to_object(unravel=True)
+                            for frame, buffer in zip(self._data.updates, self._buffers)]
             }
         elif isinstance(self._data, Metadata):
             dataobj = MessageToDict(self._data, preserving_proto_field_name=True)
@@ -118,21 +156,26 @@ class XVIZEnvelope:
     def __init__(self, data: Union[XVIZMessage, AllDataType]):
         if isinstance(data, XVIZMessage):
             type_str = data.get_schema()
-            data = data.data
+            buffers = data._buffers
+            data = data._data
         else:
             type_str = XVIZMessage(data).get_schema()
+            buffers = {}
 
         self._type = type(data)
         self._data = Envelope(type=type_str.replace("session", "xviz"))
-        self._data.data.Pack(data)
+        self._raw = data # lazy packing of data to avoid performance issue
+        self._raw_buffers = buffers
 
-    @property
-    def data(self) -> Envelope:
-        return self._data
+    def to_proto(self) -> Envelope:
+        data = Envelope()
+        data.CopyFrom(self._data)
+        data.data.Pack(self.to_message().to_proto())
+        return data
 
     def to_object(self, unravel: bool = True) -> Dict:
         if not unravel:
-            return MessageToDict(self._data, preserving_proto_field_name=True)
+            return MessageToDict(self.to_proto(), preserving_proto_field_name=True)
 
         return {
             "type": self._data.type,
@@ -141,12 +184,8 @@ class XVIZEnvelope:
 
     def to_message(self) -> XVIZMessage:
         if self._data.type == "xviz/metadata":
-            udata = Metadata()
-            self._data.data.Unpack(udata)
-            return XVIZMessage(metadata=udata)
+            return XVIZMessage(metadata=self._raw, buffers=self._raw_buffers)
         elif self._data.type == "xviz/state_update":
-            udata = StateUpdate()
-            self._data.data.Unpack(udata)
-            return XVIZMessage(update=udata)
+            return XVIZMessage(update=self._raw, buffers=self._raw_buffers)
         else:
             raise ValueError("Unrecognized envelope data")

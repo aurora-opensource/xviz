@@ -85,7 +85,7 @@ class XVIZBaseBuilder:
     def __init__(self, category, metadata: Union[Metadata, XVIZMessage], logger=None):
         self._stream_id = None
         self._category = category
-        self._metadata = metadata.data if isinstance(metadata, XVIZMessage) else metadata
+        self._metadata = metadata._data if isinstance(metadata, XVIZMessage) else metadata
         self._logger = logger or logging.getLogger("xviz")
 
     def stream(self, stream_id):

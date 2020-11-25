@@ -2,14 +2,18 @@
 This module provides basic io under GLTF format
 """
 
+import array
+import base64
+import json
 import logging
-import json, array, struct, base64
-from typing import Union
+import struct
 from collections import namedtuple
-from easydict import EasyDict as edict
+from typing import Union
 
+import numpy as np
+from easydict import EasyDict as edict
 from xviz_avs.io.base import XVIZBaseWriter
-from xviz_avs.message import XVIZMessage, XVIZEnvelope, StateUpdate
+from xviz_avs.message import StateUpdate, XVIZEnvelope, XVIZMessage
 
 # Constants
 
@@ -116,7 +120,7 @@ class GLTFBuilder:
 
         return len(self._json.bufferViews) - 1
 
-    def add_buffer(self, buffer: Union[array.array, bytes], size: int = 3):
+    def add_buffer(self, buffer: Union[np.ndarray, array.array, bytes], size: int = 3):
         '''
         Add a binary buffer. Builds glTF "JSON metadata" and saves buffer reference.
         Buffer will be copied into BIN chunk during "pack".
@@ -128,6 +132,12 @@ class GLTFBuilder:
         :param count: XXX
         :return: accessor_index: Index of added buffer in "accessors" list
         '''
+        if isinstance(buffer, np.ndarray):
+            buffer_view_index = self.add_buffer_view(buffer.tobytes())
+            return self.add_accessor(
+                buffer_view_index, size=size,
+                component_type=component_type_d[buffer.dtype.char], count=len(buffer.reshape(-1, size)))
+
         if isinstance(buffer, array.array):
             buffer_view_index = self.add_buffer_view(buffer.tobytes())
             return self.add_accessor(
@@ -277,12 +287,13 @@ class XVIZGLBWriter(XVIZBaseWriter):
         if self._wrap_envelop:
             obj = XVIZEnvelope(message).to_object()
         else:
-            obj = message.to_object()
+            obj = message.to_object() # TODO: need to avoid this to_object step
+        # TODO: methods to pack list of floats: https://stackoverflow.com/questions/9940859/fastest-way-to-pack-a-list-of-floats-into-bytes-in-python
         builder = GLTFBuilder()
 
         fname = self._get_sequential_name(message, index) + '.glb'
 
-        if isinstance(message.data, StateUpdate):
+        if isinstance(message._data, StateUpdate):
             # Wrap image data and point cloud
             if self._wrap_envelop:
                 dataobjs = obj['data']['updates']
@@ -304,7 +315,7 @@ class XVIZGLBWriter(XVIZBaseWriter):
                                     )
                                 if 'colors' in pldata:
                                     # infer size from num_points
-                                    assert num_points is not None
+                                    assert num_points is not None, "No points are provided in the stream"
                                     color_bytes = bytes(pldata['colors'])
                                     size = len(color_bytes) // num_points
                                     assert size in (3, 4), 'expecting size to be 3 or 4, got %s' % size

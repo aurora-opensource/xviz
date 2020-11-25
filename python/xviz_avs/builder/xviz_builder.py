@@ -19,12 +19,14 @@ PRIMARY_POSE_STREAM = '/vehicle_pose'
 
 class XVIZBuilder:
     def __init__(self, metadata=None, disable_streams=None,
-                 logger=logging.getLogger("xviz")):
+                 logger=logging.getLogger("xviz"),
+                 update_type=StateUpdate.UpdateType.INCREMENTAL):
         self._logger = logger
         self._metadata = metadata
         self._disable_streams = disable_streams or []
         self._stream_builder = None
-        self._update_type = StateUpdate.UpdateType.INCREMENTAL
+        self._stream_buffers = {}
+        self._update_type = update_type
 
         self._links_builder = XVIZLinkBuilder(self._metadata, self._logger)
         self._pose_builder = XVIZPoseBuilder(self._metadata, self._logger)
@@ -66,27 +68,33 @@ class XVIZBuilder:
     def _reset(self):
         self._stream_builder = None
 
-    def get_data(self):
+    def _get_streamset(self):
         poses = self._pose_builder.get_data()
         if (not poses) or (PRIMARY_POSE_STREAM not in poses):
             self._logger.error('Every message requires a %s stream', PRIMARY_POSE_STREAM)
 
-        data = XVIZFrame(StreamSet(
-            timestamp=poses[PRIMARY_POSE_STREAM].timestamp, # FIXME: does timestamp have to be the same with pose?
+        primitive_data, primitive_buffer = self._primitives_builder.get_data()
+        futures_data, futures_buffer = self._future_instance_builder.get_data()
+        sset = StreamSet(
+            timestamp=poses[PRIMARY_POSE_STREAM].timestamp, # XXX: does timestamp have to be the same with pose?
             poses=poses,
-            primitives=self._primitives_builder.get_data(),
-            future_instances=self._future_instance_builder.get_data(),
+            primitives=primitive_data,
+            future_instances=futures_data,
             variables=self._variables_builder.get_data(),
             time_series=self._time_series_builder.get_data(),
             ui_primitives=self._ui_primitives_builder.get_data(),
             links=self._links_builder.get_data()
-        ))
+        )
+        self._stream_buffers.update(primitive_buffer)
+        self._stream_buffers.update(futures_buffer)
+        return sset
 
-        return data
+    def get_data(self) -> XVIZFrame:
+        return XVIZFrame(self._get_streamset(), self._stream_buffers)
 
-    def get_message(self):
+    def get_message(self) -> XVIZMessage:
         message = XVIZMessage(StateUpdate(
             update_type=self._update_type,
-            updates=[self.get_data().data]
-        ))
+            updates=[self._get_streamset()],
+        ), buffers=[self._stream_buffers])
         return message
