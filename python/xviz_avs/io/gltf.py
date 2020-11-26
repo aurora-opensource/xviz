@@ -6,7 +6,9 @@ import array
 import base64
 import json
 import logging
+import mimetypes
 import struct
+from io import BytesIO
 from collections import namedtuple
 from typing import Union
 
@@ -36,12 +38,12 @@ def pad_to_4bytes(length):
     return (length + 3) & ~3
 
 # Wrappers
-class ImageWrapper:
-    def __init__(self, image: bytes, width: int = None, height: int = None, mime_type: str = None):
-        self.data = image
-        self.mime_type = mime_type
-        self.width = width
-        self.height = height
+ImageWrapper = namedtuple("TypedArray", (
+    "data", # bytes
+    "width",
+    "height",
+    "mime_type"
+))
 
 TypedArrayWrapper = namedtuple("TypedArray", (
     "array",  # flattened array
@@ -273,22 +275,22 @@ class GLTFBuilder:
         raise NotImplementedError()
 
 class XVIZGLBWriter(XVIZBaseWriter):
-    def __init__(self, sink, wrap_envelope=True, use_xviz_extension=True):
+    def __init__(self, sink, wrap_envelope=True, use_xviz_extension=True, image_encoding='PNG'):
         # TODO: also support precision limit in GLTF Json
         super().__init__(sink)
 
         self._use_xviz_extension = use_xviz_extension
         self._wrap_envelop = wrap_envelope
         self._counter = 2
+        self._image_encoding = image_encoding
 
     def write_message(self, message: XVIZMessage, index: int = None):
 
         self._check_valid()
         if self._wrap_envelop:
-            obj = XVIZEnvelope(message).to_object()
+            obj = XVIZEnvelope(message).to_object(unravel='partial')
         else:
-            obj = message.to_object() # TODO: need to avoid this to_object step
-        # TODO: methods to pack list of floats: https://stackoverflow.com/questions/9940859/fastest-way-to-pack-a-list-of-floats-into-bytes-in-python
+            obj = message.to_object(unravel='partial')
         builder = GLTFBuilder()
 
         fname = self._get_sequential_name(message, index) + '.glb'
@@ -309,10 +311,7 @@ class XVIZGLBWriter(XVIZBaseWriter):
                                 num_points = None
                                 if 'points' in pldata:
                                     num_points = len(pldata['points']) // 3
-                                    pldata['points'] = TypedArrayWrapper(
-                                        array=array.array('f', pldata['points']),
-                                        size=3,
-                                    )
+                                    pldata['points'] = TypedArrayWrapper(array=pldata['points'], size=3)
                                 if 'colors' in pldata:
                                     # infer size from num_points
                                     assert num_points is not None, "No points are provided in the stream"
@@ -341,11 +340,16 @@ class XVIZGLBWriter(XVIZBaseWriter):
                         # process images
                         if 'images' in pdata:
                             for imdata in pdata['images']:
+                                image = imdata['data']
+                                data = BytesIO()
+                                image.save(data, format=self._image_encoding)
+                                mime = mimetypes.types_map['.' + self._image_encoding.lower()]
+
                                 imdata['data'] = ImageWrapper(
-                                    image=base64.b64decode(imdata['data']),
-                                    width=imdata['width_px'],
-                                    height=imdata['height_px'],
-                                    mime_type='image/png', # FIXME: use Pillow to detect type
+                                    data=data.getvalue(),
+                                    width=image.width,
+                                    height=image.height,
+                                    mime_type=mime
                                 )
 
         # Encode GLB into file

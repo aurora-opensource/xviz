@@ -227,17 +227,17 @@ class TestIO:
 
         expected = b'glTF\x02\x00\x00\x00D\x03\x00\x00\xf8\x02\x00\x00JSON{"asset":{"version":"2"'\
             b'},"buffers":[{"byteLength":48}],"bufferViews":[{"buffer":0,"byteOffset":0,"byteLeng'\
-            b'th":36},{"buffer":0,"byteOffset":36,"byteLength":12}],"accessors":[{"bufferView":0,'\
-            b'"type":"VEC3","componentType":5126,"count":3},{"bufferView":1,"type":"VEC4","compon'\
-            b'entType":5121,"count":3}],"images":[],"meshes":[],"extensions":{"AVS_xviz":{"type":'\
+            b'th":12},{"buffer":0,"byteOffset":12,"byteLength":36}],"accessors":[{"bufferView":0,'\
+            b'"type":"VEC4","componentType":5121,"count":3},{"bufferView":1,"type":"VEC3","compon'\
+            b'entType":5126,"count":3}],"images":[],"meshes":[],"extensions":{"AVS_xviz":{"type":'\
             b'"xviz/state_update","data":{"update_type":"INCREMENTAL","updates":[{"timestamp":2.0'\
             b'00000000001,"poses":{"/vehicle_pose":{"timestamp":2.000000000001,"map_origin":{"lon'\
             b'gitude":4.4,"latitude":5.5,"altitude":6.6},"position":[44.0,55.0,66.0],"orientation'\
-            b'":[0.44,0.55,0.66]}},"primitives":{"/test_primitive":{"points":[{"points":"#/access'\
-            b'ors/0","colors":"#/accessors/1"}]}}}]}}},"extensionsUsed":["AVS_xviz"]}  0\x00\x00'\
-            b'\x00BIN\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x80?\x00\x00'\
-            b'\x80?\x00\x00\x80?\x00\x00\x00@\x00\x00\x00@\x00\x00\x00@\xff\x00\x00\x80\x00\xff'\
-            b'\x00\x80\x00\x00\xff\x80'
+            b'":[0.44,0.55,0.66]}},"primitives":{"/test_primitive":{"points":[{"colors":"#/access'\
+            b'ors/0","points":"#/accessors/1"}]}}}]}}},"extensionsUsed":["AVS_xviz"]}  0\x00\x00' \
+            b'\x00BIN\x00\xff\x00\x00\x80\x00\xff\x00\x80\x00\x00\xff\x80\x00\x00\x00\x00\x00\x00'\
+            b'\x00\x00\x00\x00\x00\x00\x00\x00\x80?\x00\x00\x80?\x00\x00\x80?\x00\x00\x00@\x00'   \
+            b'\x00\x00@\x00\x00\x00@'
 
         assert data == expected
 
@@ -257,7 +257,7 @@ class TestIO:
             b'ehicle_pose":{"timestamp":2.000000000001,"map_origin":{"longitude":4.4,"latitude":5'\
             b'.5,"altitude":6.6},"position":[44.0,55.0,66.0],"orientation":[0.44,0.55,0.66]}},"pr'\
             b'imitives":{"/test_primitive":{"polylines":[{"vertices":"#/accessors/0"}]}}}]}}},"ex'\
-            b'tensionsUsed":["AVS_xviz"]} \x18\x00\x00\x00BIN\x00\x00\x00\x80?\x00\x00\x80?\x00'\
+            b'tensionsUsed":["AVS_xviz"]} \x18\x00\x00\x00BIN\x00\x00\x00\x80?\x00\x00\x80?\x00'  \
             b'\x00\x80?\x00\x00\x00@\x00\x00\x00@\x00\x00\x00@'
 
         assert data == expected
@@ -279,8 +279,8 @@ class TestIO:
             b'":5.5,"altitude":6.6},"position":[44.0,55.0,66.0],"orientation":[0.44,0.55,0.66]}},'\
             b'"primitives":{"/test_primitive":{"polygons":[{"base":{"style":{"height":2.0}},"vert'\
             b'ices":"#/accessors/0"}]}}}]}}},"extensionsUsed":["AVS_xviz"]}  <\x00\x00\x00BIN\x00'\
-            b'\x00\x00\x80?\x00\x00\x80?\x00\x00\x80?\x00\x00\x00@\x00\x00\x00@\x00\x00\x00@\x00'\
-            b'\x00@@\x00\x00@@\x00\x00@@\x00\x00\x80@\x00\x00\x80@\x00\x00\x80@\x00\x00\x80?\x00'\
+            b'\x00\x00\x80?\x00\x00\x80?\x00\x00\x80?\x00\x00\x00@\x00\x00\x00@\x00\x00\x00@\x00' \
+            b'\x00@@\x00\x00@@\x00\x00@@\x00\x00\x80@\x00\x00\x80@\x00\x00\x80@\x00\x00\x80?\x00' \
             b'\x00\x80?\x00\x00\x80?'
 
         assert data == expected
@@ -293,13 +293,12 @@ class TestIO:
         writer.write_message(builder.get_message())
         data = source.read()
 
-        expected = b'glTF\x02\x00\x00\x004\x02\x00\x00\x18\x02\x00\x00JSON{"asset":{"version":"2"'\
-            b'},"buffers":[{"byteLength":0}],"bufferViews":[],"accessors":[],"image":[],"meshes":'\
-            b'[],"extensions":{"AVS_xviz":{"type":"#xviz/state_update","data":{"update_type":"#IN'\
-            b'CREMENTAL","updates":[{"timestamp":2.000000000001,"poses":{"/vehicle_pose":{"timest'\
-            b'amp":2.000000000001,"map_origin":{"longitude":4.4,"latitude":5.5,"altitude":6.6},"p'\
-            b'osition":[44.0,55.0,66.0],"orientation":[0.44,0.55,0.66]}},"primitives":{"/test_pri'\
-            b'mitive":{"circles":[{"center":[0.0,0.0,0.0],"radius":2.0}]}}}]}}},"extensionsUsed":'\
-            b'["AVS_xviz"]}\x00\x00\x00\x00\x00\x00BIN\x00'
+        expected = b'PBE1\n\x11xviz/state_update\x12\xd1\x01\n\'type.googleapis.com/xviz.v2.State'\
+            b'Update\x12\xa5\x01\x08\x02\x12\xa0\x01\t\xcc\x08\x00\x00\x00\x00\x00@\x12k\n\r/vehi'\
+            b'cle_pose\x12Z\t\xcc\x08\x00\x00\x00\x00\x00@\x12\x1b\t\x9a\x99\x99\x99\x99\x99\x11@'\
+            b'\x11\x00\x00\x00\x00\x00\x00\x16@\x19ffffff\x1a@\x1a\x18\x00\x00\x00\x00\x00\x00F@' \
+            b'\x00\x00\x00\x00\x00\x80K@\x00\x00\x00\x00\x00\x80P@"\x18)\\\x8f\xc2\xf5(\xdc?\x9a' \
+            b'\x99\x99\x99\x99\x99\xe1?\x1f\x85\xebQ\xb8\x1e\xe5?\x1a(\n\x0f/test_primitive\x12'  \
+            b'\x15"\x13\x12\x0c\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x1d\x00\x00\x00@'
 
-        # XXX: assert data == expected
+        assert data == expected

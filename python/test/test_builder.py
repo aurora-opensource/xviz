@@ -1,8 +1,11 @@
 import json
-from easydict import EasyDict as edict
-
-from xviz_avs.builder import XVIZBuilder, XVIZUIPrimitiveBuilder, XVIZTimeSeriesBuilder, XVIZVariableBuilder
 import unittest
+import numpy as np
+
+from easydict import EasyDict as edict
+from PIL import Image
+from xviz_avs.builder import (XVIZBuilder, XVIZTimeSeriesBuilder,
+                              XVIZUIPrimitiveBuilder, XVIZVariableBuilder)
 
 PRIMARY_POSE_STREAM = '/vehicle_pose'
 
@@ -69,7 +72,8 @@ class TestPrimitiveBuilder(unittest.TestCase):
         setup_pose(self.builder)
 
     def test_image(self):
-        data = bytes(b'12345')
+        data = np.array([[1,2],[3,4]])
+        data = Image.fromarray(data.astype('u1')).convert('RGB')
         self.builder.primitive('/camera/1')\
             .image(data)
 
@@ -82,7 +86,12 @@ class TestPrimitiveBuilder(unittest.TestCase):
                 '/camera/1': {
                     'images': [
                         {
-                            'data': 'MTIzNDU='
+                            'width_px': 2,
+                            'height_px': 2,
+                            'data': b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x02\x00'\
+                                    b'\x00\x00\x02\x08\x02\x00\x00\x00\xfd\xd4\x9as\x00\x00'  \
+                                    b'\x00\x16IDATx\x9ccdddddddabbbdd\x04\x00\x00\x9b\x00\x15'\
+                                    b'\x86\xe2,\xcc\x00\x00\x00\x00IEND\xaeB`\x82'
                         }
                     ]
                 }
@@ -666,3 +675,8 @@ class TestVariableBuilder(unittest.TestCase):
         }
 
         assert data == expected
+
+if __name__ == "__main__":
+    t = TestFutureInstanceBuilder()
+    t.setUp()
+    t.test_primitives()

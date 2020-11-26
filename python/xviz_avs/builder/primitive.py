@@ -1,5 +1,4 @@
 import numpy as np
-from io import BytesIO
 from PIL import Image as pImage
 from collections import defaultdict
 
@@ -24,7 +23,7 @@ class XVIZPrimitiveBuilder(XVIZBaseBuilder):
 
     def image(self, data):
         '''
-        Add image data
+        Add image data. Internal representation is handled by pillow image
         '''
         if self._type:
             self._flush()
@@ -32,26 +31,11 @@ class XVIZPrimitiveBuilder(XVIZBaseBuilder):
         self._validate_prop_set_once("_image")
         self._type = PRIMITIVE_TYPES.IMAGE
 
-        if isinstance(data, bytes):
-            self._image = Image(data=data)
-        elif isinstance(data, pImage.Image):
-            buffer = BytesIO()
-            data.save(buffer, format='PNG') # TODO: slower than jpeg
-            self._image = Image(data=buffer.getvalue())
+        if isinstance(data, pImage.Image):
+            self._image = Image(width_px=data.width, height_px=data.height)
+            self._image_buffer = data
         else:
-            self._logger.error("An image data must be numpy array or pillow Image")
-
-        return self
-
-    def dimensions(self, width_pixel=None, height_pixel=None):
-        '''
-        Add dimension specs for image data
-        '''
-        if not self._image:
-            self._logger.error("An image needs to be set first")
-        else:
-            self._image.width_px = width_pixel
-            self._image.height_px = height_pixel
+            self._logger.error("An image data must be a pillow Image")
 
         return self
 
@@ -165,10 +149,10 @@ class XVIZPrimitiveBuilder(XVIZBaseBuilder):
         super()._validate()
 
         if self._type == PRIMITIVE_TYPES.IMAGE:
-            if self._image is None or self._image.data is None:
+            if self._image is None or self._image_buffer is None:
                 self._logger.warning("Stream {} image data are not provided.".format(self._stream_id))
         else:
-            if self._vertices is None:
+            if self._vertices is None and self._vertices_buffer is None:
                 self._logger.warning("Stream {} primitives vertices are not provided.".format(self._stream_id))
 
     def _flush(self):
@@ -221,6 +205,7 @@ class XVIZPrimitiveBuilder(XVIZBaseBuilder):
             if self._vertices:
                 self._image.position = self._vertices[0]
             obj = self._image
+            self._buffers[self._stream_id].append(self._image_buffer)
 
         # Embed base data
         have_base = False
@@ -265,3 +250,4 @@ class XVIZPrimitiveBuilder(XVIZBaseBuilder):
         self._classes = None
 
         self._vertices_buffer = None
+        self._image_buffer = None
