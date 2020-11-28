@@ -3,14 +3,18 @@ from easydict import EasyDict as edict
 import numpy as np
 
 from xviz_avs.message import XVIZMessage
-from xviz_avs.builder.base_builder import build_object_style, build_stream_style
+from xviz_avs.builder.ui_builder import XVIZUIBuilder
+from xviz_avs.builder.base_builder import build_object_style, build_stream_style, SCALAR_TYPE
 from xviz_avs.v2.session_pb2 import Metadata, StreamMetadata, LogInfo
 
 
 class XVIZMetadataBuilder:
+    """
+    # Reference
+    [@xviz/builder/xviz-metadata-builder]/(https://github.com/uber/xviz/blob/master/modules/builder/src/builders/xviz-metadata-builder.js)
+    """
     def __init__(self, logger=logging.getLogger("xviz")):
         self._logger = logger
-
         self._data = Metadata(version="2.0.0")
         self._temp_ui_builder = None
         self._reset()
@@ -40,7 +44,7 @@ class XVIZMetadataBuilder:
         self._data.log_info.end_time = time
         return self
 
-    def ui(self, ui_builder):
+    def ui(self, ui_builder: XVIZUIBuilder):
         self._temp_ui_builder = ui_builder
         return self
 
@@ -70,7 +74,7 @@ class XVIZMetadataBuilder:
         if isinstance(t, int):
             self._temp_type = t
         elif isinstance(t, str):
-            self._temp_type = t.upper()
+            self._temp_type = SCALAR_TYPE.Value(t.upper())
         else:
             self._logger.error("Invalid value type for category!")
         return self

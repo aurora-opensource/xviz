@@ -18,6 +18,10 @@ from google.protobuf.json_format import MessageToDict
 PRIMARY_POSE_STREAM = '/vehicle_pose'
 
 class XVIZBuilder:
+    """
+    # Reference
+    [@xviz/builder/xviz-builder]/(https://github.com/uber/xviz/blob/master/modules/builder/src/builders/xviz-builder.js)
+    """
     def __init__(self, metadata=None, disable_streams=None,
                  logger=logging.getLogger("xviz"),
                  update_type=StateUpdate.UpdateType.INCREMENTAL):

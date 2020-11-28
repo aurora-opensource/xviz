@@ -13,7 +13,7 @@ from .base_builder import XVIZBaseBuilder,\
     PRIMITIVE_TYPES,\
     UIPRIMITIVE_TYPES
 from .xviz_builder import XVIZBuilder
-from .xviz_ui_builder import XVIZUIBuilder
+from .ui_builder import XVIZUIBuilder
 
 from .metadata import XVIZMetadataBuilder
 from .pose import XVIZPoseBuilder
