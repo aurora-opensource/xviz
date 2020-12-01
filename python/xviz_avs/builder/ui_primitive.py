@@ -1,28 +1,30 @@
+from typing import Union, Iterable, Dict
+
 from xviz_avs.builder.base_builder import XVIZBaseBuilder, CATEGORY, UIPRIMITIVE_TYPES
 from xviz_avs.v2.core_pb2 import UIPrimitiveState
 from xviz_avs.v2.uiprimitives_pb2 import TreeTableNode, TreeTableColumn
 
 
 class XVIZTreeTableRowBuilder:
-    def __init__(self, id_, values, parent=None):
+    def __init__(self, id_: int, values: Union[int, float, str, bool], parent: int = None):
         self._node = TreeTableNode(id=id_)
         if parent:
             self._node.parent = parent
         self._node.column_values.extend([str(v) for v in values])
         self._children = []
 
-    def child(self, id_, values):
+    def child(self, id_: str, values: Union[int, float, str, bool]) -> 'XVIZTreeTableRowBuilder':
         row = XVIZTreeTableRowBuilder(id_, values, self._node.id)
         self._children.append(row)
         return row
 
-    def get_data(self):
+    def get_data(self) -> list:
         return [self._node] + [node for child in self._children for node in child.get_data()]
 
 
 class XVIZUIPrimitiveBuilder(XVIZBaseBuilder):
-    def __init__(self, metadata, logger=None):
-        super().__init__(CATEGORY.PRIMITIVE, metadata, logger)
+    def __init__(self, metadata):
+        super().__init__(CATEGORY.PRIMITIVE, metadata)
 
         self.reset()
         self._primitives = {}
@@ -33,7 +35,7 @@ class XVIZUIPrimitiveBuilder(XVIZBaseBuilder):
         self._columns = None
         self._rows = []
 
-    def treetable(self, columns):
+    def treetable(self, columns: Iterable[dict]):
         if self._type:
             self._flush()
 
@@ -44,7 +46,7 @@ class XVIZUIPrimitiveBuilder(XVIZBaseBuilder):
 
         return self
 
-    def row(self, id_, values):
+    def row(self, id_: int, values: Union[int, float, str, bool]) -> XVIZTreeTableRowBuilder:
         self._validate_prop_set_once('_id')
 
         row = XVIZTreeTableRowBuilder(id_, values)
@@ -57,14 +59,10 @@ class XVIZUIPrimitiveBuilder(XVIZBaseBuilder):
         self._validate()
         self._flush_primitive()
 
-    def get_data(self):
+    def get_data(self) -> Dict[str, UIPrimitiveState]:
         if self._type:
             self._flush()
-
-        if self._primitives:
-            return self._primitives
-
-        return None
+        return self._primitives
 
     def _flush_primitive(self):
         if self._type == UIPRIMITIVE_TYPES.TREETABLE:

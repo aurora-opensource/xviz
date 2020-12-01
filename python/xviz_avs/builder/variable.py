@@ -1,10 +1,12 @@
+from typing import Union, Dict
+
 from xviz_avs.builder.base_builder import XVIZBaseBuilder, CATEGORY
 from xviz_avs.v2.core_pb2 import VariableState
 
 
 class XVIZVariableBuilder(XVIZBaseBuilder):
-    def __init__(self, metadata, logger=None):
-        super().__init__(CATEGORY.VARIABLE, metadata, logger)
+    def __init__(self, metadata):
+        super().__init__(CATEGORY.VARIABLE, metadata)
 
         # Stores variable data by stream then id
         # They will then be group when constructing final object
@@ -14,12 +16,12 @@ class XVIZVariableBuilder(XVIZBaseBuilder):
         self._id = None
         self._values = None
 
-    def id(self, identifier):
+    def id(self, identifier: str) -> 'XVIZVariableBuilder':
         self._validate_prop_set_once('_id')
         self._id = identifier
         return self
 
-    def values(self, values):
+    def values(self, values: Union[int, float, str, bool]) -> 'XVIZVariableBuilder':
         self._validate_prop_set_once('_values')
         if not isinstance(values, (list, tuple)):
             self._logger.error("Input `values` must be array")
@@ -27,7 +29,7 @@ class XVIZVariableBuilder(XVIZBaseBuilder):
         self._values = values
         return self
 
-    def get_data(self):
+    def get_data(self) -> Dict[str, VariableState]:
         self._flush()
         if not self._data:
             return None
@@ -48,9 +50,7 @@ class XVIZVariableBuilder(XVIZBaseBuilder):
         if self._id:
             for entry in stream_entry.variables:
                 if entry.base.object_id == self._id:
-                    # TODO validate error, which should throw
                     self._logger.error("Input `values` already set for id %s" % self._id)
-                    raise Exception('id values already set')
 
         var_entry = stream_entry.variables.add()
         value = self._values[0]

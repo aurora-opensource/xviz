@@ -227,13 +227,13 @@ class GLTFBuilder:
         file.write(struct.pack("<I", 28 + jsonlen + binlen))
 
         # Write Json
-        file.write(struct.pack("<I", len(jsonstr)))
+        file.write(struct.pack("<I", jsonlen))
         file.write(struct.pack("<I", self.MAGIC_JSON))
         file.write(jsonstr)
         file.write(b" " * (jsonlen - len(jsonstr))) # pad json with spaces
 
         # Write Binary
-        file.write(struct.pack("<I", len(binary)))
+        file.write(struct.pack("<I", binlen))
         file.write(struct.pack("<I", self.MAGIC_BIN))
         file.write(binary)
         file.write(b"\x00" * (binlen - len(binary))) # pad

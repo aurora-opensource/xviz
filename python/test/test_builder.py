@@ -141,10 +141,10 @@ class TestUIPrimitiveBuilder(unittest.TestCase):
         setup_pose(self.builder)
 
     def test_null(self):
-        builder = XVIZUIPrimitiveBuilder(None, None)
+        builder = XVIZUIPrimitiveBuilder(None)
         data = builder.stream('/test').get_data()
 
-        assert data is None
+        assert not data
 
     def test_treetable_no_rows(self):
         TEST_COLUMNS = [{'display_text': 'Name', 'type': 'STRING'}]
@@ -278,10 +278,10 @@ class TestTimeSeriesBuilder(unittest.TestCase):
         setup_pose(self.builder)
 
     def test_null(self):
-        builder = XVIZTimeSeriesBuilder(None, None)
+        builder = XVIZTimeSeriesBuilder(None)
         data = builder.stream('/test').get_data()
 
-        assert data is None
+        assert not data
 
     def test_single_entry(self):
         self.builder = XVIZBuilder()
@@ -539,10 +539,10 @@ class TestVariableBuilder(unittest.TestCase):
         setup_pose(self.builder)
 
     def test_null(self):
-        builder = XVIZVariableBuilder(None, None)
+        builder = XVIZVariableBuilder(None)
         data = builder.stream('/test').get_data()
 
-        assert data is None
+        assert not data
 
     def test_int32s_variable(self):
         self.builder.variable('/test_var').values([1, 2, 3])

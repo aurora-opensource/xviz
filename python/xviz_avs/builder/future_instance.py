@@ -1,3 +1,4 @@
+from typing import Tuple
 from collections import defaultdict
 
 from xviz_avs.builder.base_builder import CATEGORY, PRIMITIVE_TYPES
@@ -6,8 +7,8 @@ from xviz_avs.v2.core_pb2 import FutureInstances, PrimitiveState
 
 
 class XVIZFutureInstanceBuilder(XVIZPrimitiveBuilder):
-    def __init__(self, metadata, logger=None):
-        super().__init__(metadata, logger)
+    def __init__(self, metadata):
+        super().__init__(metadata)
         self._category = CATEGORY.FUTURE_INSTANCE  # Override category
 
         self.reset()
@@ -22,7 +23,7 @@ class XVIZFutureInstanceBuilder(XVIZPrimitiveBuilder):
         super().reset()
         self._ts = None
 
-    def timestamp(self, timestamp):
+    def timestamp(self, timestamp: float) -> 'XVIZFutureInstanceBuilder':
         self._ts = timestamp
         return self
 
@@ -42,7 +43,8 @@ class XVIZFutureInstanceBuilder(XVIZPrimitiveBuilder):
         elif primitive_type == PRIMITIVE_TYPES.TEXT:
             return primitives.texts
         else:
-            raise ValueError("FutureInstance type '{0}' is not recognized".format(primitive_type))
+            self._logger.error("FutureInstance type '%s' is not recognized", str(primitive_type))
+            return []
 
     def _flush_futures_list(self):
         # Since you cannot insert into a repeated message field
@@ -82,7 +84,7 @@ class XVIZFutureInstanceBuilder(XVIZPrimitiveBuilder):
 
         self.reset()
 
-    def get_data(self):
+    def get_data(self) -> Tuple[FutureInstances, dict]:
         if self._type:
             self._flush()
 

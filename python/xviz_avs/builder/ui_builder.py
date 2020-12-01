@@ -1,7 +1,7 @@
-from xviz_avs.builder.declarative_ui import *
-
-from typing import Type
 from functools import partial
+from typing import Dict, Type
+
+from xviz_avs.builder.declarative_ui import *
 
 
 class XVIZUIBuilder:
@@ -45,7 +45,7 @@ class XVIZUIBuilder:
             raise TypeError("Argument panel must be an XVIZPanelBuilder instance")
         self._panels.append(panel)
 
-    def get_ui(self) -> dict:
+    def get_ui(self) -> Dict[str, Dict]:
         ui = {item.name: item.get_ui() for item in self._panels}
         return ui
 
