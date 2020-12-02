@@ -53,9 +53,7 @@ class CollectorScenario:
             configfile = Path(__file__).parents[3] / 'Global-Configs' / 'Tractors' / 'John-Deere' / '8RPST_WHEEL.yaml'
 
         self.global_config = load_config(str(configfile))
-
-        self.radar_safety_config = self.global_config['safety']['radar']
-        self.radar_filter = RadarFilter(self.radar_safety_config)
+        self.radar_filter = RadarFilter(self.global_config['safety']['radar'])
         self.cab_to_nose = self.global_config['safety']['object_tracking']['cabin_to_nose_distance']
         self.combine_dimensions = self.global_config['safety']['combine_dimensions']
         self.tractor_gps_to_rear_axle = self.global_config['safety']['tractor_dimensions']['gps_to_rear_axle']
