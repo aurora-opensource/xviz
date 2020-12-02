@@ -17,7 +17,7 @@ from scenarios.utils.read_protobufs import deserialize_collector_output,\
                                             extract_collector_output, extract_collector_output_slim
 
 from scenarios.safety_subsystems.radar_filter import RadarFilter
-from scenarios.safety_subsystems.path_prediction import get_path_prediction
+from scenarios.safety_subsystems.path_prediction import get_path_prediction, get_all_path_polys
 
 import xviz
 
@@ -51,20 +51,19 @@ class CollectorScenario:
         else:
             configfile = Path(__file__).parents[3] / 'Global-Configs' / 'Tractors' / 'John-Deere' / '8RPST_WHEEL.yaml'
 
-        global_config = load_config(str(configfile))
+        self.global_config = load_config(str(configfile))
 
-        self.path_prediction = get_path_prediction(global_config)
+        self.path_prediction = get_path_prediction(self.global_config)
 
-        self.radar_safety_config = global_config['safety']['radar']
+        self.safety_config = self.global_config['safety']
+        self.radar_safety_config = self.safety_config['radar']
         self.radar_filter = RadarFilter(self.radar_safety_config)
-        self.cab_to_nose = global_config['safety']['object_tracking']['cabin_to_nose_distance']
-        self.combine_dimensions = global_config['safety']['combine_dimensions']
-        self.tractor_gps_to_rear_axle = global_config['safety']['tractor_dimensions']['gps_to_rear_axle']
+        self.cab_to_nose = self.safety_config['object_tracking']['cabin_to_nose_distance']
+        self.combine_dimensions = self.safety_config['combine_dimensions']
+        self.tractor_gps_to_rear_axle = self.safety_config['tractor_dimensions']['gps_to_rear_axle']
         self.header_width = 8.0 # default, gets updated by machine state message
-        self.wheel_base = global_config['guidance']['wheel_base']
-        self.shared_speed_thresholds = global_config['safety']['shared_speed_thresholds']
-        self.stop_distance = self.shared_speed_thresholds['stop_threshold_default']
-        self.slowdown_distance = self.shared_speed_thresholds['slowdown_threshold_default']
+        self.wheel_base = self.global_config['guidance']['wheel_base']
+        self.path_widths = self.safety_config['path_widths']
 
         self.tractor_state = deque(maxlen=10)
         self.tractor_easting = None
@@ -146,8 +145,6 @@ class CollectorScenario:
 
     def _draw_measuring_references(self, builder: xviz.XVIZBuilder, timestamp):
         radial_distances = set([5, 10, 15, 20, 25, 30])
-        radial_distances.add(self.slowdown_distance)
-        radial_distances.add(self.stop_distance)
         radial_distances = sorted(radial_distances, reverse=True)
 
         for r in radial_distances:
@@ -156,20 +153,9 @@ class CollectorScenario:
                 .position([r, 0, .1])\
                 .id(f'{r}lb')
 
-            if r == self.slowdown_distance:
-                builder.primitive('/measuring_circles')\
-                    .circle([0, 0, 0], r)\
-                    .style({'stroke_color': [255, 200, 0, 70]})\
-                    .id('slowdown: ' + str(r))
-            elif r == self.stop_distance:
-                builder.primitive('/measuring_circles')\
-                    .circle([0, 0, 0], r)\
-                    .style({'stroke_color': [255, 50, 10, 70]})\
-                    .id('stop: ' + str(r))
-            else:
-                builder.primitive('/measuring_circles')\
-                    .circle([0, 0, 0], r)\
-                    .id(str(r))
+            builder.primitive('/measuring_circles')\
+                .circle([0, 0, 0], r)\
+                .id(str(r))
 
         cam_fov = [-28.5, 28.5]  # 57 deg
         radar_fov = [-27, -13.5, -6.75, 0, 6.75, 13.5, 27]  # 54 degrees
@@ -276,8 +262,7 @@ class CollectorScenario:
             self._draw_tracking_targets(tracking_output, builder)
             self._draw_camera_targets(camera_output, builder)
             self._draw_radar_targets(radar_output, builder)
-            self._draw_predicted_path(builder)
-            self._draw_predictive_sub_path(builder)
+            self._draw_predicted_paths(builder)
             self._draw_planned_path(builder)
             self._draw_field_definition(builder)
             self._draw_control_signal(builder)
@@ -477,134 +462,31 @@ class CollectorScenario:
             print('Crashed in draw auger:', e)
 
 
-    def _draw_predicted_path(self, builder: xviz.XVIZBuilder):
+    def _draw_predicted_paths(self, builder: xviz.XVIZBuilder):
         if not self.tractor_state:
             return
         try:
             _, tractor_state = self.tractor_state[-1]
-            speed = tractor_state['speed']
-            curvature = tractor_state['curvature']
-            wheel_angle = get_wheel_angle(curvature, self.wheel_base)
 
-            if self.sync_status is not None \
-                    and self.sync_status['runningSync']:
-                threshold_list = self.shared_speed_thresholds['sync_stop_threshold']
-                running_sync = True
-            else:
-                threshold_list = self.shared_speed_thresholds['waypoint_stop_threshold']
-                running_sync = False
+            sync_stop_poly, sync_slow_poly, \
+                waypoint_stop_poly, waypoint_slow_poly, \
+                = get_all_path_polys(tractor_state, self.global_config, 0., 0., 0.)
 
-            self.path_prediction.predict(
-                wheel_angle,
-                speed,
-                0.,
-                0.,
-                0.,
-                "vision",
-                running_sync=running_sync,
-                threshold_list=threshold_list,
-            )
+            stop_polys = [sync_stop_poly, waypoint_stop_poly]
+            slow_polys = [sync_slow_poly, waypoint_slow_poly]
 
-            z = 1.1
-            left = np.column_stack((
-                self.path_prediction.left,
-                np.full(self.path_prediction.left.shape[0], z)
-            ))
-            right = np.column_stack((
-                np.flipud(self.path_prediction.right),
-                np.full(self.path_prediction.right.shape[0], z)
-            ))
+            for stop_poly in stop_polys:
+                builder.primitive('/stop_polygons')\
+                    .polyline(stop_poly)\
+                    .id('stop_polygons')
 
-            vertices = list(np.concatenate((
-                left.flatten(),
-                right.flatten()
-            )))
-
-            builder.primitive('/predicted_path')\
-                .polyline(vertices)\
-                .id('predicted_path')
-
-            # view the discrete points in the predicted path
-            # for i in range(len(vertices) // 3):
-            #     idx = i * 3
-            #     x, y, z = vertices[idx], vertices[idx+1], vertices[idx+2]
-            #     builder.primitive('/predicted_path_discrete')\
-            #         .circle([x, y, z], .2)\
-            #         .id('predicted_path_node')
+            for slow_poly in slow_polys:
+                builder.primitive('/slow_polygons')\
+                    .polyline(slow_poly)\
+                    .id('slow_polygonss')
 
         except Exception as e:
             print('Crashed in draw predicted path:', e)
-
-
-    def _draw_predictive_sub_path(self, builder: xviz.XVIZBuilder):
-        if not self.tractor_state:
-            return
-        try:
-            _, tractor_state = self.tractor_state[-1]
-            speed = tractor_state['speed']
-            curvature = tractor_state['curvature']
-            wheel_angle = get_wheel_angle(curvature, self.wheel_base)
-
-            if self.sync_status is not None \
-                    and self.sync_status['runningSync']:
-                threshold_list = self.shared_speed_thresholds['sync_stop_threshold']
-                running_sync = True
-            else:
-                threshold_list = self.shared_speed_thresholds['waypoint_stop_threshold']
-                running_sync = False
-
-            x0 = self.tractor_easting + self.tractor_gps_to_rear_axle * math.cos(self.tractor_theta)
-            y0 = self.tractor_northing + self.tractor_gps_to_rear_axle * math.sin(self.tractor_theta)
-
-            self.path_prediction.predict(
-                wheel_angle,
-                speed,
-                x0,
-                y0,
-                self.tractor_theta,
-                "predictive",
-                running_sync=running_sync,
-                threshold_list=threshold_list,
-            )
-
-            z = 1.1
-            left = np.column_stack((
-                self.path_prediction.left,
-                np.full(self.path_prediction.left.shape[0], z)
-            ))
-            right = np.column_stack((
-                np.flipud(self.path_prediction.right),
-                np.full(self.path_prediction.right.shape[0], z)
-            ))
-
-            left[:, 0] -= (
-                self.tractor_easting
-                + self.tractor_gps_to_rear_axle * math.cos(self.tractor_theta)
-            )
-            left[:, 1] -= (
-                self.tractor_northing
-                + self.tractor_gps_to_rear_axle * math.sin(self.tractor_theta)
-            )
-            right[:, 0] -= (
-                self.tractor_easting
-                + self.tractor_gps_to_rear_axle * math.cos(self.tractor_theta)
-            )
-            right[:, 1] -= (
-                self.tractor_northing
-                + self.tractor_gps_to_rear_axle * math.sin(self.tractor_theta)
-            )
-
-            vertices = list(np.concatenate((
-                left.flatten(),
-                right.flatten()
-            )))
-
-            builder.primitive('/predictive_sub_path')\
-                .polyline(vertices)\
-                .id('predictive_sub_path')
-
-        except Exception as e:
-            print('Crashed in draw predictive sub path:', e)
 
 
     def _draw_control_signal(self, builder: xviz.XVIZBuilder):
@@ -621,7 +503,7 @@ class CollectorScenario:
                 0.,
                 0.,
                 0.,
-                "control"
+                10.,
             )
 
             z = 1.1

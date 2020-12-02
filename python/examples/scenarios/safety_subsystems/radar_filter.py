@@ -22,10 +22,11 @@ class RadarFilter:
     def is_valid_target(self, target, sync_status=None):        
         self.update_queue(target['targetId'], target)
         self.target_id_set.remove(target['targetId'])
+        target_x, target_y = polar_to_cartesian(target['phi'], target['dr'])
 
         if sync_status is not None \
                 and sync_status['inSync'] \
-                and target['phi'] * 180.0 / math.pi > self.config['left_fov_cutoff']:
+                and target_y > self.config['sync_y_cutoff']:
             return False
         
         return self.queue_filter(target)
@@ -68,7 +69,7 @@ class QState:
                 and self.prev_target == target:
             return True
         return False
-    
+
     def target_meets_thresholds(self, target):
         ''' Determines if the target is valid or noise based on simple value checks.
             Returns True if the target is valid.
@@ -78,11 +79,11 @@ class QState:
             or target['phiSdv'] > self.phi_sdv_max:
             return False
         return True
-    
+
     def update_with_default_target(self):
         self.prev_target = None
         self.steps.append(None)
-    
+
     def update_with_measured_target(self, target):
         if self.prev_target is not None:
             curr_x, curr_y = polar_to_cartesian(target['phi'], target['dr'])
@@ -90,7 +91,7 @@ class QState:
             step = euclidean_distance(prev_x, prev_y, curr_x, curr_y)
             self.steps.append(step)
         self.prev_target = target
-    
+
     def update_state(self, target):
         if self.is_duplicate_target(target):
             return
