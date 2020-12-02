@@ -54,15 +54,12 @@ class CollectorScenario:
 
         self.global_config = load_config(str(configfile))
 
-        self.safety_config = self.global_config['safety']
-        self.radar_safety_config = self.safety_config['radar']
+        self.radar_safety_config = self.global_config['safety']['radar']
         self.radar_filter = RadarFilter(self.radar_safety_config)
-        self.cab_to_nose = self.safety_config['object_tracking']['cabin_to_nose_distance']
-        self.combine_dimensions = self.safety_config['combine_dimensions']
-        self.tractor_gps_to_rear_axle = self.safety_config['tractor_dimensions']['gps_to_rear_axle']
+        self.cab_to_nose = self.global_config['safety']['object_tracking']['cabin_to_nose_distance']
+        self.combine_dimensions = self.global_config['safety']['combine_dimensions']
+        self.tractor_gps_to_rear_axle = self.global_config['safety']['tractor_dimensions']['gps_to_rear_axle']
         self.header_width = 8.0 # default, gets updated by machine state message
-        self.wheel_base = self.global_config['guidance']['wheel_base']
-        self.path_widths = self.safety_config['path_widths']
 
         self.tractor_state = deque(maxlen=10)
         self.tractor_easting = None
@@ -494,7 +491,8 @@ class CollectorScenario:
         try:
             speed = self.control_signal['setSpeed']
             curvature = self.control_signal['commandCurvature']
-            wheel_angle = get_wheel_angle(curvature, self.wheel_base)
+            wheel_angle = get_wheel_angle(
+                curvature, self.global_config['guidance']['wheel_base'])
             time_horizon = 10.0
             n_steps = 10
             U = (speed, wheel_angle)
