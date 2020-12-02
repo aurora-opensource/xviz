@@ -41,19 +41,6 @@ class RadarFilter:
                 return False
         return True
 
-    def filter_targets_until_path_prediction(self, target, in_sync=True, is_combine=False, at_sync_point=False):
-        if in_sync and not at_sync_point:
-            if is_combine:
-                dr_threshold = 8
-            else:
-                dr_threshold = 10
-        else:
-            dr_threshold = 20
-        if target['dr'] > dr_threshold:
-            return False
-        else:
-            return True
-
 
 class QState:
 
