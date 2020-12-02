@@ -154,7 +154,7 @@ class CollectorScenario:
                 .id(str(r))
 
         cam_fov = [-28.5, 28.5]  # 57 deg
-        radar_fov = [-27, -13.5, -6.75, 0, 6.75, 13.5, 27]  # 54 degrees
+        radar_fov = [-42.6, -13.5, -6.75, 0, 6.75, 13.5, 42.6]  # 54 degrees
 
         for c_phi in cam_fov:
             r = 40
@@ -175,7 +175,7 @@ class CollectorScenario:
                 .id(str(r_phi)+'lb')
             if r_phi == radar_fov[0] or r_phi == radar_fov[-1]:
                 label = (r, r_phi)
-                vertices = [self.cab_to_nose, 0, 0, x, y, z]
+                vertices = [0, 0, 0, x, y, z]
                 builder.primitive('/radar_fov')\
                     .polyline(vertices)\
                     .id("radar_fov: "+str(label))
