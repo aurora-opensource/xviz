@@ -10,11 +10,12 @@ from protobuf_APIs import falconeye_pb2, radar_pb2
 from scenarios.meta.collector_meta import get_builder
 from scenarios.utils.com_manager import ComManager, MqttConst
 from scenarios.utils.filesystem import get_collector_instances, load_config
-from scenarios.utils.gis import transform_combine_to_local, get_combine_region, get_auger_region, \
-                                utm_array_to_local, lonlat_array_to_local, lonlat_to_utm, get_wheel_angle
+from scenarios.utils.gis import transform_combine_to_local, get_combine_region, \
+    get_auger_region, utm_array_to_local, lonlat_array_to_local, \
+    lonlat_to_utm, get_wheel_angle
 from scenarios.utils.image import postprocess, show_image
-from scenarios.utils.read_protobufs import deserialize_collector_output,\
-                                            extract_collector_output, extract_collector_output_slim
+from scenarios.utils.read_protobufs import deserialize_collector_output, \
+    extract_collector_output, extract_collector_output_slim
 
 from scenarios.safety_subsystems.radar_filter import RadarFilter
 from scenarios.safety_subsystems.path_prediction import get_all_path_polys, predict_path
