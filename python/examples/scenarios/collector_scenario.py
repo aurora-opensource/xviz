@@ -284,6 +284,10 @@ class CollectorScenario:
     def _draw_radar_targets(self, radar_output, builder: xviz.XVIZBuilder):
         if radar_output is None:
             return
+        if self.sync_status is None:
+            sync_status = dict(runningSync=False, inSync=False, atSyncPoint=False)
+        else:
+            sync_status = self.sync_status
         try:
             if self.radar_filter.prev_target_set is not None:
                 if self.radar_filter.prev_target_set == radar_output['targets']:
@@ -293,7 +297,7 @@ class CollectorScenario:
             for target in radar_output['targets'].values():
                 (x, y, z) = self.get_object_xyz(target, 'phi', 'dr', radar_ob=True)
 
-                if self.radar_filter.is_valid_target(target, sync_status=self.sync_status):
+                if self.radar_filter.is_valid_target(target, sync_status=sync_status):
                     builder.primitive('/radar_passed_filter_targets')\
                         .circle([x, y, z+.1], .5)\
                         .id(str(target['targetId']))
@@ -314,7 +318,7 @@ class CollectorScenario:
                     radar_pb2.RadarOutput.Target(),
                     including_default_value_fields=True
                 )
-                self.radar_filter.update_queue(not_received_id, default_target)
+                self.radar_filter.update_queue(not_received_id, default_target, sync_status)
             # reset the target id set for next cycle
             self.radar_filter.target_id_set = set(range(48))
 
