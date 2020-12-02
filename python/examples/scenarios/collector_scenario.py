@@ -17,7 +17,7 @@ from scenarios.utils.read_protobufs import deserialize_collector_output,\
                                             extract_collector_output, extract_collector_output_slim
 
 from scenarios.safety_subsystems.radar_filter import RadarFilter
-from scenarios.safety_subsystems.path_prediction import get_path_prediction, get_all_path_polys
+from scenarios.safety_subsystems.path_prediction import get_all_path_polys, predict_path
 
 import xviz
 
@@ -52,8 +52,6 @@ class CollectorScenario:
             configfile = Path(__file__).parents[3] / 'Global-Configs' / 'Tractors' / 'John-Deere' / '8RPST_WHEEL.yaml'
 
         self.global_config = load_config(str(configfile))
-
-        self.path_prediction = get_path_prediction(self.global_config)
 
         self.safety_config = self.global_config['safety']
         self.radar_safety_config = self.safety_config['radar']
@@ -496,19 +494,20 @@ class CollectorScenario:
             speed = self.control_signal['setSpeed']
             curvature = self.control_signal['commandCurvature']
             wheel_angle = get_wheel_angle(curvature, self.wheel_base)
-
-            self.path_prediction.predict(
-                wheel_angle,
-                speed,
-                0.,
-                0.,
-                0.,
-                10.,
+            time_horizon = 10.0
+            n_steps = 10
+            U = (speed, wheel_angle)
+            X0 = (0., 0., 0.)
+            C = dict(
+                wheel_base=self.global_config['guidance']['wheel_base'],
+                machine_width=1.,
             )
 
+            path, _, _ = predict_path(X0, U, C, time_horizon, n_steps)
+
             z = 1.1
-            self.path_prediction.path[:, 2] = z
-            vertices = list(self.path_prediction.path.flatten())
+            path[:, 2] = z
+            vertices = list(path.flatten())
 
             builder.primitive('/control_signal')\
                 .polyline(vertices)\

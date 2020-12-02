@@ -64,7 +64,6 @@ def get_all_path_polys(veh_state, config, x0, y0, theta0):
 def get_path_poly(speed, wheel_base, wheel_angle,
                     path_width, path_distance, x0, y0, theta0):
     time_horizon = path_distance / speed
-
     n_steps = 10
     U = (speed, wheel_angle)
     X0 = (x0, y0, theta0)
@@ -129,19 +128,6 @@ def get_threshold(speed, threshold_list, threshold):
         return threshold
 
 
-def get_path_prediction(config):
-    prediction_args = {
-        'wheel_base': config['guidance']['wheel_base'],
-        'machine_width': config['safety']['path_widths']['default'],
-        'path_width_sync': config['safety']['path_widths']['narrow'],
-    }
-    shared_speed_thresholds = config['safety']['shared_speed_thresholds']
-    min_distance = config['safety']['shared_speed_thresholds']['stop_threshold_default']
-    cabin_to_nose = config['safety']['object_tracking']['cabin_to_nose_distance']
-
-    return PathPrediction(prediction_args, shared_speed_thresholds, min_distance, cabin_to_nose)
-
-
 def predict_position(X, U, C, dt):
     """Predicts position of vehicle based on CTRV model
     X - state (x, y, yaw)
@@ -168,7 +154,7 @@ def predict_position(X, U, C, dt):
     return px_t, py_t, yaw_t
 
 
-def predict_path(X0, U0, C, horizon=10.0, n_steps=10):
+def predict_path(X0, U0, C, horizon, n_steps):
     """Predicts path until given horizon
     U0 - Control vector to use (v, steering_angle)
     tspan - sequence
@@ -187,42 +173,3 @@ def predict_path(X0, U0, C, horizon=10.0, n_steps=10):
                             path[:, 1] + W_half * np.sin(path[:, 2] - pi / 2)])
 
     return path, left, right
-
-
-class PathPrediction(object):
-    def __init__(self, C, shared_speed_thresholds, path_distance_default, cabin_to_nose):
-        """
-        C - constants dict
-            - wheel_base
-            - machine_width
-        """
-        self.X0 = (0, 0, 0)
-        self.C = C
-        self.shared_speed_thresholds = shared_speed_thresholds
-        self.path_distance_default = path_distance_default # default value, gets updated from threshold_list
-        self.cabin_to_nose = cabin_to_nose
-
-    def predict(self, steering_angle, speed, x0, y0, theta, horizon):
-        """Predict path for given speed and steering angle."""
-        n_steps = 10
-        U = (speed, steering_angle)
-        self.U = U
-        self.X0 = x0, y0, theta
-
-        self.path, self.left, self.right = predict_path(
-            self.X0, U, self.C, horizon=horizon, n_steps=int(n_steps))
-
-        z = 1.1
-        left = np.column_stack((
-            self.left,
-            np.full(self.left.shape[0], z)
-        ))
-        right = np.column_stack((
-            np.flipud(self.right),
-            np.full(self.right.shape[0], z)
-        ))
-
-        return list(np.concatenate((
-            left.flatten(),
-            right.flatten(),
-        )))
