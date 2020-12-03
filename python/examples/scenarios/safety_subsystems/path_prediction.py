@@ -8,7 +8,7 @@ from scenarios.utils.gis import get_wheel_angle
 def get_all_path_polys(veh_state, config, x0, y0, theta0):
     veh_speed = max(veh_state['speed'], 0.447 * 1.0)
     sync_stop_threshold, waypoint_stop_threshold, waypoint_slowdown_threshold \
-        = get_sync_waypoint_thresholds(veh_speed, config['safety'])
+        = get_path_distances(veh_speed, config['safety'])
 
     wheel_angle = get_wheel_angle(
         veh_state['curvature'],
@@ -76,7 +76,7 @@ def get_path_poly(speed, wheel_base, wheel_angle,
     )))
 
 
-def get_sync_waypoint_thresholds(speed, safety_config):
+def get_path_distances(speed, safety_config):
     sync_stop_threshold = get_threshold(
         speed,
         safety_config['shared_speed_thresholds']['sync_stop_threshold'],
