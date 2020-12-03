@@ -7,8 +7,7 @@ from scenarios.utils.gis import get_wheel_angle
 
 def get_all_path_polys(veh_state, config, x0, y0, theta0):
     veh_speed = max(veh_state['speed'], 0.447 * 1.0)
-    sync_stop_threshold, sync_slowdown_threshold,\
-        waypoint_stop_threshold, waypoint_slowdown_threshold\
+    sync_stop_threshold, waypoint_stop_threshold, waypoint_slowdown_threshold \
         = get_sync_waypoint_thresholds(veh_speed, config['safety'])
 
     wheel_angle = get_wheel_angle(
@@ -22,16 +21,6 @@ def get_all_path_polys(veh_state, config, x0, y0, theta0):
         wheel_angle,
         config['safety']['path_widths']['narrow'],
         sync_stop_threshold,
-        x0,
-        y0,
-        theta0,
-    )
-    sync_slow_poly = get_path_poly(
-        veh_speed,
-        config['guidance']['wheel_base'],
-        wheel_angle,
-        config['safety']['path_widths']['narrow'],
-        sync_slowdown_threshold,
         x0,
         y0,
         theta0,
@@ -50,15 +39,14 @@ def get_all_path_polys(veh_state, config, x0, y0, theta0):
         veh_speed,
         config['guidance']['wheel_base'],
         wheel_angle,
-        config['safety']['path_widths']['default'],
+        config['safety']['path_widths']['narrow'],
         waypoint_slowdown_threshold,
         x0,
         y0,
         theta0,
     )
 
-    return (sync_stop_poly, sync_slow_poly,
-            waypoint_stop_poly, waypoint_slow_poly)
+    return (sync_stop_poly, waypoint_stop_poly, waypoint_slow_poly)
 
 
 def get_path_poly(speed, wheel_base, wheel_angle,
@@ -94,11 +82,6 @@ def get_sync_waypoint_thresholds(speed, safety_config):
         safety_config['shared_speed_thresholds']['sync_stop_threshold'],
         safety_config['shared_speed_thresholds']['stop_threshold_default'],
     )
-    sync_slowdown_threshold = get_threshold(
-        speed,
-        safety_config['shared_speed_thresholds']['sync_slowdown_threshold'],
-        safety_config['shared_speed_thresholds']['slowdown_threshold_default'],
-    )
     waypoint_stop_threshold = get_threshold(
         speed,
         safety_config['shared_speed_thresholds']['waypoint_stop_threshold'],
@@ -111,12 +94,10 @@ def get_sync_waypoint_thresholds(speed, safety_config):
     )
 
     sync_stop_threshold += safety_config['object_tracking']['cabin_to_nose_distance']
-    sync_slowdown_threshold += safety_config['object_tracking']['cabin_to_nose_distance']
     waypoint_stop_threshold += safety_config['object_tracking']['cabin_to_nose_distance']
     waypoint_slowdown_threshold += safety_config['object_tracking']['cabin_to_nose_distance']
 
-    return (sync_stop_threshold, sync_slowdown_threshold,
-            waypoint_stop_threshold, waypoint_slowdown_threshold)
+    return (sync_stop_threshold, waypoint_stop_threshold, waypoint_slowdown_threshold)
 
 
 def get_threshold(speed, threshold_list, threshold):

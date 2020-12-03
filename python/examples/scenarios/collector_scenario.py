@@ -466,22 +466,19 @@ class CollectorScenario:
         try:
             _, tractor_state = self.tractor_state[-1]
 
-            sync_stop_poly, sync_slow_poly, \
-                waypoint_stop_poly, waypoint_slow_poly, \
+            sync_stop_poly, waypoint_stop_poly, waypoint_slow_poly, \
                 = get_all_path_polys(tractor_state, self.global_config, 0., 0., 0.)
 
             stop_polys = [sync_stop_poly, waypoint_stop_poly]
-            slow_polys = [sync_slow_poly, waypoint_slow_poly]
 
             for stop_poly in stop_polys:
                 builder.primitive('/stop_polygons')\
                     .polyline(stop_poly)\
                     .id('stop_polygons')
 
-            for slow_poly in slow_polys:
-                builder.primitive('/slow_polygons')\
-                    .polyline(slow_poly)\
-                    .id('slow_polygonss')
+            builder.primitive('/slow_polygon')\
+                .polyline(waypoint_slow_poly)\
+                .id('slow_polygon')
 
         except Exception as e:
             print('Crashed in draw predicted path:', e)
