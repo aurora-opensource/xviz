@@ -64,12 +64,12 @@ def get_builder():
         .category(xviz.CATEGORY.PRIMITIVE)\
         .type(xviz.PRIMITIVE_TYPES.POLYLINE)
 
-    builder.stream("/stop_polygons")\
+    builder.stream("/vision_polygons")\
         .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
         .stream_style({'stroke_color': [0, 128, 128, 128]})\
         .category(xviz.CATEGORY.PRIMITIVE)\
         .type(xviz.PRIMITIVE_TYPES.POLYLINE)
-    builder.stream("/slow_polygon")\
+    builder.stream("/predictive_polygons")\
         .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
         .stream_style({'stroke_color': [128, 128, 0, 128]})\
         .category(xviz.CATEGORY.PRIMITIVE)\

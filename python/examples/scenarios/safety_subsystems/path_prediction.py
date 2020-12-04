@@ -5,75 +5,7 @@ import functools as ft
 from scenarios.utils.gis import get_wheel_angle
 
 
-def get_all_path_polys(veh_state, config, x0, y0, theta0):
-    veh_speed = max(veh_state['speed'], 0.447 * 1.0)
-    sync_stop_threshold, waypoint_stop_threshold, waypoint_slowdown_threshold \
-        = get_path_distances(veh_speed, config['safety'])
-
-    wheel_angle = get_wheel_angle(
-        veh_state['curvature'],
-        config['guidance']['wheel_base']
-    )
-
-    sync_stop_poly = get_path_poly(
-        veh_speed,
-        config['guidance']['wheel_base'],
-        wheel_angle,
-        config['safety']['path_widths']['narrow'],
-        sync_stop_threshold,
-        x0,
-        y0,
-        theta0,
-    )
-    waypoint_stop_poly = get_path_poly(
-        veh_speed,
-        config['guidance']['wheel_base'],
-        wheel_angle,
-        config['safety']['path_widths']['default'],
-        waypoint_stop_threshold,
-        x0,
-        y0,
-        theta0,
-    )
-    waypoint_slow_poly = get_path_poly(
-        veh_speed,
-        config['guidance']['wheel_base'],
-        wheel_angle,
-        config['safety']['path_widths']['narrow'],
-        waypoint_slowdown_threshold,
-        x0,
-        y0,
-        theta0,
-    )
-
-    return (sync_stop_poly, waypoint_stop_poly, waypoint_slow_poly)
-
-
-def get_path_poly(speed, wheel_base, wheel_angle,
-                    path_width, path_distance, x0, y0, theta0):
-    time_horizon = path_distance / speed
-    n_steps = 10
-    U = (speed, wheel_angle)
-    X0 = (x0, y0, theta0)
-    C = dict(wheel_base=wheel_base, machine_width=path_width)
-
-    _path, left, right = predict_path(
-        X0, U, C, horizon=time_horizon, n_steps=int(n_steps))
-
-    z = 1.1
-    left = np.column_stack((
-        left,
-        np.full(left.shape[0], z)
-    ))
-    right = np.column_stack((
-        np.flipud(right),
-        np.full(right.shape[0], z)
-    ))
-
-    return list(np.concatenate((
-        left.flatten(),
-        right.flatten(),
-    )))
+N_STEPS = 10
 
 
 def get_path_distances(speed, safety_config):
@@ -109,6 +41,31 @@ def get_threshold(speed, threshold_list, threshold):
         return threshold
 
 
+def get_path_poly(speed, wheel_base, wheel_angle,
+                    path_width, path_distance, x0, y0, theta0):
+    time_horizon = path_distance / speed
+    U = (speed, wheel_angle)
+    X0 = (x0, y0, theta0)
+    C = dict(wheel_base=wheel_base, machine_width=path_width)
+
+    _path, left, right = predict_path(X0, U, C, time_horizon)
+
+    z = 1.1
+    left = np.column_stack((
+        left,
+        np.full(left.shape[0], z)
+    ))
+    right = np.column_stack((
+        np.flipud(right),
+        np.full(right.shape[0], z)
+    ))
+
+    return list(np.concatenate((
+        left.flatten(),
+        right.flatten(),
+    )))
+
+
 def predict_position(X, U, C, dt):
     """Predicts position of vehicle based on CTRV model
     X - state (x, y, yaw)
@@ -135,13 +92,13 @@ def predict_position(X, U, C, dt):
     return px_t, py_t, yaw_t
 
 
-def predict_path(X0, U0, C, horizon, n_steps):
+def predict_path(X0, U0, C, horizon):
     """Predicts path until given horizon
     U0 - Control vector to use (v, steering_angle)
     tspan - sequence
         Time steps at which to predict state - [0.0, 0.1, 0.2 ... ]
     """
-    tspan = np.linspace(0, horizon, n_steps+1, endpoint=True)
+    tspan = np.linspace(0, horizon, N_STEPS+1, endpoint=True)
 
     path = np.array(list(
         map(ft.partial(predict_position, X0, U0, C), tspan)
