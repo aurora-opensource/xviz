@@ -481,7 +481,7 @@ class CollectorScenario:
                                                     waypoint_stop_threshold, builder)
 
         except Exception as e:
-            print('Crashed in draw predicted path:', e)
+            print('Crashed in draw predicted paths:', e)
 
 
     def _draw_predictive_polygons(self, veh_speed, wheel_angle,
