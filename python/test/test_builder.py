@@ -307,6 +307,22 @@ class TestTimeSeriesBuilder(unittest.TestCase):
         data = self.builder.get_data().to_object()
         assert json.dumps(data['time_series'], sort_keys=True) == json.dumps(expected, sort_keys=True)
 
+    def test_zero_value_attribute_check(self):
+        self.builder.time_series('/test')\
+            .timestamp(20.)\
+            .value(0.)
+
+        self.builder.time_series('/foo')\
+            .timestamp(20.)\
+            .value(2.)
+
+        expected = [{
+            'timestamp': 20.,
+            'streams': ['/test', '/foo'],
+            'values': {'doubles': [0., 2.]}
+        }]
+        data = self.builder.get_data().to_object()
+        assert json.dumps(data['time_series'], sort_keys=True) == json.dumps(expected, sort_keys=True)
 
 class TestFutureInstanceBuilder(unittest.TestCase):
     def setUp(self):
