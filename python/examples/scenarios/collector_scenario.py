@@ -467,73 +467,56 @@ class CollectorScenario:
             _, tractor_state = self.tractor_state[-1]
             veh_speed = max(tractor_state['speed'], 0.447 * 1.0)
 
-            sync_stop_threshold, waypoint_stop_threshold, waypoint_slowdown_threshold \
+            sync_stop_threshold, waypoint_stop_threshold, \
+                sync_slowdown_threshold, _waypoint_slowdown_threshold \
                 = get_path_distances(veh_speed, self.global_config['safety'])
 
             wheel_angle = get_wheel_angle(
                 tractor_state['curvature'],
-                self.global_config['guidance']['wheel_base']
+                self.global_config['guidance']['wheel_base'],
             )
 
-            self._draw_predictive_polygons(veh_speed, wheel_angle, sync_stop_threshold,
-                        waypoint_stop_threshold, waypoint_slowdown_threshold, builder)
-            self._draw_vision_polygons(veh_speed, wheel_angle, sync_stop_threshold,
-                                                    waypoint_stop_threshold, builder)
+            self._draw_predictive_polygons(veh_speed, wheel_angle,
+                sync_stop_threshold, sync_slowdown_threshold, builder)
+            self._draw_vision_polygons(veh_speed, wheel_angle,
+                sync_stop_threshold, waypoint_stop_threshold, builder)
 
         except Exception as e:
             print('Crashed in draw predicted paths:', e)
 
 
     def _draw_predictive_polygons(self, veh_speed, wheel_angle,
-                                sync_stop_threshold, waypoint_stop_threshold,
-                                waypoint_slowdown_threshold, builder: xviz.XVIZBuilder):
+            stop_threshold, slowdown_threshold, builder: xviz.XVIZBuilder):
         if self.sync_status is None:
             sync_status = dict(runningSync=False, inSync=False, atSyncPoint=False)
         else:
             sync_status = self.sync_status
         try:
-            sync_stop_poly = get_path_poly(
+            stop_poly = get_path_poly(
                 veh_speed,
                 self.global_config['guidance']['wheel_base'],
                 wheel_angle,
                 self.global_config['safety']['path_widths']['narrow'],
-                sync_stop_threshold,
+                stop_threshold,
                 0.,
                 0.,
                 0.,
             )
-            waypoint_stop_poly = get_path_poly(
+            slow_poly = get_path_poly(
                 veh_speed,
                 self.global_config['guidance']['wheel_base'],
                 wheel_angle,
                 self.global_config['safety']['path_widths']['narrow'],
-                waypoint_stop_threshold,
-                0.,
-                0.,
-                0.,
-            )
-            waypoint_slow_poly = get_path_poly(
-                veh_speed,
-                self.global_config['guidance']['wheel_base'],
-                wheel_angle,
-                self.global_config['safety']['path_widths']['narrow'],
-                waypoint_slowdown_threshold,
+                slowdown_threshold,
                 0.,
                 0.,
                 0.,
             )
 
-            predictive_polys = []
-
-            if sync_status['runningSync']:
-                predictive_polys.append(sync_stop_poly)
-                if not sync_status['inSync']:
-                    predictive_polys.append(waypoint_stop_poly)
-            else:
-                predictive_polys.append(waypoint_stop_poly)
+            predictive_polys = [stop_poly]
 
             if not sync_status['inSync']:
-                predictive_polys.append(waypoint_slow_poly)
+                predictive_polys.append(slow_poly)
             
             for poly in predictive_polys:
                 builder.primitive('/predictive_polygons')\

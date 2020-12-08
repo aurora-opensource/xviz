@@ -12,33 +12,54 @@ def get_path_distances(speed, safety_config):
     sync_stop_threshold = get_threshold(
         speed,
         safety_config['shared_speed_thresholds']['sync_stop_threshold'],
-        safety_config['shared_speed_thresholds']['stop_threshold_default'],
     )
     waypoint_stop_threshold = get_threshold(
         speed,
         safety_config['shared_speed_thresholds']['waypoint_stop_threshold'],
-        safety_config['shared_speed_thresholds']['stop_threshold_default'],
+    )
+    sync_slowdown_threshold = get_threshold(
+        speed,
+        safety_config['shared_speed_thresholds']['sync_slowdown_threshold'],
     )
     waypoint_slowdown_threshold = get_threshold(
         speed,
         safety_config['shared_speed_thresholds']['waypoint_slowdown_threshold'],
-        safety_config['shared_speed_thresholds']['slowdown_threshold_default'],
     )
 
     sync_stop_threshold += safety_config['object_tracking']['cabin_to_nose_distance']
     waypoint_stop_threshold += safety_config['object_tracking']['cabin_to_nose_distance']
+    sync_slowdown_threshold += safety_config['object_tracking']['cabin_to_nose_distance']
     waypoint_slowdown_threshold += safety_config['object_tracking']['cabin_to_nose_distance']
 
-    return (sync_stop_threshold, waypoint_stop_threshold, waypoint_slowdown_threshold)
+    return (sync_stop_threshold, waypoint_stop_threshold,
+            sync_slowdown_threshold, waypoint_slowdown_threshold)
 
 
-def get_threshold(speed, threshold_list, threshold):
-        speed /= 0.447
-        for val in threshold_list:
-            if val['min_speed'] <= speed <= val['max_speed']:
-                threshold = val['threshold']
-                break
-        return threshold
+def linear_interpolation(x, x0, y0, x1, y1):
+    if x0 == x1:
+        print('linear interpolation called with invalid arguments')
+        return y1
+    m = (y1 - y0) / (x1 - x0)
+    return y0 + m * (x - x0)
+
+
+def get_threshold(speed_ms, threshold_list):
+    speed_mph = speed_ms / 0.447
+    for i in range(len(threshold_list)-1):
+        if threshold_list[i]['speed'] <= speed_mph < threshold_list[i+1]['speed']:
+            lower_speed = threshold_list[i]['speed']
+            lower_threshold = threshold_list[i]['threshold']
+            upper_speed = threshold_list[i+1]['speed']
+            upper_threshold = threshold_list[i+1]['threshold']
+            return linear_interpolation(
+                speed_mph,
+                lower_speed,
+                lower_threshold,
+                upper_speed,
+                upper_threshold,
+            )
+    print('get_threshold failed to find interpolated value, returning 100')
+    return 100.
 
 
 def get_path_poly(speed, wheel_base, wheel_angle,
