@@ -23,6 +23,8 @@ def main():
     ax.set_title('threshold config')
     ax.set_xlabel('speed (mph)')
     ax.set_ylabel('distance (m)')
+    ax.set_xlim([0, 20])
+    ax.set_ylim([0, 60])
 
     shared_speed_thresholds = global_config['safety']['shared_speed_thresholds']
 
