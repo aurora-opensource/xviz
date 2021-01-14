@@ -71,7 +71,8 @@ export function getPrimitiveData(primitiveObject) {
 
   if (currentMajorVersion === 2) {
     // Primitives have the type as the first key
-    const keys = Object.keys(primitiveObject);
+    // Protobuf defaults entries with empty arrays, so filter by those popluated
+    const keys = Object.keys(primitiveObject).filter(key => primitiveObject[key].length);
 
     for (const type of keys) {
       if (PrimitiveTypes.includes(type)) {

@@ -29,7 +29,24 @@ export const STATE_UPDATE_TYPE = {
   PERSISTENT: 'PERSISTENT',
 
   // Deprecated
-  SNAPSHOT: 'INCREMENTAL'
+  SNAPSHOT: 'INCREMENTAL',
+
+  // TODO(twojtasz): the lowercase and protobuf enum numbers
+  //  should be fixed another way
+  complete_state: 'COMPLETE',
+  incremental: 'INCREMENTAL',
+  persistent: 'PERSISTENT',
+
+  // Deprecated
+  snapshot: 'INCREMENTAL',
+
+  // Protobuf enum
+  // TODO(twojtasz): don't commit with this
+  1: 'INCREMENTAL',
+  2: 'INCREMENTAL',
+  3: 'COMPLETE',
+
+  4: 'PERSISTENT'
 };
 
 // Deprecated
