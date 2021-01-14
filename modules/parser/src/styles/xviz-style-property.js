@@ -70,6 +70,8 @@ function getBool(value) {
 }
 
 const IDENTITY = x => x;
+// TODO(twojtasz): automatically populate with a function that
+//   duplicates snake_case entries with camelCase ones
 const PROPERTY_FORMATTERS = {
   opacity: getNumber,
 
@@ -80,6 +82,8 @@ const PROPERTY_FORMATTERS = {
 
   stroke_color: getColor,
   fill_color: getColor,
+  strokeColor: getColor,
+  fillColor: getColor,
 
   font_family: String,
   font_weight: String,
@@ -87,16 +91,44 @@ const PROPERTY_FORMATTERS = {
   text_rotation: getNumber,
   text_anchor: String,
   text_baseline: String,
+  fontFamily: String,
+  fontWeight: String,
+  textSize: getNumber,
+  textRotation: getNumber,
+  textAnchor: String,
+  textBaseline: String,
 
   radius: getNumber,
   radius_min_pixels: getNumber,
   radius_max_pixels: getNumber,
+  radiusMinPixels: getNumber,
+  radiusMaxPixels: getNumber,
 
-  stroke_width: getNumber,
+  strokeWidth: getNumber,
   stroke_width_min_pixels: getNumber,
-  stroke_width_max_pixels: getNumber
+  stroke_width_max_pixels: getNumber,
+  strokeWidthMinPixels: getNumber,
+  strokeWidthMaxPixels: getNumber
 };
 
+function POINT_COLOR_DOMAIN_DEFAULT(stylesheet) {
+  let colorMode =
+    stylesheet.getProperty('point_color_mode') || stylesheet.getProperty('pointColorMode');
+  if (colorMode) {
+    colorMode = colorMode.toUpperCase();
+  }
+  switch (colorMode) {
+    case 'ELEVATION':
+      return [0, 3];
+    case 'DISTANCE_TO_VEHICLE':
+      return [0, 60];
+    default:
+      return [0, 0];
+  }
+}
+
+// TODO(twojtasz): automatically populate with a function that
+//   duplicates snake_case entries with camelCase ones
 const DEFAULT_STYLES = {
   opacity: 1,
 
@@ -106,39 +138,42 @@ const DEFAULT_STYLES = {
   height: 0,
 
   stroke_color: [0, 0, 0],
+  strokeColor: [0, 0, 0],
   fill_color: [255, 255, 255],
+  fillColor: [255, 255, 255],
 
   font_family: 'Arial',
+  fontFamily: 'Arial',
   font_weight: 'normal',
+  fontWeight: 'normal',
   text_size: 12,
+  textSize: 12,
   text_rotation: 0,
+  textRotation: 0,
   text_anchor: 'MIDDLE',
+  textAnchor: 'MIDDLE',
   text_baseline: 'CENTER',
+  textBaseline: 'CENTER',
 
   radius: 1,
   radius_pixels: 1,
+  radiusPixels: 1,
   radius_min_pixels: 0,
+  radiusMinPixels: 0,
   radius_max_pixels: Number.MAX_SAFE_INTEGER,
+  radiusMaxPixels: Number.MAX_SAFE_INTEGER,
 
   stroke_width: 0.1,
+  strokeWidth: 0.1,
   stroke_width_min_pixels: 0,
+  strokeWidthMinPixels: 1,
   stroke_width_max_pixels: Number.MAX_SAFE_INTEGER,
+  strokeWidthMaxPixels: Number.MAX_SAFE_INTEGER,
 
   point_color_mode: 'DEFAULT',
-  point_color_domain: stylesheet => {
-    let colorMode = stylesheet.getProperty('point_color_mode');
-    if (colorMode) {
-      colorMode = colorMode.toUpperCase();
-    }
-    switch (colorMode) {
-      case 'ELEVATION':
-        return [0, 3];
-      case 'DISTANCE_TO_VEHICLE':
-        return [0, 60];
-      default:
-        return [0, 0];
-    }
-  }
+  pointColorMode: 'DEFAULT',
+  point_color_domain: POINT_COLOR_DOMAIN_DEFAULT,
+  pointColorDomain: POINT_COLOR_DOMAIN_DEFAULT
 };
 
 export default class XVIZStyleProperty {
