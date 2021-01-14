@@ -21,9 +21,15 @@ import assert from '../utils/assert';
 
 // MEMOIZATION OF LOGSLICE CONSTRUCTOR AND GET METHOD
 const getCurrentLogSliceMemoized = memoize(
-  (streamFilter, lookAheadMs, linksByReverseTime, ...streamsByReverseTime) => {
+  (streamFilter, lookAheadMs, linksByReverseTime, posesByReverseTime, ...streamsByReverseTime) => {
     xvizStats.get('getCurrentLogSliceMemoized').incrementCount();
-    return new LogSlice(streamFilter, lookAheadMs, linksByReverseTime, streamsByReverseTime);
+    return new LogSlice(
+      streamFilter,
+      lookAheadMs,
+      linksByReverseTime,
+      posesByReverseTime,
+      streamsByReverseTime
+    );
   }
 );
 
@@ -132,15 +138,17 @@ export default class BaseSynchronizer {
 
     // Find the right timeslices
     const {TIME_WINDOW} = getXVIZConfig();
-    const {streams, links} = this._getTimeRangeInReverse(this.time - TIME_WINDOW, this.time);
+    const {streams, links, poses} = this._getTimeRangeInReverse(this.time - TIME_WINDOW, this.time);
     this._streamsByReverseTime = streams;
     this._linksByReverseTime = links;
+    this._posesByReverseTime = poses;
     xvizStats.get('geometry-refresh').incrementCount();
 
     return getCurrentLogSliceMemoized(
       streamFilter,
       this.lookAheadMs,
       this._linksByReverseTime,
+      this._posesByReverseTime,
       ...this._streamsByReverseTime
     );
   }

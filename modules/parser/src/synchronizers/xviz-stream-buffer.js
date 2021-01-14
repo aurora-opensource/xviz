@@ -218,6 +218,7 @@ export default class XVIZStreamBuffer {
     timeslice.streams = timeslice.streams || {};
     timeslice.videos = timeslice.videos || {};
     timeslice.links = timeslice.links || {};
+    timeslice.poses = timeslice.poses || {};
 
     const {timeslices, streams, videos} = this;
 
@@ -353,7 +354,7 @@ export default class XVIZStreamBuffer {
 
   _insertPersistentSlice(persistentSlice) {
     const {persistent, persistentStreams} = this;
-    const {timestamp, streams, links} = persistentSlice;
+    const {timestamp, streams, links, poses} = persistentSlice;
     const index = findInsertPos(persistent, timestamp, LEFT);
     const timesliceAtInsertPosition = persistent[index];
 
@@ -361,7 +362,8 @@ export default class XVIZStreamBuffer {
       // merge
       Object.assign(timesliceAtInsertPosition, persistentSlice, {
         streams: Object.assign(timesliceAtInsertPosition.streams, streams),
-        links: Object.assign(timesliceAtInsertPosition.links, links)
+        links: Object.assign(timesliceAtInsertPosition.links, links),
+        poses: Object.assign(timesliceAtInsertPosition.poses, poses)
       });
     } else {
       // insert
@@ -383,6 +385,7 @@ export default class XVIZStreamBuffer {
     Object.assign(timesliceAtInsertPosition, timeslice, {
       streams: Object.assign(timesliceAtInsertPosition.streams, timeslice.streams),
       links: Object.assign(timesliceAtInsertPosition.links, timeslice.links),
+      poses: Object.assign(timesliceAtInsertPosition.poses, timeslice.poses),
       videos: Object.assign(timesliceAtInsertPosition.videos, timeslice.videos)
     });
 
