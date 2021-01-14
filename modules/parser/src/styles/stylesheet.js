@@ -15,7 +15,7 @@
 import XVIZStyleProperty from './xviz-style-property';
 
 const SELECTOR_REGEX = /\S+/g;
-const OPERATOR_REGEX = /([=:~\*\^]+)/;
+const OPERATOR_REGEX = /([=:~*^]+)/;
 const NULL_VALIDATOR = () => true;
 
 /* Parser for single stylesheet */
@@ -71,12 +71,13 @@ export default class Stylesheet {
   }
 
   /**
-   * get default style by property name
+   * get default style by property name and primitive type if it is provided
    * @param {String} propertyName - name of the style
+   * @param {String} primitiveType - name of primitive type if available
    * @returns {Number|String|Array} style property default value
    */
-  getPropertyDefault(propertyName) {
-    const value = XVIZStyleProperty.getDefault(propertyName);
+  getPropertyDefault(propertyName, type) {
+    const value = XVIZStyleProperty.getDefault(propertyName, type);
     if (typeof value === 'function') {
       return value(this);
     }
