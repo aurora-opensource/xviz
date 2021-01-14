@@ -284,6 +284,9 @@ tape('StreamSynchronizer#getCurrentFrame links', t => {
   testBuffer.timeslices = [
     {
       timestamp: 50,
+      poses: {
+        log1: {position: [1, 0, 0]}
+      },
       streams: {
         log1: {value: 1},
         log2: {value: 10}
@@ -304,6 +307,7 @@ tape('StreamSynchronizer#getCurrentFrame links', t => {
 
   t.ok(frame, 'frame is generated without vehicle pose');
   t.deepEquals(frame.links, {log2: {target_pose: 'log1'}}, 'frame contains correct links');
+  t.deepEquals(frame.poses, {log1: {position: [1, 0, 0]}}, 'frame contains correct poses');
 
   t.end();
 });

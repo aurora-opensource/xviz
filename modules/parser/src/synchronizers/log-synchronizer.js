@@ -75,7 +75,8 @@ export default class LogSynchronizer extends BaseSynchronizer {
       }
     }
 
-    return {streams: [streams], links: []};
+    // links and poses are not supported in this synchronizer
+    return {streams: [streams], links: [], poses: []};
   }
 
   /**

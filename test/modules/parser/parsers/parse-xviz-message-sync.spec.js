@@ -1139,5 +1139,11 @@ tape('parseXVIZData timeslice with link', t => {
   t.ok(link, 'lidar link entry defined');
   t.equal(link.target_pose, '/vehicle_pose', 'link has correct target_pose');
 
+  t.ok(result.poses, 'Has poses entry');
+  t.equal(Object.keys(result.poses).length, 1, 'Has 1 entry in poses object');
+
+  t.ok(result.streams, 'Has streams entry');
+  t.equal(Object.keys(result.streams).length, 1, 'Has 1 entry in streams object');
+
   t.end();
 });

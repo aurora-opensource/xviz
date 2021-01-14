@@ -59,16 +59,29 @@ function addObjectAttributesFromTimeSeries(streamName, entries) {
 
 // One time slice, one datum from each stream.
 export default class LogSlice {
-  constructor(streamFilter, lookAheadMs, linksByReverseTime, streamsByReverseTime) {
+  constructor(
+    streamFilter,
+    lookAheadMs,
+    linksByReverseTime,
+    posesByReverseTime,
+    streamsByReverseTime
+  ) {
     this.features = {};
     this.variables = {};
     this.pointCloud = null;
     this.lookAheads = {};
     this.components = {};
     this.links = {};
+    this.poses = {};
     this.streams = {};
 
-    this.initialize(streamFilter, lookAheadMs, linksByReverseTime, streamsByReverseTime);
+    this.initialize(
+      streamFilter,
+      lookAheadMs,
+      linksByReverseTime,
+      posesByReverseTime,
+      streamsByReverseTime
+    );
   }
 
   // Extract car data from vehicle_pose and get geoJson for related frames
@@ -94,7 +107,8 @@ export default class LogSlice {
       variables: this.variables,
       // from this.initialize
       streams: this.streams,
-      links: this.links
+      links: this.links,
+      poses: this.poses
     };
 
     // OBJECTS
@@ -138,7 +152,13 @@ export default class LogSlice {
    * Among other things parses XVIZ Object-related info from misc streams and merge into XVIZ
    * feature properties.
    */
-  initialize(streamFilter, lookAheadMs, linksByReverseTime, streamsByReverseTime) {
+  initialize(
+    streamFilter,
+    lookAheadMs,
+    linksByReverseTime,
+    posesByReverseTime,
+    streamsByReverseTime
+  ) {
     const filter = streamFilter && Object.keys(streamFilter).length > 0 ? streamFilter : null;
 
     // get data if we don't already have that stream && it is not filtered.
@@ -163,6 +183,19 @@ export default class LogSlice {
           this._includeStream(filter, streamName)
         ) {
           this.links[streamName] = links[streamName];
+        }
+      }
+    });
+
+    // get data if we don't already have that stream && it is not filtered.
+    posesByReverseTime.forEach(poses => {
+      for (const streamName in poses) {
+        if (
+          this.poses[streamName] !== null && // Explicit no data entry
+          !this.poses[streamName] && // undefined means it has not been seen so keep looking for valid entry
+          this._includeStream(filter, streamName)
+        ) {
+          this.poses[streamName] = poses[streamName];
         }
       }
     });
@@ -247,7 +280,7 @@ export default class LogSlice {
   // @param {*} defaultValue={} - return value in case stream is not present
   // @return {Object} - contents of stream or defaultValue
   getStream(stream, defaultValue = {}) {
-    const streamData = this.streams[stream];
+    const streamData = this.streams[stream] || this.poses[stream];
     if (!streamData) {
       return defaultValue;
     }

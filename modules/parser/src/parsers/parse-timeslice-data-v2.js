@@ -76,6 +76,7 @@ export default function parseStreamSet(data, convertPrimitive) {
   const result = {
     type: XVIZ_MESSAGE_TYPE.TIMESLICE,
     updateType,
+    poses: {},
     streams: {},
     links: {},
     timestamp
@@ -83,7 +84,8 @@ export default function parseStreamSet(data, convertPrimitive) {
   };
 
   if (streamSets) {
-    const {streams, links} = parseStreamSets(streamSets, timestamp, convertPrimitive);
+    const {poses, streams, links} = parseStreamSets(streamSets, timestamp, convertPrimitive);
+    Object.assign(result.poses, poses);
     Object.assign(result.streams, streams);
     Object.assign(result.links, links);
   }
@@ -96,6 +98,7 @@ function parseStreamSets(streamSets, timestamp, convertPrimitive) {
   const {STREAM_BLACKLIST} = getXVIZConfig();
 
   const newStreams = {};
+  const newPoses = {};
   const newLinks = {};
 
   const poses = {};
@@ -135,7 +138,7 @@ function parseStreamSets(streamSets, timestamp, convertPrimitive) {
   Object.keys(poses)
     .filter(streamName => !STREAM_BLACKLIST.has(streamName))
     .forEach(streamName => {
-      newStreams[streamName] = parseXVIZPose(poses[streamName]);
+      newPoses[streamName] = parseXVIZPose(poses[streamName]);
     });
 
   Object.keys(primitives)
@@ -182,6 +185,7 @@ function parseStreamSets(streamSets, timestamp, convertPrimitive) {
   }
 
   return {
+    poses: newPoses,
     streams: newStreams,
     links: newLinks
   };
