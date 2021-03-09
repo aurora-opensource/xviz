@@ -211,6 +211,8 @@ class CollectorScenario:
                     tractor_state['latitude'],
                     self.utm_zone
                 )
+                tractor_speed = tractor_state['speed']
+
                 builder.pose("/vehicle_pose")\
                     .timestamp(timestamp)\
                     .position(0., 0., 0.)\
@@ -219,6 +221,10 @@ class CollectorScenario:
                         tractor_state['pitch'],
                         self.tractor_theta
                     )
+                builder.primitive('/tractor_speed')\
+                .text(tractor_speed)\
+                .position([-self.tractor_gps_to_rear_axle-5., 0., 1.])\
+                .id('tractor speed')
             else:
                 builder.pose("/vehicle_pose")\
                     .timestamp(timestamp)\
