@@ -222,7 +222,7 @@ class CollectorScenario:
                         self.tractor_theta
                     )
                 builder.primitive('/tractor_speed')\
-                .text(tractor_speed)\
+                .text(str(tractor_speed))\
                 .position([-self.tractor_gps_to_rear_axle-5., 0., 1.])\
                 .id('tractor speed')
             else:
@@ -602,7 +602,7 @@ class CollectorScenario:
                 .id('control_signal')
 
             builder.primitive('/set_speed')\
-                .text(speed)\
+                .text(str(speed))\
                 .position([-self.tractor_gps_to_rear_axle-4., 0., 1.])\
                 .id('set speed')
 
