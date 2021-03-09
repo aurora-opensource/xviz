@@ -595,6 +595,11 @@ class CollectorScenario:
                 .polyline(vertices)\
                 .id('control_signal')
 
+            builder.primitive('/set_speed')\
+                .text(speed)\
+                .position([-self.tractor_gps_to_rear_axle-4., 0., 1.])\
+                .id('set speed')
+
         except Exception as e:
             print('Crashed in draw control signal:', e)
 
