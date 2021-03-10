@@ -222,8 +222,8 @@ class CollectorScenario:
                         self.tractor_theta
                     )
                 builder.primitive('/tractor_speed')\
-                .text(str(tractor_speed))\
-                .position([-self.tractor_gps_to_rear_axle-5., 0., 1.])\
+                .text("T speed: " + str(round(tractor_speed, 3)))\
+                .position([-self.tractor_gps_to_rear_axle-10, 10., 1.])\
                 .id('tractor speed')
             else:
                 builder.pose("/vehicle_pose")\
@@ -398,6 +398,7 @@ class CollectorScenario:
             for combine_id, combine_state_tuple in self.combine_states.items():
                 _, combine_state = combine_state_tuple
                 combine_heading = combine_state['heading']  # degrees
+                combine_speed = combine_state['speed']
                 combine_relative_theta = (tractor_heading - combine_heading) * math.pi / 180
 
                 gps_x, gps_y = transform_combine_to_local(combine_state, tractor_state, self.utm_zone)
@@ -429,6 +430,11 @@ class CollectorScenario:
                 builder.primitive('/combine')\
                     .polyline(vertices)\
                     .id('combine')
+
+                builder.primitive('/combine_speed')\
+                    .text("C_speed: " + str(round(combine_speed, 3)))\
+                    .position([self.combine_x-10., self.combine_y-10, 1.])\
+                    .id('combine_speed')
 
         except Exception as e:
             print('Crashed in draw machine state:', e)
@@ -602,8 +608,8 @@ class CollectorScenario:
                 .id('control_signal')
 
             builder.primitive('/set_speed')\
-                .text(str(speed))\
-                .position([-self.tractor_gps_to_rear_axle-4., 0., 1.])\
+                .text("set_speed: " + str(round(speed, 3)))\
+                .position([-self.tractor_gps_to_rear_axle-20., 10., 1.])\
                 .id('set speed')
 
         except Exception as e:

@@ -100,6 +100,12 @@ def get_builder():
         .stream_style({'fill_color': [0, 0, 0]})\
         .category(xviz.CATEGORY.PRIMITIVE)\
         .type(xviz.PRIMITIVE_TYPES.TEXT)
+
+    builder.stream("/combine_speed")\
+        .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+        .stream_style({'fill_color': [0, 0, 0]})\
+        .category(xviz.CATEGORY.PRIMITIVE)\
+        .type(xviz.PRIMITIVE_TYPES.TEXT)
     builder.stream("/set_speed")\
         .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
         .stream_style({'fill_color': [0, 0, 0]})\
