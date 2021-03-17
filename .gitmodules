@@ -4,3 +4,6 @@
 [submodule "Global-Configs"]
 	path = Global-Configs
 	url = https://github.com/Smart-Ag/Global-Configs.git
+[submodule "SmartHP-v2"]
+	path = SmartHP-v2
+	url = https://github.com/Smart-Ag/SmartHP-v2.git
