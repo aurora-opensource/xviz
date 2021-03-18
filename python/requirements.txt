@@ -12,3 +12,4 @@ opencv-python==4.5.1.48
 Cython==0.29.22
 wheel==0.34.2
 matplotlib==3.3.2
+setuptools==54.1.2
