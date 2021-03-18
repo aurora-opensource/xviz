@@ -1,8 +1,10 @@
 import sys
+import math
 from pathlib import Path
 from scenarios.utils.filesystem import get_collector_instances, load_config
 from scenarios.utils.read_protobufs import deserialize_collector_output, \
     extract_collector_output, extract_collector_output_slim
+from scenarios.utils.gis import lonlat_to_utm, get_wheel_angle
 
 sys.path.append('../../SmartHP-v2')
 from smarthp.gnc.guidance import Guidance, CTEGuidanceTask
@@ -21,6 +23,7 @@ def main():
 
     utm_zone = None
     tractor_state = None
+    combine_states = dict()
     planned_path = None
 
     for collector_instance in collector_instances:
@@ -35,7 +38,7 @@ def main():
                 = extract_collector_output_slim(collector_output)
         else:
             img, camera_output, radar_output, tracking_output, \
-                machine_state = extract_collector_output( collector_output)
+                machine_state = extract_collector_output(collector_output)
             field_definition = None
             planned_path = None
             sync_status = None
@@ -53,8 +56,16 @@ def main():
         
         if tractor_state:
             tractor_theta = (90 - tractor_state['heading']) * math.pi / 180
-            tractor_pos = tractor_state['utm_pos']
-            tractor_speed = tractor_state['speed']
+            tractor_easting, tractor_northing = lonlat_to_utm(
+                tractor_state['longitude'],
+                tractor_state['latitude'],
+                utm_zone,
+            )
+            guidance_state = dict(
+                utm_pos=(tractor_easting, tractor_northing),
+                heading=tractor_state['heading'],
+                veh_speed=tractor_state['speed'],
+            )
 
         if planned_path is not None:
             if planned_path.size > 0:

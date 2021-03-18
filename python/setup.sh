@@ -12,11 +12,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-pip install -r requirements.txt
+pip install -r requirements.txt --force-reinstall
 cd ../Proto-Files
 rm -rf dist
 python setup.py bdist_wheel
-pip install --ignore-installed dist/*.whl
+pip install --force-reinstall dist/*.whl
+pip install setuptools --force-reinstall
 cd ../python
 python setup.py bdist_wheel
-pip install --ignore-installed dist/*.whl
+pip install --force-reinstall dist/*.whl
