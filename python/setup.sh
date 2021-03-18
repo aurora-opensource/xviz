@@ -17,5 +17,10 @@ cd ../Proto-Files
 rm -rf dist
 python setup.py bdist_wheel
 pip install --ignore-installed dist/*.whl
-cd ../python
-python setup.py --ignore-installed install
+cd ../SmartHP-v2/SmartHP-Utilities
+rm -rf dist
+python setup.py bdist_wheel
+pip install --ignore-installed dist/*.whl
+cd ../../python
+python setup.py bdist_wheel
+pip install --ignore-installed dist/*.whl
