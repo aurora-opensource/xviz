@@ -101,3 +101,36 @@ test('XVIZUIPrimitiveBuilder#treetable', t => {
 
   t.end();
 });
+
+test('XVIZUIPrimitiveBuilder#treetable row build order', t => {
+  let builder = new XVIZUIPrimitiveBuilder({validator});
+  builder = new XVIZUIPrimitiveBuilder({validator});
+  const row0 = builder
+    .stream('/test')
+    .treetable(TEST_COLUMNS)
+    .row(0, ['row0']);
+  const row2 = builder.row(2, null);
+
+  row0.child(1, ['row1']);
+  row2.child(3, ['row3']);
+
+  t.deepEquals(
+    builder.getData(),
+    {
+      '/test': {
+        treetable: {
+          columns: TEST_COLUMNS,
+          nodes: [
+            {id: 0, column_values: ['row0']},
+            {id: 1, parent: 0, column_values: ['row1']},
+            {id: 2},
+            {id: 3, parent: 2, column_values: ['row3']}
+          ]
+        }
+      }
+    },
+    'XVIZUIPrimitiveBuilder returns correct data'
+  );
+
+  t.end();
+});

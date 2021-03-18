@@ -56,7 +56,7 @@ export function postDeserialize(message) {
 
   for (const streamName in streams) {
     const objects = streams[streamName];
-    if (objects.features && objects.features.length && objects.features[0].id) {
+    if (objects && objects.features && objects.features.length && objects.features[0].id) {
       observeObjects(objects, timestamp);
     }
   }

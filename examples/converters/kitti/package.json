@@ -3,7 +3,8 @@
   "version": "1.1.0",
   "description": "Provides a minimal set of tools for working with the KITTI dataset in Javascript",
   "scripts": {
-    "start": "node ./src/index.js"
+    "start": "node ./src/index.js",
+    "start-debug": "node --inspect-brk ./src/index.js"
   },
   "dependencies": {
     "argparse": "^1.0.10",

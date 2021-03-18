@@ -10,3 +10,4 @@ Cython==0.29.21
 wheel==0.34.2
 matplotlib==3.3.2
 git+https://github.com/Smart-Ag/utm#egg=utm-0.4.2
+pytest

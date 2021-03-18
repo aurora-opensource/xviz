@@ -18,7 +18,7 @@
   `message` refers to the raw message received via webSocket.onmessage
  * `data` refers to pre-processed data objects (blob, arraybuffer, JSON object)
  */
-/* global Blob, Uint8Array */
+/* global Blob */
 import {XVIZ_MESSAGE_TYPE} from '../constants';
 import {XVIZData} from '@xviz/io';
 import {parseLogMetadata} from './parse-log-metadata';

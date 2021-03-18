@@ -53,7 +53,7 @@ export async function resizeImage(filePath, maxWidth, maxHeight) {
     imageData = fs.readFileSync(filePath);
   } else {
     imageData = await sharp(filePath)
-      .resize(resizeWidth, resizeHeight,{fit:'inside'})
+      .resize(resizeWidth, resizeHeight, {fit: 'inside'})
       .toBuffer()
       .then(data => data);
   }
