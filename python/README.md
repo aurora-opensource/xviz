@@ -18,7 +18,6 @@ python setup.py .
 python examples/serve_scenarios.py
 ```
 
-# xviz.py
 # xviz_avs
 
 Python implementation of XVIZ protocol libraries.
