@@ -1,4 +1,4 @@
-import xviz
+import xviz_avs as xviz
 
 
 def get_builder():

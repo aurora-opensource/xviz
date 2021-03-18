@@ -20,7 +20,7 @@ from scenarios.utils.read_protobufs import deserialize_collector_output, \
 from scenarios.safety_subsystems.radar_filter import RadarFilter
 from scenarios.safety_subsystems.path_prediction import get_path_distances, get_path_poly, predict_path
 
-import xviz
+import xviz_avs as xviz
 
 
 class CollectorScenario:
