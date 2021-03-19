@@ -11,7 +11,7 @@ sys.path.append(str(Path(__file__).parents[2] / 'SmartHP-v2'))
 from smarthp.gnc.guidance import Guidance, CTEGuidanceTask
 
 
-plt.rcParams['figure.figsize'] = [15, 10]
+plt.rcParams['figure.figsize'] = [16, 10]
 plt.rcParams['savefig.facecolor'] = 'black'
 plt.rcParams['figure.facecolor'] = 'black'
 plt.rcParams['figure.edgecolor'] = 'white'
@@ -123,16 +123,43 @@ def main():
     simulated_control_signals = simulate_guidance(guidance_states,
                                                   waypoints, global_config)
 
-    return
-    fig, ax = plt.subplots(nrows=1, ncols=2)
+    fig, ax = plt.subplots()
 
     tractor_pos = get_value_list(guidance_states, 'utm_pos')
-    ax[0].plot(*zip(*waypoints))
-    ax[0].plot(*zip(*tractor_pos))
 
-    commanded_speeds = get_value_list(control_signals, 'setSpeed')
-    commanded_curvatures = get_value_list(control_signals, 'commandCurvature')
-    ax[1].plot(commanded_speeds)
+    ax.plot(*zip(*waypoints), label='planned path')
+    ax.plot(*zip(*tractor_pos), label='tractor position')
+
+    ax.set_aspect('equal')
+    ax.set_title('Path Tracking')
+    ax.set_xlabel('utm easting')
+    ax.set_ylabel('utm northing')
+    ax.legend()
+
+    plt.show()
+    plt.close()
+
+    fig, ax = plt.subplots(nrows=1, ncols=2)
+
+    actual_commanded_speeds = get_value_list(control_signals, 'setSpeed')
+    actual_commanded_curvatures = get_value_list(control_signals, 'commandCurvature')
+    wheel_base = global_config['guidance']['wheel_base']
+    actual_commanded_wheel_angles = list(map(
+        lambda x: get_wheel_angle(x, wheel_base) * 180 / math.pi,
+        actual_commanded_curvatures))
+
+    ax[0].plot(actual_commanded_speeds, label='actual command')
+    ax[1].plot(actual_commanded_wheel_angles, label='actual command')
+
+    ax[0].set_title('Speed Control')
+    ax[0].set_xlabel('discrete timesteps ~0.1s')
+    ax[0].set_ylabel('commanded speed (m/s)')
+    ax[0].legend()
+
+    ax[1].set_title('Steering Control')
+    ax[1].set_xlabel('discrete timesteps ~0.1s')
+    ax[1].set_ylabel('commanded wheel angles (degrees)')
+    ax[1].legend()
 
     plt.show()
     plt.close()
@@ -148,10 +175,13 @@ def simulate_guidance(guidance_states, waypoints, global_config):
     guidance.start_pending()
     guidance.set_config(global_config)
 
-    for gs in guidance_states:
-        simulated_control = guidance.run(gs)
-        print(simulated_control)
+    control_commands = []
 
+    for gs in guidance_states:
+        control_command = guidance.run(gs)
+        control_commands.append(control_command)
+
+    return control_commands
 
 if __name__ == '__main__':
     main()
