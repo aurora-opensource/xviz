@@ -1,4 +1,5 @@
 import sys
+import time
 import math
 from pathlib import Path
 import matplotlib.pyplot as plt
@@ -141,15 +142,26 @@ def main():
 
     fig, ax = plt.subplots(nrows=1, ncols=2)
 
+    wheel_base = global_config['guidance']['wheel_base']
+
     actual_commanded_speeds = get_value_list(control_signals, 'setSpeed')
     actual_commanded_curvatures = get_value_list(control_signals, 'commandCurvature')
-    wheel_base = global_config['guidance']['wheel_base']
     actual_commanded_wheel_angles = list(map(
         lambda x: get_wheel_angle(x, wheel_base) * 180 / math.pi,
         actual_commanded_curvatures))
 
+    simulated_commanded_speeds = get_value_list(simulated_control_signals,
+                                                'set_speed')
+    simulated_commanded_curvatures = get_value_list(simulated_control_signals,
+                                                'curvature')
+    simulated_commanded_wheel_angles = list(map(
+        lambda x: get_wheel_angle(x, wheel_base) * 180 / math.pi,
+        simulated_commanded_curvatures))
+
     ax[0].plot(actual_commanded_speeds, label='actual command')
+    ax[0].plot(simulated_commanded_speeds, label='simulated command')
     ax[1].plot(actual_commanded_wheel_angles, label='actual command')
+    ax[1].plot(simulated_commanded_wheel_angles, label='simulated command')
 
     ax[0].set_title('Speed Control')
     ax[0].set_xlabel('discrete timesteps ~0.1s')
@@ -177,9 +189,23 @@ def simulate_guidance(guidance_states, waypoints, global_config):
 
     control_commands = []
 
+    delay = 1. / global_config['guidance_loop_rate']
     for gs in guidance_states:
+        t = time.time()
+
         control_command = guidance.run(gs)
+        if control_command is None:
+            control_command = {
+                'set_speed': 0.0,
+                'curvature': 0.0,
+            }
         control_commands.append(control_command)
+
+        dt = time.time() - t
+        if dt >= delay:
+            print('guidance simulation loop took too long: ', dt)
+        else:
+            time.sleep(delay - dt)
 
     return control_commands
 
