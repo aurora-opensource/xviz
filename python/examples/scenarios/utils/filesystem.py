@@ -14,7 +14,9 @@ def get_collector_instances(output_file, extract_directory):
     establish_fresh_directory(extract_directory)
     shutil.unpack_archive(str(output_file), str(extract_directory))
 
-    return sorted(extract_directory.glob('*.txt'))
+    # sort by the last componenent of the file names
+    return sorted(extract_directory.glob('*.txt'),
+                  key=lambda x: int(x.stem.split('-')[-1]))
 
 
 def establish_fresh_directory(path):
