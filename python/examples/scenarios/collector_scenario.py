@@ -192,7 +192,7 @@ class CollectorScenario:
 
             collector_output, is_slim_output = deserialize_collector_output(collector_output)
             if is_slim_output:
-                img, camera_output, radar_output, tracking_output, machine_state,\
+                imgs, camera_output, radar_output, tracking_output, machine_state,\
                     field_definition, planned_path, sync_status, control_signal, sync_params \
                     = extract_collector_output_slim(collector_output)
             else:
@@ -254,7 +254,7 @@ class CollectorScenario:
 
             if sync_status is not None:
                 self.sync_status = sync_status
-            
+
             if sync_params is not None:
                 if sync_params:
                     self.sync_params = sync_params
@@ -273,10 +273,14 @@ class CollectorScenario:
             self._draw_sync_status(builder)
             self._draw_sync_params(builder)
 
-            if img is not None:
+            if sorted(imgs):
+                conglomerate = imgs[0][1]  # primary cam image
                 if camera_output is not None:
-                    img = postprocess(img, camera_output)
-                show_image(img)
+                    conglomerate = postprocess(conglomerate, camera_output)
+                if len(imgs) > 1:
+                    for _cam_index, img in imgs[1:]:
+                        conglomerate = np.vstack((conglomerate, img))
+                show_image(conglomerate)
 
             # if self.index == 0:
             #     print('start time:', time.gmtime(float(collector_output.timestamp)))
