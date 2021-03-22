@@ -1,13 +1,17 @@
 import json
-import numpy as np
 from pathlib import Path
+import numpy as np
 
 from google.protobuf.json_format import MessageToDict
 from google.protobuf.message import DecodeError
-from protobuf_APIs import collector_pb2, gandalf_pb2, falconeye_pb2, radar_pb2, camera_pb2, smarthp_pb2
+from protobuf_APIs import collector_pb2, gandalf_pb2, falconeye_pb2, \
+    radar_pb2, camera_pb2, smarthp_pb2
 
 from .image import extract_image
 from .com_manager import MqttConst
+
+
+NUM_OF_CAMS = 6
 
 
 def deserialize_collector_output(file_path):
@@ -15,23 +19,31 @@ def deserialize_collector_output(file_path):
         collector_output = collector_pb2.CollectorOutputSlim()
         collector_output.ParseFromString(Path(file_path).read_bytes())
         is_slim_output = True
-        
+
     except DecodeError:
         collector_output = collector_pb2.CollectorOutput()
         collector_output.ParseFromString(Path(file_path).read_bytes())
         is_slim_output = False
-        
+
     return collector_output, is_slim_output
 
 
 def extract_collector_output_slim(collector_output):
     try:
-        if 'frame'in collector_output.data:
+        frames = []
+        if 'frame_cam_0' in collector_output.data:
+            for i in range(NUM_OF_CAMS):
+                key = 'frame_cam_' + str(i)
+                if key in collector_output.data:
+                    frame = extract_image(collector_output.data[key])
+                    frames.append((i, frame))
+        elif 'frame' in collector_output.data:
             frame = extract_image(collector_output.data['frame'])
+            frames.append((0, frame))
         else:
             print('missing frame from collector output')
             frame = None
-        
+
         if MqttConst.CAMERA_TOPIC in collector_output.data:
             camera_output = camera_pb2.CameraOutput()
             camera_output.ParseFromString(collector_output.data[MqttConst.CAMERA_TOPIC])
@@ -46,7 +58,7 @@ def extract_collector_output_slim(collector_output):
             radar_output = MessageToDict(radar_output, including_default_value_fields=True)
         else:
             radar_output = None
-        
+
         if MqttConst.TRACKS_TOPIC in collector_output.data:
             tracking_output = falconeye_pb2.TrackingOutput()
             tracking_output.ParseFromString(collector_output.data[MqttConst.TRACKS_TOPIC])
@@ -60,7 +72,7 @@ def extract_collector_output_slim(collector_output):
             machine_state = MessageToDict(machine_state, including_default_value_fields=True)
         else:
             machine_state = None
-        
+
         if 'collector/data/field_def' in collector_output.data:
             field_definition = collector_output.data['collector/data/field_def']
             field_definition = json.loads(field_definition.decode('ascii'))
@@ -101,11 +113,11 @@ def extract_collector_output_slim(collector_output):
             sync_params = json.loads(sync_params.decode('ascii'))
         else:
             sync_params = None
-    
+
     except Exception as e:
         print('failed to extract collector output:', e)
 
-    return frame, camera_output, radar_output, tracking_output, machine_state, \
+    return frames, camera_output, radar_output, tracking_output, machine_state, \
             field_definition, planned_path, sync_status, control_signal, sync_params
 
 
