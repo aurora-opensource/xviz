@@ -39,7 +39,8 @@ class CollectorScenario:
 
         collector_output_file = collector_config['collector_output_file']
         extract_directory = collector_config['extract_directory']
-        self.collector_instances = get_collector_instances(collector_output_file, extract_directory)
+        self.collector_instances = get_collector_instances(
+            collector_output_file, extract_directory)
 
         self.mqtt_enabled = collector_config['mqtt_enabled']
         if self.mqtt_enabled:
@@ -48,9 +49,11 @@ class CollectorScenario:
             comm.subscribe(MqttConst.TRACKS_TOPIC, self.store_tracking_output)
 
         if collector_config['IVT']:
-            configfile = Path(__file__).parents[3] / 'Global-Configs' / 'Tractors' / 'John-Deere' / '8RIVT_WHEEL.yaml'
+            configfile = Path(__file__).parents[3] / 'Global-Configs' \
+                / 'Tractors' / 'John-Deere' / '8RIVT_WHEEL.yaml'
         else:
-            configfile = Path(__file__).parents[3] / 'Global-Configs' / 'Tractors' / 'John-Deere' / '8RPST_WHEEL.yaml'
+            configfile = Path(__file__).parents[3] / 'Global-Configs' \
+                / 'Tractors' / 'John-Deere' / '8RPST_WHEEL.yaml'
 
         self.global_config = load_config(str(configfile))
         self.radar_filter = RadarFilter(self.global_config['safety']['radar'])
@@ -182,6 +185,7 @@ class CollectorScenario:
     def _draw_collector_instance(self, builder: xviz.XVIZBuilder, timestamp):
         try:
             if self.index == len(self.collector_instances):
+                print('reset')
                 self.reset_values()
 
             collector_output = self.collector_instances[self.index]
