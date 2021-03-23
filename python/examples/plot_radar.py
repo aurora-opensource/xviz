@@ -56,14 +56,15 @@ def establish_target_key(tgt_id, targets):
         make_keys(targets[tgt_id], signal_type='filtered')
 
 
-def get_targets(collector_instances, radar_filter, selected_tgt_ids):
+def get_targets(collector_instances, radar_filter,
+                selected_tgt_ids, sync_status):
     targets = {}
 
     for collector_output in collector_instances:
 
         collector_output, is_slim_output = deserialize_collector_output(collector_output)
         if is_slim_output:
-            _, _, radar_output, _, _, _, _, _, _ = extract_collector_output_slim(collector_output)
+            _, _, radar_output, _, _, _, _, _, _, _ = extract_collector_output_slim(collector_output)
         else:
             _, _, radar_output, _, _ = extract_collector_output(collector_output)
 
@@ -127,21 +128,21 @@ def get_targets(collector_instances, radar_filter, selected_tgt_ids):
                     if prev_target == target:
                         duplicate_target = True
 
-            if radar_filter.is_valid_target(target) \
+            if radar_filter.is_valid_target(target, sync_status=sync_status) \
                     and not duplicate_target:
                 append_values(targets[tgt_id], 'filtered', target)
                 targets[tgt_id]['filtered']['x'].append(curr_x)
                 targets[tgt_id]['filtered']['y'].append(curr_y)
                 targets[tgt_id]['filtered']['step'].append(step)
-            else:
-                append_nan(targets[tgt_id], 'filtered')
                 targets[tgt_id]['filtered']['x'].append(np.nan)
                 targets[tgt_id]['filtered']['y'].append(np.nan)
                 targets[tgt_id]['filtered']['step'].append(np.nan)
         
         for not_received_id in radar_filter.target_id_set:
-            default_target = MessageToDict(radar_pb2.RadarOutput.Target(), including_default_value_fields=True)
-            radar_filter.update_queue(not_received_id, default_target)
+            default_target = MessageToDict(
+                radar_pb2.RadarOutput.Target(), including_default_value_fields=True)
+            radar_filter.update_queue(
+                not_received_id, default_target, sync_status=sync_status)
         # reset the target id set for next cycle
         radar_filter.target_id_set = set(range(48))
 
@@ -291,8 +292,9 @@ def main(selected_tgt_ids, selected_timespan):
     radar_safety_config['confidence_threshold'] = 0.9
     
     radar_filter = RadarFilter(radar_safety_config)
-
-    targets = get_targets(collector_instances, radar_filter, selected_tgt_ids)
+    sync_status = dict(inSync=False)
+    targets = get_targets(collector_instances, radar_filter,
+                          selected_tgt_ids, sync_status)
 
     detected_target_ids = get_detected_target_ids(targets, 'raw')
 

@@ -3,26 +3,25 @@ import time
 from pathlib import Path
 from collections import deque
 import numpy as np
+import cv2
 
 from google.protobuf.json_format import MessageToDict
 from protobuf_APIs import falconeye_pb2, radar_pb2
 
 from scenarios.meta.collector_meta import get_builder
 from scenarios.utils.com_manager import ComManager, MqttConst
-from scenarios.utils.filesystem import get_collector_instances, load_config
-from scenarios.utils.gis import transform_combine_to_local, utm_array_to_local, get_combine_region, latlon_to_utm
+from scenarios.utils.filesystem import get_collector_instances, load_config, load_global_config
+from scenarios.utils.gis import transform_combine_to_local, get_combine_region, \
+    get_auger_region, utm_array_to_local, lonlat_array_to_local, \
+    lonlat_to_utm, get_wheel_angle
 from scenarios.utils.image import postprocess, show_image
-from scenarios.utils.read_protobufs import deserialize_collector_output,\
-                                            extract_collector_output, extract_collector_output_slim
+from scenarios.utils.read_protobufs import deserialize_collector_output, \
+    extract_collector_output, extract_collector_output_slim
 
 from scenarios.safety_subsystems.radar_filter import RadarFilter
-from scenarios.safety_subsystems.path_prediction import get_path_prediction
+from scenarios.safety_subsystems.path_prediction import get_path_distances, get_path_poly, predict_path
 
 import xviz
-
-TRACTOR_GPS_TO_REAR_AXLE = 1.9304
-COMBINE_GPS_TO_CENTER = 1.0
-
 
 class CollectorScenario:
 
@@ -47,50 +46,49 @@ class CollectorScenario:
             self.mqtt_tracking_outputs = []
             comm = ComManager()
             comm.subscribe(MqttConst.TRACKS_TOPIC, self.store_tracking_output)
-        
-        if collector_config['IVT']:
-            configfile = Path(__file__).parents[3] / 'Global-Configs' / 'Tractors' / 'John-Deere' / '8RIVT_WHEEL.yaml'
-        else:
-            configfile = Path(__file__).parents[3] / 'Global-Configs' / 'Tractors' / 'John-Deere' / '8RPST_WHEEL.yaml'
-        global_config = load_config(str(configfile))
 
-        self.path_prediction = get_path_prediction(global_config)
 
-        self.radar_safety_config = global_config['safety']['radar']
-        self.radar_filter = RadarFilter(self.radar_safety_config)
-
-        self.cab_to_nose = global_config['safety']['object_tracking']['cabin_to_nose_distance']
-        self.combine_length = self.radar_safety_config['combine_length']
-        self.combine_width = 8.0 # default, gets updated by machine state message
-        self.wheel_base = global_config['guidance']['wheel_base']
-        self.stop_distance = self.radar_safety_config['stop_threshold_default']
-        self.slowdown_distance = self.radar_safety_config['slowdown_threshold_default']
+        self.global_config = load_global_config(collector_config['MACHINE_TYPE'])
+        print("Global config:", self.global_config)
+        self.radar_filter = RadarFilter(self.global_config['safety']['radar'])
+        self.cab_to_nose = self.global_config['safety']['object_tracking']['cabin_to_nose_distance']
+        self.combine_dimensions = self.global_config['safety']['combine_dimensions']
+        self.tractor_gps_to_rear_axle = self.global_config['safety']['tractor_dimensions']['gps_to_rear_axle']
+        self.header_width = 8.0 # default, gets updated by machine state message
 
         self.tractor_state = deque(maxlen=10)
         self.tractor_easting = None
         self.tractor_northing = None
         self.tractor_theta = None
         self.combine_states = {}
+        self.combine_x = None
+        self.combine_y = None
+        self.combine_relative_theta = None
         self.utm_zone = ''
         self.planned_path = None
         self.field_definition = None
         self.sync_status = None
         self.control_signal = None
+        self.sync_params = None
 
-    
+
     def reset_values(self):
         self.tractor_state.clear()
         self.tractor_easting = None
         self.tractor_northing = None
         self.tractor_theta = None
         self.combine_states = {}
+        self.combine_x = None
+        self.combine_y = None
+        self.combine_relative_theta = None
         self.planned_path = None
         self.field_definition = None
         self.sync_status = None
         self.control_signal = None
+        self.sync_params = None
         self.index = 0
 
-    
+
     def store_tracking_output(self, msg):
         tracking_output = falconeye_pb2.TrackingOutput()
         tracking_output.ParseFromString(msg.payload)
@@ -138,8 +136,6 @@ class CollectorScenario:
 
     def _draw_measuring_references(self, builder: xviz.XVIZBuilder, timestamp):
         radial_distances = set([5, 10, 15, 20, 25, 30])
-        radial_distances.add(self.slowdown_distance)
-        radial_distances.add(self.stop_distance)
         radial_distances = sorted(radial_distances, reverse=True)
 
         for r in radial_distances:
@@ -148,23 +144,12 @@ class CollectorScenario:
                 .position([r, 0, .1])\
                 .id(f'{r}lb')
 
-            if r == self.slowdown_distance:
-                builder.primitive('/measuring_circles')\
-                    .circle([0, 0, 0], r)\
-                    .style({'stroke_color': [255, 200, 0, 70]})\
-                    .id('slowdown: ' + str(r))
-            elif r == self.stop_distance:
-                builder.primitive('/measuring_circles')\
-                    .circle([0, 0, 0], r)\
-                    .style({'stroke_color': [255, 50, 10, 70]})\
-                    .id('stop: ' + str(r))
-            else:
-                builder.primitive('/measuring_circles')\
-                    .circle([0, 0, 0], r)\
-                    .id(str(r))
+            builder.primitive('/measuring_circles')\
+                .circle([0, 0, 0], r)\
+                .id(str(r))
 
         cam_fov = [-28.5, 28.5]  # 57 deg
-        radar_fov = [-27, -13.5, -6.75, 0, 6.75, 13.5, 27]  # 54 degrees
+        radar_fov = [-42.6, -13.5, -6.75, 0, 6.75, 13.5, 42.6]  # 54 degrees
 
         for c_phi in cam_fov:
             r = 40
@@ -185,7 +170,7 @@ class CollectorScenario:
                 .id(str(r_phi)+'lb')
             if r_phi == radar_fov[0] or r_phi == radar_fov[-1]:
                 label = (r, r_phi)
-                vertices = [self.cab_to_nose, 0, 0, x, y, z]
+                vertices = [0, 0, 0, x, y, z]
                 builder.primitive('/radar_fov')\
                     .polyline(vertices)\
                     .id("radar_fov: "+str(label))
@@ -195,13 +180,17 @@ class CollectorScenario:
         try:
             if self.index == len(self.collector_instances):
                 self.reset_values()
+                print("#############################WE FINISHED#################################")
+                print("#############################WE FINISHED#################################")
+                print("#############################WE FINISHED#################################")
+                print("#############################WE FINISHED#################################")
 
             collector_output = self.collector_instances[self.index]
 
             collector_output, is_slim_output = deserialize_collector_output(collector_output)
             if is_slim_output:
                 img, camera_output, radar_output, tracking_output, machine_state,\
-                    field_definition, planned_path, sync_status, control_signal\
+                    field_definition, planned_path, sync_status, control_signal, sync_params \
                     = extract_collector_output_slim(collector_output)
             else:
                 img, camera_output, radar_output,\
@@ -210,21 +199,33 @@ class CollectorScenario:
                 planned_path = None
                 sync_status = None
                 control_signal = None
+                sync_params = None
 
             if machine_state is not None:
                 self.update_machine_state(machine_state)
-            
+
             if self.tractor_state:
                 _, tractor_state = self.tractor_state[-1]
                 self.tractor_theta = (90 - tractor_state['heading']) * math.pi / 180
-                self.tractor_easting, self.tractor_northing = latlon_to_utm(
-                                                                tractor_state['latitude'],
-                                                                tractor_state['longitude'],
-                                                                self.utm_zone)
+                self.tractor_easting, self.tractor_northing = lonlat_to_utm(
+                    tractor_state['longitude'],
+                    tractor_state['latitude'],
+                    self.utm_zone
+                )
+                tractor_speed = tractor_state['speed']
+
                 builder.pose("/vehicle_pose")\
                     .timestamp(timestamp)\
                     .position(0., 0., 0.)\
-                    .orientation(tractor_state['roll'], tractor_state['pitch'], self.tractor_theta)
+                    .orientation(
+                        tractor_state['roll'],
+                        tractor_state['pitch'],
+                        self.tractor_theta
+                    )
+                builder.primitive('/tractor_speed')\
+                .text("T speed: " + str(round(tractor_speed, 3)))\
+                .position([-self.tractor_gps_to_rear_axle-10, 10., 1.])\
+                .id('tractor speed')
             else:
                 builder.pose("/vehicle_pose")\
                     .timestamp(timestamp)\
@@ -247,22 +248,34 @@ class CollectorScenario:
 
             if control_signal is not None:
                 self.control_signal = control_signal
-            
+
             if sync_status is not None:
                 self.sync_status = sync_status
-            
+
+            if sync_params is not None:
+                if sync_params:
+                    self.sync_params = sync_params
+                else:
+                    self.sync_params = None
+
+            self._draw_combine(builder)
+            self._draw_auger(builder)
             self._draw_tracking_targets(tracking_output, builder)
             self._draw_camera_targets(camera_output, builder)
             self._draw_radar_targets(radar_output, builder)
-            self._draw_machine_state(builder)
-            self._draw_predicted_path(builder)
-            self._draw_predictive_sub_path(builder)
+            self._draw_predicted_paths(builder)
             self._draw_planned_path(builder)
             self._draw_field_definition(builder)
             self._draw_control_signal(builder)
             self._draw_sync_status(builder)
+            self._draw_sync_params(builder)
 
             if img is not None:
+                img_out_name = "./temp_out/{0}.jpeg".format(self.index)
+                image_copy = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                #print("img_out_name: ", img_out_name)
+                #cv2.imwrite(img_out_name, image_copy)
+
                 if camera_output is not None:
                     img = postprocess(img, camera_output)
                 show_image(img)
@@ -279,8 +292,14 @@ class CollectorScenario:
 
 
     def _draw_radar_targets(self, radar_output, builder: xviz.XVIZBuilder):
+
         if radar_output is None:
             return
+        if self.sync_status is None:
+            sync_status = dict(runningSync=False, inSync=False, atSyncPoint=False)
+        else:
+            sync_status = self.sync_status
+
         try:
             if self.radar_filter.prev_target_set is not None:
                 if self.radar_filter.prev_target_set == radar_output['targets']:
@@ -289,8 +308,11 @@ class CollectorScenario:
 
             for target in radar_output['targets'].values():
                 (x, y, z) = self.get_object_xyz(target, 'phi', 'dr', radar_ob=True)
-    
-                if self.radar_filter.is_valid_target(target):
+
+                _phi = target['phi']
+                _dr = target['dr']
+
+                if self.radar_filter.is_valid_target(target, sync_status=sync_status):
                     builder.primitive('/radar_passed_filter_targets')\
                         .circle([x, y, z+.1], .5)\
                         .id(str(target['targetId']))
@@ -299,6 +321,8 @@ class CollectorScenario:
                         builder.primitive('/radar_filtered_out_targets')\
                             .circle([x, y, z], .5)\
                             .id(str(target['targetId']))
+                    else:
+                        pass
 
                 if not target['consecutive'] < 1:
                     builder.primitive('/radar_id')\
@@ -307,8 +331,11 @@ class CollectorScenario:
                         .id(str(target['targetId']))
 
             for not_received_id in self.radar_filter.target_id_set:
-                default_target = MessageToDict(radar_pb2.RadarOutput.Target(), including_default_value_fields=True)
-                self.radar_filter.update_queue(not_received_id, default_target)
+                default_target = MessageToDict(
+                    radar_pb2.RadarOutput.Target(),
+                    including_default_value_fields=True
+                )
+                self.radar_filter.update_queue(not_received_id, default_target, sync_status)
             # reset the target id set for next cycle
             self.radar_filter.target_id_set = set(range(48))
 
@@ -320,7 +347,7 @@ class CollectorScenario:
         if tracking_output is None:
             return
         try:
-            if 'tracks' in tracking_output:            
+            if 'tracks' in tracking_output:
                 min_confidence = 0.1
                 min_hits = 2
                 for track in tracking_output['tracks']:
@@ -357,9 +384,17 @@ class CollectorScenario:
             return
         try:
             for target in camera_output['targets']:
-                (x, y, z) = self.get_object_xyz(target, 'objectAngle', 'objectDistance', radar_ob=False)
+                (x, y, z) = self.get_object_xyz(
+                    target,
+                    'objectAngle',
+                    'objectDistance',
+                    radar_ob=False
+                )
                 if target['label'] == 'qrcode':
                     continue
+
+                _phi = target['objectAngle']
+                _dr = target['objectDistance']
 
                 builder.primitive('/camera_targets')\
                     .circle([x, y, z], .5)\
@@ -368,143 +403,199 @@ class CollectorScenario:
         except Exception as e:
             print('Crashed in draw camera targets:', e)
 
-    
-    def _draw_machine_state(self, builder: xviz.XVIZBuilder):
+
+    def _draw_combine(self, builder: xviz.XVIZBuilder):
         if not self.tractor_state or not self.combine_states:
             return
         try:
             _, tractor_state = self.tractor_state[-1]
             tractor_heading = tractor_state['heading']  # degrees
-            
-            for combine_state_tuple in self.combine_states.values():
+
+            for combine_id, combine_state_tuple in self.combine_states.items():
                 _, combine_state = combine_state_tuple
-
-                x, y = transform_combine_to_local(combine_state, tractor_state, self.utm_zone)
-                x -= TRACTOR_GPS_TO_REAR_AXLE
-                z = 0.5
-
                 combine_heading = combine_state['heading']  # degrees
-                relative_combine_heading = (tractor_heading - combine_heading) * math.pi / 180
-                combine_rel_heading_xyz = self.get_object_xyz_primitive(radial_dist=3.0,
-                                                                    angle_radians=relative_combine_heading)
-                c_r_x, c_r_y, _ = combine_rel_heading_xyz
+                combine_speed = combine_state['speed']
+                combine_relative_theta = (tractor_heading - combine_heading) * math.pi / 180
 
-                combine_center_x = x - (COMBINE_GPS_TO_CENTER * math.cos(relative_combine_heading))
-                combine_center_y = y - (COMBINE_GPS_TO_CENTER * math.sin(relative_combine_heading))
+                gps_x, gps_y = transform_combine_to_local(combine_state, tractor_state, self.utm_zone)
+
+                if combine_id == "combine":  # controlling combine
+                    self.combine_x = gps_x
+                    self.combine_y = gps_y
+                    self.combine_relative_theta = combine_relative_theta
+
+                gps_x -= self.tractor_gps_to_rear_axle
 
                 combine_region = get_combine_region(
-                    combine_center_x,
-                    combine_center_y,
-                    relative_combine_heading,
-                    self.combine_length,
-                    self.combine_width + 1.0
+                    gps_x,
+                    gps_y,
+                    combine_relative_theta,
+                    self.combine_dimensions['body_width'],
+                    self.combine_dimensions['header_length'],
+                    self.header_width + 1.0,
+                    self.combine_dimensions['gps_to_header'],
+                    self.combine_dimensions['gps_to_back'],
                 )
 
+                z = 0.5
                 vertices = list(np.column_stack((
                     combine_region,
                     np.full(combine_region.shape[0], z)
                 )).flatten())
-                
-                builder.primitive('/combine_position')\
-                    .circle([combine_center_x, combine_center_y, z], .5)\
-                    .id('combine')
-                builder.primitive('/combine_region')\
+
+                builder.primitive('/combine')\
                     .polyline(vertices)\
-                    .id('combine_region')
-                builder.primitive('/combine_heading')\
-                    .polyline([
-                        combine_center_x, combine_center_y, z,
-                        combine_center_x+c_r_x, combine_center_y+c_r_y, z
-                    ])\
-                    .id('combine_heading')
+                    .id('combine')
+
+                builder.primitive('/combine_speed')\
+                    .text("C_speed: " + str(round(combine_speed, 3)))\
+                    .position([self.combine_x-10., self.combine_y-10, 1.])\
+                    .id('combine_speed')
 
         except Exception as e:
             print('Crashed in draw machine state:', e)
 
-    
-    def _draw_predicted_path(self, builder: xviz.XVIZBuilder):
+
+    def _draw_auger(self, builder: xviz.XVIZBuilder):
+        if self.combine_x is None\
+                or self.sync_status is None \
+                or not self.sync_status['runningSync']:
+            return
+        try:
+            combine_gps_x = self.combine_x - self.tractor_gps_to_rear_axle
+            combine_gps_y = self.combine_y
+            auger_region = get_auger_region(
+                combine_gps_x,
+                combine_gps_y,
+                self.combine_relative_theta,
+                self.combine_dimensions['body_width'],
+                self.combine_dimensions['auger_length'],
+                self.combine_dimensions['auger_width'],
+                self.combine_dimensions['gps_to_auger'],
+            )
+
+            z = 0.5
+            vertices = list(np.column_stack((
+                auger_region,
+                np.full(auger_region.shape[0], z)
+            )).flatten())
+
+            builder.primitive('/auger')\
+                .polyline(vertices)\
+                .id('auger')
+
+        except Exception as e:
+            print('Crashed in draw auger:', e)
+
+
+    def _draw_predicted_paths(self, builder: xviz.XVIZBuilder):
         if not self.tractor_state:
             return
         try:
             _, tractor_state = self.tractor_state[-1]
-            speed = tractor_state['speed']
-            curvature = tractor_state['curvature']
-            heading = 0.
-            wheel_angle = curvature * self.wheel_base / 1000
+            veh_speed = max(tractor_state['speed'], 0.447 * 1.0)
+            #print("tractor_state:", tractor_state)
 
-            if self.sync_status is not None \
-                    and self.sync_status['runningSync']:
-                threshold_list = self.radar_safety_config['sync_stop_threshold']
-            else:
-                threshold_list = self.radar_safety_config['waypoint_stop_threshold']
-            
-            self.path_prediction.set_min_distance(speed, threshold_list)
-            self.path_prediction.predict(wheel_angle, speed, heading, "vision")
+            sync_stop_threshold, waypoint_stop_threshold, \
+                sync_slowdown_threshold, _waypoint_slowdown_threshold \
+                = get_path_distances(veh_speed, self.global_config['safety'])
 
-            z = 0.9
-            left = np.column_stack((
-                self.path_prediction.left,
-                np.full(self.path_prediction.left.shape[0], z)
-            ))
-            right = np.column_stack((
-                np.flipud(self.path_prediction.right),
-                np.full(self.path_prediction.right.shape[0], z)
-            ))
+            wheel_angle = get_wheel_angle(
+                tractor_state['curvature'],
+                self.global_config['guidance']['wheel_base'],
+            )
 
-            vertices = list(np.concatenate((
-                left.flatten(),
-                right.flatten()
-            )))
-
-            builder.primitive('/predicted_path')\
-                .polyline(vertices)\
-                .id('predicted_path')
-
-            # view the discrete points in the predicted path
-            # for i in range(len(vertices) // 3):
-            #     idx = i * 3
-            #     x, y, z = vertices[idx], vertices[idx+1], vertices[idx+2]
-            #     builder.primitive('/predicted_path_discrete')\
-            #         .circle([x, y, z], .2)\
-            #         .id('predicted_path_node')
+            self._draw_predictive_polygons(veh_speed, wheel_angle,
+                sync_stop_threshold, sync_slowdown_threshold, builder)
+            self._draw_vision_polygons(veh_speed, wheel_angle,
+                sync_stop_threshold, waypoint_stop_threshold, builder)
 
         except Exception as e:
-            print('Crashed in draw predicted path:', e)
+            print('Crashed in draw predicted paths:', e)
 
-    
-    def _draw_predictive_sub_path(self, builder: xviz.XVIZBuilder):
-        if not self.tractor_state:
-            return
+
+    def _draw_predictive_polygons(self, veh_speed, wheel_angle,
+            stop_threshold, slowdown_threshold, builder: xviz.XVIZBuilder):
+        if self.sync_status is None:
+            sync_status = dict(runningSync=False, inSync=False, atSyncPoint=False)
+        else:
+            sync_status = self.sync_status
         try:
-            _, tractor_state = self.tractor_state[-1]
-            speed = tractor_state['speed']
-            heading = 90 - tractor_state['heading']
-            avg_curvature = get_average_curvature(self.tractor_state)
-            avg_wheel_angle = avg_curvature * self.wheel_base / 1000
+            stop_poly = get_path_poly(
+                veh_speed,
+                self.global_config['guidance']['wheel_base'],
+                wheel_angle,
+                self.global_config['safety']['path_widths']['narrow'],
+                stop_threshold,
+                0.,
+                0.,
+                0.,
+            )
+            slow_poly = get_path_poly(
+                veh_speed,
+                self.global_config['guidance']['wheel_base'],
+                wheel_angle,
+                self.global_config['safety']['path_widths']['narrow'],
+                slowdown_threshold,
+                0.,
+                0.,
+                0.,
+            )
 
-            self.path_prediction.predict(avg_wheel_angle, speed, heading, "predictive")
+            predictive_polys = [stop_poly]
 
-            z = 0.9
-            left = np.column_stack((
-                self.path_prediction.left,
-                np.full(self.path_prediction.left.shape[0], z)
-            ))
-            right = np.column_stack((
-                np.flipud(self.path_prediction.right),
-                np.full(self.path_prediction.right.shape[0], z)
-            ))
+            if not sync_status['inSync']:
+                predictive_polys.append(slow_poly)
 
-            vertices = list(np.concatenate((
-                left.flatten(),
-                right.flatten()
-            )))
-
-            builder.primitive('/predictive_sub_path')\
-                .polyline(vertices)\
-                .id('predictive_sub_path')
+            for poly in predictive_polys:
+                builder.primitive('/predictive_polygons')\
+                    .polyline(poly)\
+                    .id('predictive_polygons')
 
         except Exception as e:
-            print('Crashed in draw predictive sub path:', e)
+            print('Crashed in draw predictive polygons:', e)
+
+
+    def _draw_vision_polygons(self, veh_speed, wheel_angle, sync_stop_threshold,
+                                waypoint_stop_threshold, builder: xviz.XVIZBuilder):
+        if self.sync_status is None:
+            sync_status = dict(runningSync=False, inSync=False, atSyncPoint=False)
+        else:
+            sync_status = self.sync_status
+        try:
+            sync_stop_poly = get_path_poly(
+                veh_speed,
+                self.global_config['guidance']['wheel_base'],
+                wheel_angle,
+                self.global_config['safety']['path_widths']['narrow'],
+                sync_stop_threshold,
+                0.,
+                0.,
+                0.,
+            )
+            waypoint_stop_poly = get_path_poly(
+                veh_speed,
+                self.global_config['guidance']['wheel_base'],
+                wheel_angle,
+                self.global_config['safety']['path_widths']['default'],
+                waypoint_stop_threshold,
+                0.,
+                0.,
+                0.,
+            )
+
+            vision_polys = [waypoint_stop_poly]
+
+            if sync_status['runningSync']:
+                vision_polys.append(sync_stop_poly)
+
+            for poly in vision_polys:
+                builder.primitive('/vision_polygons')\
+                    .polyline(poly)\
+                    .id('vision_polygons')
+
+        except Exception as e:
+            print('Crashed in draw predictive polygons:', e)
 
 
     def _draw_control_signal(self, builder: xviz.XVIZBuilder):
@@ -513,20 +604,33 @@ class CollectorScenario:
         try:
             speed = self.control_signal['setSpeed']
             curvature = self.control_signal['commandCurvature']
-            wheel_angle = curvature * self.wheel_base / 1000
-            heading = 0.
-            self.path_prediction.predict(wheel_angle, speed, heading, "control")
+            wheel_angle = get_wheel_angle(
+                curvature, self.global_config['guidance']['wheel_base'])
+            time_horizon = 10.0
+            U = (speed, wheel_angle)
+            X0 = (0., 0., 0.)
+            C = dict(
+                wheel_base=self.global_config['guidance']['wheel_base'],
+                machine_width=1.,
+            )
 
-            z = 0.9
-            self.path_prediction.path[:, 2] = z
-            vertices = list(self.path_prediction.path.flatten())
+            path, _, _ = predict_path(X0, U, C, time_horizon)
+
+            z = 1.1
+            path[:, 2] = z
+            vertices = list(path.flatten())
 
             builder.primitive('/control_signal')\
                 .polyline(vertices)\
                 .id('control_signal')
 
+            builder.primitive('/set_speed')\
+                .text("set_speed: " + str(round(speed, 3)))\
+                .position([-self.tractor_gps_to_rear_axle-20., 10., 1.])\
+                .id('set speed')
+
         except Exception as e:
-            print('Crashed in draw commanded path:', e)
+            print('Crashed in draw control signal:', e)
 
 
     def _draw_planned_path(self, builder: xviz.XVIZBuilder):
@@ -547,7 +651,7 @@ class CollectorScenario:
 
         except Exception as e:
             print('Crashed in draw planned path:', e)
-    
+
 
     def _draw_field_definition(self, builder: xviz.XVIZBuilder):
         if self.field_definition is None or self.tractor_easting is None:
@@ -579,24 +683,75 @@ class CollectorScenario:
 
         except Exception as e:
             print('Crashed in draw field definition:', e)
-    
+
 
     def _draw_sync_status(self, builder: xviz.XVIZBuilder):
         if self.sync_status is None:
             return
         try:
-            #TODO: draw sync status
-            pass
+            if self.sync_status['atSyncPoint']:
+                text = "at sync point"
+            elif self.sync_status['inSync']:
+                text = "in sync"
+            elif self.sync_status['runningSync']:
+                text = "running sync"
+            else:
+                text = ""
+
+            builder.primitive('/sync_status')\
+                .text(text)\
+                .position([-self.tractor_gps_to_rear_axle-3., 0., 1.])\
+                .id('sync status')
+
         except Exception as e:
             print('Crashed in draw sync status:', e)
 
-    
+
+    def _draw_sync_params(self, builder: xviz.XVIZBuilder):
+        if self.sync_params is None \
+                or self.combine_x is None:
+            return
+
+        try:
+            sync_x_rel_combine = self.sync_params['sync_point'][0] + self.sync_params['sync_dx']
+            sync_y_rel_combine = self.sync_params['sync_point'][1] + self.sync_params['sync_dy']
+            sync_x = self.combine_x \
+                + sync_x_rel_combine * math.cos(self.combine_relative_theta) \
+                - sync_y_rel_combine * math.sin(self.combine_relative_theta)
+            sync_y = self.combine_y \
+                + sync_x_rel_combine * math.sin(self.combine_relative_theta) \
+                + sync_y_rel_combine * math.cos(self.combine_relative_theta)
+            z = 2.0
+
+            builder.primitive('/sync_point')\
+                .circle([sync_x, sync_y, z], .3)\
+                .id('sync point')
+
+            if self.sync_params['breadcrumbs']:
+                _, tractor_state = self.tractor_state[-1]
+                breadcrumbs_xy = lonlat_array_to_local(
+                    tractor_state,
+                    self.utm_zone,
+                    np.array(self.sync_params['breadcrumbs'])
+                )
+                vertices = list(np.column_stack(
+                    (breadcrumbs_xy, np.full(breadcrumbs_xy.shape[0], z-.1))
+                ).flatten())
+
+                builder.primitive('/breadcrumbs')\
+                    .polyline(vertices)\
+                    .id('breadcrumbs')
+
+        except Exception as e:
+            print('Crashed in draw sync params:', e)
+
+
     def update_machine_state(self, machine_state):
         if not self.utm_zone:
             # only need to set it once
             self.utm_zone = machine_state['opState']['refUtmZone']
-        
-        self.combine_width = machine_state['opState']['machineWidth']
+
+        self.header_width = machine_state['opState']['machineWidth']
         vehicle_states = machine_state['vehicleStates']
         if vehicle_states:
             for vehicle, state in vehicle_states.items():
@@ -604,7 +759,7 @@ class CollectorScenario:
                     self.tractor_state.append((self.index, state))
                 else:
                     self.combine_states[vehicle] = (self.index, state)
-    
+
 
     def _is_vehicle_state_old(self, vehicle_state_tuple):
         last_updated_index, _ = vehicle_state_tuple
@@ -628,12 +783,3 @@ class CollectorScenario:
         z = 1.0
 
         return (x, y, z)
-
-
-def get_average_curvature(tractor_state_history):
-    curvature_sum = 0
-    for i, state_tuple in enumerate(tractor_state_history):
-        _, state = state_tuple
-        curvature_sum += state['curvature']
-
-    return curvature_sum / (i + 1)

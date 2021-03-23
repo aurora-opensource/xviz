@@ -38,25 +38,19 @@ def get_builder():
         .category(xviz.CATEGORY.PRIMITIVE)\
         .type(xviz.PRIMITIVE_TYPES.TEXT)
 
-    combine_color = [128, 0, 128]
-    builder.stream("/combine_position")\
-        .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
-        .stream_style({'fill_color': combine_color})\
-        .category(xviz.CATEGORY.PRIMITIVE)\
-        .type(xviz.PRIMITIVE_TYPES.CIRCLE)
-    builder.stream("/combine_heading")\
-        .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
-        .stream_style({
-            'stroke_width': 0.3, 
-            'stroke_color': combine_color
-        })\
-        .category(xviz.CATEGORY.PRIMITIVE)\
-        .type(xviz.PRIMITIVE_TYPES.POLYLINE)
-    builder.stream("/combine_region")\
+    builder.stream("/combine")\
         .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
         .stream_style({
             'stroke_width': 0.3,
-            'stroke_color': combine_color
+            'stroke_color': [128, 0, 128],
+        })\
+        .category(xviz.CATEGORY.PRIMITIVE)\
+        .type(xviz.PRIMITIVE_TYPES.POLYLINE)
+    builder.stream("/auger")\
+        .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+        .stream_style({
+            'stroke_width': 0.3,
+            'stroke_color': [255, 69, 0],
         })\
         .category(xviz.CATEGORY.PRIMITIVE)\
         .type(xviz.PRIMITIVE_TYPES.POLYLINE)
@@ -70,18 +64,13 @@ def get_builder():
         .category(xviz.CATEGORY.PRIMITIVE)\
         .type(xviz.PRIMITIVE_TYPES.POLYLINE)
 
-    # builder.stream("/predicted_path_discrete")\
-    #     .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
-    #     .stream_style({'fill_color': [0, 128, 128, 128]})\
-    #     .category(xviz.CATEGORY.PRIMITIVE)\
-    #     .type(xviz.PRIMITIVE_TYPES.CIRCLE)
-    builder.stream("/predicted_path")\
+    builder.stream("/vision_polygons")\
         .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
         .stream_style({'stroke_color': [0, 128, 128, 128]})\
         .category(xviz.CATEGORY.PRIMITIVE)\
         .type(xviz.PRIMITIVE_TYPES.POLYLINE)
-    builder.stream("/predictive_sub_path")\
-        .coordinate(xviz.COORDINATE_TYPES.IDENTITY)\
+    builder.stream("/predictive_polygons")\
+        .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
         .stream_style({'stroke_color': [128, 128, 0, 128]})\
         .category(xviz.CATEGORY.PRIMITIVE)\
         .type(xviz.PRIMITIVE_TYPES.POLYLINE)
@@ -89,8 +78,8 @@ def get_builder():
     builder.stream("/planned_path")\
         .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
         .stream_style({
-            'stroke_width': 0.3,
-            'stroke_color': [128, 0, 128, 128]
+            'stroke_width': 0.2,
+            'stroke_color': [0, 170, 220, 200]
         })\
         .category(xviz.CATEGORY.PRIMITIVE)\
         .type(xviz.PRIMITIVE_TYPES.POLYLINE)
@@ -98,6 +87,41 @@ def get_builder():
     builder.stream("/control_signal")\
         .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
         .stream_style({'stroke_color': [128, 0, 128, 128]})\
+        .category(xviz.CATEGORY.PRIMITIVE)\
+        .type(xviz.PRIMITIVE_TYPES.POLYLINE)
+    
+    builder.stream("/sync_status")\
+        .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+        .stream_style({'fill_color': [0, 0, 0]})\
+        .category(xviz.CATEGORY.PRIMITIVE)\
+        .type(xviz.PRIMITIVE_TYPES.TEXT)
+    builder.stream("/tractor_speed")\
+        .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+        .stream_style({'fill_color': [0, 0, 0]})\
+        .category(xviz.CATEGORY.PRIMITIVE)\
+        .type(xviz.PRIMITIVE_TYPES.TEXT)
+
+    builder.stream("/combine_speed")\
+        .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+        .stream_style({'fill_color': [0, 0, 0]})\
+        .category(xviz.CATEGORY.PRIMITIVE)\
+        .type(xviz.PRIMITIVE_TYPES.TEXT)
+    builder.stream("/set_speed")\
+        .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+        .stream_style({'fill_color': [0, 0, 0]})\
+        .category(xviz.CATEGORY.PRIMITIVE)\
+        .type(xviz.PRIMITIVE_TYPES.TEXT)
+    builder.stream("/sync_point")\
+        .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+        .stream_style({'fill_color': [0, 128, 30]})\
+        .category(xviz.CATEGORY.PRIMITIVE)\
+        .type(xviz.PRIMITIVE_TYPES.CIRCLE)
+    builder.stream("/breadcrumbs")\
+        .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+        .stream_style({
+            'stroke_width': 0.2,
+            'stroke_color': [255, 50, 20, 200]
+        })\
         .category(xviz.CATEGORY.PRIMITIVE)\
         .type(xviz.PRIMITIVE_TYPES.POLYLINE)
 

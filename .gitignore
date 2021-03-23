@@ -19,3 +19,4 @@ package-lock.json
 *.DS_Store
 .npmrc
 .dir-locals.el
+python/temp_out/*.jpeg
