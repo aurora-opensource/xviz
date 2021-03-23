@@ -3,13 +3,14 @@ import time
 from pathlib import Path
 from collections import deque
 import numpy as np
+import cv2
 
 from google.protobuf.json_format import MessageToDict
 from protobuf_APIs import falconeye_pb2, radar_pb2
 
 from scenarios.meta.collector_meta import get_builder
 from scenarios.utils.com_manager import ComManager, MqttConst
-from scenarios.utils.filesystem import get_collector_instances, load_config
+from scenarios.utils.filesystem import get_collector_instances, load_config, load_global_config
 from scenarios.utils.gis import transform_combine_to_local, get_combine_region, \
     get_auger_region, utm_array_to_local, lonlat_array_to_local, \
     lonlat_to_utm, get_wheel_angle
@@ -21,7 +22,6 @@ from scenarios.safety_subsystems.radar_filter import RadarFilter
 from scenarios.safety_subsystems.path_prediction import get_path_distances, get_path_poly, predict_path
 
 import xviz
-
 
 class CollectorScenario:
 
@@ -47,12 +47,9 @@ class CollectorScenario:
             comm = ComManager()
             comm.subscribe(MqttConst.TRACKS_TOPIC, self.store_tracking_output)
 
-        if collector_config['IVT']:
-            configfile = Path(__file__).parents[3] / 'Global-Configs' / 'Tractors' / 'John-Deere' / '8RIVT_WHEEL.yaml'
-        else:
-            configfile = Path(__file__).parents[3] / 'Global-Configs' / 'Tractors' / 'John-Deere' / '8RPST_WHEEL.yaml'
 
-        self.global_config = load_config(str(configfile))
+        self.global_config = load_global_config(collector_config['MACHINE_TYPE'])
+        print("Global config:", self.global_config)
         self.radar_filter = RadarFilter(self.global_config['safety']['radar'])
         self.cab_to_nose = self.global_config['safety']['object_tracking']['cabin_to_nose_distance']
         self.combine_dimensions = self.global_config['safety']['combine_dimensions']
@@ -183,6 +180,10 @@ class CollectorScenario:
         try:
             if self.index == len(self.collector_instances):
                 self.reset_values()
+                print("#############################WE FINISHED#################################")
+                print("#############################WE FINISHED#################################")
+                print("#############################WE FINISHED#################################")
+                print("#############################WE FINISHED#################################")
 
             collector_output = self.collector_instances[self.index]
 
@@ -244,7 +245,7 @@ class CollectorScenario:
 
             if sync_status is not None:
                 self.sync_status = sync_status
-            
+
             if sync_params is not None:
                 if sync_params:
                     self.sync_params = sync_params
@@ -264,6 +265,11 @@ class CollectorScenario:
             self._draw_sync_params(builder)
 
             if img is not None:
+                img_out_name = "./temp_out/{0}.jpeg".format(self.index)
+                image_copy = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                #print("img_out_name: ", img_out_name)
+                #cv2.imwrite(img_out_name, image_copy)
+
                 if camera_output is not None:
                     img = postprocess(img, camera_output)
                 show_image(img)
@@ -280,12 +286,14 @@ class CollectorScenario:
 
 
     def _draw_radar_targets(self, radar_output, builder: xviz.XVIZBuilder):
+
         if radar_output is None:
             return
         if self.sync_status is None:
             sync_status = dict(runningSync=False, inSync=False, atSyncPoint=False)
         else:
             sync_status = self.sync_status
+
         try:
             if self.radar_filter.prev_target_set is not None:
                 if self.radar_filter.prev_target_set == radar_output['targets']:
@@ -294,6 +302,9 @@ class CollectorScenario:
 
             for target in radar_output['targets'].values():
                 (x, y, z) = self.get_object_xyz(target, 'phi', 'dr', radar_ob=True)
+
+                _phi = target['phi']
+                _dr = target['dr']
 
                 if self.radar_filter.is_valid_target(target, sync_status=sync_status):
                     builder.primitive('/radar_passed_filter_targets')\
@@ -304,6 +315,8 @@ class CollectorScenario:
                         builder.primitive('/radar_filtered_out_targets')\
                             .circle([x, y, z], .5)\
                             .id(str(target['targetId']))
+                    else:
+                        pass
 
                 if not target['consecutive'] < 1:
                     builder.primitive('/radar_id')\
@@ -328,7 +341,7 @@ class CollectorScenario:
         if tracking_output is None:
             return
         try:
-            if 'tracks' in tracking_output:            
+            if 'tracks' in tracking_output:
                 min_confidence = 0.1
                 min_hits = 2
                 for track in tracking_output['tracks']:
@@ -374,6 +387,9 @@ class CollectorScenario:
                 if target['label'] == 'qrcode':
                     continue
 
+                _phi = target['objectAngle']
+                _dr = target['objectDistance']
+
                 builder.primitive('/camera_targets')\
                     .circle([x, y, z], .5)\
                     .id(target['label'])
@@ -388,7 +404,7 @@ class CollectorScenario:
         try:
             _, tractor_state = self.tractor_state[-1]
             tractor_heading = tractor_state['heading']  # degrees
-            
+
             for combine_id, combine_state_tuple in self.combine_states.items():
                 _, combine_state = combine_state_tuple
                 combine_heading = combine_state['heading']  # degrees
@@ -426,7 +442,7 @@ class CollectorScenario:
 
         except Exception as e:
             print('Crashed in draw machine state:', e)
-    
+
 
     def _draw_auger(self, builder: xviz.XVIZBuilder):
         if self.combine_x is None\
@@ -466,6 +482,7 @@ class CollectorScenario:
         try:
             _, tractor_state = self.tractor_state[-1]
             veh_speed = max(tractor_state['speed'], 0.447 * 1.0)
+            #print("tractor_state:", tractor_state)
 
             sync_stop_threshold, waypoint_stop_threshold, \
                 sync_slowdown_threshold, _waypoint_slowdown_threshold \
@@ -517,7 +534,7 @@ class CollectorScenario:
 
             if not sync_status['inSync']:
                 predictive_polys.append(slow_poly)
-            
+
             for poly in predictive_polys:
                 builder.primitive('/predictive_polygons')\
                     .polyline(poly)\
@@ -559,7 +576,7 @@ class CollectorScenario:
 
             if sync_status['runningSync']:
                 vision_polys.append(sync_stop_poly)
-            
+
             for poly in vision_polys:
                 builder.primitive('/vision_polygons')\
                     .polyline(poly)\
@@ -716,7 +733,7 @@ class CollectorScenario:
         if not self.utm_zone:
             # only need to set it once
             self.utm_zone = machine_state['opState']['refUtmZone']
-        
+
         self.header_width = machine_state['opState']['machineWidth']
         vehicle_states = machine_state['vehicleStates']
         if vehicle_states:
