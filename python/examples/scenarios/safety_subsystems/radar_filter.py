@@ -27,7 +27,7 @@ class RadarFilter:
         if sync_status['inSync'] \
                 and target_y > self.config['sync_y_cutoff']:
             return False
-        
+
         return self.queue_filter(target, sync_status)
 
     def queue_filter(self, target, sync_status):

@@ -1,4 +1,5 @@
-collector_output_file:
-extract_directory:
+collector_output_file: /Users/azizalibasic/Desktop/important/arizona-dot/radar-fov-test/unknown-v2020-25-0-3691020dae1046df88e855e6d9928fca-dot-misc-1616179632582-6693.tar
+extract_directory: /Users/azizalibasic/Downloads/temp/
 mqtt_enabled: False
 IVT: True
+MACHINE_TYPE: 2020_DOT_AU1_NARROW

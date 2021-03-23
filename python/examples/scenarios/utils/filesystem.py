@@ -1,7 +1,25 @@
 import shutil
 import yaml
 from pathlib import Path
+import os
 
+FILE_PATH = Path(__file__).parent.absolute()
+
+def load_global_config(machine_type):
+    new_path = os.path.join(FILE_PATH, '../../../../Global-Configs/')
+
+    print("LOOKING FOR GC IN:", new_path)
+    for subdir, dirnames, files in os.walk(new_path):
+        for file in files:
+            filepath = subdir + os.sep + file
+            filename = os.path.splitext(file)[0]
+            if (filename.upper() == machine_type.upper()) and (
+                    filepath.endswith('.yaml') or filepath.endswith('.yml')):
+                print('found global config file for ', machine_type)
+                return load_config(filepath)
+
+    # if here, something bad happened
+    return {}
 
 def get_collector_instances(output_file, extract_directory):
     output_file = Path(output_file)
