@@ -1,5 +1,5 @@
-import matplotlib.pyplot as plt
 from pathlib import Path
+import matplotlib.pyplot as plt
 from scenarios.utils.filesystem import load_config
 
 
@@ -11,6 +11,13 @@ def get_speed_and_distance_arrays(threshold_config):
         threshold.append(pair['threshold'])
 
     return speed, threshold
+
+
+def get_distance_with_accel(start_speed, end_speed, accel):
+    """
+    Vf^2 = Vi^2 + 2*a*d
+    """
+    return (end_speed**2 - start_speed**2) / (2 * accel)
 
 
 def main():
@@ -31,6 +38,13 @@ def main():
     for key, value in shared_speed_thresholds.items():
         speed, distance = get_speed_and_distance_arrays(value)
         ax.plot(speed, distance, label=key)
+
+    # stop_df = get_distance_with_accel(4 * .447, 20 * .447, 1) + 10
+    # print(stop_df)
+    # ax.plot((4, 20), (10, stop_df))
+    # slowdown_df = get_distance_with_accel(4 * .447, 20 * .447, 1) + 15
+    # print(slowdown_df)
+    # ax.plot((4, 20), (15, slowdown_df))
 
     ax.legend()
     plt.show()
