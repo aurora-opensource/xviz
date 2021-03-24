@@ -180,7 +180,6 @@ class CollectorScenario:
     def _draw_collector_instance(self, builder: xviz.XVIZBuilder, timestamp):
         try:
             if self.index == len(self.collector_instances):
-                print('reset')
                 self.reset_values()
                 print("#############################WE FINISHED#################################")
                 print("#############################WE FINISHED#################################")
