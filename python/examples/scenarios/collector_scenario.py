@@ -140,13 +140,13 @@ class CollectorScenario:
         radial_distances = sorted(radial_distances, reverse=True)
 
         for r in radial_distances:
-            builder.primitive('/measuring_circles_lbl')\
-                .text(str(r))\
-                .position([r, 0, .1])\
+            builder.primitive('/measuring_circles_lbl') \
+                .text(str(r)) \
+                .position([r, 0, .1]) \
                 .id(f'{r}lb')
 
-            builder.primitive('/measuring_circles')\
-                .circle([0, 0, 0], r)\
+            builder.primitive('/measuring_circles') \
+                .circle([0, 0, 0], r) \
                 .id(str(r))
 
         cam_fov = [-28.5, 28.5]  # 57 deg
@@ -156,24 +156,25 @@ class CollectorScenario:
             r = 40
             label = (r, c_phi)
             (x, y, z) = self.get_object_xyz_primitive(r, c_phi*math.pi/180)
-            vertices = [0, 0, 0, x, y, z]
-            builder.primitive('/camera_fov')\
-                .polyline(vertices)\
+            vertices = [0, 0, z, x, y, z]
+            builder.primitive('/camera_fov') \
+                .polyline(vertices) \
                 .id("cam_fov: "+str(label))
 
         for r_phi in radar_fov:
             r = 40
             (x, y, z) = self.get_object_xyz_primitive(r, r_phi*math.pi/180)
             x += self.cab_to_nose
-            builder.primitive('/measuring_circles_lbl')\
-                .text(str(r_phi))\
-                .position([x, y, z])\
+            builder.primitive('/measuring_circles_lbl') \
+                .text(str(r_phi)) \
+                .position([x, y, 0.1]) \
                 .id(str(r_phi)+'lb')
+
             if r_phi == radar_fov[0] or r_phi == radar_fov[-1]:
                 label = (r, r_phi)
-                vertices = [0, 0, 0, x, y, z]
-                builder.primitive('/radar_fov')\
-                    .polyline(vertices)\
+                vertices = [0, 0, z, x, y, z]
+                builder.primitive('/radar_fov') \
+                    .polyline(vertices) \
                     .id("radar_fov: "+str(label))
 
 
@@ -190,12 +191,13 @@ class CollectorScenario:
 
             collector_output, is_slim_output = deserialize_collector_output(collector_output)
             if is_slim_output:
-                imgs, camera_output, radar_output, tracking_output, machine_state,\
-                    field_definition, planned_path, sync_status, control_signal, sync_params \
+                imgs, camera_output, radar_output, tracking_output, \
+                    machine_state, field_definition, planned_path, \
+                    sync_status, control_signal, sync_params \
                     = extract_collector_output_slim(collector_output)
             else:
-                img, camera_output, radar_output,\
-                    tracking_output, machine_state = extract_collector_output(collector_output)
+                img, camera_output, radar_output, tracking_output, \
+                    machine_state = extract_collector_output(collector_output)
                 field_definition = None
                 planned_path = None
                 sync_status = None
@@ -211,25 +213,29 @@ class CollectorScenario:
                 self.tractor_easting, self.tractor_northing = lonlat_to_utm(
                     tractor_state['longitude'],
                     tractor_state['latitude'],
-                    self.utm_zone
-                )
+                    self.utm_zone)
                 tractor_speed = tractor_state['speed']
 
-                builder.pose("/vehicle_pose")\
-                    .timestamp(timestamp)\
-                    .position(0., 0., 0.)\
-                    .orientation(
-                        tractor_state['roll'],
-                        tractor_state['pitch'],
-                        self.tractor_theta
-                    )
-                builder.primitive('/tractor_speed')\
-                .text("T speed: " + str(round(tractor_speed, 3)))\
-                .position([-self.tractor_gps_to_rear_axle-10, 10., 1.])\
-                .id('tractor speed')
+                builder.pose("/vehicle_pose") \
+                    .position(0., 0., 0.) \
+                    .orientation(0., 0., self.tractor_theta) \
+                    .timestamp(timestamp)
+
+                    # tilting for roll and pitch is an option but it has weird
+                    # visual side effects so assume flat ground for now
+                    # .orientation(tractor_state['roll'],
+                    #              tractor_state['pitch'],
+                    #              self.tractor_theta)
+
+                builder.primitive('/tractor_speed') \
+                    .text("T speed: " + str(round(tractor_speed, 3))) \
+                    .position([-self.tractor_gps_to_rear_axle-10, 10., 1.]) \
+                    .id('tractor speed')
             else:
-                builder.pose("/vehicle_pose")\
-                    .timestamp(timestamp)\
+                builder.pose("/vehicle_pose") \
+                    .position(0., 0., 0.) \
+                    .orientation( 0., 0., 0.) \
+                    .timestamp(timestamp)
 
             if self.mqtt_enabled:
                 if self.mqtt_tracking_outputs:
