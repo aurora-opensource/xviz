@@ -1,5 +1,6 @@
-collector_output_file: /Users/azizalibasic/Desktop/important/arizona-dot/radar-fov-test/unknown-v2020-25-0-3691020dae1046df88e855e6d9928fca-dot-misc-1616179632582-6693.tar
-extract_directory: /Users/azizalibasic/Downloads/temp/
+# collector_output_file: /home/raven.ravenind.net/r103943/work/collector_outputs/texas/mar16/Estop_pressed-v2020-25-0-f4482e96507042909ec286e4b13a7022-smartag-autocart-1615929736189-532.tar
+collector_output_file: /home/raven.ravenind.net/r103943/work/collector_outputs/arizona/mar24/00-v2020-25-0-3691020dae1046df88e855e6d9928fca-dot-misc-1616544674670-7927.tar
+extract_directory: /home/raven.ravenind.net/r103943/work/collector_outputs/extracted
 mqtt_enabled: False
 IVT: True
 MACHINE_TYPE: 2020_DOT_AU1_NARROW
