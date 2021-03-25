@@ -306,13 +306,16 @@ class CollectorScenario:
         """
         try:
             if camera_data:
+                primary_cam_img = None
+
                 for key, val in camera_data.items():
                     cam_idx = int(key.split('_')[-1])
                     img, cam_output = val
+
                     if cam_output is not None:
                         img = draw_cam_targets_on_image(img, cam_output)
                         if cam_idx == 0:
-                            # only for primary camera
+                            # TODO: draw camera targets for all cameras
                             self._draw_camera_targets(cam_output, builder)
 
                     if cam_idx == 0:
@@ -320,9 +323,14 @@ class CollectorScenario:
                     else:
                         self.haz_imgs[cam_idx] = img
 
+                if primary_cam_img is None:
+                    print('missing primary camera image in show_images')
+                    return
+
                 for cam_idx, img in self.haz_imgs.items():
                     primary_cam_img = np.vstack((primary_cam_img, img))
-                    show_image(primary_cam_img)
+
+                show_image(primary_cam_img)
 
         except Exception as e:
             print('Crashed in show images:', e)
