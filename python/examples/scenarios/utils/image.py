@@ -16,7 +16,7 @@ def show_image(image):
     cv2.waitKey(1)
 
 
-def postprocess(image, camera_output):
+def draw_cam_targets_on_image(image, camera_output):
     for target in camera_output['targets']:
         tl, br = target['topleft'], target['bottomright']
         tl['x'], tl['y'] = int(tl['x']), int(tl['y'])
