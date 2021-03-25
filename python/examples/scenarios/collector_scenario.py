@@ -280,29 +280,7 @@ class CollectorScenario:
             self._draw_control_signal(builder)
             self._draw_sync_status(builder)
             self._draw_sync_params(builder)
-
-            try:
-                if camera_data:
-                    for key, val in camera_data.items():
-                        cam_idx = int(key.split('_')[-1])
-                        img, cam_output = val
-                        if cam_output is not None:
-                            img = draw_cam_targets_on_image(img, cam_output)
-                            if cam_idx == 0:
-                                # only for primary camera
-                                self._draw_camera_targets(cam_output, builder)
-
-                        if cam_idx == 0:
-                            primary_cam_img = img
-                        else:
-                            self.haz_imgs[cam_idx] = img
-
-                    for cam_idx, img in self.haz_imgs.items():
-                        primary_cam_img = np.vstack((primary_cam_img, img))
-                        show_image(primary_cam_img)
-
-            except Exception as e:
-                print('Crashed in show image:', e)
+            self._show_images(camera_data, builder)
 
             # if self.index == 0:
             #     print('start time:', time.gmtime(float(collector_output.timestamp)))
@@ -313,6 +291,41 @@ class CollectorScenario:
 
         except Exception as e:
             print('Crashed in draw collector instance:', e)
+
+
+    def _show_images(self, camera_data, builder: xviz.XVIZBuilder):
+        """
+        Draws the camera targets on the images for each camera and displays all
+        the images as a table
+
+        Parameters
+        ----------
+
+        camera_data: dict(string, tuple(np.array, dict))
+        - {key associated to frame: (frame, CameraOutput as dict)}
+        """
+        try:
+            if camera_data:
+                for key, val in camera_data.items():
+                    cam_idx = int(key.split('_')[-1])
+                    img, cam_output = val
+                    if cam_output is not None:
+                        img = draw_cam_targets_on_image(img, cam_output)
+                        if cam_idx == 0:
+                            # only for primary camera
+                            self._draw_camera_targets(cam_output, builder)
+
+                    if cam_idx == 0:
+                        primary_cam_img = img
+                    else:
+                        self.haz_imgs[cam_idx] = img
+
+                for cam_idx, img in self.haz_imgs.items():
+                    primary_cam_img = np.vstack((primary_cam_img, img))
+                    show_image(primary_cam_img)
+
+        except Exception as e:
+            print('Crashed in show images:', e)
 
 
     def _draw_radar_targets(self, radar_output, builder: xviz.XVIZBuilder):
