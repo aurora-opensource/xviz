@@ -72,11 +72,10 @@ class CollectorScenario:
         self.sync_status = None
         self.control_signal = None
         self.sync_params = None
-
         self.haz_imgs = dict()
-        self.num_haz_cams = 8
-        self.show_haz_cams = True
-        self.all_imgs_equal_size = True
+        self.num_haz_cams = collector_config['num_haz_cams']  # TODO: make this a function of machine type
+        self.show_haz_cams = collector_config['show_haz_cams']
+        self.all_imgs_equal_size = collector_config['all_imgs_equal_size']
 
 
     def reset_values(self):
@@ -307,12 +306,6 @@ class CollectorScenario:
         - {camera index: (frame, camera output)}
         """
         try:
-
-            # self.haz_imgs = dict()
-            # self.num_haz_cams = 4
-            # self.show_haz_cams = True
-            # self.all_imgs_equal_size = False
-
             if camera_data:
                 if 0 not in camera_data:
                     print('missing primary camera image in show_images')
@@ -334,21 +327,17 @@ class CollectorScenario:
 
                 if self.show_haz_cams:
                     if self.all_imgs_equal_size:
-                        tile_shape = primary_cam_img.shape
+                        tile_h, tile_w, tile_d = primary_cam_img.shape
                         num_tiles_root = math.sqrt(self.num_haz_cams + 1)
 
                         if num_tiles_root.is_integer():
                             n_rows = n_cols = int(num_tiles_root)
-                            num_tiles = self.num_haz_cams + 1
                         else:
-                            n_rows = int(num_tiles_root) + 1
-                            n_cols = int(num_tiles_root)
-                            # int rounds down
-                            num_tiles = int(num_tiles_root + 1) * int(num_tiles_root)
+                            n_rows = math.ceil(num_tiles_root) + 1
+                            n_cols = math.ceil(num_tiles_root)
 
-                        img_table = np.zeros((
-                            num_tiles, tile_shape[0],
-                            tile_shape[1], tile_shape[2])).astype(np.uint8)
+                        img_table = np.zeros((n_rows * n_cols, tile_h, tile_w,
+                                              tile_d)).astype(np.uint8)
 
                         img_table[0, :, :, :] = primary_cam_img
 
@@ -357,11 +346,42 @@ class CollectorScenario:
 
                         # don't even know how this works
                         # https://stackoverflow.com/questions/50669984/python-numpy-how-to-reshape-this-list-of-arrays-images-into-a-collage
-                        img_table = img_table.reshape(n_rows, n_cols, tile_shape[0], tile_shape[1], tile_shape[2]) \
-                            .swapaxes(1, 2).reshape(n_rows*tile_shape[0], tile_shape[1]*n_cols, tile_shape[2])
+                        img_table = img_table.reshape(
+                            n_rows, n_cols, tile_h, tile_w, tile_d) \
+                            .swapaxes(1, 2) \
+                            .reshape(n_rows * tile_h, tile_w * n_cols, tile_d)
                     else:
+                        tile_h, tile_w, tile_d = primary_cam_img.shape
+                        num_tiles_root = math.sqrt(self.num_haz_cams)
+
+                        if num_tiles_root.is_integer():
+                            n_rows = n_cols = int(num_tiles_root)
+                        else:
+                            n_rows = math.ceil(num_tiles_root) + 1
+                            n_cols = math.ceil(num_tiles_root)
+
+                        img_table = np.zeros((n_rows * n_cols, tile_h, tile_w,
+                                              tile_d)).astype(np.uint8)
+
                         for cam_idx, img in self.haz_imgs.items():
-                            primary_cam_img = np.vstack((primary_cam_img, img))
+                            img_table[cam_idx-1, :, :, :] = img
+
+                        # don't even know how this works
+                        # https://stackoverflow.com/questions/50669984/python-numpy-how-to-reshape-this-list-of-arrays-images-into-a-collage
+                        img_table = img_table.reshape(
+                            n_rows, n_cols, tile_h, tile_w, tile_d) \
+                            .swapaxes(1, 2) \
+                            .reshape(n_rows * tile_h, tile_w * n_cols, tile_d)
+
+                        final_width = primary_cam_img.shape[1]
+                        final_height = int(primary_cam_img.shape[0] /
+                                           primary_cam_img.shape[1] *
+                                           final_width)
+                        img_table = cv2.resize(img_table,
+                                               (final_width,
+                                                final_height))
+
+                        img_table = np.vstack((primary_cam_img, img_table))
 
                     display_img = img_table
                 else:
