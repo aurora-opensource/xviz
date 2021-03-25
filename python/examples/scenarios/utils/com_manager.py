@@ -1,10 +1,13 @@
 import paho.mqtt.client as mqtt
 
+
 class MqttConst(object):
     TRACKS_TOPIC = 'vision/tracking/targets'
     RADAR_TOPIC = 'vision/radar/targets'
     CAMERA_TOPIC = 'vision/camera/targets'
     DATA_TOPIC = 'collector/data/#'
+    HAZARD_CAMERA_TOPIC = 'vision/hazard-camera/targets'
+
 
 class ComManager(object):
 
@@ -17,7 +20,6 @@ class ComManager(object):
         self.client.connect_async(host, port=port, keepalive=60)
         self.subscriptions = {}
     
-
     def subscribe(self, topic, callbackFn):
         if isinstance(topic, list): # subscribing to multiple topics in one subscription
             qos_lst = [] # must pass quality of service in as an argument when subscribing to multiple topics
@@ -38,12 +40,10 @@ class ComManager(object):
         
         return lambda: self.unsubscribe(topic, callbackFn)
 
-
     def remove_topic_if_subs_empty(self, topic):
         subs = self.subscriptions.get(topic)  
         if subs is not None and len(subs) == 0:
             del self.subscriptions[topic]
-
 
     def unsubscribe(self, topic, callbackFn):
         self.client.unsubscribe(topic)
@@ -71,22 +71,18 @@ class ComManager(object):
                     del subs[i]
                     self.remove_topic_if_subs_empty(topic)
                     return 1
-
         return 0
-
 
     def on_connect(self, client, userdata, flags, rc):
         print("Connected with result code " + str(rc))
         for key in self.subscriptions:
             self.client.subscribe(key)
 
-
     def on_message(self, client, userdata, msg):
         topic_cbs = self.subscriptions.get(msg.topic)
         if topic_cbs is not None:
             for cb in topic_cbs:
                 cb(msg)
-
 
     def on_disconnect(self, client, userdata, rc):
         print("Client  disconnected")
