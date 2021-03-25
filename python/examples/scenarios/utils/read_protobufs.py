@@ -101,37 +101,24 @@ def extract_collector_output_slim(collector_output):
 
         # {camera index: (frame, CameraOutput)}
         camera_data = dict()
-        # Collector appends the camera index to the key for the image
-        # Primary camera is assumed to have index 0
+        # collector appends the camera index to the key for the image
+        # pimary camera is assumed to have index 0
         if 'frame_cam_0' in collector_output.data:
             for key in collector_output.data:
                 if 'frame_cam_' in key:
                     frame = extract_image(collector_output.data[key])
-                    cam_idx = key.split('_')[-1]
-                    if int(cam_idx) == 0:  # primary camera
-                        if mc.CAMERA_TOPIC in collector_output.data:
-                            camera_output = camera_pb2.CameraOutput()
-                            camera_output.ParseFromString(
-                                collector_output.data[mc.CAMERA_TOPIC])
-                            camera_output = MessageToDict(
-                                camera_output,
-                                including_default_value_fields=True)
-                        else:
-                            print('missing primary camera output from collector output')
-                            camera_output = None
-                    else:  # hazard camera
-                        haz_cam_output_key = mc.HAZARD_CAMERA_TOPIC + '_' + cam_idx
-                        if haz_cam_output_key  in collector_output.data:
-                            camera_output = camera_pb2.CameraOutput()
-                            camera_output.ParseFromString(
-                                collector_output.data[haz_cam_output_key])
-                            camera_output = MessageToDict(
-                                camera_output,
-                                including_default_value_fields=True)
-                        else:
-                            print('missing primary camera output from collector output')
-                            camera_output = None
-                    camera_data[int(cam_idx)] = (frame, camera_output)
+                    cam_idx = int(key.split('_')[-1])
+                    expected_output_key = mc.CAMERA_TOPIC \
+                        if cam_idx == 0 \
+                        else mc.HAZARD_CAMERA_TOPIC + '_' + str(cam_idx)
+                    if expected_output_key in collector_output.data:
+                        camera_output = camera_pb2.CameraOutput()
+                        camera_output.ParseFromString(collector_output.data[expected_output_key])
+                        camera_output = MessageToDict(camera_output, including_default_value_fields=True)
+                    else:
+                        print('missing camera output for an image')
+                        camera_output = None
+                    camera_data[cam_idx] = (frame, camera_output)
         elif 'frame' in collector_output.data:
             frame = extract_image(collector_output.data['frame'])
             if mc.CAMERA_TOPIC in collector_output.data:
