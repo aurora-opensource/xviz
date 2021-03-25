@@ -302,7 +302,7 @@ class CollectorScenario:
         ----------
 
         camera_data: dict(int, tuple(np.array, dict))
-        - {camera index: (frame, CameraOutput as dict)}
+        - {camera index: (frame, camera output)}
         """
         try:
             if camera_data:

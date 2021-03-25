@@ -99,7 +99,7 @@ def extract_collector_output_slim(collector_output):
         else:
             sync_params = None
 
-        # {camera index: (frame, CameraOutput as dict)}
+        # {camera index: (frame, CameraOutput)}
         camera_data = dict()
         # Collector appends the camera index to the key for the image
         # Primary camera is assumed to have index 0
