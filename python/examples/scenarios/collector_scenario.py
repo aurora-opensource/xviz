@@ -10,18 +10,21 @@ from protobuf_APIs import falconeye_pb2, radar_pb2
 
 from scenarios.meta.collector_meta import get_builder
 from scenarios.utils.com_manager import ComManager, MqttConst
-from scenarios.utils.filesystem import get_collector_instances, load_config, load_global_config
+from scenarios.utils.filesystem import get_collector_instances, load_config, \
+    load_global_config
 from scenarios.utils.gis import transform_combine_to_local, get_combine_region, \
     get_auger_region, utm_array_to_local, lonlat_array_to_local, \
     lonlat_to_utm, get_wheel_angle
-from scenarios.utils.image import postprocess, show_image
+from scenarios.utils.image import draw_cam_targets_on_image, show_image
 from scenarios.utils.read_protobufs import deserialize_collector_output, \
     extract_collector_output, extract_collector_output_slim
 
 from scenarios.safety_subsystems.radar_filter import RadarFilter
-from scenarios.safety_subsystems.path_prediction import get_path_distances, get_path_poly, predict_path
+from scenarios.safety_subsystems.path_prediction import get_path_distances, \
+    get_path_poly, predict_path
 
 import xviz_avs as xviz
+
 
 class CollectorScenario:
 
@@ -48,14 +51,12 @@ class CollectorScenario:
             comm = ComManager()
             comm.subscribe(MqttConst.TRACKS_TOPIC, self.store_tracking_output)
 
-
         self.global_config = load_global_config(collector_config['MACHINE_TYPE'])
-        print("Global config:", self.global_config)
         self.radar_filter = RadarFilter(self.global_config['safety']['radar'])
         self.cab_to_nose = self.global_config['safety']['object_tracking']['cabin_to_nose_distance']
         self.combine_dimensions = self.global_config['safety']['combine_dimensions']
         self.tractor_gps_to_rear_axle = self.global_config['safety']['tractor_dimensions']['gps_to_rear_axle']
-        self.header_width = 8.0 # default, gets updated by machine state message
+        self.header_width = 8.0  # default, gets updated by machine state message
 
         self.tractor_state = deque(maxlen=10)
         self.tractor_easting = None
@@ -71,6 +72,9 @@ class CollectorScenario:
         self.sync_status = None
         self.control_signal = None
         self.sync_params = None
+        self.haz_imgs = dict()
+        self.num_haz_cams = 4
+        self.show_haz_cams = True
 
 
     def reset_values(self):
@@ -191,11 +195,12 @@ class CollectorScenario:
 
             collector_output, is_slim_output = deserialize_collector_output(collector_output)
             if is_slim_output:
-                imgs, camera_output, radar_output, tracking_output, \
+                camera_data, radar_output, tracking_output, \
                     machine_state, field_definition, planned_path, \
                     sync_status, control_signal, sync_params \
                     = extract_collector_output_slim(collector_output)
             else:
+                # very old proto file definition, this will break things
                 img, camera_output, radar_output, tracking_output, \
                     machine_state = extract_collector_output(collector_output)
                 field_definition = None
@@ -268,7 +273,6 @@ class CollectorScenario:
             self._draw_combine(builder)
             self._draw_auger(builder)
             self._draw_tracking_targets(tracking_output, builder)
-            self._draw_camera_targets(camera_output, builder)
             self._draw_radar_targets(radar_output, builder)
             self._draw_predicted_paths(builder)
             self._draw_planned_path(builder)
@@ -277,14 +281,28 @@ class CollectorScenario:
             self._draw_sync_status(builder)
             self._draw_sync_params(builder)
 
-            if sorted(imgs):
-                conglomerate = imgs[0][1]  # primary cam image
-                if camera_output is not None:
-                    conglomerate = postprocess(conglomerate, camera_output)
-                if len(imgs) > 1:
-                    for _cam_index, img in imgs[1:]:
-                        conglomerate = np.vstack((conglomerate, img))
-                show_image(conglomerate)
+            try:
+                if camera_data:
+                    for key, val in camera_data.items():
+                        cam_idx = int(key.split('_')[-1])
+                        img, cam_output = val
+                        if cam_output is not None:
+                            img = draw_cam_targets_on_image(img, cam_output)
+                            if cam_idx == 0:
+                                # only for primary camera
+                                self._draw_camera_targets(cam_output, builder)
+
+                        if cam_idx == 0:
+                            primary_cam_img = img
+                        else:
+                            self.haz_imgs[cam_idx] = img
+
+                    for cam_idx, img in self.haz_imgs.items():
+                        primary_cam_img = np.vstack((primary_cam_img, img))
+                        show_image(primary_cam_img)
+
+            except Exception as e:
+                print('Crashed in show image:', e)
 
             # if self.index == 0:
             #     print('start time:', time.gmtime(float(collector_output.timestamp)))
