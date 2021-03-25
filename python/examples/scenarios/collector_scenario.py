@@ -301,17 +301,14 @@ class CollectorScenario:
         Parameters
         ----------
 
-        camera_data: dict(string, tuple(np.array, dict))
-        - {key associated to frame: (frame, CameraOutput as dict)}
+        camera_data: dict(int, tuple(np.array, dict))
+        - {camera index: (frame, CameraOutput as dict)}
         """
         try:
             if camera_data:
                 primary_cam_img = None
 
-                for key, val in camera_data.items():
-                    cam_idx = int(key.split('_')[-1])
-                    img, cam_output = val
-
+                for cam_idx, (img, cam_output) in camera_data.items():
                     if cam_output is not None:
                         img = draw_cam_targets_on_image(img, cam_output)
                         if cam_idx == 0:

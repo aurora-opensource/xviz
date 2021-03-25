@@ -99,7 +99,7 @@ def extract_collector_output_slim(collector_output):
         else:
             sync_params = None
 
-        # {key associated to frame: (frame, CameraOutput as dict)}
+        # {camera index: (frame, CameraOutput as dict)}
         camera_data = dict()
         # Collector appends the camera index to the key for the image
         # Primary camera is assumed to have index 0
@@ -131,7 +131,7 @@ def extract_collector_output_slim(collector_output):
                         else:
                             print('missing primary camera output from collector output')
                             camera_output = None
-                    camera_data[key] = (frame, camera_output)
+                    camera_data[int(cam_idx)] = (frame, camera_output)
         elif 'frame' in collector_output.data:
             frame = extract_image(collector_output.data['frame'])
             if mc.CAMERA_TOPIC in collector_output.data:
@@ -141,7 +141,7 @@ def extract_collector_output_slim(collector_output):
             else:
                 print('missing primary camera output from collector output')
                 camera_output = None
-            camera_data['frame_cam_0'] = (frame, camera_output)
+            camera_data[0] = (frame, camera_output)
         else:
             print('missing primary camera frame from collector output')
             frame = None
