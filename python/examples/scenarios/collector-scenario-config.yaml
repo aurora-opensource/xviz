@@ -1,6 +1,8 @@
 # collector_output_file: /home/raven.ravenind.net/r103943/work/collector_outputs/texas/mar16/Estop_pressed-v2020-25-0-f4482e96507042909ec286e4b13a7022-smartag-autocart-1615929736189-532.tar
-collector_output_file: /home/raven.ravenind.net/r103943/work/collector_outputs/arizona/mar24/00-v2020-25-0-3691020dae1046df88e855e6d9928fca-dot-misc-1616544674670-7927.tar
+collector_output_file: /home/raven.ravenind.net/r103943/work/collector_outputs/arizona/mar24/7_15-v2020-25-0-3691020dae1046df88e855e6d9928fca-dot-misc-1616614225649-421.tar
 extract_directory: /home/raven.ravenind.net/r103943/work/collector_outputs/extracted
 mqtt_enabled: False
-IVT: True
 MACHINE_TYPE: 2020_DOT_AU1_NARROW
+num_haz_cams: 8
+show_haz_cams: True
+all_imgs_equal_size: True
