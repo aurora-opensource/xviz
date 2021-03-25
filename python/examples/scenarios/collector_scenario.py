@@ -72,9 +72,11 @@ class CollectorScenario:
         self.sync_status = None
         self.control_signal = None
         self.sync_params = None
+
         self.haz_imgs = dict()
-        self.num_haz_cams = 4
+        self.num_haz_cams = 8
         self.show_haz_cams = True
+        self.all_imgs_equal_size = True
 
 
     def reset_values(self):
@@ -305,8 +307,18 @@ class CollectorScenario:
         - {camera index: (frame, camera output)}
         """
         try:
+
+            # self.haz_imgs = dict()
+            # self.num_haz_cams = 4
+            # self.show_haz_cams = True
+            # self.all_imgs_equal_size = False
+
             if camera_data:
-                primary_cam_img = None
+                if 0 not in camera_data:
+                    print('missing primary camera image in show_images')
+                    return
+
+                primary_cam_img = camera_data[0][0]
 
                 for cam_idx, (img, cam_output) in camera_data.items():
                     if cam_output is not None:
@@ -320,14 +332,42 @@ class CollectorScenario:
                     else:
                         self.haz_imgs[cam_idx] = img
 
-                if primary_cam_img is None:
-                    print('missing primary camera image in show_images')
-                    return
+                if self.show_haz_cams:
+                    if self.all_imgs_equal_size:
+                        tile_shape = primary_cam_img.shape
+                        num_tiles_root = math.sqrt(self.num_haz_cams + 1)
 
-                for cam_idx, img in self.haz_imgs.items():
-                    primary_cam_img = np.vstack((primary_cam_img, img))
+                        if num_tiles_root.is_integer():
+                            n_rows = n_cols = int(num_tiles_root)
+                            num_tiles = self.num_haz_cams + 1
+                        else:
+                            n_rows = int(num_tiles_root) + 1
+                            n_cols = int(num_tiles_root)
+                            # int rounds down
+                            num_tiles = int(num_tiles_root + 1) * int(num_tiles_root)
 
-                show_image(primary_cam_img)
+                        img_table = np.zeros((
+                            num_tiles, tile_shape[0],
+                            tile_shape[1], tile_shape[2])).astype(np.uint8)
+
+                        img_table[0, :, :, :] = primary_cam_img
+
+                        for cam_idx, img in self.haz_imgs.items():
+                            img_table[cam_idx, :, :, :] = img
+
+                        # don't even know how this works
+                        # https://stackoverflow.com/questions/50669984/python-numpy-how-to-reshape-this-list-of-arrays-images-into-a-collage
+                        img_table = img_table.reshape(n_rows, n_cols, tile_shape[0], tile_shape[1], tile_shape[2]) \
+                            .swapaxes(1, 2).reshape(n_rows*tile_shape[0], tile_shape[1]*n_cols, tile_shape[2])
+                    else:
+                        for cam_idx, img in self.haz_imgs.items():
+                            primary_cam_img = np.vstack((primary_cam_img, img))
+
+                    display_img = img_table
+                else:
+                    display_img = primary_cam_img
+
+                show_image(display_img)
 
         except Exception as e:
             print('Crashed in show images:', e)
