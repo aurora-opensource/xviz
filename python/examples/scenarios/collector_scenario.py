@@ -74,7 +74,8 @@ class CollectorScenario:
         self.control_signal = None
         self.sync_params = None
         self.haz_imgs = dict()
-        self.num_haz_cams = collector_config['num_haz_cams']  # TODO: make this a function of machine type
+        self.num_haz_cams = 8 if 'DOT' in collector_config['MACHINE_TYPE'] \
+            else 4 if '8R' in collector_config['MACHINE_TYPE'] else 0
         self.show_haz_cams = collector_config['show_haz_cams']
         self.all_imgs_equal_size = collector_config['all_imgs_equal_size']
 
