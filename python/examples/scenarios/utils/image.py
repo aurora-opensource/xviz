@@ -1,3 +1,4 @@
+import math
 import cv2
 import numpy as np
 
@@ -8,12 +9,11 @@ def extract_image(img_bytes):
     return decimg
 
 
-def show_image(image, final_height=600):
+def show_image(image, destination_height=600):
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     # image = cv2.resize(image, (0, 0), fx=.5, fy=.5)  # scale by factor
-    # preserve aspect ratio
-    final_width = int(image.shape[1] / image.shape[0] * final_height)
-    image = cv2.resize(image, (final_width, final_height))
+    image = resize_img_preserve_aspect_ratio(
+        image, destination_height=destination_height)
     cv2.imshow('collector-scenario', image)
     cv2.moveWindow('collector-scenario', 0, 0)
     cv2.waitKey(1)
@@ -44,3 +44,70 @@ def draw_cam_targets_on_image(image, camera_output):
                     fontScale, box_color, 2)
 
     return image
+
+
+def get_table_rows_cols(num_tiles):
+    num_tiles_root = math.sqrt(num_tiles)
+    n_rows, n_cols = int(num_tiles_root) \
+        if num_tiles_root.is_integer() \
+        else math.ceil(num_tiles_root) + 1, math.ceil(num_tiles_root)
+    return n_rows, n_cols
+
+
+def reshape_stacked_tiles_into_table(stacked_tiles, n_rows,
+                                     n_cols, tile_h, tile_w, tile_d):
+    # don't even know how this works
+    # https://stackoverflow.com/questions/50669984/python-numpy-how-to-reshape-this-list-of-arrays-images-into-a-collage
+    return stacked_tiles.reshape(
+        n_rows, n_cols, tile_h, tile_w, tile_d) \
+        .swapaxes(1, 2) \
+        .reshape(n_rows * tile_h, tile_w * n_cols, tile_d)
+
+
+def resize_img_preserve_aspect_ratio(img, destination_height=None,
+                                     destination_width=None):
+    if bool(destination_height) ^ bool(destination_width):
+        if destination_height:
+            destination_width = int(img.shape[1] / img.shape[0]
+                                    * destination_height)
+        else:
+            destination_height = int(img.shape[0] / img.shape[1]
+                                     * destination_width)
+        return cv2.resize(img, (destination_width, destination_height))
+
+    raise ValueError(
+        "only one of the destination dimensions should be specififed")
+
+
+def make_image_collage(primary_img, haz_imgs, all_imgs_equal_size, num_haz_cams):
+    tile_h, tile_w, tile_d = primary_img.shape
+
+    if all_imgs_equal_size:
+       n_rows, n_cols = get_table_rows_cols(num_haz_cams + 1)
+       img_collage = np.zeros((
+           n_rows * n_cols, tile_h, tile_w, tile_d)).astype(np.uint8)
+       img_collage[0, ...] = primary_img
+
+       for cam_idx, img in haz_imgs.items():
+           img_collage[cam_idx, ...] = img
+
+       img_collage = reshape_stacked_tiles_into_table(
+           img_collage, n_rows, n_cols, tile_h, tile_w, tile_d)
+
+    else:
+        n_rows, n_cols = get_table_rows_cols(num_haz_cams)
+        img_collage = np.zeros((
+            n_rows * n_cols, tile_h, tile_w, tile_d)).astype(np.uint8)
+
+        for cam_idx, img in haz_imgs.items():
+            img_collage[cam_idx-1, ...] = img
+
+        img_collage = reshape_stacked_tiles_into_table(
+            img_collage, n_rows, n_cols, tile_h, tile_w, tile_d)
+
+        img_collage = resize_img_preserve_aspect_ratio(
+            img_collage, destination_width=tile_w)
+
+        img_collage = np.vstack((primary_img, img_collage))
+
+    return img_collage
