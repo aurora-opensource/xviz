@@ -46,7 +46,22 @@ def draw_cam_targets_on_image(image, camera_output):
 
 
 def get_table_rows_cols(num_tiles):
-    n_rows = n_cols = math.ceil(math.sqrt(num_tiles))
+    num_tiles_root = math.sqrt(num_tiles)
+    if num_tiles_root.is_integer():
+        # perfect square table
+        n_rows = n_cols = int(num_tiles_root)
+    else:
+        # find factors of num_tiles, if a pair of factors are adjacent numbers
+        # then use the pair for the dimensions, otherwise round up to the next
+        # perfect square and use the root to make a square table
+        n_rows = n_cols = math.ceil(num_tiles_root)
+        for i in range(2, math.ceil(num_tiles_root)):
+            if num_tiles % i == 0:
+                pair = num_tiles // i
+                if pair == i + 1:
+                    n_rows = pair
+                    n_cols = i
+                    break
     return n_rows, n_cols
 
 
@@ -88,7 +103,7 @@ def make_image_collage(primary_img, haz_imgs, all_imgs_equal_size, num_haz_cams)
 
         for cam_idx, img in haz_imgs.items():
             if cam_idx >= n_rows * n_cols:
-                print('camer index is greater than expected, skipping:',
+                print('camera index is greater than expected, skipping:',
                       cam_idx)
                 continue
             img_collage[cam_idx, ...] = img
@@ -103,7 +118,7 @@ def make_image_collage(primary_img, haz_imgs, all_imgs_equal_size, num_haz_cams)
 
         for cam_idx, img in haz_imgs.items():
             if cam_idx > n_rows * n_cols:
-                print('camer index is greater than expected, skipping:',
+                print('camera index is greater than expected, skipping:',
                       cam_idx)
                 continue
             img_collage[cam_idx-1, ...] = img
