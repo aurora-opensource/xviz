@@ -203,9 +203,10 @@ class CollectorScenario:
                     sync_status, control_signal, sync_params \
                     = extract_collector_output_slim(collector_output)
             else:
-                # very old proto file definition, this will break things
+                print('collector file is using old proto definition')
                 img, camera_output, radar_output, tracking_output, \
                     machine_state = extract_collector_output(collector_output)
+                camera_data = {0: (img, camera_output)}
                 field_definition = None
                 planned_path = None
                 sync_status = None
@@ -242,7 +243,7 @@ class CollectorScenario:
             else:
                 builder.pose("/vehicle_pose") \
                     .position(0., 0., 0.) \
-                    .orientation( 0., 0., 0.) \
+                    .orientation(0., 0., 0.) \
                     .timestamp(timestamp)
 
             if self.mqtt_enabled:
