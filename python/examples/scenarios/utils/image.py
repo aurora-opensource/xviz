@@ -83,16 +83,16 @@ def make_image_collage(primary_img, haz_imgs, all_imgs_equal_size, num_haz_cams)
     tile_h, tile_w, tile_d = primary_img.shape
 
     if all_imgs_equal_size:
-       n_rows, n_cols = get_table_rows_cols(num_haz_cams + 1)
-       img_collage = np.zeros((
-           n_rows * n_cols, tile_h, tile_w, tile_d)).astype(np.uint8)
-       img_collage[0, ...] = primary_img
+        n_rows, n_cols = get_table_rows_cols(num_haz_cams + 1)
+        img_collage = np.zeros((
+            n_rows * n_cols, tile_h, tile_w, tile_d)).astype(np.uint8)
+        img_collage[0, ...] = primary_img
 
-       for cam_idx, img in haz_imgs.items():
-           img_collage[cam_idx, ...] = img
+        for cam_idx, img in haz_imgs.items():
+            img_collage[cam_idx, ...] = img
 
-       img_collage = reshape_stacked_tiles_into_table(
-           img_collage, n_rows, n_cols, tile_h, tile_w, tile_d)
+        img_collage = reshape_stacked_tiles_into_table(
+            img_collage, n_rows, n_cols, tile_h, tile_w, tile_d)
 
     else:
         n_rows, n_cols = get_table_rows_cols(num_haz_cams)
