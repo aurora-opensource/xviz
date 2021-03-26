@@ -12,8 +12,7 @@ def extract_image(img_bytes):
 def show_image(image, destination_height=600):
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     # image = cv2.resize(image, (0, 0), fx=.5, fy=.5)  # scale by factor
-    image = resize_img_preserve_aspect_ratio(
-        image, destination_height=destination_height)
+    image = resize_image(image, destination_height=destination_height)
     cv2.imshow('collector-scenario', image)
     cv2.moveWindow('collector-scenario', 0, 0)
     cv2.waitKey(1)
@@ -64,8 +63,7 @@ def reshape_stacked_tiles_into_table(stacked_tiles, n_rows,
         .reshape(n_rows * tile_h, tile_w * n_cols, tile_d)
 
 
-def resize_img_preserve_aspect_ratio(img, destination_height=None,
-                                     destination_width=None):
+def resize_image(img, destination_height=None, destination_width=None):
     if bool(destination_height) ^ bool(destination_width):
         if destination_height:
             destination_width = int(img.shape[1] / img.shape[0]
@@ -73,10 +71,13 @@ def resize_img_preserve_aspect_ratio(img, destination_height=None,
         else:
             destination_height = int(img.shape[0] / img.shape[1]
                                      * destination_width)
-        return cv2.resize(img, (destination_width, destination_height))
-
-    raise ValueError(
-        "only one of the destination dimensions should be specififed")
+    elif destination_height and destination_width:
+        print(('both destination dimensions specified, preserving aspect '
+               'ratio is not guaranteed'))
+    else:
+        print('no destination dimensions specified, leaving original shape')
+        destination_height, destination_width = img.shape[:2]
+    return cv2.resize(img, (destination_width, destination_height))
 
 
 def make_image_collage(primary_img, haz_imgs, all_imgs_equal_size, num_haz_cams):
@@ -105,8 +106,7 @@ def make_image_collage(primary_img, haz_imgs, all_imgs_equal_size, num_haz_cams)
         img_collage = reshape_stacked_tiles_into_table(
             img_collage, n_rows, n_cols, tile_h, tile_w, tile_d)
 
-        img_collage = resize_img_preserve_aspect_ratio(
-            img_collage, destination_width=tile_w)
+        img_collage = resize_image(img_collage, destination_width=tile_w)
 
         img_collage = np.vstack((primary_img, img_collage))
 
