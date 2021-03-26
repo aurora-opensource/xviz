@@ -3,6 +3,5 @@ collector_output_file: /home/raven.ravenind.net/r103943/work/collector_outputs/a
 extract_directory: /home/raven.ravenind.net/r103943/work/collector_outputs/extracted
 mqtt_enabled: False
 MACHINE_TYPE: 2020_DOT_AU1_NARROW
-num_haz_cams: 8
 show_haz_cams: True
 all_imgs_equal_size: True
