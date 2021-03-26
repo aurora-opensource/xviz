@@ -46,16 +46,13 @@ def draw_cam_targets_on_image(image, camera_output):
 
 
 def get_table_rows_cols(num_tiles):
-    num_tiles_root = math.sqrt(num_tiles)
-    n_rows, n_cols = int(num_tiles_root) \
-        if num_tiles_root.is_integer() \
-        else math.ceil(num_tiles_root) + 1, math.ceil(num_tiles_root)
+    n_rows = n_cols = math.ceil(math.sqrt(num_tiles))
     return n_rows, n_cols
 
 
 def reshape_stacked_tiles_into_table(stacked_tiles, n_rows,
                                      n_cols, tile_h, tile_w, tile_d):
-    # don't even know how this works
+    # pure magic
     # https://stackoverflow.com/questions/50669984/python-numpy-how-to-reshape-this-list-of-arrays-images-into-a-collage
     return stacked_tiles.reshape(
         n_rows, n_cols, tile_h, tile_w, tile_d) \
@@ -90,6 +87,10 @@ def make_image_collage(primary_img, haz_imgs, all_imgs_equal_size, num_haz_cams)
         img_collage[0, ...] = primary_img
 
         for cam_idx, img in haz_imgs.items():
+            if cam_idx >= n_rows * n_cols:
+                print('camer index is greater than expected, skipping:',
+                      cam_idx)
+                continue
             img_collage[cam_idx, ...] = img
 
         img_collage = reshape_stacked_tiles_into_table(
@@ -101,6 +102,10 @@ def make_image_collage(primary_img, haz_imgs, all_imgs_equal_size, num_haz_cams)
             n_rows * n_cols, tile_h, tile_w, tile_d)).astype(np.uint8)
 
         for cam_idx, img in haz_imgs.items():
+            if cam_idx > n_rows * n_cols:
+                print('camer index is greater than expected, skipping:',
+                      cam_idx)
+                continue
             img_collage[cam_idx-1, ...] = img
 
         img_collage = reshape_stacked_tiles_into_table(
