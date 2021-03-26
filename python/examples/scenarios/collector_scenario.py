@@ -15,7 +15,8 @@ from scenarios.utils.filesystem import get_collector_instances, load_config, \
 from scenarios.utils.gis import transform_combine_to_local, get_combine_region, \
     get_auger_region, utm_array_to_local, lonlat_array_to_local, \
     lonlat_to_utm, get_wheel_angle
-from scenarios.utils.image import draw_cam_targets_on_image, show_image
+from scenarios.utils.image import draw_cam_targets_on_image, show_image, \
+    make_image_collage
 from scenarios.utils.read_protobufs import deserialize_collector_output, \
     extract_collector_output, extract_collector_output_slim
 
@@ -308,84 +309,29 @@ class CollectorScenario:
         try:
             if camera_data:
                 if 0 not in camera_data:
-                    print('missing primary camera image in show_images')
+                    print('missing primary camera data in show_images')
                     return
 
-                primary_cam_img = camera_data[0][0]
-
-                for cam_idx, (img, cam_output) in camera_data.items():
-                    if cam_output is not None:
-                        img = draw_cam_targets_on_image(img, cam_output)
-                        if cam_idx == 0:
-                            # TODO: draw camera targets for all cameras
-                            self._draw_camera_targets(cam_output, builder)
-
-                    if cam_idx == 0:
-                        primary_cam_img = img
-                    else:
-                        self.haz_imgs[cam_idx] = img
+                primary_img, primary_output = camera_data[0]
+                primary_img = draw_cam_targets_on_image(primary_img,
+                                                        primary_output)
+                self._draw_camera_targets(primary_output, builder)
 
                 if self.show_haz_cams:
-                    if self.all_imgs_equal_size:
-                        tile_h, tile_w, tile_d = primary_cam_img.shape
-                        num_tiles_root = math.sqrt(self.num_haz_cams + 1)
+                    for cam_idx, (img, cam_output) in camera_data.items():
+                        if cam_idx == 0:  # already drew targets on primary img
+                            continue
+                        if cam_output is not None:
+                            self.haz_imgs[cam_idx] = draw_cam_targets_on_image(
+                                img, cam_output)
+                            # TODO: draw camera targets in the xviz world for
+                            # hazard cameras too
 
-                        if num_tiles_root.is_integer():
-                            n_rows = n_cols = int(num_tiles_root)
-                        else:
-                            n_rows = math.ceil(num_tiles_root) + 1
-                            n_cols = math.ceil(num_tiles_root)
-
-                        img_table = np.zeros((n_rows * n_cols, tile_h, tile_w,
-                                              tile_d)).astype(np.uint8)
-
-                        img_table[0, :, :, :] = primary_cam_img
-
-                        for cam_idx, img in self.haz_imgs.items():
-                            img_table[cam_idx, :, :, :] = img
-
-                        # don't even know how this works
-                        # https://stackoverflow.com/questions/50669984/python-numpy-how-to-reshape-this-list-of-arrays-images-into-a-collage
-                        img_table = img_table.reshape(
-                            n_rows, n_cols, tile_h, tile_w, tile_d) \
-                            .swapaxes(1, 2) \
-                            .reshape(n_rows * tile_h, tile_w * n_cols, tile_d)
-                    else:
-                        tile_h, tile_w, tile_d = primary_cam_img.shape
-                        num_tiles_root = math.sqrt(self.num_haz_cams)
-
-                        if num_tiles_root.is_integer():
-                            n_rows = n_cols = int(num_tiles_root)
-                        else:
-                            n_rows = math.ceil(num_tiles_root) + 1
-                            n_cols = math.ceil(num_tiles_root)
-
-                        img_table = np.zeros((n_rows * n_cols, tile_h, tile_w,
-                                              tile_d)).astype(np.uint8)
-
-                        for cam_idx, img in self.haz_imgs.items():
-                            img_table[cam_idx-1, :, :, :] = img
-
-                        # don't even know how this works
-                        # https://stackoverflow.com/questions/50669984/python-numpy-how-to-reshape-this-list-of-arrays-images-into-a-collage
-                        img_table = img_table.reshape(
-                            n_rows, n_cols, tile_h, tile_w, tile_d) \
-                            .swapaxes(1, 2) \
-                            .reshape(n_rows * tile_h, tile_w * n_cols, tile_d)
-
-                        final_width = primary_cam_img.shape[1]
-                        final_height = int(primary_cam_img.shape[0] /
-                                           primary_cam_img.shape[1] *
-                                           final_width)
-                        img_table = cv2.resize(img_table,
-                                               (final_width,
-                                                final_height))
-
-                        img_table = np.vstack((primary_cam_img, img_table))
-
-                    display_img = img_table
+                    display_img = make_image_collage(
+                        primary_img, self.haz_imgs,
+                        self.all_imgs_equal_size, self.num_haz_cams)
                 else:
-                    display_img = primary_cam_img
+                    display_img = primary_img
 
                 show_image(display_img)
 
