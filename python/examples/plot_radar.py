@@ -6,10 +6,11 @@ import numpy as np
 from google.protobuf.json_format import MessageToDict
 from protobuf_APIs import radar_pb2
 from scenarios.safety_subsystems.radar_filter import RadarFilter
-from scenarios.utils.filesystem import get_collector_instances, load_config
+from scenarios.utils.filesystem import get_collector_instances, load_config, \
+    load_global_config
 from scenarios.utils.gis import polar_to_cartesian, euclidean_distance
-from scenarios.utils.read_protobufs import deserialize_collector_output,\
-                                            extract_collector_output, extract_collector_output_slim
+from scenarios.utils.read_protobufs import deserialize_collector_output, \
+    extract_collector_output, extract_collector_output_slim
 
 
 def get_detected_target_ids(targets, signal_type):
@@ -64,9 +65,10 @@ def get_targets(collector_instances, radar_filter,
 
         collector_output, is_slim_output = deserialize_collector_output(collector_output)
         if is_slim_output:
-            _, _, radar_output, _, _, _, _, _, _, _ = extract_collector_output_slim(collector_output)
+            _, radar_output, _, _, _, _, _, _, _ = extract_collector_output_slim(
+                collector_output, get_camera_data=False)
         else:
-            _, _, radar_output, _, _ = extract_collector_output(collector_output)
+            _, radar_output, _, _ = extract_collector_output(collector_output)
 
         if radar_output is None:
             continue
@@ -284,12 +286,11 @@ def main(selected_tgt_ids, selected_timespan):
     extract_directory = collector_config['extract_directory']
     collector_instances = get_collector_instances(collector_output_file, extract_directory)
 
-    configfile = Path(__file__).resolve().parents[2] / 'Global-Configs' / 'Tractors' / 'John-Deere' / '8RIVT_WHEEL.yaml'
-    global_config = load_config(str(configfile))
+    global_config = load_global_config(collector_config['MACHINE_TYPE'])
     radar_safety_config = global_config['safety']['radar']
-    radar_safety_config['d_bpower_threshold'] = -8.0
-    radar_safety_config['phi_sdv_threshold'] = 0.01
-    radar_safety_config['confidence_threshold'] = 0.9
+    # radar_safety_config['d_bpower_threshold'] = -8.0
+    # radar_safety_config['phi_sdv_threshold'] = 0.01
+    # radar_safety_config['confidence_threshold'] = 0.9
     
     radar_filter = RadarFilter(radar_safety_config)
     sync_status = dict(inSync=False)
