@@ -35,15 +35,16 @@ import {XVIZ_FORMAT} from './constants';
 // - arraybuffer which is a JSON string
 // - JSON object
 // - arraybuffer which is a GLB
+// opts.messageType is the XVIZ Envelope 'type', i.e. one of ('xviz/state_update', 'xviz/metadata', etc.)
 export class XVIZData {
-  constructor(data) {
+  constructor(data, messageType) {
     this._data = data;
 
     // _dataFormat is an XVIZ_FORMAT for 'data'
     this._dataFormat = undefined;
 
     // _xvizType is the XVIZ Envelope 'type'
-    this._xvizType = undefined;
+    this._xvizType = messageType && { type: messageType };
 
     // _message is an XVIZMessage and has been fully parsed
     this._message = undefined;

@@ -164,8 +164,8 @@ export class WorkerFarm {
     }
   }
 
-  process(data, onResult, onError) {
-    this.queue.push({data, onResult, onError});
+  process(data, onResult, onError, opts = {}) {
+    this.queue.push({data, onResult, onError, opts});
     this.next();
   }
 }

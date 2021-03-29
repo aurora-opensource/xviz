@@ -28,6 +28,7 @@ import parseTimesliceDataV2 from './parse-timeslice-data-v2';
 import {getXVIZConfig} from '../config/xviz-config';
 
 // Post processes a stream message to make it easy to use for JavaScript applications
+// opts.messageType is the XVIZ Envelope 'type', i.e. one of ('xviz/state_update', 'xviz/metadata', etc.)
 export function parseXVIZMessageSync(message, onResult, onError, opts) {
   // TODO(twojtasz): better message dispatching
   // here, not all arraybuffer may be image (packed point cloud)
@@ -38,14 +39,14 @@ export function parseXVIZMessageSync(message, onResult, onError, opts) {
   }
 
   try {
-    const xvizData = new XVIZData(message);
+    const xvizData = new XVIZData(message, opts.messageType);
     const xvizMsg = xvizData.message();
 
     // Non-xviz messages will return null
     if (xvizMsg) {
       const data = xvizMsg.data;
 
-      const v2Type = xvizMsg.type || undefined;
+      const v2Type = opts.messageType || xvizMsg.type || undefined;
 
       const result = parseXVIZData(data, {...opts, v2Type});
 

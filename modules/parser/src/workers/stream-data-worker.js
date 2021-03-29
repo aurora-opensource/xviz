@@ -70,7 +70,7 @@ export default config => self => {
     if (e.data && e.data.xvizConfig) {
       setXVIZConfig(e.data.xvizConfig);
     } else if (e.data) {
-      parseXVIZMessageSync(e.data, onResult, onError);
+      parseXVIZMessageSync(e.data, onResult, onError, e.opts);
     }
   };
 };
