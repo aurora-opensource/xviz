@@ -136,6 +136,8 @@ def get_targets(collector_instances, radar_filter,
                 targets[tgt_id]['filtered']['x'].append(curr_x)
                 targets[tgt_id]['filtered']['y'].append(curr_y)
                 targets[tgt_id]['filtered']['step'].append(step)
+            else:
+                append_nan(targets[tgt_id], 'filtered')
                 targets[tgt_id]['filtered']['x'].append(np.nan)
                 targets[tgt_id]['filtered']['y'].append(np.nan)
                 targets[tgt_id]['filtered']['step'].append(np.nan)
