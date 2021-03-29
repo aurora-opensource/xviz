@@ -115,12 +115,17 @@ def get_auger_region(combine_x, combine_y, combine_theta,
     half_combine_width = combine_width / 2.0
     half_auger_width = auger_width / 2.0
 
-    auger_pivot_x, auger_pivot_y = get_relative_xy(combine_x, combine_y, gps_to_auger, half_combine_width, combine_theta)
+    auger_pivot_x, auger_pivot_y = get_relative_xy(
+        combine_x, combine_y, gps_to_auger, half_combine_width, combine_theta)
 
-    front_left = get_relative_xy(auger_pivot_x, auger_pivot_y, half_auger_width, auger_length, combine_theta)
-    front_right = get_relative_xy(auger_pivot_x, auger_pivot_y, half_auger_width, 0, combine_theta)
-    back_left = get_relative_xy(auger_pivot_x, auger_pivot_y, -half_auger_width, auger_length, combine_theta)
-    back_right = get_relative_xy(auger_pivot_x, auger_pivot_y, -half_auger_width, 0., combine_theta)
+    front_left = get_relative_xy(
+        auger_pivot_x, auger_pivot_y, half_auger_width, auger_length, combine_theta)
+    front_right = get_relative_xy(
+        auger_pivot_x, auger_pivot_y, half_auger_width, 0, combine_theta)
+    back_left = get_relative_xy(
+        auger_pivot_x, auger_pivot_y, -half_auger_width, auger_length, combine_theta)
+    back_right = get_relative_xy(
+        auger_pivot_x, auger_pivot_y, -half_auger_width, 0., combine_theta)
 
     return np.row_stack((
         front_left,
