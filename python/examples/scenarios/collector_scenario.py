@@ -319,7 +319,8 @@ class CollectorScenario:
 
                 if self.show_haz_cams:
                     for cam_idx, (img, cam_output) in camera_data.items():
-                        if cam_idx == 0:  # already drew targets on primary img
+                        if cam_idx == 0:
+                            # already drew targets on primary img
                             continue
 
                         if cam_output is not None:
