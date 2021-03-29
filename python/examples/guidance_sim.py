@@ -2,14 +2,17 @@ import sys
 import time
 import math
 from pathlib import Path
+
 import matplotlib.pyplot as plt
 import numpy as np
+
 from scenarios.utils.filesystem import get_collector_instances, load_config, \
     load_global_config
 from scenarios.utils.read_protobufs import deserialize_collector_output, \
     extract_collector_output_slim
 from scenarios.utils.gis import lonlat_to_utm, get_wheel_angle
 
+from smarthp_utilities.config_utils import add_control_limits_to_guidance_config
 sys.path.append(str(Path(__file__).parents[2] / 'SmartHP-v2'))
 from smarthp.gnc.guidance import Guidance, CTEGuidanceTask
 
@@ -24,9 +27,9 @@ plt.rcParams['axes.labelcolor'] = 'white'
 plt.rcParams['axes.titlecolor'] = 'white'
 plt.rcParams['xtick.color'] = 'white'
 plt.rcParams['ytick.color'] = 'white'
-# plt.rcParams['legend.facecolor'] = 'white'
 plt.rcParams['text.color'] = 'white'
 plt.rcParams["figure.autolayout"] = True
+# plt.rcParams['legend.facecolor'] = 'white'
 
 
 def get_planned_path(collector_instances):
@@ -60,9 +63,10 @@ def get_next_waypoint_index(current_pos, waypoints):
     current_pos = np.array(current_pos)
     waypoints = np.array(waypoints)
     distances = np.linalg.norm(waypoints - current_pos, ord=2, axis=1)
-    closest_wp_idx = distances.argmin()
+    closest_wp_idx = max(distances.argmin(), 1)
     return closest_wp_idx \
-        if distances[closest_wp_idx-1] < distances[closest_wp_idx+1] \
+        if closest_wp_idx == len(distances) - 1 \
+        or distances[closest_wp_idx-1] < distances[closest_wp_idx+1] \
         else closest_wp_idx + 1
 
 
@@ -70,7 +74,7 @@ def set_next_waypoint(current_pos, waypoints, guidance):
     next_wp_idx = get_next_waypoint_index(current_pos, waypoints)
     guidance.task.next_wp = guidance.task._waypoints[0]
     guidance.task._wpctr = next(guidance.task._wpctr_iter)
-    for i in range(next_wp_idx):
+    for _ in range(next_wp_idx):
         guidance.task.update_waypoint()
     guidance.task.initialized = True
 
@@ -120,6 +124,8 @@ def main():
                                                   extract_directory)
 
     global_config = load_global_config(collector_config['MACHINE_TYPE'])
+    # global_config['guidance']['wheel_angle_rate_limit'] = 0.52
+    add_control_limits_to_guidance_config(global_config)
 
     planned_path = get_planned_path(collector_instances)
     waypoints = list(map(tuple, planned_path))
