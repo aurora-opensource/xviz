@@ -57,8 +57,7 @@ def establish_target_key(tgt_id, targets):
         make_keys(targets[tgt_id], signal_type='filtered')
 
 
-def get_targets(collector_instances, radar_filter,
-                selected_tgt_ids, sync_status):
+def get_targets(collector_instances, radar_filter, selected_tgt_ids, sync_status):
     targets = {}
 
     for collector_output in collector_instances:
@@ -68,7 +67,7 @@ def get_targets(collector_instances, radar_filter,
             _, radar_output, _, _, _, _, _, _, _ = extract_collector_output_slim(
                 collector_output, get_camera_data=False)
         else:
-            _, radar_output, _, _ = extract_collector_output(collector_output)
+            _, _, radar_output, _, _ = extract_collector_output(collector_output)
 
         if radar_output is None:
             continue
@@ -81,12 +80,12 @@ def get_targets(collector_instances, radar_filter,
 
             tgt_id = target['targetId']
 
-            if selected_target_ids is not None:
-                if tgt_id not in selected_target_ids:
+            if selected_tgt_ids is not None:
+                if tgt_id not in selected_tgt_ids:
                     continue
 
             establish_target_key(tgt_id, targets)
-            
+
             targets[tgt_id]['timestamp'].append(float(radar_output['timestamp']))
 
             if target['consecutive'] < 1:
@@ -100,7 +99,7 @@ def get_targets(collector_instances, radar_filter,
                 curr_x, curr_y = polar_to_cartesian(target['phi'], target['dr'])
                 targets[tgt_id]['raw']['x'].append(curr_x)
                 targets[tgt_id]['raw']['y'].append(curr_y)
-            
+
             if len(targets[tgt_id]['raw']['x']) < 2:
                 targets[tgt_id]['raw']['step'].append(np.nan)
                 step = np.nan
@@ -110,16 +109,15 @@ def get_targets(collector_instances, radar_filter,
                 else:
                     prev_x, prev_y = polar_to_cartesian(
                         targets[tgt_id]['raw']['phi'][-2],
-                        targets[tgt_id]['raw']['dr'][-2]
-                    )
-                
+                        targets[tgt_id]['raw']['dr'][-2])
+
                 step = euclidean_distance(prev_x, prev_y, curr_x, curr_y)
 
                 if int(prev_x) == 0 and int(curr_x) == 0:
                     targets[tgt_id]['raw']['step'].append(np.nan)
                 else:
                     targets[tgt_id]['raw']['step'].append(step)
-            
+
             duplicate_target = False
             if tgt_id in radar_filter.queues:
                 prev_target = radar_filter.queues[tgt_id].prev_target
@@ -138,7 +136,7 @@ def get_targets(collector_instances, radar_filter,
                 targets[tgt_id]['filtered']['x'].append(np.nan)
                 targets[tgt_id]['filtered']['y'].append(np.nan)
                 targets[tgt_id]['filtered']['step'].append(np.nan)
-        
+
         for not_received_id in radar_filter.target_id_set:
             default_target = MessageToDict(
                 radar_pb2.RadarOutput.Target(), including_default_value_fields=True)
@@ -290,7 +288,7 @@ def main(selected_tgt_ids, selected_timespan):
     # radar_safety_config['d_bpower_threshold'] = -8.0
     # radar_safety_config['phi_sdv_threshold'] = 0.01
     # radar_safety_config['confidence_threshold'] = 0.9
-    
+
     radar_filter = RadarFilter(radar_safety_config)
     sync_status = dict(inSync=False)
     targets = get_targets(collector_instances, radar_filter,
@@ -317,11 +315,11 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Select which target id(s) to plot')
     parser.add_argument('-i', metavar='target id', nargs='*', type=int, help='target id [0:47]')
     parser.add_argument('-t', metavar='time span', nargs='*', type=int, help='timespan [0:T]')
-    selected_target_ids = parser.parse_args().i
+    selected_tgt_ids = parser.parse_args().i
     selected_timespan = parser.parse_args().t
 
     if selected_timespan is not None:
         if len(selected_timespan) != 2:
             print('selected invalid timespand: must give start and end times')
 
-    main(selected_target_ids, selected_timespan)
+    main(selected_tgt_ids, selected_timespan)
