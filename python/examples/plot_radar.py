@@ -356,8 +356,8 @@ if __name__ == '__main__':
         if len(tgt_id_tspan_pairs) % 3 != 0:
             print('invalid -c input: each target id should be accompanied by start and end times')
         selected_tgt_ids = set(tgt_id_tspan_pairs[::3])
-        for i in range(0,flen(tgt_id_tspan_pairs), 3):
-            tgt_id_tspans[i].append(tgt_id_tspan_pairs[i+1:i+3])
+        for i, tgt_id in enumerate(tgt_id_tspan_pairs[::3]):
+            tgt_id_tspans[tgt_id].append(tgt_id_tspan_pairs[i*3+1:i*3+3])
 
     print(selected_tgt_ids)
     print(tgt_id_tspan_pairs)
