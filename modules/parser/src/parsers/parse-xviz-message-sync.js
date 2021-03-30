@@ -30,7 +30,7 @@ import {getXVIZConfig} from '../config/xviz-config';
 // Post processes a stream message to make it easy to use for JavaScript applications
 // opts.messageType is the XVIZ Envelope 'type', i.e. one of ('xviz/state_update', 'xviz/metadata', etc.)
 export function parseXVIZMessageSync(message, onResult, onError, opts) {
-  console.log("parseXVIZMessageSync");
+  console.log('parseXVIZMessageSync');
   // TODO(twojtasz): better message dispatching
   // here, not all arraybuffer may be image (packed point cloud)
   // TODO(jlisee): Node.js support for blobs for better unit testing
@@ -39,10 +39,10 @@ export function parseXVIZMessageSync(message, onResult, onError, opts) {
     return;
   }
 
-  const { messageType } = opts;
+  const {messageType} = opts;
 
   try {
-    const xvizData = new XVIZData(message, { messageType });
+    const xvizData = new XVIZData(message, {messageType});
     const xvizMsg = xvizData.message();
 
     // Non-xviz messages will return null

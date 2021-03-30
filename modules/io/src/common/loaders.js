@@ -288,9 +288,9 @@ export function parsePBEXVIZ(arrayBuffer, messageType) {
   let data = arrayBuffer;
   if (!xviz.type) {
     const strippedBuffer = new Uint8Array(arrayBuffer, 4);
-    envelope = XVIZ_PROTOBUF_MESSAGE.Envelope.decode(strippedBuffer);
+    const envelope = XVIZ_PROTOBUF_MESSAGE.Envelope.decode(strippedBuffer);
     xviz.type = envelope.type;
-    data = envelope.data.value
+    data = envelope.data.value;
   }
 
   switch (xviz.type) {
@@ -304,7 +304,7 @@ export function parsePBEXVIZ(arrayBuffer, messageType) {
       xviz.data = postProcessProtobuf(tmpState);
       break;
     default:
-      throw new Error(`Unknown Message type ${envelope.type}`);
+      throw new Error(`Unknown Message type ${ xviz.type}`);
   }
 
   return xviz;

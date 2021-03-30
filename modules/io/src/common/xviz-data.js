@@ -38,14 +38,14 @@ import {XVIZ_FORMAT} from './constants';
 // opts.messageType is the XVIZ Envelope 'type', i.e. one of ('xviz/state_update', 'xviz/metadata', etc.)
 export class XVIZData {
   constructor(data, opts = {}) {
-    const { messageType, messageFormat } = opts;
+    const {messageType, messageFormat} = opts;
     this._data = data;
 
     // _dataFormat is an XVIZ_FORMAT for 'data'
     this._dataFormat = messageFormat;
 
     // _xvizType is the XVIZ Envelope 'type'
-    this._xvizType = messageType && { type: messageType };
+    this._xvizType = messageType && {type: messageType};
 
     // _message is an XVIZMessage and has been fully parsed
     this._message = undefined;
