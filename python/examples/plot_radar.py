@@ -97,10 +97,7 @@ def get_targets(collector_instances, radar_filter,
             else:
                 append_values(targets[tgt_id], 'raw', target)
 
-                curr_x, curr_y = polar_to_cartesian(
-                    target['phi'],
-                    target['dr']
-                )
+                curr_x, curr_y = polar_to_cartesian(target['phi'], target['dr'])
                 targets[tgt_id]['raw']['x'].append(curr_x)
                 targets[tgt_id]['raw']['y'].append(curr_y)
             
