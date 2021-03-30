@@ -1,6 +1,6 @@
 import argparse
 from pathlib import Path
-from collections import deque
+from collections import deque, defaultdict
 import matplotlib.pyplot as plt
 import numpy as np
 from google.protobuf.json_format import MessageToDict
@@ -57,7 +57,7 @@ def establish_target_key(tgt_id, targets):
         make_keys(targets[tgt_id], signal_type='filtered')
 
 
-def get_targets(collector_instances, radar_filter, selected_tgt_ids, sync_status):
+def get_targets(collector_instances, radar_filter, sync_status, selected_tgt_ids):
     targets = {}
 
     for collector_output in collector_instances:
@@ -192,7 +192,7 @@ def prepare_tracking_plot(signal_type):
     return ax
 
 
-def smooth(signal, N=12):
+def _smooth(signal, N=12):
     smooth_signal = []
     prev_values = deque(maxlen=N)
     for v in signal:
@@ -202,11 +202,12 @@ def smooth(signal, N=12):
             prev_values.clear()
         else:
             smooth_signal.append(np.mean(prev_values))
-    
+
     return smooth_signal
 
 
-def plot_metadata(targets, detected_target_ids, signal_type, radar_filter, selected_timespan):
+def plot_metadata(targets, detected_target_ids, signal_type, radar_filter,
+                  selected_timespan, tgt_id_tspans):
     ax = prepare_metadata_plot()
 
     cc_idx = 0
@@ -216,17 +217,24 @@ def plot_metadata(targets, detected_target_ids, signal_type, radar_filter, selec
 
         t = np.array(target['timestamp']) - target['timestamp'][0]
 
-        if selected_timespan is not None:
-            over_start_time = t > selected_timespan[0]
-            before_end_time = t < selected_timespan[1]
-            timespan_idx = np.nonzero(over_start_time & before_end_time)[0]
-            t = t[timespan_idx]
-            target[signal_type]['phi'] = np.array(target[signal_type]['phi'])[timespan_idx]
-            target[signal_type]['dr'] = np.array(target[signal_type]['dr'])[timespan_idx]
-            target[signal_type]['phiSdv'] = np.array(target[signal_type]['phiSdv'])[timespan_idx]
-            target[signal_type]['step'] = np.array(target[signal_type]['step'])[timespan_idx]
-            target[signal_type]['pexist'] = np.array(target[signal_type]['pexist'])[timespan_idx]
-            target[signal_type]['dBpower'] = np.array(target[signal_type]['dBpower'])[timespan_idx]
+        tspan = tgt_id_tspans[tgt_id] if tgt_id_tspans \
+            else [selected_timespan] if selected_timespan is not None \
+            else [(0, t[-1])]
+
+        timespan_idx = []
+        for ts in tspan:
+            over_start_time = t > ts[0]
+            before_end_time = t < ts[1]
+            timespan_idx.extend(np.nonzero(over_start_time & before_end_time)[0])
+
+        t = t[timespan_idx]
+
+        target[signal_type]['phi'] = np.array(target[signal_type]['phi'])[timespan_idx]
+        target[signal_type]['dr'] = np.array(target[signal_type]['dr'])[timespan_idx]
+        target[signal_type]['phiSdv'] = np.array(target[signal_type]['phiSdv'])[timespan_idx]
+        target[signal_type]['step'] = np.array(target[signal_type]['step'])[timespan_idx]
+        target[signal_type]['pexist'] = np.array(target[signal_type]['pexist'])[timespan_idx]
+        target[signal_type]['dBpower'] = np.array(target[signal_type]['dBpower'])[timespan_idx]
 
         point_idx = get_lone_elements_indices(target[signal_type]['phi'])
         step_point_idx = get_lone_elements_indices(target[signal_type]['step'])
@@ -249,7 +257,8 @@ def plot_metadata(targets, detected_target_ids, signal_type, radar_filter, selec
     plt.close()
 
 
-def plot_tracking(targets, detected_target_ids, signal_type, selected_timespan):
+def plot_tracking(targets, detected_target_ids, signal_type,
+                  selected_timespan, tgt_id_tspans):
     ax = prepare_tracking_plot(signal_type)
 
     cc_idx = 0
@@ -257,13 +266,22 @@ def plot_tracking(targets, detected_target_ids, signal_type, selected_timespan):
         if tgt_id not in detected_target_ids:
             continue
 
-        if selected_timespan is not None:
-            t = np.array(target['timestamp']) - target['timestamp'][0]
-            over_start_time = t > selected_timespan[0]
-            before_end_time = t < selected_timespan[1]
-            timespan_idx = np.nonzero(over_start_time & before_end_time)[0]
-            target[signal_type]['y'] = np.array(target[signal_type]['y'])[timespan_idx]
-            target[signal_type]['x'] = np.array(target[signal_type]['x'])[timespan_idx]
+        t = np.array(target['timestamp']) - target['timestamp'][0]
+
+        tspan = tgt_id_tspans[tgt_id] if tgt_id_tspans \
+            else [selected_timespan] if selected_timespan is not None \
+            else [(0, t[-1])]
+
+        timespan_idx = []
+        for ts in tspan:
+            over_start_time = t > ts[0]
+            before_end_time = t < ts[1]
+            timespan_idx.extend(np.nonzero(over_start_time & before_end_time)[0])
+
+        t = t[timespan_idx]
+
+        target[signal_type]['y'] = np.array(target[signal_type]['y'])[timespan_idx]
+        target[signal_type]['x'] = np.array(target[signal_type]['x'])[timespan_idx]
 
         point_idx = get_lone_elements_indices(target[signal_type]['y'])
         plot_line_point_combo(ax, np.negative(target[signal_type]['y']), target[signal_type]['x'], cc_idx, point_idx)
@@ -275,7 +293,7 @@ def plot_tracking(targets, detected_target_ids, signal_type, selected_timespan):
     plt.close()
 
 
-def main(selected_tgt_ids, selected_timespan):
+def main(selected_tgt_ids, selected_timespan, tgt_id_tspans):
     configfile = Path(__file__).parent / 'scenarios' / 'collector-scenario-config.yaml'
     collector_config = load_config(str(configfile))
 
@@ -285,6 +303,8 @@ def main(selected_tgt_ids, selected_timespan):
 
     global_config = load_global_config(collector_config['MACHINE_TYPE'])
     radar_safety_config = global_config['safety']['radar']
+
+    # override thresholds in Global Configs
     # radar_safety_config['d_bpower_threshold'] = -8.0
     # radar_safety_config['phi_sdv_threshold'] = 0.01
     # radar_safety_config['confidence_threshold'] = 0.9
@@ -292,14 +312,19 @@ def main(selected_tgt_ids, selected_timespan):
     radar_filter = RadarFilter(radar_safety_config)
     sync_status = dict(inSync=False)
     targets = get_targets(collector_instances, radar_filter,
-                          selected_tgt_ids, sync_status)
+                          sync_status, selected_tgt_ids)
 
     detected_target_ids = get_detected_target_ids(targets, 'raw')
 
-    plot_metadata(targets, detected_target_ids, 'raw', radar_filter, selected_timespan)
-    plot_metadata(targets, detected_target_ids, 'filtered', radar_filter, selected_timespan)
-    plot_tracking(targets, detected_target_ids, 'raw', selected_timespan)
-    plot_tracking(targets, detected_target_ids, 'filtered', selected_timespan)
+    plot_metadata(targets, detected_target_ids, 'raw',
+                  radar_filter, selected_timespan, tgt_id_tspans)
+    plot_metadata(targets, detected_target_ids, 'filtered',
+                  radar_filter, selected_timespan, tgt_id_tspans)
+
+    plot_tracking(targets, detected_target_ids, 'raw',
+                  selected_timespan, tgt_id_tspans)
+    plot_tracking(targets, detected_target_ids, 'filtered',
+                  selected_timespan, tgt_id_tspans)
 
 
 if __name__ == '__main__':
@@ -315,11 +340,27 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Select which target id(s) to plot')
     parser.add_argument('-i', metavar='target id', nargs='*', type=int, help='target id [0:47]')
     parser.add_argument('-t', metavar='time span', nargs='*', type=int, help='timespan [0:T]')
+    parser.add_argument('-c', metavar='target id and timespan pair', nargs='*',
+                        type=int, help='(target_id, t_start, t_end)')
+
     selected_tgt_ids = parser.parse_args().i
     selected_timespan = parser.parse_args().t
+    tgt_id_tspan_pairs = parser.parse_args().c
 
     if selected_timespan is not None:
         if len(selected_timespan) != 2:
-            print('selected invalid timespand: must give start and end times')
+            print('invalid -t input: must give start and end times')
 
-    main(selected_tgt_ids, selected_timespan)
+    tgt_id_tspans = defaultdict(list)
+    if tgt_id_tspan_pairs is not None:
+        if len(tgt_id_tspan_pairs) % 3 != 0:
+            print('invalid -c input: each target id should be accompanied by start and end times')
+        selected_tgt_ids = set(tgt_id_tspan_pairs[::3])
+        for i in range(0,flen(tgt_id_tspan_pairs), 3):
+            tgt_id_tspans[i].append(tgt_id_tspan_pairs[i+1:i+3])
+
+    print(selected_tgt_ids)
+    print(tgt_id_tspan_pairs)
+    print(tgt_id_tspans)
+
+    main(selected_tgt_ids, selected_timespan, tgt_id_tspans)
