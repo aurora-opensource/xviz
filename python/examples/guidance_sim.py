@@ -2,12 +2,17 @@ import sys
 import time
 import math
 from pathlib import Path
+
 import matplotlib.pyplot as plt
-from scenarios.utils.filesystem import get_collector_instances, load_config
+import numpy as np
+
+from scenarios.utils.filesystem import get_collector_instances, load_config, \
+    load_global_config
 from scenarios.utils.read_protobufs import deserialize_collector_output, \
     extract_collector_output_slim
 from scenarios.utils.gis import lonlat_to_utm, get_wheel_angle
 
+from smarthp_utilities.config_utils import add_control_limits_to_guidance_config
 sys.path.append(str(Path(__file__).parents[2] / 'SmartHP-v2'))
 from smarthp.gnc.guidance import Guidance, CTEGuidanceTask
 
@@ -22,9 +27,9 @@ plt.rcParams['axes.labelcolor'] = 'white'
 plt.rcParams['axes.titlecolor'] = 'white'
 plt.rcParams['xtick.color'] = 'white'
 plt.rcParams['ytick.color'] = 'white'
-# plt.rcParams['legend.facecolor'] = 'white'
 plt.rcParams['text.color'] = 'white'
 plt.rcParams["figure.autolayout"] = True
+# plt.rcParams['legend.facecolor'] = 'white'
 
 
 def get_planned_path(collector_instances):
@@ -34,7 +39,7 @@ def get_planned_path(collector_instances):
             collector_instance)
 
         if is_slim_output:
-            _, _, _, _, _, _, planned_path, _, _, _ \
+            _, _, _, _, _, planned_path, _, _, _ \
                 = extract_collector_output_slim(collector_output)
         else:
             print('collector file is not campatible for running guidance sim')
@@ -48,10 +53,64 @@ def get_planned_path(collector_instances):
 
 
 def get_value_list(dict_list, k):
-    '''
+    """
     return list of values for given key from a list of dicts
-    '''
+    """
     return list(map(lambda x: x[k], dict_list))
+
+
+def get_next_waypoint_index(current_pos, waypoints):
+    current_pos = np.array(current_pos)
+    waypoints = np.array(waypoints)
+    distances = np.linalg.norm(waypoints - current_pos, ord=2, axis=1)
+    closest_wp_idx = max(distances.argmin(), 1)
+    return closest_wp_idx \
+        if closest_wp_idx == len(distances) - 1 \
+        or distances[closest_wp_idx-1] < distances[closest_wp_idx+1] \
+        else closest_wp_idx + 1
+
+
+def set_next_waypoint(current_pos, waypoints, guidance):
+    next_wp_idx = get_next_waypoint_index(current_pos, waypoints)
+    guidance.task.next_wp = guidance.task._waypoints[0]
+    guidance.task._wpctr = next(guidance.task._wpctr_iter)
+    for _ in range(next_wp_idx):
+        guidance.task.update_waypoint()
+    guidance.task.initialized = True
+
+
+def simulate_guidance(guidance_states, waypoints, global_config):
+    guidance = Guidance()
+    route_task = CTEGuidanceTask(
+        waypoints,
+        config=global_config,
+        stop_on_target=True)
+    guidance.add_task(route_task)
+    guidance.start_pending()
+    guidance.set_config(global_config)
+    set_next_waypoint(guidance_states[0]['utm_pos'], waypoints, guidance)
+
+    control_commands = []
+
+    delay = 1. / global_config['guidance_loop_rate']
+    for gs in guidance_states:
+        t = time.time()
+
+        control_command = guidance.run(gs)
+        if control_command is None:
+            control_command = {
+                'set_speed': 0.0,
+                'curvature': 0.0,
+            }
+        control_commands.append(control_command)
+
+        dt = time.time() - t
+        if dt >= delay:
+            print('guidance simulation loop took too long: ', dt)
+        else:
+            time.sleep(delay - dt)
+
+    return control_commands
 
 
 def main():
@@ -64,14 +123,9 @@ def main():
     collector_instances = get_collector_instances(collector_output_file,
                                                   extract_directory)
 
-    if collector_config['IVT']:
-        configfile = Path(__file__).parents[3] / 'Global-Configs' / \
-            'Tractors' / 'John-Deere' / '8RIVT_WHEEL.yaml'
-    else:
-        configfile = Path(__file__).parents[3] / 'Global-Configs' / \
-            'Tractors' / 'John-Deere' / '8RPST_WHEEL.yaml'
-
-    global_config = load_config(str(configfile))
+    global_config = load_global_config(collector_config['MACHINE_TYPE'])
+    # global_config['guidance']['wheel_angle_rate_limit'] = 0.52
+    add_control_limits_to_guidance_config(global_config)
 
     planned_path = get_planned_path(collector_instances)
     waypoints = list(map(tuple, planned_path))
@@ -85,8 +139,9 @@ def main():
             collector_instance)
 
         if is_slim_output:
-            _, _, _, _, machine_state, _, _, _, control_signal, _ \
-                = extract_collector_output_slim(collector_output)
+            _, _, _, machine_state, _, _, _, control_signal, _ \
+                = extract_collector_output_slim(collector_output,
+                                                get_camera_data=False)
         else:
             print('collector file is not campatible for running guidance sim')
             return
@@ -176,38 +231,6 @@ def main():
     plt.show()
     plt.close()
 
-
-def simulate_guidance(guidance_states, waypoints, global_config):
-    guidance = Guidance()
-    route_task = CTEGuidanceTask(
-        waypoints,
-        config=global_config,
-        stop_on_target=True)
-    guidance.add_task(route_task)
-    guidance.start_pending()
-    guidance.set_config(global_config)
-
-    control_commands = []
-
-    delay = 1. / global_config['guidance_loop_rate']
-    for gs in guidance_states:
-        t = time.time()
-
-        control_command = guidance.run(gs)
-        if control_command is None:
-            control_command = {
-                'set_speed': 0.0,
-                'curvature': 0.0,
-            }
-        control_commands.append(control_command)
-
-        dt = time.time() - t
-        if dt >= delay:
-            print('guidance simulation loop took too long: ', dt)
-        else:
-            time.sleep(delay - dt)
-
-    return control_commands
 
 if __name__ == '__main__':
     main()

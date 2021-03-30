@@ -45,8 +45,28 @@ def draw_cam_targets_on_image(image, camera_output):
     return image
 
 
-def get_table_rows_cols(num_tiles):
-    n_rows = n_cols = math.ceil(math.sqrt(num_tiles))
+def get_table_rows_cols(num_tiles, row_col_delta=2):
+    """
+    Given a number of tiles for a table, calculate the necessary dimensions of
+    the table with a preference for dimensions with smaller differences
+    """
+    num_tiles_root = math.sqrt(num_tiles)
+    if num_tiles_root.is_integer():
+        # perfect square table
+        n_rows = n_cols = int(num_tiles_root)
+    else:
+        # find factors of num_tiles, if a pair of factors have a delta that is
+        # within row_col_delta then set the pair as the (row, col) dimensions,
+        # otherwise round up to the next perfect square and use the root to
+        # make a square table
+        n_rows = n_cols = math.ceil(num_tiles_root)
+        for i in range(2, math.ceil(num_tiles_root)):
+            if num_tiles % i == 0:
+                pair = num_tiles // i
+                if pair - i <= row_col_delta:
+                    n_rows = pair
+                    n_cols = i
+
     return n_rows, n_cols
 
 
@@ -74,6 +94,7 @@ def resize_image(img, destination_height=None, destination_width=None):
     else:
         print('no destination dimensions specified, leaving original shape')
         destination_height, destination_width = img.shape[:2]
+
     return cv2.resize(img, (destination_width, destination_height))
 
 
@@ -88,7 +109,7 @@ def make_image_collage(primary_img, haz_imgs, all_imgs_equal_size, num_haz_cams)
 
         for cam_idx, img in haz_imgs.items():
             if cam_idx >= n_rows * n_cols:
-                print('camer index is greater than expected, skipping:',
+                print('camera index is greater than expected, skipping:',
                       cam_idx)
                 continue
             img_collage[cam_idx, ...] = img
@@ -103,7 +124,7 @@ def make_image_collage(primary_img, haz_imgs, all_imgs_equal_size, num_haz_cams)
 
         for cam_idx, img in haz_imgs.items():
             if cam_idx > n_rows * n_cols:
-                print('camer index is greater than expected, skipping:',
+                print('camera index is greater than expected, skipping:',
                       cam_idx)
                 continue
             img_collage[cam_idx-1, ...] = img
