@@ -177,7 +177,7 @@ def prepare_metadata_plot():
     ax[1, 1].set_title('step')
     ax[2, 0].set_title('pexist')
     ax[2, 1].set_title('dBpower')
-    # ax[1, 1].set_ylim(0, 5)
+    ax[1, 1].set_ylim(0, 4)
 
     return ax
 
@@ -305,9 +305,9 @@ def main(selected_tgt_ids, selected_timespan, tgt_id_tspans):
     radar_safety_config = global_config['safety']['radar']
 
     # override thresholds in Global Configs
-    # radar_safety_config['d_bpower_threshold'] = -8.0
-    # radar_safety_config['phi_sdv_threshold'] = 0.01
-    # radar_safety_config['confidence_threshold'] = 0.9
+    # radar_safety_config['d_bpower_threshold'] = -20.0
+    # radar_safety_config['phi_sdv_threshold'] = 0.015
+    # radar_safety_config['confidence_threshold'] = 0.65
 
     radar_filter = RadarFilter(radar_safety_config)
     sync_status = dict(inSync=False)
@@ -347,6 +347,9 @@ if __name__ == '__main__':
     selected_timespan = parser.parse_args().t
     tgt_id_tspan_pairs = parser.parse_args().c
 
+    # unknown-v2020-25-0-3691020dae1046df88e855e6d9928fca-dot-misc-1616179632582-6693.tar
+    # -c 3 0 50 5 40 100 0 90 300 2 250 350 6 350 500
+
     if selected_timespan is not None:
         if len(selected_timespan) != 2:
             print('invalid -t input: must give start and end times')
@@ -358,9 +361,5 @@ if __name__ == '__main__':
         selected_tgt_ids = set(tgt_id_tspan_pairs[::3])
         for i, tgt_id in enumerate(tgt_id_tspan_pairs[::3]):
             tgt_id_tspans[tgt_id].append(tgt_id_tspan_pairs[i*3+1:i*3+3])
-
-    print(selected_tgt_ids)
-    print(tgt_id_tspan_pairs)
-    print(tgt_id_tspans)
 
     main(selected_tgt_ids, selected_timespan, tgt_id_tspans)
