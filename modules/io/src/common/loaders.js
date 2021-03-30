@@ -280,23 +280,27 @@ function postProcessProtobuf(msg, pbType) {
 /* eslint-enable max-depth, complexity */
 
 // TODO: unpackEnvelop produces namespace, type data
-export function parsePBEXVIZ(arrayBuffer) {
-  const strippedBuffer = new Uint8Array(arrayBuffer, 4);
-  const envelope = XVIZ_PROTOBUF_MESSAGE.Envelope.decode(strippedBuffer);
-
+export function parsePBEXVIZ(arrayBuffer, messageType) {
   const xviz = {
-    type: envelope.type,
+    type: messageType,
     data: null
   };
+  let data = arrayBuffer;
+  if (!xviz.type) {
+    const strippedBuffer = new Uint8Array(arrayBuffer, 4);
+    envelope = XVIZ_PROTOBUF_MESSAGE.Envelope.decode(strippedBuffer);
+    xviz.type = envelope.type;
+    data = envelope.data.value
+  }
 
-  switch (envelope.type) {
+  switch (xviz.type) {
     case 'xviz/metadata':
-      const tmpMeta = XVIZ_PROTOBUF_MESSAGE.Metadata.decode(envelope.data.value);
+      const tmpMeta = XVIZ_PROTOBUF_MESSAGE.Metadata.decode(data);
       xviz.data = postProcessProtobuf(tmpMeta);
       postProcessUIConfig(xviz.data);
       break;
     case 'xviz/state_update':
-      const tmpState = XVIZ_PROTOBUF_MESSAGE.StateUpdate.decode(envelope.data.value);
+      const tmpState = XVIZ_PROTOBUF_MESSAGE.StateUpdate.decode(data);
       xviz.data = postProcessProtobuf(tmpState);
       break;
     default:

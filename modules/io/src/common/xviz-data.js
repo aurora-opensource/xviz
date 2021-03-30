@@ -37,11 +37,11 @@ import {XVIZ_FORMAT} from './constants';
 // - arraybuffer which is a GLB
 // opts.messageType is the XVIZ Envelope 'type', i.e. one of ('xviz/state_update', 'xviz/metadata', etc.)
 export class XVIZData {
-  constructor(data, messageType) {
+  constructor(data, messageType, messageFormat) {
     this._data = data;
 
     // _dataFormat is an XVIZ_FORMAT for 'data'
-    this._dataFormat = undefined;
+    this._dataFormat = messageFormat;
 
     // _xvizType is the XVIZ Envelope 'type'
     this._xvizType = messageType && { type: messageType };
@@ -142,6 +142,9 @@ export class XVIZData {
   }
 
   _determineFormat() {
+    if (this._dataFormat) {
+      return;
+    }
     let data = this._data;
     switch (getDataContainer(data)) {
       case 'binary':

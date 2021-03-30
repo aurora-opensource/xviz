@@ -33,6 +33,7 @@ export function parseXVIZMessage({
   capacity = null,
   opts = {}
 }) {
+  console.log('parseXVIZMessage');
   if (worker) {
     if (!getWorkerFarm()) {
       initializeWorkers({worker, maxConcurrency, capacity});
