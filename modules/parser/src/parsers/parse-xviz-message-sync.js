@@ -39,15 +39,17 @@ export function parseXVIZMessageSync(message, onResult, onError, opts) {
     return;
   }
 
+  const { messageType } = opts;
+
   try {
-    const xvizData = new XVIZData(message, opts.messageType);
+    const xvizData = new XVIZData(message, { messageType });
     const xvizMsg = xvizData.message();
 
     // Non-xviz messages will return null
     if (xvizMsg) {
       const data = xvizMsg.data;
 
-      const v2Type = opts.messageType || xvizMsg.type || undefined;
+      const v2Type = messageType || xvizMsg.type || undefined;
 
       const result = parseXVIZData(data, {...opts, v2Type});
 
