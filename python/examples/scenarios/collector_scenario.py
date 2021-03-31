@@ -367,7 +367,9 @@ class CollectorScenario:
                                                 theta=target['elevation'], radar_ob=True)
 
                 if self.smartmicro_radar:
-                    d = .5  # cube dimension / 2, height is determined in collector_meta.py
+                    # d = <cube dimension> / 2, height is determined in collector_meta.py
+                    # select d such that it is == <height in collector_meta.py> / 2
+                    d = .3
                     builder.primitive("/smartmicro_radar_targets") \
                         .polygon([
                             x-d, y-d, z-d,
