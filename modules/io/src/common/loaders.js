@@ -14,7 +14,7 @@
 /* global Buffer */
 import {GLTFParser} from '../gltf/gltf-parser';
 
-import {XVIZ_GLTF_EXTENSION} from './constants';
+import {XVIZ_FORMAT, XVIZ_GLTF_EXTENSION} from './constants';
 import {TextDecoder} from './text-encoding';
 import {MAGIC_PBE1, XVIZ_PROTOBUF_MESSAGE, XVIZ_PROTOBUF_TYPE} from './protobuf-support';
 import {Enum, Type, MapField} from 'protobufjs';
@@ -106,10 +106,12 @@ export function isBinaryXVIZ(arrayBuffer) {
 }
 
 // Supports GLB and Protobuf formats
-export function parseBinaryXVIZ(arrayBuffer) {
-  if (checkMagic(arrayBuffer, {magic: MAGIC_PBE1})) {
-    const data = parsePBEXVIZ(arrayBuffer);
-    return data;
+export function parseBinaryXVIZ(arrayBuffer, opts) {
+  if (
+    (opts && opts.messageFormat === XVIZ_FORMAT.BINARY_PBE) ||
+    checkMagic(arrayBuffer, {magic: MAGIC_PBE1})
+  ) {
+    return parsePBEXVIZ(arrayBuffer, opts);
   }
 
   const gltfParser = new GLTFParser();
@@ -219,7 +221,7 @@ function postProcessUIConfig(msg) {
  * - Recursive on objects
  */
 /* eslint-disable max-depth, complexity */
-export function postProcessProtobuf(msg, pbType) {
+function postProcessProtobuf(msg, pbType) {
   const type = pbType || msg.$type;
 
   if (msg && type && type.fields) {
@@ -280,19 +282,24 @@ export function postProcessProtobuf(msg, pbType) {
 /* eslint-enable max-depth, complexity */
 
 // TODO: unpackEnvelop produces namespace, type data
-export function parsePBEXVIZ(arrayBuffer, messageType) {
+// Handle PBE and raw protobuf messages if opts.messageType is supplied
+export function parsePBEXVIZ(arrayBuffer, opts = {}) {
+  const {messageType} = opts;
   const xviz = {
     type: messageType,
     data: null
   };
+
   let data = arrayBuffer;
+
+  // If the type has been provided, it means there is no Envelope so skip that step
   if (!xviz.type) {
     const strippedBuffer = new Uint8Array(arrayBuffer, 4);
     const envelope = XVIZ_PROTOBUF_MESSAGE.Envelope.decode(strippedBuffer);
     xviz.type = envelope.type;
     data = envelope.data.value;
   }
-  console.log('parsePBEXVIZ');
+
   switch (xviz.type) {
     case 'xviz/metadata':
       const tmpMeta = XVIZ_PROTOBUF_MESSAGE.Metadata.decode(data);
@@ -304,7 +311,7 @@ export function parsePBEXVIZ(arrayBuffer, messageType) {
       xviz.data = postProcessProtobuf(tmpState);
       break;
     default:
-      throw new Error(`Unknown Message type ${ xviz.type}`);
+      throw new Error(`Unknown Message type ${xviz.type}`);
   }
 
   return xviz;
