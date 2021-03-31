@@ -1,6 +1,7 @@
 collector_output_file:
 extract_directory:
 mqtt_enabled: False
-MACHINE_TYPE: 2020_DOT_AU1_NARROW
-show_haz_cams: True
-all_imgs_equal_size: True
+MACHINE_TYPE: 8RIVT_WHEEL
+show_haz_cams: False
+all_imgs_equal_size: False
+smartmicro_radar: True
