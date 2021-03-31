@@ -25,7 +25,7 @@ def get_builder():
         .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
         .stream_style({
             'fill_color': [255, 0, 0],
-            'height': 1.,
+            'height': 0.6,
             'extruded': True,
         })\
         .category(xviz.CATEGORY.PRIMITIVE)\
