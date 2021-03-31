@@ -293,6 +293,32 @@ def plot_tracking(targets, detected_target_ids, signal_type,
     plt.close()
 
 
+def plot_3d(targets, detected_target_ids, signal_type):
+    fig = plt.figure()
+    ax = fig.add_subplot(projection='3d')
+
+    for tgt_id, target in targets.items():
+        if tgt_id not in detected_target_ids:
+            continue
+
+        target[signal_type]['phi'] = np.array(target[signal_type]['phi'])
+        target[signal_type]['dr'] = np.array(target[signal_type]['dr'])
+        target[signal_type]['dBpower'] = np.array(target[signal_type]['dBpower'])
+
+        x = target[signal_type]['dr'] * np.cos(target[signal_type]['phi'])
+        y = target[signal_type]['dr'] * np.sin(target[signal_type]['phi'])
+
+        ax.scatter(x, y, target[signal_type]['dBpower'])
+
+    ax.view_init(30, 45)
+    ax.set_xlabel('x (m)')
+    ax.set_ylabel('y (m)')
+    ax.set_zlabel('dBpower')
+
+    plt.show()
+    plt.close()
+
+
 def main(selected_tgt_ids, selected_timespan, tgt_id_tspans):
     configfile = Path(__file__).parent / 'scenarios' / 'collector-scenario-config.yaml'
     collector_config = load_config(str(configfile))
@@ -326,8 +352,12 @@ def main(selected_tgt_ids, selected_timespan, tgt_id_tspans):
     plot_tracking(targets, detected_target_ids, 'filtered',
                   selected_timespan, tgt_id_tspans)
 
+    # plot_3d(targets, detected_target_ids, 'raw')
+
 
 if __name__ == '__main__':
+    plt.rcParams['figure.figsize'] = [16, 10]
+    plt.rcParams['savefig.facecolor'] = 'black'
     plt.rcParams['figure.facecolor'] = 'black'
     plt.rcParams['figure.edgecolor'] = 'white'
     plt.rcParams['axes.facecolor'] = 'black'
@@ -336,6 +366,9 @@ if __name__ == '__main__':
     plt.rcParams['axes.titlecolor'] = 'white'
     plt.rcParams['xtick.color'] = 'white'
     plt.rcParams['ytick.color'] = 'white'
+    plt.rcParams['text.color'] = 'white'
+    plt.rcParams["figure.autolayout"] = True
+    # plt.rcParams['legend.facecolor'] = 'white'
 
     parser = argparse.ArgumentParser(description='Select which target id(s) to plot')
     parser.add_argument('-i', metavar='target id', nargs='*', type=int, help='target id [0:47]')
