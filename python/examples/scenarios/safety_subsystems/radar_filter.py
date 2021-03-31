@@ -2,6 +2,7 @@ import math
 from collections import deque
 from scenarios.utils.gis import polar_to_cartesian, euclidean_distance
 
+
 QUEUE_LENGTH = 6
 
 
