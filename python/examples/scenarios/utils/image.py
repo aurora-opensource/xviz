@@ -9,10 +9,10 @@ def extract_image(img_bytes):
     return decimg
 
 
-def show_image(image, destination_height=600):
+def show_image(image, destination_width=800):
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     # image = cv2.resize(image, (0, 0), fx=.5, fy=.5)  # scale by factor
-    image = resize_image(image, destination_height=destination_height)
+    image = resize_image(image, destination_width=destination_width)
     cv2.imshow('collector-scenario', image)
     cv2.moveWindow('collector-scenario', 0, 0)
     cv2.waitKey(1)
