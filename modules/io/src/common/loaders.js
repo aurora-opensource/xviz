@@ -219,7 +219,7 @@ function postProcessUIConfig(msg) {
  * - Recursive on objects
  */
 /* eslint-disable max-depth, complexity */
-function postProcessProtobuf(msg, pbType) {
+export function postProcessProtobuf(msg, pbType) {
   const type = pbType || msg.$type;
 
   if (msg && type && type.fields) {
@@ -292,7 +292,7 @@ export function parsePBEXVIZ(arrayBuffer, messageType) {
     xviz.type = envelope.type;
     data = envelope.data.value;
   }
-
+  console.log('parsePBEXVIZ');
   switch (xviz.type) {
     case 'xviz/metadata':
       const tmpMeta = XVIZ_PROTOBUF_MESSAGE.Metadata.decode(data);

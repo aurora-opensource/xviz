@@ -42,7 +42,8 @@ export {
   isJSONString,
   getObjectXVIZType,
   getXVIZMessageType,
-  isXVIZMessage
+  isXVIZMessage,
+  postProcessProtobuf
 } from './common/loaders';
 
 export {XVIZ_PROTOBUF_MESSAGE} from './common/protobuf-support';

@@ -28,7 +28,7 @@ import parseTimesliceDataV2 from './parse-timeslice-data-v2';
 import {getXVIZConfig} from '../config/xviz-config';
 
 // Post processes a stream message to make it easy to use for JavaScript applications
-// opts.messageType is the XVIZ Envelope 'type', i.e. one of ('xviz/state_update', 'xviz/metadata', etc.)
+// opts.messageType is the XVIZ Envelope 'type', i.e. one of ('state_update', 'metadata', etc.)
 export function parseXVIZMessageSync(message, onResult, onError, opts) {
   console.log('parseXVIZMessageSync');
   // TODO(twojtasz): better message dispatching
@@ -39,10 +39,10 @@ export function parseXVIZMessageSync(message, onResult, onError, opts) {
     return;
   }
 
-  const {messageType} = opts;
+  const {messageType, messageFormat} = opts;
 
   try {
-    const xvizData = new XVIZData(message, {messageType});
+    const xvizData = new XVIZData(message, {messageType, messageFormat});
     const xvizMsg = xvizData.message();
 
     // Non-xviz messages will return null
@@ -61,6 +61,16 @@ export function parseXVIZMessageSync(message, onResult, onError, opts) {
 }
 
 export function parseXVIZData(data, opts = {}) {
+  // TODO: should go away, for testing only
+  if (typeof data.update_type === 'number') {
+    switch (data.update_type) {
+      case 3:
+        data.update_type = 'state_update';
+      case 1:
+        data.update_type = 'metadata';
+    }
+  }
+
   // TODO(twojtasz): this data.message is due an
   // uncoordinated change on the XVIZ server, temporary.
   const typeKey = opts.v2Type || data.type || data.message || data.update_type;
