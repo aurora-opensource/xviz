@@ -21,6 +21,15 @@ def get_builder():
         .stream_style({'fill_color': [0, 0, 0]})\
         .category(xviz.CATEGORY.PRIMITIVE)\
         .type(xviz.PRIMITIVE_TYPES.TEXT)
+    builder.stream("/smartmicro_radar_targets")\
+        .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
+        .stream_style({
+            'fill_color': [255, 0, 0],
+            'height': 1.,
+            'extruded': True,
+        })\
+        .category(xviz.CATEGORY.PRIMITIVE)\
+        .type(xviz.PRIMITIVE_TYPES.POLYGON)
 
     builder.stream("/camera_targets")\
         .coordinate(xviz.COORDINATE_TYPES.VEHICLE_RELATIVE)\
