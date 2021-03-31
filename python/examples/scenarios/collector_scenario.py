@@ -77,6 +77,7 @@ class CollectorScenario:
             else 4 if '8R' in collector_config['MACHINE_TYPE'] else 0
         self.show_haz_cams = collector_config['show_haz_cams']
         self.all_imgs_equal_size = collector_config['all_imgs_equal_size']
+        self.smartmicro_radar = collector_config['smartmicro_radar']
 
 
     def reset_values(self):
@@ -137,6 +138,7 @@ class CollectorScenario:
                 'type': 'xviz/state_update',
                 'data': data.to_object()
             }
+
         except Exception as e:
             print("Crashed in get_message:", e)
 
@@ -146,9 +148,10 @@ class CollectorScenario:
         radial_distances = sorted(radial_distances, reverse=True)
 
         for r in radial_distances:
+            z = 0.1
             builder.primitive('/measuring_circles_lbl') \
                 .text(str(r)) \
-                .position([r, 0, .1]) \
+                .position([r, 0, z]) \
                 .id(f'{r}lb')
 
             builder.primitive('/measuring_circles') \
@@ -161,7 +164,8 @@ class CollectorScenario:
         for c_phi in cam_fov:
             r = 40
             label = (r, c_phi)
-            (x, y, z) = self.get_object_xyz_primitive(r, c_phi*math.pi/180)
+            (x, y, z) = self.get_object_xyz(r, c_phi*math.pi/180)
+            z = 0.2
             vertices = [0, 0, z, x, y, z]
             builder.primitive('/camera_fov') \
                 .polyline(vertices) \
@@ -169,7 +173,8 @@ class CollectorScenario:
 
         for r_phi in radar_fov:
             r = 40
-            (x, y, z) = self.get_object_xyz_primitive(r, r_phi*math.pi/180)
+            (x, y, z) = self.get_object_xyz(r, r_phi*math.pi/180)
+            z = 0.2
             x += self.cab_to_nose
             builder.primitive('/measuring_circles_lbl') \
                 .text(str(r_phi)) \
@@ -191,7 +196,7 @@ class CollectorScenario:
                 print("#############################WE FINISHED#################################")
                 print("#############################WE FINISHED#################################")
                 print("#############################WE FINISHED#################################")
-                print("#############################WE FINISHED#################################")
+                print("#############################WE FINISHED#################################\n")
 
             collector_output = self.collector_instances[self.index]
 
@@ -351,35 +356,45 @@ class CollectorScenario:
             sync_status = self.sync_status
 
         try:
-            if self.radar_filter.prev_target_set is not None:
-                if self.radar_filter.prev_target_set == radar_output['targets']:
-                    return
+            # if a duplicate target set was received, dont' show it
+            if self.radar_filter.prev_target_set is not None \
+                    and self.radar_filter.prev_target_set == radar_output['targets']:
+                return
             self.radar_filter.prev_target_set = radar_output['targets']
 
             for target in radar_output['targets'].values():
-                (x, y, z) = self.get_object_xyz(target, 'phi', 'dr', radar_ob=True)
+                (x, y, z) = self.get_object_xyz(target['dr'], target['phi'],
+                                                theta=target['elevation'], radar_ob=True)
 
-                _phi = target['phi']
-                _dr = target['dr']
-
-                if self.radar_filter.is_valid_target(target,
-                                                     sync_status=sync_status):
-                    builder.primitive('/radar_passed_filter_targets') \
-                        .circle([x, y, z+.1], .5) \
+                if self.smartmicro_radar:
+                    d = .5  # cube dimension / 2, height is determined in collector_meta.py
+                    builder.primitive("/smartmicro_radar_targets") \
+                        .polygon([
+                            x-d, y-d, z-d,
+                            x+d, y-d, z-d,
+                            x+d, y+d, z-d,
+                            x-d, y+d, z-d,
+                        ]) \
                         .id(str(target['targetId']))
+
                 else:
-                    if not target['consecutive'] < 1:
-                        builder.primitive('/radar_filtered_out_targets') \
-                            .circle([x, y, z], .5) \
+                    z = 1.
+                    if self.radar_filter.is_valid_target(target,
+                                                         sync_status=sync_status):
+                        builder.primitive('/radar_passed_filter_targets') \
+                            .circle([x, y, z+.1], .5) \
                             .id(str(target['targetId']))
                     else:
-                        pass
+                        if not target['consecutive'] < 1:
+                            builder.primitive('/radar_filtered_out_targets') \
+                                .circle([x, y, z], .5) \
+                                .id(str(target['targetId']))
 
-                if not target['consecutive'] < 1:
-                    builder.primitive('/radar_id') \
-                        .text(str(target['targetId'])) \
-                        .position([x, y, z+.2]) \
-                        .id(str(target['targetId']))
+                    if not target['consecutive'] < 1:
+                        builder.primitive('/radar_id') \
+                            .text(str(target['targetId'])) \
+                            .position([x, y, z+.2]) \
+                            .id(str(target['targetId']))
 
             for not_received_id in self.radar_filter.target_id_set:
                 default_target = MessageToDict(
@@ -397,6 +412,7 @@ class CollectorScenario:
     def _draw_tracking_targets(self, tracking_output, builder: xviz.XVIZBuilder):
         if tracking_output is None:
             return
+
         try:
             if 'tracks' in tracking_output:
                 min_confidence = 0.1
@@ -406,8 +422,8 @@ class CollectorScenario:
                             or not track['hitStreak'] > min_hits:
                         continue
 
-                    (x, y, z) = self.get_object_xyz(track, 'angle',
-                                                    'distance', radar_ob=False)
+                    (x, y, z) = self.get_object_xyz(track['distance'], track['angle'])
+                    z = 1.
 
                     if track['radarDistCamFrame'] != self.track_history.get(
                             track['trackId'], -1) \
@@ -436,19 +452,14 @@ class CollectorScenario:
     def _draw_camera_targets(self, camera_output, builder: xviz.XVIZBuilder):
         if camera_output is None:
             return
+
         try:
             for target in camera_output['targets']:
-                (x, y, z) = self.get_object_xyz(
-                    target,
-                    'objectAngle',
-                    'objectDistance',
-                    radar_ob=False
-                )
+                (x, y, z) = self.get_object_xyz(target['objectDistance'],
+                                                target['objectAngle'])
+                z = 1.
                 if target['label'] == 'qrcode':
                     continue
-
-                _phi = target['objectAngle']
-                _dr = target['objectDistance']
 
                 builder.primitive('/camera_targets') \
                     .circle([x, y, z], .5) \
@@ -461,6 +472,7 @@ class CollectorScenario:
     def _draw_combine(self, builder: xviz.XVIZBuilder):
         if not self.tractor_state or not self.combine_states:
             return
+
         try:
             tractor_heading = self.tractor_state['heading']  # degrees
 
@@ -513,6 +525,7 @@ class CollectorScenario:
                 or self.sync_status is None \
                 or not self.sync_status['runningSync']:
             return
+
         try:
             combine_gps_x = self.combine_x - self.tractor_gps_to_rear_axle
             combine_gps_y = self.combine_y
@@ -542,6 +555,7 @@ class CollectorScenario:
     def _draw_predicted_paths(self, builder: xviz.XVIZBuilder):
         if not self.tractor_state:
             return
+
         try:
             veh_speed = max(self.tractor_state['speed'], 0.447 * 1.0)
 
@@ -636,6 +650,7 @@ class CollectorScenario:
     def _draw_control_signal(self, builder: xviz.XVIZBuilder):
         if self.control_signal is None:
             return
+
         try:
             speed = self.control_signal['setSpeed']
             curvature = self.control_signal['commandCurvature']
@@ -650,7 +665,7 @@ class CollectorScenario:
 
             path, _, _ = predict_path(X0, U, C, time_horizon)
 
-            z = 1.1
+            z = 0.4
             path[:, 2] = z
             vertices = list(path.flatten())
 
@@ -670,10 +685,11 @@ class CollectorScenario:
     def _draw_planned_path(self, builder: xviz.XVIZBuilder):
         if self.planned_path is None:
             return
+
         try:
             xy_array = utm_array_to_local(self.tractor_state,
                                           self.utm_zone, self.planned_path)
-            z = 1.0
+            z = 0.3
 
             vertices = list(np.column_stack(
                 (xy_array, np.full(xy_array.shape[0], z))
@@ -690,6 +706,7 @@ class CollectorScenario:
     def _draw_field_definition(self, builder: xviz.XVIZBuilder):
         if self.field_definition is None or self.tractor_easting is None:
             return
+
         try:
             poly = []
             if self.field_definition['type'] == 'MultiPolygon':
@@ -706,7 +723,7 @@ class CollectorScenario:
                 utm_coords[:, 0] -= self.tractor_easting
                 utm_coords[:, 1] -= self.tractor_northing
 
-                z = 1.0
+                z = 0.3
                 vertices = list(np.column_stack(
                     (utm_coords, np.full(utm_coords.shape[0], z))
                 ).flatten())
@@ -722,6 +739,7 @@ class CollectorScenario:
     def _draw_sync_status(self, builder: xviz.XVIZBuilder):
         if self.sync_status is None:
             return
+
         try:
             if self.sync_status['atSyncPoint']:
                 text = "at sync point"
@@ -757,8 +775,8 @@ class CollectorScenario:
             sync_y = self.combine_y \
                 + sync_x_rel_combine * math.sin(self.combine_relative_theta) \
                 + sync_y_rel_combine * math.cos(self.combine_relative_theta)
-            z = 2.0
 
+            z = 2.0
             builder.primitive('/sync_point') \
                 .circle([sync_x, sync_y, z], .3) \
                 .id('sync point')
@@ -769,8 +787,9 @@ class CollectorScenario:
                     self.utm_zone,
                     np.array(self.sync_params['breadcrumbs'])
                 )
+                z = 0.3
                 vertices = list(np.column_stack(
-                    (breadcrumbs_xy, np.full(breadcrumbs_xy.shape[0], z-.1))
+                    (breadcrumbs_xy, np.full(breadcrumbs_xy.shape[0], z))
                 ).flatten())
 
                 builder.primitive('/breadcrumbs') \
@@ -796,17 +815,19 @@ class CollectorScenario:
                     self.combine_states[vehicle] = state
 
 
-    def get_object_xyz(self, ob, angle_key, dist_key, radar_ob=False):
-        x = math.cos(ob[angle_key]) * ob[dist_key]
-        y = math.sin(ob[angle_key]) * ob[dist_key]
-        z = 1.5
+    def get_object_xyz(self, r, phi, theta=0., radar_ob=False):
+        """
+        Input:
+        - r: radial distance
+        - phi: azimuth angle (radians)
+        - theta: elevation angle (radians)
+        - radar_ob: boolean that flags radar objects
+        """
+        x = r * math.cos(phi)
+        y = r * math.sin(phi)
+        z = r * math.sin(theta)
         if radar_ob:
             x += self.cab_to_nose
-        return (x, y, z)
-
-
-    def get_object_xyz_primitive(self, radial_dist, angle_radians):
-        x = math.cos(angle_radians) * radial_dist
-        y = math.sin(angle_radians) * radial_dist
-        z = 1.0
+            # radar is 1.37 m off the ground, offset this for the smartmicro radar
+            z += 1.37
         return (x, y, z)
