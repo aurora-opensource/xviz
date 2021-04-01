@@ -144,7 +144,7 @@ class CollectorScenario:
 
 
     def _draw_measuring_references(self, builder: xviz.XVIZBuilder, timestamp):
-        radial_distances = set([5, 10, 15, 20, 25, 30])
+        radial_distances = set([5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55])
         radial_distances = sorted(radial_distances, reverse=True)
 
         for r in radial_distances:
@@ -159,7 +159,7 @@ class CollectorScenario:
                 .id(str(r))
 
         cam_fov = [-28.5, 28.5]  # 57 deg
-        radar_fov = [-42.6, -13.5, -6.75, 0, 6.75, 13.5, 42.6]  # 54 degrees
+        radar_fov = [-65, -40, -20, 0, 20, 40, 65]  # 54 degrees
 
         for c_phi in cam_fov:
             r = 40
@@ -372,10 +372,10 @@ class CollectorScenario:
                     d = .3
                     builder.primitive("/smartmicro_radar_targets") \
                         .polygon([
-                            x-d, y-d, z-d,
-                            x+d, y-d, z-d,
-                            x+d, y+d, z-d,
-                            x-d, y+d, z-d,
+                            x-d, y-d, z,
+                            x+d, y-d, z,
+                            x+d, y+d, z,
+                            x-d, y+d, z,
                         ]) \
                         .id(str(target['targetId']))
 
