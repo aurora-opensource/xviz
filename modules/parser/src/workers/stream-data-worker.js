@@ -67,10 +67,19 @@ export default config => self => {
   }
 
   self.onmessage = e => {
+    // The WorkerFarm will "broadcast" the version to the workers
+    // to make sure they properly respond in the event a v1 log is read
+    // then a v2 during the same session
     if (e.data && e.data.xvizConfig) {
       setXVIZConfig(e.data.xvizConfig);
     } else if (e.data) {
-      parseXVIZMessageSync(e.data, onResult, onError, e.opts);
+      if (e.data.opts) {
+        // Support explicit message type with non-enveloped protobuf
+        parseXVIZMessageSync(e.data.data, onResult, onError, e.data.opts);
+      } else {
+        // Normal flow where we handle message type determination
+        parseXVIZMessageSync(e.data, onResult, onError);
+      }
     }
   };
 };
