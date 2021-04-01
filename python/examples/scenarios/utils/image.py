@@ -9,10 +9,11 @@ def extract_image(img_bytes):
     return decimg
 
 
-def show_image(image, destination_width=800):
+def show_image(image, destination_height=800, destination_width=800):
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     # image = cv2.resize(image, (0, 0), fx=.5, fy=.5)  # scale by factor
-    image = resize_image(image, destination_width=destination_width)
+    image = resize_image(image, destination_height=destination_height,
+                         destination_width=destination_width)
     cv2.imshow('collector-scenario', image)
     cv2.moveWindow('collector-scenario', 0, 0)
     cv2.waitKey(1)
@@ -81,16 +82,24 @@ def reshape_stacked_tiles_into_table(stacked_tiles, n_rows,
 
 
 def resize_image(img, destination_height=None, destination_width=None):
+    AR = img.shape[1] / img.shape[0]
     if bool(destination_height) ^ bool(destination_width):
         if destination_height:
-            destination_width = int(img.shape[1] / img.shape[0]
-                                    * destination_height)
+            destination_width = int(AR * destination_height)
         else:
-            destination_height = int(img.shape[0] / img.shape[1]
-                                     * destination_width)
+            destination_height = int(1 / AR * destination_width)
     elif destination_height and destination_width:
-        print(('both destination dimensions specified, preserving aspect '
-               'ratio is not guaranteed'))
+        h = int(1 / AR * destination_width)
+        w = int(AR * destination_height)
+        if h > destination_height:
+            destination_width = w
+        elif w > destination_width:
+            destination_height = h
+        else:
+            if destination_height * w > destination_width * h:
+                destination_width = w
+            else:
+                destination_height = h
     else:
         print('no destination dimensions specified, leaving original shape')
         destination_height, destination_width = img.shape[:2]
