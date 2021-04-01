@@ -35,7 +35,9 @@ import {XVIZ_FORMAT} from './constants';
 // - arraybuffer which is a JSON string
 // - JSON object
 // - arraybuffer which is a GLB
-// opts.messageType is the XVIZ Envelope 'type', i.e. one of ('state_update', 'metadata', etc.)
+// opts.messageType is the message type contained in data. 
+// - If supplied it assume data does not have an Envelope.
+// - Can be one of ('state_update', 'metadata', etc.)
 export class XVIZData {
   constructor(data, opts = {}) {
     this._data = data;
