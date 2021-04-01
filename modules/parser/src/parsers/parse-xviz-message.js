@@ -30,7 +30,8 @@ export function parseXVIZMessage({
   // worker options
   worker = false,
   maxConcurrency = 4,
-  capacity = null
+  capacity = null,
+  opts = {}
 }) {
   if (worker) {
     if (!getWorkerFarm()) {
@@ -44,8 +45,8 @@ export function parseXVIZMessage({
     }
 
     const onMessage = data => onResult(postDeserialize(data));
-    workerFarm.process(message, onMessage, onError);
+    workerFarm.process({data: message, opts}, onMessage, onError);
   } else {
-    parseXVIZMessageSync(message, onResult, onError);
+    parseXVIZMessageSync(message, onResult, onError, opts);
   }
 }

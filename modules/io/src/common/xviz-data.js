@@ -35,9 +35,13 @@ import {XVIZ_FORMAT} from './constants';
 // - arraybuffer which is a JSON string
 // - JSON object
 // - arraybuffer which is a GLB
+// opts.messageType is the message type contained in data.
+// - If supplied it assume data does not have an Envelope.
+// - Can be one of ('xviz/state_update', 'xviz/metadata', etc.)
 export class XVIZData {
-  constructor(data) {
+  constructor(data, opts = {}) {
     this._data = data;
+    this._opts = opts;
 
     // _dataFormat is an XVIZ_FORMAT for 'data'
     this._dataFormat = undefined;
@@ -69,7 +73,7 @@ export class XVIZData {
     if (this._message) {
       return this._message.type;
     } else if (!this._xvizType) {
-      const rawType = getXVIZMessageType(this._data);
+      const rawType = this._opts.messageType || getXVIZMessageType(this._data);
       if (rawType) {
         const parts = rawType.split('/');
         this._xvizType = {
@@ -105,7 +109,7 @@ export class XVIZData {
         if (data instanceof Buffer) {
           data = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
         }
-        msg = parseBinaryXVIZ(data);
+        msg = parseBinaryXVIZ(data, this._opts);
         break;
       case XVIZ_FORMAT.JSON_BUFFER:
         let jsonString = null;
@@ -141,6 +145,12 @@ export class XVIZData {
   }
 
   _determineFormat() {
+    const {messageFormat} = this._opts;
+    if (messageFormat) {
+      this._dataFormat = messageFormat;
+      return;
+    }
+
     let data = this._data;
     switch (getDataContainer(data)) {
       case 'binary':
