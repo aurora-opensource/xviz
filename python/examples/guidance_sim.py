@@ -40,7 +40,8 @@ def get_planned_path(collector_instances):
 
         if is_slim_output:
             _, _, _, _, _, planned_path, _, _, _ \
-                = extract_collector_output_slim(collector_output)
+                = extract_collector_output_slim(collector_output,
+                                                get_camera_data=False)
         else:
             print('collector file is not campatible for running guidance sim')
 
