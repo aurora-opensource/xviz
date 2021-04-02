@@ -73,6 +73,7 @@ def get_next_waypoint_index(current_pos, waypoints):
 
 def set_next_waypoint(current_pos, waypoints, guidance):
     next_wp_idx = get_next_waypoint_index(current_pos, waypoints)
+    print('starting waypoint index:', next_wp_idx)
     guidance.task.next_wp = guidance.task._waypoints[0]
     guidance.task._wpctr = next(guidance.task._wpctr_iter)
     for _ in range(next_wp_idx):
@@ -125,6 +126,7 @@ def main():
                                                   extract_directory)
 
     global_config = load_global_config(collector_config['MACHINE_TYPE'])
+    global_config['guidance']['turning_radius'] = global_config['guidance']['turning_radius_min']
     # global_config['guidance']['wheel_angle_rate_limit'] = 0.52
     add_control_limits_to_guidance_config(global_config)
 
