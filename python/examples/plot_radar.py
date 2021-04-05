@@ -8,7 +8,8 @@ from protobuf_APIs import radar_pb2
 from scenarios.safety_subsystems.radar_filter import RadarFilter
 from scenarios.utils.filesystem import get_collector_instances, load_config, \
     load_global_config
-from scenarios.utils.gis import polar_to_cartesian, euclidean_distance
+from scenarios.utils.gis import polar_to_cartesian, euclidean_distance, \
+    spherical_to_cartesian
 from scenarios.utils.read_protobufs import deserialize_collector_output, \
     extract_collector_output, extract_collector_output_slim
 
@@ -49,12 +50,41 @@ def append_values(target, signal_type, measurement):
     target[signal_type]['phiSdv'].append(measurement['phiSdv'])
 
 
+def append_values_smartmicro(targets, measurement):
+    x, y, z = spherical_to_cartesian(measurement['dr'], measurement['phi'],
+                                     measurement['elevation'])
+    targets['x'].append(x)
+    targets['y'].append(y)
+    targets['z'].append(z)
+    targets['dBpower'].append(measurement['dBpower'])
+    targets['rcs'].append(measurement['rcs'])
+    targets['noise'].append(measurement['noise'])
+
+
 def establish_target_key(tgt_id, targets):
     if tgt_id not in targets:
         targets[tgt_id] = {}
         targets[tgt_id]['timestamp'] = []
         make_keys(targets[tgt_id], signal_type='raw')
         make_keys(targets[tgt_id], signal_type='filtered')
+
+
+def get_targets_smartmicro(collector_instances):
+    targets = defaultdict(list)
+
+    for collector_output in collector_instances:
+
+        collector_output, _ = deserialize_collector_output(collector_output)
+        _, radar_output, _, _, _, _, _, _, _ = extract_collector_output_slim(
+            collector_output, get_camera_data=False)
+
+        if radar_output is None:
+            continue
+
+        for target in radar_output['targets'].values():
+            append_values_smartmicro(targets, target)
+
+    return targets
 
 
 def get_targets(collector_instances, radar_filter, sync_status, selected_tgt_ids):
@@ -319,6 +349,21 @@ def plot_3d(targets, detected_target_ids, signal_type):
     plt.close()
 
 
+def plot_3d_smartmicro(targets, x_key, y_key, z_key):
+    fig = plt.figure()
+    ax = fig.add_subplot(projection='3d')
+
+    ax.scatter(targets[x_key], targets[y_key], targets[z_key])
+
+    ax.view_init(0, 45)
+    ax.set_xlabel(x_key)
+    ax.set_ylabel(y_key)
+    ax.set_zlabel(z_key)
+
+    plt.show()
+    plt.close()
+
+
 def main(selected_tgt_ids, selected_timespan, tgt_id_tspans):
     configfile = Path(__file__).parent / 'scenarios' / 'collector-scenario-config.yaml'
     collector_config = load_config(str(configfile))
@@ -329,30 +374,36 @@ def main(selected_tgt_ids, selected_timespan, tgt_id_tspans):
 
     global_config = load_global_config(collector_config['MACHINE_TYPE'])
     radar_safety_config = global_config['safety']['radar']
+    is_smartmicro = collector_config['smartmicro_radar']
 
     # override thresholds in Global Configs
     # radar_safety_config['d_bpower_threshold'] = -20.0
     # radar_safety_config['phi_sdv_threshold'] = 0.015
     # radar_safety_config['confidence_threshold'] = 0.65
 
-    radar_filter = RadarFilter(radar_safety_config)
-    sync_status = dict(inSync=False)
-    targets = get_targets(collector_instances, radar_filter,
-                          sync_status, selected_tgt_ids)
+    if is_smartmicro:
+        targets = get_targets_smartmicro(collector_instances)
+        plot_3d_smartmicro(targets, 'x', 'y', 'rcs')
 
-    detected_target_ids = get_detected_target_ids(targets, 'raw')
+    else:
+        radar_filter = RadarFilter(radar_safety_config)
+        sync_status = dict(inSync=False)
+        targets = get_targets(collector_instances, radar_filter,
+                              sync_status, selected_tgt_ids, is_smartmicro)
 
-    plot_metadata(targets, detected_target_ids, 'raw',
-                  radar_filter, selected_timespan, tgt_id_tspans)
-    plot_metadata(targets, detected_target_ids, 'filtered',
-                  radar_filter, selected_timespan, tgt_id_tspans)
+        detected_target_ids = get_detected_target_ids(targets, 'raw')
 
-    plot_tracking(targets, detected_target_ids, 'raw',
-                  selected_timespan, tgt_id_tspans)
-    plot_tracking(targets, detected_target_ids, 'filtered',
-                  selected_timespan, tgt_id_tspans)
+        plot_metadata(targets, detected_target_ids, 'raw',
+                      radar_filter, selected_timespan, tgt_id_tspans)
+        plot_metadata(targets, detected_target_ids, 'filtered',
+                      radar_filter, selected_timespan, tgt_id_tspans)
 
-    # plot_3d(targets, detected_target_ids, 'raw')
+        plot_tracking(targets, detected_target_ids, 'raw',
+                      selected_timespan, tgt_id_tspans)
+        plot_tracking(targets, detected_target_ids, 'filtered',
+                      selected_timespan, tgt_id_tspans)
+
+        # plot_3d(targets, detected_target_ids, 'raw')
 
 
 if __name__ == '__main__':
