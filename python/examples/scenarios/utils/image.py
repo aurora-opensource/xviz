@@ -9,7 +9,7 @@ def extract_image(img_bytes):
     return decimg
 
 
-def show_image(image, destination_height=800, destination_width=800):
+def show_image(image, destination_height=800, destination_width=700):
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     # image = cv2.resize(image, (0, 0), fx=.5, fy=.5)  # scale by factor
     image = resize_image(image, destination_height=destination_height,
