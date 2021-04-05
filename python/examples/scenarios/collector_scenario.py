@@ -360,11 +360,11 @@ class CollectorScenario:
             if self.radar_filter.prev_target_set is not None \
                     and self.radar_filter.prev_target_set == radar_output['targets']:
                 return
-            self.radar_filter.prev_target_set = radar_output['targets']
 
             for target in radar_output['targets'].values():
-                (x, y, z) = self.get_object_xyz(target['dr'], target['phi'],
-                                                theta=target['elevation'], radar_ob=True)
+                (x, y, z) = self.get_object_xyz(
+                    target['dr'], target['phi'],
+                    theta=target.get('elevation', 0.), radar_ob=True)
 
                 if self.smartmicro_radar:
                     # d = <cube dimension> / 2, height is determined in collector_meta.py
@@ -406,6 +406,7 @@ class CollectorScenario:
                                                default_target, sync_status)
             # reset the target id set for next cycle
             self.radar_filter.target_id_set = set(range(48))
+            self.radar_filter.prev_target_set = radar_output['targets']
 
         except Exception as e:
             print('Crashed in draw radar targets:', e)
