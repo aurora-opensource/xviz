@@ -99,3 +99,12 @@ class QState:
             else:
                 self.prev_target = target
                 self.steps.append(None)
+
+
+class SmartMicroRadarFilter:
+
+    def __init__(self):
+        pass
+
+    def is_valid_target(self, target):
+        return target['dBpower'] > 120.

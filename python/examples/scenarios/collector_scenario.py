@@ -19,7 +19,8 @@ from scenarios.utils.image import draw_cam_targets_on_image, show_image, \
 from scenarios.utils.read_protobufs import deserialize_collector_output, \
     extract_collector_output, extract_collector_output_slim
 
-from scenarios.safety_subsystems.radar_filter import RadarFilter
+from scenarios.safety_subsystems.radar_filter import RadarFilter, \
+    SmartMicroRadarFilter
 from scenarios.safety_subsystems.path_prediction import get_path_distances, \
     get_path_poly, predict_path
 
@@ -367,17 +368,19 @@ class CollectorScenario:
                     theta=target.get('elevation', 0.), radar_ob=True)
 
                 if self.smartmicro_radar:
-                    # d = <cube dimension> / 2, height is determined in collector_meta.py
-                    # select d such that it is == <height in collector_meta.py> / 2
-                    d = .3
-                    builder.primitive("/smartmicro_radar_targets") \
-                        .polygon([
-                            x-d, y-d, z,
-                            x+d, y-d, z,
-                            x+d, y+d, z,
-                            x-d, y+d, z,
-                        ]) \
-                        .id(str(target['targetId']))
+                    sm = SmartMicroRadarFilter()
+                    if sm.is_valid_target(target):
+                        # d = <cube dimension> / 2, height is determined in collector_meta.py
+                        # select d such that it is == <height in collector_meta.py> / 2
+                        d = .3
+                        builder.primitive("/smartmicro_radar_targets") \
+                            .polygon([
+                                x-d, y-d, z,
+                                x+d, y-d, z,
+                                x+d, y+d, z,
+                                x-d, y+d, z,
+                            ]) \
+                            .id(str(target['targetId']))
 
                 else:
                     z = 1.
