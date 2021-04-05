@@ -359,7 +359,6 @@ def plot_3d_smartmicro(targets, x_key, y_key, z_key):
     ax.set_xlabel(x_key)
     ax.set_ylabel(y_key)
     ax.set_zlabel(z_key)
-
     plt.show()
     plt.close()
 
@@ -383,7 +382,9 @@ def main(selected_tgt_ids, selected_timespan, tgt_id_tspans):
 
     if is_smartmicro:
         targets = get_targets_smartmicro(collector_instances)
-        plot_3d_smartmicro(targets, 'x', 'y', 'rcs')
+        # plot_3d_smartmicro(targets, 'x', 'y', 'rcs')
+        plot_3d_smartmicro(targets, 'x', 'y', 'dBpower')
+        # plot_3d_smartmicro(targets, 'x', 'y', 'noise')
 
     else:
         radar_filter = RadarFilter(radar_safety_config)
