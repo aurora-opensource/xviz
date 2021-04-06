@@ -353,7 +353,17 @@ def plot_3d_smartmicro(targets, x_key, y_key, z_key):
     fig = plt.figure()
     ax = fig.add_subplot(projection='3d')
 
-    ax.scatter(targets[x_key], targets[y_key], targets[z_key])
+    idx = list(map(lambda x: x[0], filter(lambda x: x[1] > 80.,
+                                        enumerate(targets[z_key]))))
+
+    x = list(map(targets[x_key].__getitem__, idx))
+    y = list(map(targets[y_key].__getitem__, idx))
+    z = list(map(targets[z_key].__getitem__, idx))
+
+    cm = plt.cm.get_cmap('RdYlBu')
+    im = ax.scatter(x, y, z, c=z, cmap=cm)
+
+    fig.colorbar(im, ax=ax)
 
     ax.view_init(0, 45)
     ax.set_xlabel(x_key)
