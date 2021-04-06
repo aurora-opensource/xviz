@@ -348,13 +348,15 @@ def plot_3d(targets, detected_target_ids, signal_type):
     plt.show()
     plt.close()
 
-
 def plot_3d_smartmicro(targets, x_key, y_key, z_key):
     fig = plt.figure()
     ax = fig.add_subplot(projection='3d')
 
-    idx = list(map(lambda x: x[0], filter(lambda x: x[1] > 80.,
+    # filter out z values below a threshold
+    idx = set(map(lambda x: x[0], filter(lambda x: x[1] > 80.,
                                         enumerate(targets[z_key]))))
+    # idx = set(map(lambda x: x[0], filter(lambda _: True,
+    #                                     enumerate(targets[z_key]))))
 
     x = list(map(targets[x_key].__getitem__, idx))
     y = list(map(targets[y_key].__getitem__, idx))
