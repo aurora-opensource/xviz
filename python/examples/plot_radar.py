@@ -57,6 +57,7 @@ def append_values_smartmicro(targets, measurement):
     targets['x'].append(x)
     targets['y'].append(y)
     targets['z'].append(z)
+    targets['vr'].append(measurement['vr'])
     targets['dBpower'].append(measurement['dBpower'])
     targets['rcs'].append(measurement['rcs'])
     targets['noise'].append(measurement['noise'])
