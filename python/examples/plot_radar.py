@@ -1,3 +1,4 @@
+import math
 import argparse
 from pathlib import Path
 from collections import deque, defaultdict
@@ -348,29 +349,51 @@ def plot_3d(targets, detected_target_ids, signal_type):
     plt.show()
     plt.close()
 
-def plot_3d_smartmicro(targets, x_key, y_key, z_key):
+
+def get_filtered_indices(signal, bounds):
+    return list(map(lambda x: x[0],
+                    filter(lambda x: bounds[0] < x[1] < bounds[1],
+                           enumerate(signal))))
+
+
+def plot_3d_smartmicro(targets, x_key, y_key, z_key, c_key=None,
+                       x_bounds=(-math.inf, math.inf),
+                       y_bounds=(-math.inf, math.inf),
+                       z_bounds=(-math.inf, math.inf),
+                       c_bounds=(-math.inf, math.inf)):
+
     fig = plt.figure()
     ax = fig.add_subplot(projection='3d')
 
-    # filter out z values below a threshold
-    idx = set(map(lambda x: x[0], filter(lambda x: x[1] > 80.,
-                                        enumerate(targets[z_key]))))
-    # idx = set(map(lambda x: x[0], filter(lambda _: True,
-    #                                     enumerate(targets[z_key]))))
+    x_idx = set(get_filtered_indices(targets[x_key], x_bounds))
+    y_idx = set(get_filtered_indices(targets[y_key], y_bounds))
+    z_idx = set(get_filtered_indices(targets[z_key], z_bounds))
+
+    if c_key is None:
+        idx = list(x_idx & y_idx & z_idx)
+        c = None
+    else:
+        c_idx = set(get_filtered_indices(targets[c_key], c_bounds))
+        idx = list(x_idx & y_idx & z_idx & c_idx)
+        c = list(map(targets[c_key].__getitem__, idx))
 
     x = list(map(targets[x_key].__getitem__, idx))
     y = list(map(targets[y_key].__getitem__, idx))
     z = list(map(targets[z_key].__getitem__, idx))
 
+    if c is None:
+        c = z
+
     cm = plt.cm.get_cmap('RdYlBu')
-    im = ax.scatter(x, y, z, c=z, cmap=cm)
+    im = ax.scatter(x, y, z, c=c, cmap=cm)
 
     fig.colorbar(im, ax=ax)
 
-    ax.view_init(0, 45)
+    ax.view_init(45, 45)
     ax.set_xlabel(x_key)
     ax.set_ylabel(y_key)
     ax.set_zlabel(z_key)
+
     plt.show()
     plt.close()
 
@@ -394,15 +417,16 @@ def main(selected_tgt_ids, selected_timespan, tgt_id_tspans):
 
     if is_smartmicro:
         targets = get_targets_smartmicro(collector_instances)
-        # plot_3d_smartmicro(targets, 'x', 'y', 'rcs')
-        plot_3d_smartmicro(targets, 'x', 'y', 'dBpower')
+        plot_3d_smartmicro(targets, 'x', 'y', 'z', c_key='dBpower', c_bounds=(80, math.inf))
+        # plot_3d_smartmicro(targets, 'x', 'y', 'dBpower', z_bounds=(80, math.inf))
         # plot_3d_smartmicro(targets, 'x', 'y', 'noise')
+        # plot_3d_smartmicro(targets, 'x', 'y', 'rcs')
 
     else:
         radar_filter = RadarFilter(radar_safety_config)
         sync_status = dict(inSync=False)
         targets = get_targets(collector_instances, radar_filter,
-                              sync_status, selected_tgt_ids, is_smartmicro)
+                              sync_status, selected_tgt_ids)
 
         detected_target_ids = get_detected_target_ids(targets, 'raw')
 
