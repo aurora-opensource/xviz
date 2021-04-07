@@ -368,7 +368,7 @@ class CollectorScenario:
                     theta=target.get('elevation', 0.), radar_ob=True)
 
                 if self.smartmicro_radar:
-                    sm = SmartMicroRadarFilter()
+                    sm = SmartMicroRadarFilter(dBpower_threshold=80.)
                     if sm.is_valid_target(target):
                         # d = <cube dimension> / 2, height is determined in collector_meta.py
                         # select d such that it is == <height in collector_meta.py> / 2
