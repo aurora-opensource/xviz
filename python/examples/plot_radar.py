@@ -351,16 +351,15 @@ def plot_3d(targets, detected_target_ids, signal_type):
 
 
 def get_filtered_indices(signal, bounds):
+    if bounds is None:
+        return list(range(len(signal)))
     return list(map(lambda x: x[0],
                     filter(lambda x: bounds[0] < x[1] < bounds[1],
                            enumerate(signal))))
 
 
-def plot_3d_smartmicro(targets, x_key, y_key, z_key, c_key=None,
-                       x_bounds=(-math.inf, math.inf),
-                       y_bounds=(-math.inf, math.inf),
-                       z_bounds=(-math.inf, math.inf),
-                       c_bounds=(-math.inf, math.inf)):
+def plot_3d_smartmicro(targets, x_key, y_key, z_key, c_key=None, x_bounds=None,
+                       y_bounds=None, z_bounds=None, c_bounds=None):
 
     fig = plt.figure()
     ax = fig.add_subplot(projection='3d')
