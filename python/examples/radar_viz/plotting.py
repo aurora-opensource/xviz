@@ -182,10 +182,28 @@ def plot_3d_smartmicro(targets, x_key, y_key, z_key, c_key=None, x_bounds=None,
 
     fig.colorbar(im, ax=ax)
 
-    ax.view_init(45, 45)
+    ax.view_init(90, 180)
     ax.set_xlabel(x_key)
     ax.set_ylabel(y_key)
     ax.set_zlabel(z_key)
+
+    plt.show()
+    plt.close()
+
+
+def polar_plot(targets):
+    r = targets['dr']
+    phi = targets['phi']
+
+    fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
+    ax.scatter(phi, r)
+    ax.set_thetamin(-85.)
+    ax.set_thetamax(85.)
+    ax.set_theta_zero_location("N")
+    # ax.set_rmax(35)
+    # ax.set_rticks([0.5, 1, 1.5, 2])  # Less radial ticks
+    # ax.set_rlabel_position(-22.5)  # Move radial labels away from plotted line
+    ax.grid(True)
 
     plt.show()
     plt.close()

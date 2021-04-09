@@ -9,7 +9,7 @@ from scenarios.utils.filesystem import get_collector_instances, load_config, \
     load_global_config
 from radar_viz.read import get_targets, get_detected_target_ids, get_targets_smartmicro
 from radar_viz.plotting import plot_metadata, plot_tracking, plot_3d, \
-    plot_3d_smartmicro
+    plot_3d_smartmicro, polar_plot
 
 
 def main(selected_tgt_ids, selected_timespan, tgt_id_tspans):
@@ -30,13 +30,25 @@ def main(selected_tgt_ids, selected_timespan, tgt_id_tspans):
     # radar_safety_config['confidence_threshold'] = 0.65
 
     if is_smartmicro:
-        radar_filter = SmartMicroRadarFilter(dBpower_threshold=80)
+        dBpower_threshold = 120
+        radar_filter = SmartMicroRadarFilter(dBpower_threshold=dBpower_threshold)
         raw_targets, filtered_targets = get_targets_smartmicro(
             collector_instances, radar_filter)
+
+        # polar_plot(filtered_targets)
+
+        # plot_3d_smartmicro(raw_targets, 'x', 'y', 'z',
+        #                    c_key='rcs')
+        # plot_3d_smartmicro(raw_targets, 'x', 'y', 'z',
+        #                    c_key='noise', c_bounds=(10, math.inf))
+        # plot_3d_smartmicro(raw_targets, 'x', 'y', 'z',
+        #                    c_key='vr')
+        # plot_3d_smartmicro(filtered_targets, 'x', 'y', 'z',
+        #                    c_key='vr')
         plot_3d_smartmicro(raw_targets, 'x', 'y', 'z',
-                           c_key='dBpower', c_bounds=(80, math.inf))
+                           c_key='dBpower', c_bounds=(10, math.inf))
         plot_3d_smartmicro(filtered_targets, 'x', 'y', 'z',
-                           c_key='dBpower', c_bounds=(80, math.inf))
+                           c_key='dBpower', c_bounds=(dBpower_threshold, math.inf))
 
     else:
         radar_filter = RadarFilter(radar_safety_config)
