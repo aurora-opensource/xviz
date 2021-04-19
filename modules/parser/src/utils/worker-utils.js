@@ -86,8 +86,10 @@ export class WorkerFarm {
     maxConcurrency = 1,
     debug = () => {},
     initialMessage = null,
-    capacity = null
+    capacity = null,
+    id = 'default'
   }) {
+    this.id = id;
     this.workerURL = workerURL;
     this.workers = [];
     this.queue = [];
@@ -141,6 +143,7 @@ export class WorkerFarm {
       const job = queue.shift();
 
       this.debug({
+        id: this.id,
         message: 'processing',
         worker: worker.metadata.name,
         backlog: queue.length,
@@ -153,6 +156,7 @@ export class WorkerFarm {
         .catch(job.onError)
         .then(() => {
           this.debug({
+            id: this.id,
             message: 'waiting',
             worker: worker.metadata.name,
             backlog: queue.length,

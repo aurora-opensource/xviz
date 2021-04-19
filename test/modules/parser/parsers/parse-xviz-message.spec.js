@@ -132,3 +132,58 @@ tape('parseXVIZMessage#parseMetadata worker', t => {
     t.end();
   }
 });
+
+tape('parseXVIZMessage#parseMetadata multiple worker', t => {
+  if (isBrowser) {
+    // XVIZ Version of workers would be set to 1 by default
+    initializeWorkers({id: 'A', worker: true, maxConcurrency: 1});
+    initializeWorkers({id: 'B', worker: true, maxConcurrency: 1});
+
+    // After parsing on main thread, this will call setXVIZConfig, which
+    // should trigger workers to have their XVIZ version updated
+    parseXVIZMessage({
+      message: metadataMessageV2,
+      onResult: result => {
+        t.equal(result.type, 'METADATA', 'Message type detected as metadata');
+        t.equal(getXVIZConfig().currentMajorVersion, 2, 'XVIZ Version set to 2');
+      },
+      onError: err => t.fail(err),
+      debug: msg => t.comment(msg),
+      worker: false
+    });
+
+    // Verify the XVIZ v2 messages are properly parsed in different worker pools
+    let resultCalled = 0;
+    parseXVIZMessage({
+      message: xvizUpdateV2,
+      onResult: result => {
+        t.equal(result.type, 'TIMESLICE', 'XVIZ message properly parsed on worker');
+        resultCalled++;
+        if (resultCalled === 2) {
+          t.end();
+        }
+      },
+      onError: err => t.fail(err),
+      debug: msg => t.comment(JSON.stringify(msg)),
+      worker: true,
+      workerId: 'A'
+    });
+    parseXVIZMessage({
+      message: xvizUpdateV2,
+      onResult: result => {
+        t.equal(result.type, 'TIMESLICE', 'XVIZ message properly parsed on worker');
+        resultCalled++;
+        if (resultCalled === 2) {
+          t.end();
+        }
+      },
+      onError: err => t.fail(err),
+      debug: msg => t.comment(JSON.stringify(msg)),
+      worker: true,
+      workerId: 'B'
+    });
+  } else {
+    t.comment('-- browser only test');
+    t.end();
+  }
+});
