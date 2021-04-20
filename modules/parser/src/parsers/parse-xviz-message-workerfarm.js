@@ -17,22 +17,29 @@ import {WorkerFarm} from '../utils/worker-utils';
 import {getXVIZConfig, subscribeXVIZConfigChange} from '../config/xviz-config';
 import streamDataWorker from '../../dist/workers/stream-data.worker.js';
 
-let workerFarm = null;
+const workerFarm = {};
 
-export function getWorkerFarm() {
-  return workerFarm;
+export function getWorkerFarm(id = 'default') {
+  return workerFarm[id];
 }
 
 // Mainly for testing
 export function destroyWorkerFarm() {
-  if (workerFarm) {
-    workerFarm.destroy();
-    workerFarm = null;
-  }
+  Object.keys(workerFarm).forEach(id => {
+    if (workerFarm[id]) {
+      workerFarm[id].destroy();
+      delete workerFarm[id];
+    }
+  });
 }
 
-export function initializeWorkerFarm({worker, maxConcurrency = 4, capacity = null}) {
-  if (!workerFarm) {
+export function initializeWorkerFarm({
+  worker,
+  maxConcurrency = 4,
+  capacity = null,
+  id = 'default'
+}) {
+  if (!workerFarm[id]) {
     const xvizConfig = {...getXVIZConfig()};
     delete xvizConfig.preProcessPrimitive;
     let workerURL;
@@ -46,7 +53,8 @@ export function initializeWorkerFarm({worker, maxConcurrency = 4, capacity = nul
       workerURL = URL.createObjectURL(blob);
     }
 
-    workerFarm = new WorkerFarm({
+    workerFarm[id] = new WorkerFarm({
+      id,
       workerURL,
       maxConcurrency,
       capacity,
@@ -56,12 +64,14 @@ export function initializeWorkerFarm({worker, maxConcurrency = 4, capacity = nul
 }
 
 export function updateWorkerXVIZVersion() {
-  if (workerFarm) {
-    const xvizConfig = {...getXVIZConfig()};
-    delete xvizConfig.preProcessPrimitive;
+  Object.keys(workerFarm).forEach(id => {
+    if (workerFarm[id]) {
+      const xvizConfig = {...getXVIZConfig()};
+      delete xvizConfig.preProcessPrimitive;
 
-    workerFarm.broadcast({xvizConfig});
-  }
+      workerFarm[id].broadcast({xvizConfig});
+    }
+  });
 }
 
 // Subscribe to XVIZConfig changes so we can

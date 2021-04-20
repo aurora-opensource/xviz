@@ -17,8 +17,8 @@ import {postDeserialize} from './serialize';
 import {getWorkerFarm, initializeWorkerFarm} from './parse-xviz-message-workerfarm';
 
 // Public function for initializing workers
-export function initializeWorkers({worker, maxConcurrency = 4, capacity = null}) {
-  initializeWorkerFarm({worker, maxConcurrency, capacity});
+export function initializeWorkers({id, worker, maxConcurrency = 4, capacity = null}) {
+  initializeWorkerFarm({id, worker, maxConcurrency, capacity});
 }
 
 export function parseXVIZMessage({
@@ -29,16 +29,18 @@ export function parseXVIZMessage({
   debug,
   // worker options
   worker = false,
+  workerId = 'default',
   maxConcurrency = 4,
   capacity = null,
   opts = {}
 }) {
   if (worker) {
-    if (!getWorkerFarm()) {
-      initializeWorkers({worker, maxConcurrency, capacity});
+    const id = workerId;
+    if (!getWorkerFarm(id)) {
+      initializeWorkers({id, worker, maxConcurrency, capacity});
     }
 
-    const workerFarm = getWorkerFarm();
+    const workerFarm = getWorkerFarm(id);
 
     if (debug) {
       workerFarm.debug = debug;

@@ -38,7 +38,7 @@ function shouldRunTest(t) {
   return true;
 }
 
-function runWorkerTest(t, total, workerFarmConfig, onFinished) {
+function runWorkerTest(t, total, workerFarmConfig, onFinished, skipEnd) {
   let processed = 0;
 
   const workerFarm = new WorkerFarm(workerFarmConfig);
@@ -52,7 +52,9 @@ function runWorkerTest(t, total, workerFarmConfig, onFinished) {
         onFinished(workerFarm);
       }
       workerFarm.destroy();
-      t.end();
+      if (!skipEnd) {
+        t.end();
+      }
     }
   };
 
@@ -127,4 +129,61 @@ test('WorkerFarm#Capped', t => {
   };
 
   runWorkerTest(t, CHUNKS_TOTAL, workerFarmConfig, onFinished);
+});
+
+class TestWorkerFarmer {
+  constructor(t, id, chunks, concurrency, capacity) {
+    this.t = t;
+    this.id = id;
+    this.chunks = chunks;
+    this.concurrency = concurrency;
+    this.capacity = capacity;
+
+    this.updates = [];
+  }
+
+  config() {
+    return {
+      id: this.id,
+      workerURL: testWorker,
+      maxConcurrency: this.concurrency,
+      debug: message => {
+        this.t.comment(`Processing with worker ${message.worker}, backlog ${message.backlog}`);
+        this.updates.push(message);
+      }
+    };
+  }
+}
+
+test('WorkerFarm#Multiple', t => {
+  if (!shouldRunTest(t)) {
+    return;
+  }
+
+  const farmerA = new TestWorkerFarmer(t, 'A', 6, 3, 1000);
+  const farmerB = new TestWorkerFarmer(t, 'B', 5, 2, 1000);
+
+  let resultCalled = 0;
+  const onFinished = farmer => {
+    return workerFarm => {
+      t.equals(0, workerFarm.dropped, 'No data dropped');
+
+      const messageCounts = {};
+      farmer.updates.forEach(u => {
+        messageCounts[u.message] = messageCounts[u.message] + 1 || 1;
+      });
+
+      t.equals(messageCounts.processing, farmer.chunks, 'worker sends processing messages');
+      t.ok(messageCounts.waiting >= farmer.concurrency, 'worker sends waiting messages');
+
+      resultCalled++;
+      if (resultCalled === 2) {
+        t.end();
+      }
+    };
+  };
+
+  const skipEnd = true;
+  runWorkerTest(t, farmerA.chunks, farmerA.config(), onFinished(farmerA), skipEnd);
+  runWorkerTest(t, farmerB.chunks, farmerB.config(), onFinished(farmerB), skipEnd);
 });
