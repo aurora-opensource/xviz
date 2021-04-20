@@ -13,7 +13,7 @@ from scenarios.utils.read_protobufs import deserialize_collector_output, \
 from scenarios.utils.gis import lonlat_to_utm, get_wheel_angle
 
 from smarthp_utilities.config_utils import add_control_limits_to_guidance_config
-sys.path.append(str(Path(__file__).parents[2] / 'SmartHP-v2'))
+sys.path.append(str(Path(__file__).resolve().parents[2] / 'SmartHP-v2'))
 from smarthp.gnc.guidance import Guidance, CTEGuidanceTask
 
 
