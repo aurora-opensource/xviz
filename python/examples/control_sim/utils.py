@@ -5,23 +5,36 @@ from scenarios.utils.read_protobufs import deserialize_collector_output, \
     extract_collector_output_slim
 
 
-def get_planned_path(collector_instances):
+def detect_sync_task(collector_instances):
     for collector_instance in collector_instances:
-
         collector_output, is_slim_output = deserialize_collector_output(
             collector_instance)
+        if is_slim_output:
+            _, _, _, _, _, _, sync_status, _, _ \
+                = extract_collector_output_slim(collector_output,
+                                                get_camera_data=False)
+        else:
+            print('collector file is not campatible for running guidance sim')
+        if sync_status is not None and sync_status['runningSync']:
+            print('running SyncPIDTask simulation')
+            return True
+    print('running CTEGuidanceTask simulation')
+    return False
 
+
+def get_planned_path(collector_instances):
+    for collector_instance in collector_instances:
+        collector_output, is_slim_output = deserialize_collector_output(
+            collector_instance)
         if is_slim_output:
             _, _, _, _, _, planned_path, _, _, _ \
                 = extract_collector_output_slim(collector_output,
                                                 get_camera_data=False)
         else:
             print('collector file is not campatible for running guidance sim')
-
         if planned_path is not None:
             if planned_path.size > 0:
                 return planned_path.reshape(-1, 2)
-
     print('planned path never found in collector file')
     return None
 
@@ -59,6 +72,9 @@ def get_data_instances(collector_instances):
     guidance_states_with_duplicates = []
     control_signals = []
     control_signals_with_duplicates = []
+    field_definitions = []
+    sync_statuses = []
+    sync_parameters = []
 
     for collector_instance in collector_instances:
 
@@ -66,7 +82,8 @@ def get_data_instances(collector_instances):
             collector_instance)
 
         if is_slim_output:
-            _, _, _, machine_state, _, _, _, control_signal, _ \
+            _, _, _, machine_state, field_definition, _, sync_status, \
+                control_signal, sync_params \
                 = extract_collector_output_slim(collector_output,
                                                 get_camera_data=False)
         else:
@@ -120,5 +137,15 @@ def get_data_instances(collector_instances):
             control_signals_with_duplicates.append(control_signal)
             guidance_states_with_duplicates.append(guidance_state)
 
+        if field_definition is not None:
+            field_definitions.append(field_definition)
+
+        if sync_status is not None:
+            sync_statuses.append(sync_status)
+
+        if sync_params is not None:
+            sync_parameters.append(sync_params)
+
     return guidance_states, guidance_states_with_duplicates, \
-        control_signals, control_signals_with_duplicates
+        control_signals, control_signals_with_duplicates, field_definitions, \
+        sync_statuses, sync_parameters, utm_zone
