@@ -108,4 +108,4 @@ class SmartMicroRadarFilter:
 
     def is_valid_target(self, target):
         return target['dBpower'] > self.dBpower_threshold \
-            # and target['vr'] != 0.0
+            and target['vr'] != 0.0
