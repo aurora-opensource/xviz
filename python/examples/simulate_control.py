@@ -61,7 +61,7 @@ def main():
                 continue
         else:
             continue
-        
+
         tractor_theta = (90 - tractor_state['heading']) * math.pi / 180
         tractor_easting, tractor_northing = lonlat_to_utm(
             tractor_state['longitude'],
