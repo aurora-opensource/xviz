@@ -99,3 +99,13 @@ class QState:
             else:
                 self.prev_target = target
                 self.steps.append(None)
+
+
+class SmartMicroRadarFilter:
+
+    def __init__(self, dBpower_threshold=0.):
+        self.dBpower_threshold = dBpower_threshold
+
+    def is_valid_target(self, target):
+        return target['dBpower'] > self.dBpower_threshold \
+            and target['vr'] != 0.0
