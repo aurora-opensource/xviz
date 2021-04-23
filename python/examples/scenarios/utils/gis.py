@@ -145,6 +145,19 @@ def polar_to_cartesian(theta, r):
     return (r * math.cos(theta), r * math.sin(theta))
 
 
+def spherical_to_cartesian(r, phi, theta):
+    """
+    Input:
+    - r: radial distance
+    - phi: azimuth angle (radians)
+    - theta: elevation angle (radians)
+    """
+    x = r * math.cos(phi)
+    y = r * math.sin(phi)
+    z = r * math.sin(theta)
+    return (x, y, z)
+
+
 def euclidean_distance(x0, y0, x1, y1):
     return math.sqrt((x1-x0)**2 + (y1-y0)**2)
 
