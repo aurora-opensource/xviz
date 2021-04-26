@@ -31,21 +31,19 @@ def main():
     is_sync_task = detect_sync_task(collector_instances)
     waypoints = list(map(tuple, planned_path))
 
-    guidance_states, guidance_states_with_duplicates, control_signals, \
-        control_signals_with_duplicates, field_definitions, sync_statuses, \
+    guidance_states, control_signals, field_definitions, sync_statuses, \
         sync_parameters, utm_zone = get_data_instances(collector_instances)
 
     if is_sync_task:
-        simulate_sync_pid_task(guidance_states_with_duplicates, waypoints,
-                               global_config, field_definitions,
-                               sync_parameters, sync_statuses, utm_zone)
+        simulated_control_signals = simulate_sync_pid_task(
+            guidance_states, waypoints, global_config, field_definitions,
+            sync_parameters, sync_statuses, utm_zone)
     else:
         simulated_control_signals = simulate_cte_guidance_task(
-            guidance_states_with_duplicates, waypoints, global_config)
+            guidance_states, waypoints, global_config)
 
-    plot_path_tracking(guidance_states, waypoints)
-    plot_control(control_signals_with_duplicates,
-                 simulated_control_signals, global_config)
+    plot_path_tracking(list(zip(*guidance_states))[1], waypoints)
+    plot_control(list(zip(*control_signals))[1], simulated_control_signals, global_config)
 
 
 if __name__ == '__main__':

@@ -46,6 +46,16 @@ def get_value_list(dict_list, k):
     return list(map(lambda x: x[k], dict_list))
 
 
+def get_current_data(data_tuples, current_idx):
+    data_idx, data_value = data_tuples[0]
+    for i in range(len(data_tuples)-1):
+        data_idx, data_value = data_tuples[i]
+        next_data_idx = data_tuples[i+1][0]
+        if next_data_idx > current_idx:
+            break
+    return data_idx, data_value
+
+
 def get_next_waypoint_index(current_pos, waypoints):
     current_pos = np.array(current_pos)
     waypoints = np.array(waypoints)
@@ -57,26 +67,24 @@ def get_next_waypoint_index(current_pos, waypoints):
         else closest_wp_idx + 1
 
 
-def set_next_waypoint(current_pos, waypoints, guidance):
+def set_next_waypoint(current_pos, waypoints, task):
     next_wp_idx = get_next_waypoint_index(current_pos, waypoints)
     print('starting waypoint index:', next_wp_idx)
-    guidance.task.next_wp = guidance.task._waypoints[0]
-    guidance.task._wpctr = next(guidance.task._wpctr_iter)
+    task.next_wp = task._waypoints[0]
+    task._wpctr = next(task._wpctr_iter)
     for _ in range(next_wp_idx):
-        guidance.task.update_waypoint()
-    guidance.task.initialized = True
+        task.update_waypoint()
+    task.initialized = True
 
 
 def get_data_instances(collector_instances):
     guidance_states = []
-    guidance_states_with_duplicates = []
     control_signals = []
-    control_signals_with_duplicates = []
     field_definitions = []
     sync_statuses = []
     sync_parameters = []
 
-    for collector_instance in collector_instances:
+    for i, collector_instance in enumerate(collector_instances):
 
         collector_output, is_slim_output = deserialize_collector_output(
             collector_instance)
@@ -84,24 +92,27 @@ def get_data_instances(collector_instances):
         if is_slim_output:
             _, _, _, machine_state, field_definition, _, sync_status, \
                 control_signal, sync_params \
-                = extract_collector_output_slim(collector_output,
-                                                get_camera_data=False)
+                = extract_collector_output_slim(
+                    collector_output, get_camera_data=False,
+                    preserving_proto_field_name=True)
         else:
             print('collector file is not campatible for running guidance sim')
             return
 
         if machine_state is not None:
-            utm_zone = machine_state['opState']['refUtmZone']
-            vehicle_states = machine_state['vehicleStates']
+            utm_zone = machine_state['op_state']['ref_utm_zone']
+            vehicle_states = machine_state['vehicle_states']
             tractor_state = None
             combine_states = {}
-            guidance_state = {}
+            guidance_state = {'zone': utm_zone}
 
             for vehicle, state in vehicle_states.items():
                 if vehicle == 'tractor':
                     tractor_state = state
                 else:
-                    combine_states[vehicle] = state
+                    state['lat'] = state.pop('latitude')
+                    state['lon'] = state.pop('longitude')
+                    combine_states[vehicle + '_state'] = state
 
             if tractor_state is not None:
                 tractor_easting, tractor_northing = lonlat_to_utm(
@@ -118,34 +129,19 @@ def get_data_instances(collector_instances):
             if combine_states:
                 guidance_state.update(combine_states)
 
-            guidance_states.append(guidance_state)
+            guidance_states.append((i, guidance_state))
 
         if control_signal is not None:
-            control_signals.append(control_signal)
-
-        if bool(guidance_state) ^ bool(control_signal):
-            if guidance_state:  # no control signal in this instance
-                if control_signals:
-                    control_signals_with_duplicates.append(control_signals[-1])
-                    guidance_states_with_duplicates.append(guidance_state)
-            else:  # no guidance state in this instance
-                if guidance_states:
-                    guidance_states_with_duplicates.append(guidance_states[-1])
-                    control_signals_with_duplicates.append(control_signal)
-
-        elif machine_state and control_signal:
-            control_signals_with_duplicates.append(control_signal)
-            guidance_states_with_duplicates.append(guidance_state)
+            control_signals.append((i, control_signal))
 
         if field_definition is not None:
-            field_definitions.append(field_definition)
+            field_definitions.append((i, field_definition))
 
         if sync_status is not None:
-            sync_statuses.append(sync_status)
+            sync_statuses.append((i, sync_status))
 
         if sync_params is not None:
-            sync_parameters.append(sync_params)
+            sync_parameters.append((i, sync_params))
 
-    return guidance_states, guidance_states_with_duplicates, \
-        control_signals, control_signals_with_duplicates, field_definitions, \
+    return guidance_states, control_signals, field_definitions, \
         sync_statuses, sync_parameters, utm_zone

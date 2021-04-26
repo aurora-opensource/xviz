@@ -43,9 +43,9 @@ def plot_control(control_signals, simulated_control_signals, global_config):
 
     wheel_base = global_config['guidance']['wheel_base']
 
-    actual_commanded_speeds = get_value_list(control_signals, 'setSpeed')
+    actual_commanded_speeds = get_value_list(control_signals, 'set_speed')
     actual_commanded_curvatures = get_value_list(control_signals,
-                                                 'commandCurvature')
+                                                 'command_curvature')
     actual_commanded_wheel_angles = list(map(
         lambda x: get_wheel_angle(x, wheel_base) * 180 / math.pi,
         actual_commanded_curvatures))
