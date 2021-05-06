@@ -142,6 +142,7 @@ class CollectorScenario:
 
         except Exception as e:
             print("Crashed in get_message:", e)
+            raise e
 
 
     def _draw_measuring_references(self, builder: xviz.XVIZBuilder, timestamp):
@@ -299,6 +300,7 @@ class CollectorScenario:
 
         except Exception as e:
             print('Crashed in draw collector instance:', e)
+            raise e
 
 
     def _show_images(self, camera_data, builder: xviz.XVIZBuilder):
@@ -345,6 +347,7 @@ class CollectorScenario:
 
         except Exception as e:
             print('Crashed in show images:', e)
+            raise e
 
 
     def _draw_radar_targets(self, radar_output, builder: xviz.XVIZBuilder):
@@ -413,6 +416,7 @@ class CollectorScenario:
 
         except Exception as e:
             print('Crashed in draw radar targets:', e)
+            raise e
 
 
     def _draw_tracking_targets(self, tracking_output, builder: xviz.XVIZBuilder):
@@ -453,6 +457,7 @@ class CollectorScenario:
 
         except Exception as e:
             print('Crashed in draw tracking targets:', e)
+            raise e
 
 
     def _draw_camera_targets(self, camera_output, builder: xviz.XVIZBuilder):
@@ -473,6 +478,7 @@ class CollectorScenario:
 
         except Exception as e:
             print('Crashed in draw camera targets:', e)
+            raise e
 
 
     def _draw_combine(self, builder: xviz.XVIZBuilder):
@@ -524,6 +530,7 @@ class CollectorScenario:
 
         except Exception as e:
             print('Crashed in draw combine:', e)
+            raise e
 
 
     def _draw_auger(self, builder: xviz.XVIZBuilder):
@@ -556,6 +563,7 @@ class CollectorScenario:
 
         except Exception as e:
             print('Crashed in draw auger:', e)
+            raise e
 
 
     def _draw_predicted_paths(self, builder: xviz.XVIZBuilder):
@@ -582,6 +590,7 @@ class CollectorScenario:
 
         except Exception as e:
             print('Crashed in draw predicted paths:', e)
+            raise e
 
 
     def _draw_predictive_polygons(self, veh_speed, wheel_angle,
@@ -616,6 +625,7 @@ class CollectorScenario:
 
         except Exception as e:
             print('Crashed in draw predictive polygons:', e)
+            raise e
 
 
     def _draw_vision_polygons(self, veh_speed, wheel_angle,
@@ -651,6 +661,7 @@ class CollectorScenario:
 
         except Exception as e:
             print('Crashed in draw predictive polygons:', e)
+            raise e
 
 
     def _draw_control_signal(self, builder: xviz.XVIZBuilder):
@@ -686,6 +697,7 @@ class CollectorScenario:
 
         except Exception as e:
             print('Crashed in draw control signal:', e)
+            raise e
 
 
     def _draw_planned_path(self, builder: xviz.XVIZBuilder):
@@ -707,6 +719,7 @@ class CollectorScenario:
 
         except Exception as e:
             print('Crashed in draw planned path:', e)
+            raise e
 
 
     def _draw_field_definition(self, builder: xviz.XVIZBuilder):
@@ -740,6 +753,7 @@ class CollectorScenario:
 
         except Exception as e:
             print('Crashed in draw field definition:', e)
+            raise e
 
 
     def _draw_sync_status(self, builder: xviz.XVIZBuilder):
@@ -763,6 +777,7 @@ class CollectorScenario:
 
         except Exception as e:
             print('Crashed in draw sync status:', e)
+            raise e
 
 
     def _draw_sync_params(self, builder: xviz.XVIZBuilder):
@@ -804,6 +819,7 @@ class CollectorScenario:
 
         except Exception as e:
             print('Crashed in draw sync params:', e)
+            raise e
 
 
     def update_machine_state(self, machine_state):

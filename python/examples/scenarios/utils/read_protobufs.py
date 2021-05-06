@@ -69,9 +69,12 @@ def extract_collector_output_slim(collector_output, get_camera_data=True):
                 field_definition = None
 
         if 'collector/data/planned_path' in collector_output.data:
-            planned_path = collector_output.data['collector/data/planned_path']
-            planned_path = np.frombuffer(planned_path, dtype=np.float_)
-            del collector_output.data['collector/data/planned_path']
+            try:
+                planned_path = collector_output.data['collector/data/planned_path']
+                planned_path = np.frombuffer(planned_path, dtype=np.float_)
+                del collector_output.data['collector/data/planned_path']
+            except Exception as e:
+                planned_path = None
         else:
             planned_path = None
 
@@ -150,6 +153,7 @@ def extract_collector_output_slim(collector_output, get_camera_data=True):
 
     except Exception as e:
         print('failed to extract collector output:', e)
+        raise e
 
     return camera_data, radar_output, tracking_output, machine_state, \
             field_definition, planned_path, sync_status, control_signal, sync_params
