@@ -260,7 +260,10 @@ class CollectorScenario:
 
             if planned_path is not None:
                 if planned_path.size > 0:
-                    self.planned_path = planned_path.reshape(-1, 2)
+                    try:
+                        self.planned_path = planned_path.reshape(-1, 2)
+                    except Exception as e:
+                        print('failed to reshape planned path:', e)
                 else:
                     self.planned_path = None
 
