@@ -25,13 +25,15 @@ def deserialize_collector_output(file_path):
     return collector_output, is_slim_output
 
 
-def extract_collector_output_slim(collector_output, get_camera_data=True):
+def extract_collector_output_slim(collector_output, get_camera_data=True,
+                                  preserving_proto_field_name=False):
     try:
         if mc.RADAR_TOPIC in collector_output.data:
             radar_output = radar_pb2.RadarOutput()
             radar_output.ParseFromString(collector_output.data[mc.RADAR_TOPIC])
-            radar_output = MessageToDict(radar_output,
-                                         including_default_value_fields=True)
+            radar_output = MessageToDict(
+                radar_output, including_default_value_fields=True,
+                preserving_proto_field_name=preserving_proto_field_name)
             del collector_output.data[mc.RADAR_TOPIC]
         else:
             radar_output = None
@@ -39,8 +41,9 @@ def extract_collector_output_slim(collector_output, get_camera_data=True):
         if mc.TRACKS_TOPIC in collector_output.data:
             tracking_output = falconeye_pb2.TrackingOutput()
             tracking_output.ParseFromString(collector_output.data[mc.TRACKS_TOPIC])
-            tracking_output = MessageToDict(tracking_output,
-                                            including_default_value_fields=True)
+            tracking_output = MessageToDict(
+                tracking_output, including_default_value_fields=True,
+                preserving_proto_field_name=preserving_proto_field_name)
             del collector_output.data[mc.TRACKS_TOPIC]
         else:
             tracking_output = None
@@ -49,8 +52,9 @@ def extract_collector_output_slim(collector_output, get_camera_data=True):
             machine_state = gandalf_pb2.MachineState()
             machine_state.ParseFromString(
                 collector_output.data['collector/data/machine_state'])
-            machine_state = MessageToDict(machine_state,
-                                          including_default_value_fields=True)
+            machine_state = MessageToDict(
+                machine_state, including_default_value_fields=True,
+                preserving_proto_field_name=preserving_proto_field_name)
             del collector_output.data['collector/data/machine_state']
         else:
             machine_state = None
@@ -69,25 +73,30 @@ def extract_collector_output_slim(collector_output, get_camera_data=True):
                 field_definition = None
 
         if 'collector/data/planned_path' in collector_output.data:
-            planned_path = collector_output.data['collector/data/planned_path']
-            planned_path = np.frombuffer(planned_path, dtype=np.float_)
-            del collector_output.data['collector/data/planned_path']
+            try:
+                planned_path = collector_output.data['collector/data/planned_path']
+                planned_path = np.frombuffer(planned_path, dtype=np.float_)
+                del collector_output.data['collector/data/planned_path']
+            except Exception as e:
+                planned_path = None
         else:
             planned_path = None
 
         if 'collector/data/sync' in collector_output.data:
             sync_status = smarthp_pb2.SyncStatus()
             sync_status.ParseFromString(collector_output.data['collector/data/sync'])
-            sync_status = MessageToDict(sync_status,
-                                        including_default_value_fields=True)
+            sync_status = MessageToDict(
+                sync_status, including_default_value_fields=True,
+                preserving_proto_field_name=preserving_proto_field_name)
             del collector_output.data['collector/data/sync']
         else: # maintain backwards compatibility by checking for old key
             if 'collector/data/sync_status' in collector_output.data:
                 sync_status = smarthp_pb2.SyncStatus()
                 sync_status.ParseFromString(
                     collector_output.data['collector/data/sync_status'])
-                sync_status = MessageToDict(sync_status,
-                                            including_default_value_fields=True)
+                sync_status = MessageToDict(
+                    sync_status, including_default_value_fields=True,
+                preserving_proto_field_name=preserving_proto_field_name)
                 del collector_output.data['collector/data/sync_status']
             else:
                 sync_status = None
@@ -96,8 +105,9 @@ def extract_collector_output_slim(collector_output, get_camera_data=True):
             control_signal = gandalf_pb2.ControlSignal()
             control_signal.ParseFromString(
                 collector_output.data['collector/data/control_signal'])
-            control_signal = MessageToDict(control_signal,
-                                           including_default_value_fields=True)
+            control_signal = MessageToDict(
+                control_signal, including_default_value_fields=True,
+                preserving_proto_field_name=preserving_proto_field_name)
             del collector_output.data['collector/data/control_signal']
         else:
             control_signal = None
@@ -127,7 +137,8 @@ def extract_collector_output_slim(collector_output, get_camera_data=True):
                             camera_output.ParseFromString(
                                 collector_output.data[expected_output_key])
                             camera_output = MessageToDict(
-                                camera_output, including_default_value_fields=True)
+                                camera_output, including_default_value_fields=True,
+                                preserving_proto_field_name=preserving_proto_field_name)
                         else:
                             print('missing camera output for an image')
                             camera_output = None
@@ -139,7 +150,8 @@ def extract_collector_output_slim(collector_output, get_camera_data=True):
                     camera_output.ParseFromString(
                         collector_output.data[mc.CAMERA_TOPIC])
                     camera_output = MessageToDict(
-                        camera_output, including_default_value_fields=True)
+                        camera_output, including_default_value_fields=True,
+                        preserving_proto_field_name=preserving_proto_field_name)
                 else:
                     print('missing primary camera output from collector output')
                     camera_output = None
@@ -150,6 +162,7 @@ def extract_collector_output_slim(collector_output, get_camera_data=True):
 
     except Exception as e:
         print('failed to extract collector output:', e)
+        raise e
 
     return camera_data, radar_output, tracking_output, machine_state, \
             field_definition, planned_path, sync_status, control_signal, sync_params
