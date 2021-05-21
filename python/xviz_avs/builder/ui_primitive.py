@@ -44,6 +44,15 @@ class XVIZUIPrimitiveBuilder(XVIZBaseBuilder):
 
         return self
 
+    def single_row(self, id_, values):
+        self._validate_prop_set_once('_id')
+
+        row = XVIZTreeTableRowBuilder(id_, values)
+        self._rows.append(row)
+        self._type = UIPRIMITIVE_TYPES.TREETABLE
+
+        return self
+
     def row(self, id_, values):
         self._validate_prop_set_once('_id')
 
