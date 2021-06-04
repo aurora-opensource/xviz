@@ -1,0 +1,24 @@
+FROM 407636574581.dkr.ecr.us-east-2.amazonaws.com/python:3.6.4-slim-stretch
+# FROM node:12
+WORKDIR /xviz
+
+# # update
+RUN apt-get update
+# # install curl 
+RUN apt-get install curl git gcc libgl1-mesa-glx libglib2.0-0 -y
+# get install script and pass it to execute: 
+RUN curl -sL https://deb.nodesource.com/setup_12.x | bash
+# and install node 
+RUN apt-get install nodejs -y
+
+RUN pip install --upgrade pip setuptools wheel
+
+COPY . /xviz
+
+RUN npm install
+RUN npm install -g yarn
+RUN npm run bootstrap
+
+RUN python/setup.sh
+
+CMD python examples/serve_scenarios.py
