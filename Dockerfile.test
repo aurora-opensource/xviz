@@ -19,6 +19,6 @@ RUN npm install
 RUN npm install -g yarn
 RUN npm run bootstrap
 
-RUN python/setup.sh
+RUN cd python && bash setup.sh
 
 CMD python examples/serve_scenarios.py
