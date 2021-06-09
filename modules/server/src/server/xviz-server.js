@@ -23,7 +23,7 @@ function getRequestData(requestUrl) {
   }
 
   return {
-    path: req.pathname,
+    path: decodeURI(req.pathname),
     params
   };
 }
@@ -58,7 +58,7 @@ export class XVIZServer {
   }
 
   async handleSession(socket, request) {
-    this.log(`[> Connection] created: ${request.url}`);
+    this.log(`[> Connection] created: ${decodeURI(request.url)}`);
     const req = getRequestData(request.url);
 
     for (const handler of this.handlers) {
