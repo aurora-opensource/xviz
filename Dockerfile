@@ -14,6 +14,7 @@ RUN apt-get update
 
 # required by lint script
 RUN apt-get -y install jq
+RUN apt-get -y install vim
 
 # https://github.com/buildkite/docker-puppeteer/blob/master/Dockerfile
 RUN  apt-get update \
@@ -32,3 +33,6 @@ RUN  apt-get update \
 COPY . /xviz/
 
 RUN yarn bootstrap
+
+EXPOSE 3000
+ENTRYPOINT ["/xviz/modules/server/bin/xvizserver", "--port", "3000", "-d", "/"]
