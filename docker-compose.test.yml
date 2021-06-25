@@ -1,0 +1,13 @@
+version: '3.2'
+services:
+  xviz-server:
+    image: xviz-server:latest
+    network_mode: host
+    ports:
+      - "8081:8081"
+
+  # xviz-front:
+  #   image: xviz-front:latest
+  #   network_mode: host
+  #   ports:`
+  #     - 3000:3000

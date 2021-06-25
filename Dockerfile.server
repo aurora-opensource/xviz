@@ -1,0 +1,18 @@
+FROM 407636574581.dkr.ecr.us-east-2.amazonaws.com/python:3.6.4-slim-stretch
+
+EXPOSE 8081
+
+WORKDIR /xviz
+
+# # update
+RUN apt-get update
+# # install curl 
+RUN apt-get install curl git gcc libgl1-mesa-glx libglib2.0-0 -y
+
+RUN pip install --upgrade pip setuptools wheel
+
+COPY . /xviz
+
+RUN cd python && bash setup.sh
+
+CMD python python/examples/serve_scenarios.py
