@@ -14,6 +14,8 @@
 # limitations under the License.
 pip install -r requirements.txt --force-reinstall
 cd ../Proto-Files
+pip uninstall protobuf -y
+pip install protobuf
 rm -rf dist
 python setup.py bdist_wheel
 pip install --force-reinstall dist/*.whl

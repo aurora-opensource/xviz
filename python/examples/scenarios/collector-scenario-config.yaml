@@ -1,5 +1,5 @@
-collector_output_file:
-extract_directory:
+collector_output_file: '/xviz/Radar_object_detection-v2020-25-0-0bbd888528064bbbb1f3852ea9dda39d-smartag-autocart-1618820911312-498.tar'
+extract_directory: '/xviz/tmp'
 mqtt_enabled: False
 MACHINE_TYPE: 8RIVT_WHEEL
 show_haz_cams: False

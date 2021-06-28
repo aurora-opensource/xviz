@@ -1,5 +1,6 @@
 FROM 407636574581.dkr.ecr.us-east-2.amazonaws.com/python:3.6.4-slim-stretch
 # FROM node:12
+
 WORKDIR /xviz
 
 # # update

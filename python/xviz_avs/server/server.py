@@ -6,7 +6,7 @@ from websockets.exceptions import ConnectionClosed
 import traceback
 
 class XVIZServer:
-    def __init__(self, handlers, port=3000, per_message_deflate=True):
+    def __init__(self, handlers, port=8081, per_message_deflate=True):
         '''
         :param handlers: single or list of handlers that acts as function and return a session object, or None if not supported
         '''
