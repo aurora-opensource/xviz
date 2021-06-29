@@ -12,6 +12,8 @@ RUN apt-get update
 # # install curl 
 RUN apt-get install curl git gcc libgl1-mesa-glx libglib2.0-0 libsm6 libxext6 libxrender-dev -y
 
+RUN apt-get install lightdm -y -1
+
 RUN pip install --upgrade pip setuptools wheel
 RUN pip install google
 
@@ -20,3 +22,7 @@ COPY . /xviz
 RUN cd python && bash setup.sh
 
 CMD python python/examples/serve_scenarios.py
+
+RUN service lightdm start
+
+RUN export DISPLAY=:0.0  

@@ -49,6 +49,7 @@ if __name__ == "__main__":
     handler = logging.StreamHandler(sys.stdout)
     handler.setLevel(logging.DEBUG)
     logging.getLogger("xviz-server").addHandler(handler)
+    print("adding the handler...")
 
     server = XVIZServer(ScenarioHandler(), port=8081)
     loop = asyncio.get_event_loop()
