@@ -6,7 +6,6 @@ ENV QT_X11_NO_MITSHM=1
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-
 EXPOSE 8081
 
 WORKDIR /xviz
@@ -20,8 +19,6 @@ RUN apt-get update
 RUN apt-get install curl git gcc libgl1-mesa-glx libglib2.0-0 libsm6 libxext6 libxrender-dev -y
 
 RUN apt-get install lightdm -y
-
-# ^^ this command needs to a way to pass -1 as an input for keyboard selection otherwise this will not build right
 
 RUN pip install --upgrade pip setuptools wheel
 
