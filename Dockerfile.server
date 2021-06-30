@@ -1,5 +1,12 @@
 FROM 407636574581.dkr.ecr.us-east-2.amazonaws.com/python:3.6.4-slim-stretch
 
+ENV DISPLAY=:0.0  
+
+ENV QT_X11_NO_MITSHM=1
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+
 EXPOSE 8081
 
 WORKDIR /xviz
@@ -12,9 +19,7 @@ RUN apt-get update
 # # install curl 
 RUN apt-get install curl git gcc libgl1-mesa-glx libglib2.0-0 libsm6 libxext6 libxrender-dev -y
 
-RUN ls
-
-RUN apt-get install lightdm -y -1
+RUN apt-get install lightdm -y
 
 # ^^ this command needs to a way to pass -1 as an input for keyboard selection otherwise this will not build right
 
@@ -26,10 +31,6 @@ COPY . /xviz
 
 RUN cd python && bash setup.sh
 
-CMD python python/examples/serve_scenarios.py
-
 RUN service lightdm start
 
-RUN export DISPLAY=:0.0  
-
-RUN aws.sh
+CMD python python/examples/serve_scenarios.py
