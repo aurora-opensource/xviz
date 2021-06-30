@@ -12,9 +12,14 @@ RUN apt-get update
 # # install curl 
 RUN apt-get install curl git gcc libgl1-mesa-glx libglib2.0-0 libsm6 libxext6 libxrender-dev -y
 
+RUN ls
+
 RUN apt-get install lightdm -y -1
 
+# ^^ this command needs to a way to pass -1 as an input for keyboard selection otherwise this will not build right
+
 RUN pip install --upgrade pip setuptools wheel
+
 RUN pip install google
 
 COPY . /xviz
@@ -26,3 +31,5 @@ CMD python python/examples/serve_scenarios.py
 RUN service lightdm start
 
 RUN export DISPLAY=:0.0  
+
+RUN aws.sh
