@@ -1,32 +1,44 @@
 FROM 407636574581.dkr.ecr.us-east-2.amazonaws.com/python:3.6.4-slim-stretch
 
+
+# set this to display anything rendered by qt creator
 ENV DISPLAY=:0.0  
 
+# set a variable to show images being rendered from tar file
 ENV QT_X11_NO_MITSHM=1
 
+# changed to noninteractive to be able to install lightdm
 ENV DEBIAN_FRONTEND=noninteractive
 
+# exposing a port to openly transfer data
 EXPOSE 8081
 
+# changed the current work directory to xviz 
 WORKDIR /xviz
 
-RUN ls
-
-# update
+# update apt get
 RUN apt-get update
 
+# installing curl
 RUN apt-get install curl git gcc libgl1-mesa-glx libglib2.0-0 libsm6 libxext6 libxrender-dev -y
 
+# installing lightdm in a noninteractive window
 RUN apt-get install lightdm -y
 
+# installing pip and upgrading it if a new version is found
 RUN pip install --upgrade pip setuptools wheel
 
+# installing google package for opencv dependencies
 RUN pip install google
 
+# copying everything in the local xviz folder to the xviz docker directory
 COPY . /xviz
 
+# running setup.sh
 RUN cd python && bash setup.sh
 
+# starting up an instance of lightdm to show images within qt
 RUN service lightdm start
 
+# exicuting serve_senieros.py
 CMD python python/examples/serve_scenarios.py
