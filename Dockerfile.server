@@ -12,10 +12,9 @@ WORKDIR /xviz
 
 RUN ls
 
-# # update
+# update
 RUN apt-get update
 
-# # install curl 
 RUN apt-get install curl git gcc libgl1-mesa-glx libglib2.0-0 libsm6 libxext6 libxrender-dev -y
 
 RUN apt-get install lightdm -y
