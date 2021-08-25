@@ -8,7 +8,7 @@ Python3, `websockets`, `protobuf`, `numpy`
 
 # Get started
 
-You can try running the scenario server by `python examples/serve_scenarios.py`. Then you can run `cd examples/get-started && yarn start-live` under your `streetscape.gl` repository to see the example scenarios.
+You can try running the scenario server by `python examples/serve_scenarios.py`. Then you can run `cd examples/get-started && yarn start-live-local` under your `streetscape.gl` repository to see the example scenarios.
 
 # Acknowledgements
 
