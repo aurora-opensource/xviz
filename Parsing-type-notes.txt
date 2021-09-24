@@ -1,0 +1,84 @@
+raw
+
+envelope
+  type
+  data: stateupdate | metadata
+unpackedEnvelop =
+  namespace
+  type
+  data: stateupdate | metadata
+
+parseXVIZData(@data, opts)
+
+stateupdate
+  update_type
+  updates
+
+normalizePrimitive <= parseStreamSets
+  vertices // line, polygon
+  center // circle
+    = primitive
+  // does zOffset if enabled (?? why not done in model matrix)
+  // add 'type' to primitive, normaly part of structure
+  // validate
+  // normalize
+    // text: +id
+    // circle: +id
+    // stadium: +id
+    // polyline: +id, vertices = filterVertice(.)
+      // remove duplicate vertices to avoid rendering artifacts
+    // polygon: +id
+    // point: +id, points=>vertices
+    // image: -data => +imageData format => +imageType, +id   base64->bytearray
+      // position => vertices
+      // position => vertices
+      
+  // postProcess primitive hook
+
+parseTimesliceDataV2 = parseStreamSets(@stateupdate)
+  // restructured from state_update to top-level map of streams
+  // config blacklist filtering
+  type TIMESLICE
+  updateType
+  streams
+    primitive
+      // reshape {
+        // {features:[], lookAhead:[][], labels:[], pointCloud:[], images:[], components:[]}
+        // perf field: vertices = single array all entries
+        // backward compat: pointCloud, time
+        // }
+        // primitives in each array are: {type: string, primitives: actual_primitive array}
+        // 1 handle futures
+        // 2 preProcessPrimitives
+        // 3 normalize primitives
+        // 2 XVIZObject observe() ? main thread only?)
+
+    time_series
+      //  reshape, {stream: {time, variable: {type, values, id}}
+      //  It is an array, we reshape to stream based map
+      // 1. values has vtype removed and mapped like variables
+      // 2. filter any blacklist streams
+      // 3. duplicate stream warning since array->map not safe
+      // normalize +id
+      // 
+    variable
+      // reshape {type: vtype, values: values[vtype], id: base.object_id}
+      // - remove type from structure and inline it, map id from base
+    future_instance
+      // reshape, {time, lookAheads:[normalizedPrimitives + 'timestamp']}
+      //
+      // 1. We only allow 1 primitive type per stream, so this removes teh
+      //    "type" structure and gives direct access to the underlying primitive directly}
+      // 2. as these are parallel arrays, it also adds the 'timestamp' for each entry to the entry.
+      // 3. normalize  each primitive
+      // getPrimitiveData({type: primitive[]} => {type: string, primitives: actual_primitive array}
+    ui_primitives
+      // added, time
+      // ? this makes a copy?
+  links
+    // same, just validation on target_pose
+  // poses  
+    // extracted and expanded, longitude, latitude, altitude x, y, z, roll, pitch, yaw
+  timestamp
+
+
