@@ -21,6 +21,10 @@ import {getXVIZConfig} from '../config/xviz-config';
 // This reduces data size and works around an issue in the deck.gl PathLayer
 export function filterVertices(vertices) {
   const THRESHOLD = getXVIZConfig().pathDistanceThreshold;
+
+  if (THRESHOLD === 0.0) {
+    return vertices;
+  }
   const isFlatArray = Number.isFinite(vertices[0]);
   const vertexCount = isFlatArray ? vertices.length / 3 : vertices.length;
 
