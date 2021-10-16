@@ -2,12 +2,12 @@ from xviz_avs.builder.base_builder import XVIZBaseBuilder, CATEGORY, PRIMITIVE_T
 from xviz_avs.v2.core_pb2 import Link
 
 class XVIZLinkBuilder(XVIZBaseBuilder):
-    def __init__(self, metadata, logger=None):
-        super().__init__(None, metadata, logger)
+    def __init__(self, metadata):
+        super().__init__(None, metadata)
         self._links = None
         self._target_stream = None
 
-    def parent(self, target_stream):
+    def parent(self, target_stream: str):
         self._target_stream = target_stream
 
     def _flush(self):

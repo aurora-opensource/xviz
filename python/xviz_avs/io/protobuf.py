@@ -12,9 +12,9 @@ class XVIZProtobufWriter(XVIZBaseWriter):
     def write_message(self, message: XVIZMessage, index: int = None):
         self._check_valid()
         if self._wrap_envelop:
-            obj = XVIZEnvelope(message).data
+            obj = XVIZEnvelope(message).to_proto()
         else:
-            obj = message.data
+            obj = message.to_proto()
 
         data = BytesIO()
         # write PBE1 header

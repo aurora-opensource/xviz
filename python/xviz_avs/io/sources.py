@@ -2,9 +2,11 @@
 This module contains `sources` that can read and write data from certain source by key-value strategy.
 Here the source is the combine definition of `source` and `sink` as from xviz JS library.
 '''
-import os
 import io
+import os
 from collections import defaultdict
+from pathlib import Path
+
 
 class BaseSource:
     def __init__(self):
@@ -21,23 +23,24 @@ class BaseSource:
 
 class DirectorySource:
     def __init__(self, directory):
-        self._dir = directory
-        assert os.path.isdir(self._dir)
+        self._dir = Path(directory)
+        if self._dir.exists():
+            assert self._dir.is_dir()
+        else:
+            self._dir.mkdir(parents=True)
 
     def open(self, name, mode='r'):
-        fpath = os.path.join(self._dir, name)
+        fpath = self._dir / name
         if mode == 'r':
-            return open(fpath, 'rb')
+            return fpath.open('rb')
         elif mode == 'w':
-            return open(fpath, 'wb')
+            return fpath.open('wb')
 
     def read(self, name):
-        with open(os.path.join(self._dir, name), 'rb') as fin:
-            return fin.read()
+        return (self._dir / name).read_bytes()
 
     def write(self, data, name):
-        with open(os.path.join(self._dir, name), 'wb') as fout:
-            fout.write(data)
+        (self._dir / name).write_bytes(data)
 
     def close(self):
         pass

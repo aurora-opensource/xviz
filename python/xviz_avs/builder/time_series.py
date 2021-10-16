@@ -1,21 +1,23 @@
+from typing import Union
+
 from xviz_avs.builder.base_builder import XVIZBaseBuilder, CATEGORY
 from xviz_avs.v2.core_pb2 import TimeSeriesState
 
 class XVIZTimeSeriesBuilder(XVIZBaseBuilder):
-    def __init__(self, metadata, logger=None):
-        super().__init__(CATEGORY.TIME_SERIES, metadata, logger)
+    def __init__(self, metadata):
+        super().__init__(CATEGORY.TIME_SERIES, metadata)
 
         # Stores time_series data by timestamp then id
         # They will then be group when constructing final object
         self._data = {}
         self.reset()
 
-    def id(self, identifier):
+    def id(self, identifier: str) -> 'XVIZTimeSeriesBuilder':
         self._validate_prop_set_once('_id')
         self._id = identifier
         return self
 
-    def value(self, value):
+    def value(self, value: Union[int, float, str, bool]) -> 'XVIZTimeSeriesBuilder':
         self._validate_prop_set_once('_value')
 
         if isinstance(value, list):
@@ -24,7 +26,7 @@ class XVIZTimeSeriesBuilder(XVIZBaseBuilder):
         self._value = value
         return self
 
-    def timestamp(self, timestamp):
+    def timestamp(self, timestamp: float) -> 'XVIZTimeSeriesBuilder':
         self._validate_prop_set_once('_timestamp')
 
         if isinstance(timestamp, list):
@@ -33,7 +35,7 @@ class XVIZTimeSeriesBuilder(XVIZBaseBuilder):
         self._timestamp = timestamp
         return self
 
-    def get_data(self):
+    def get_data(self) -> []:
         self._flush()
         if not self._data:
             return None
@@ -93,10 +95,10 @@ class XVIZTimeSeriesBuilder(XVIZBaseBuilder):
             ts_entry = {self._id: self._get_id_entry(field_name)}
             self._data[self._timestamp] = ts_entry
 
-    def _get_id_entry(self, field_name):
+    def _get_id_entry(self, field_name: str):
         return {field_name: self._get_field_entry(field_name)}
 
-    def _get_field_entry(self, field_name):
+    def _get_field_entry(self, field_name: str):
         return dict(streams=[self._stream_id], values={field_name: [self._value]})
 
     def _data_pending(self):

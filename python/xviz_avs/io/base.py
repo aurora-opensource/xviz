@@ -17,7 +17,7 @@ class XVIZBaseWriter:
         self._counter = 2
 
     def _get_sequential_name(self, message: XVIZMessage, index=None):
-        raw_data = message.data
+        raw_data = message._data
         if isinstance(raw_data, Metadata):
             self._save_timestamp(raw_data)
             fname = "1-frame"

@@ -1,17 +1,26 @@
 import logging
-from typing import Union
+from typing import Union, NewType
 from easydict import EasyDict as edict
 
 from xviz_avs.message import XVIZMessage
 from xviz_avs.v2.session_pb2 import Metadata, StreamMetadata
 from xviz_avs.v2.style_pb2 import StyleStreamValue
 
+# expose the constants
 ANNOTATION_TYPES = StreamMetadata.AnnotationType
 CATEGORY = StreamMetadata.Category
 COORDINATE_TYPES = StreamMetadata.CoordinateType
 SCALAR_TYPE = StreamMetadata.ScalarType
 PRIMITIVE_TYPES = StreamMetadata.PrimitiveType
 UIPRIMITIVE_TYPES = StreamMetadata.UIPrimitiveType
+
+# for type hints
+ANNOTATION_TYPES_T = NewType("ANNOTATION_TYPES", int)
+CATEGORY_T = NewType("CATEGORY", int)
+COORDINATE_TYPES_T = NewType("COORDINATE_TYPES", int)
+SCALAR_TYPE_T = NewType("SCALAR_TYPE", int)
+PRIMITIVE_TYPES_T = NewType("PRIMITIVE_TYPES", int)
+UIPRIMITIVE_TYPES_T = NewType("UIPRIMITIVE_TYPES", int)
 
 PRIMITIVE_STYLE_MAP = dict([
     (PRIMITIVE_TYPES.CIRCLE, [
@@ -82,26 +91,26 @@ class XVIZBaseBuilder:
     # Reference
     [@xviz/builder/xviz-base-builder]/(https://github.com/uber/xviz/blob/master/modules/builder/src/builders/xviz-base-builder.js)
     """
-    def __init__(self, category, metadata: Union[Metadata, XVIZMessage], logger=None):
+    def __init__(self, category, metadata: Union[Metadata, XVIZMessage]):
         self._stream_id = None
         self._category = category
-        self._metadata = metadata.data if isinstance(metadata, XVIZMessage) else metadata
-        self._logger = logger or logging.getLogger("xviz")
+        self._metadata = metadata._data if isinstance(metadata, XVIZMessage) else metadata
+        self._logger = logging.getLogger("xviz")
 
-    def stream(self, stream_id):
+    def stream(self, stream_id: str):
         if self._stream_id:
             self._flush()
         self._stream_id = stream_id
         return self
 
     @property
-    def stream_id(self):
+    def stream_id(self) -> str:
         return self._stream_id
     @property
-    def category(self):
+    def category(self) -> CATEGORY:
         return self._category
     @property
-    def metadata(self):
+    def metadata(self) -> XVIZMessage:
         return self._metadata
 
     def _flush(self):
@@ -149,22 +158,39 @@ class XVIZBaseBuilder:
 import array
 from xviz_avs.v2.style_pb2 import StyleObjectValue, StyleStreamValue
 
-def build_object_style(style):
+def build_color(color: Union[list, tuple, bytes, str]) -> bytes:
+    '''
+    Convert css style color string to bytes
+    '''
+    if isinstance(color, (list, tuple, bytes)):
+        return bytes(color)
+    elif isinstance(color, str):
+        color = color.lstrip('#')
+        if len(color) in [3, 4]: # '#rgb' or '#rgba' style
+            return bytes([16 * int(c, 16) for c in color])
+        elif len(color) in [6, 8]: # '#rrggbb' or '#rrggbbaa' style
+            return bytes([int(color[i*2:i*2+2], 16)
+                          for i in range(len(color) // 2)])
+        else:
+            raise ValueError("Unrecognized color string!")
+    raise ValueError("Unrecognized color object!")
+
+def build_object_style(style: dict) -> StyleObjectValue:
     '''
     Create StyleObjectValue from dictionary. It basically deal with list of bytes.
     '''
     if 'fill_color' in style.keys():
-        style['fill_color'] = bytes(style['fill_color'])
+        style['fill_color'] = build_color(style['fill_color'])
     if 'stroke_color' in style.keys():
-        style['stroke_color'] = bytes(style['stroke_color'])
+        style['stroke_color'] = build_color(style['stroke_color'])
     return StyleObjectValue(**style)
 
-def build_stream_style(style):
+def build_stream_style(style: dict) -> StyleStreamValue:
     '''
     Create StyleStreamValue from dictionary. It basically deal with list of bytes.
     '''
     if 'fill_color' in style.keys():
-        style['fill_color'] = bytes(style['fill_color'])
+        style['fill_color'] = build_color(style['fill_color'])
     if 'stroke_color' in style.keys():
-        style['stroke_color'] = bytes(style['stroke_color'])
+        style['stroke_color'] = build_color(style['stroke_color'])
     return StyleStreamValue(**style)
