@@ -682,3 +682,40 @@ class TestVariableBuilder(unittest.TestCase):
         }
 
         assert data == expected
+
+# No pose should not error
+class TestOnlyPrimitiveBuilder(unittest.TestCase):
+    def setUp(self):
+        self.builder = XVIZBuilder()
+
+    def test_polyline(self):
+        verts = [0., 0., 0., 4., 0., 0., 4., 3., 0.]
+        self.builder.timestamp(1.0)
+        self.builder.primitive('/test/polyline')\
+            .polyline(verts)\
+            .id('1')\
+            .style({
+                'stroke_color': [255, 0, 0]
+            })
+
+        expected = {
+            'timestamp': 1.0,
+            'primitives': {
+                '/test/polyline': {
+                    'polylines': [
+                        {
+                            'base': {
+                                'style': {
+                                    'stroke_color': [255, 0, 0],
+                                },
+                                'object_id': '1'
+                            },
+                            'vertices': verts
+                        }
+                    ]
+                }
+            }
+        }
+
+        data = self.builder.get_data().to_object()
+        assert json.dumps(data, sort_keys=True) == json.dumps(expected, sort_keys=True)

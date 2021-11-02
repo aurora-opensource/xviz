@@ -15,6 +15,7 @@ from xviz_avs.v2.core_pb2 import StreamSet
 from xviz_avs.v2.session_pb2 import StateUpdate
 from google.protobuf.json_format import MessageToDict
 
+# TODO(twojtasz): This should be a configuration setting
 PRIMARY_POSE_STREAM = '/vehicle_pose'
 
 class XVIZBuilder:
@@ -25,6 +26,7 @@ class XVIZBuilder:
         self._disable_streams = disable_streams or []
         self._stream_builder = None
         self._update_type = StateUpdate.UpdateType.INCREMENTAL
+        self._timestamp = None
 
         self._links_builder = XVIZLinkBuilder(self._metadata, self._logger)
         self._pose_builder = XVIZPoseBuilder(self._metadata, self._logger)
@@ -33,6 +35,11 @@ class XVIZBuilder:
         self._future_instance_builder = XVIZFutureInstanceBuilder(self._metadata, self._logger)
         self._ui_primitives_builder = XVIZUIPrimitiveBuilder(self._metadata, self._logger)
         self._time_series_builder = XVIZTimeSeriesBuilder(self._metadata, self._logger)
+
+    def timestamp(self, ts):
+        if self._timestamp != None:
+            self._logger.error('Timestamp is already set to %d', self._timestamp)
+        self._timestamp = ts;
 
     def pose(self, stream_id=PRIMARY_POSE_STREAM):
         self._stream_builder = self._pose_builder.stream(stream_id)
@@ -65,14 +72,18 @@ class XVIZBuilder:
 
     def _reset(self):
         self._stream_builder = None
+        self._timestamp = None
 
     def get_data(self):
         poses = self._pose_builder.get_data()
-        if (not poses) or (PRIMARY_POSE_STREAM not in poses):
-            self._logger.error('Every message requires a %s stream', PRIMARY_POSE_STREAM)
-
+        ts = self._timestamp
+        if not ts:
+            if (not poses) or (PRIMARY_POSE_STREAM not in poses):
+                self._logger.error('No timestamp has been set. Either set directly on builder or through a Pose entry on the %s stream.', PRIMARY_POSE_STREAM)
+            else:
+                ts = poses[PRIMARY_POSE_STREAM].timestamp
         data = XVIZFrame(StreamSet(
-            timestamp=poses[PRIMARY_POSE_STREAM].timestamp, # FIXME: does timestamp have to be the same with pose?
+            timestamp=ts,
             poses=poses,
             primitives=self._primitives_builder.get_data(),
             future_instances=self._future_instance_builder.get_data(),
