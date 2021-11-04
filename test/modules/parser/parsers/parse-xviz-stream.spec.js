@@ -65,27 +65,37 @@ tape('parseStreamTimeSeries#simple', t => {
   ];
 
   const expected = {
-    '/test/doubles': {
-      time: 1001,
-      variable: 23.32
-    },
-    '/test/doubles2': {
-      time: 1001,
-      variable: 32.23
-    },
-    '/test/int32s': {
-      time: 1002,
-      variable: 23
-    },
-    '/test/bools': {
-      time: 1003,
-      variable: false
-    },
-    '/test/strings': {
-      time: 1004,
-      variable: 'test string',
-      id: '123'
-    }
+    '/test/doubles': [
+      {
+        time: 1001,
+        variable: 23.32
+      }
+    ],
+    '/test/doubles2': [
+      {
+        time: 1001,
+        variable: 32.23
+      }
+    ],
+    '/test/int32s': [
+      {
+        time: 1002,
+        variable: 23
+      }
+    ],
+    '/test/bools': [
+      {
+        time: 1003,
+        variable: false
+      }
+    ],
+    '/test/strings': [
+      {
+        time: 1004,
+        variable: 'test string',
+        id: '123'
+      }
+    ]
   };
 
   testData.forEach(d => schemaValidator.validate('core/timeseries_state', d));
@@ -95,8 +105,264 @@ tape('parseStreamTimeSeries#simple', t => {
 
   setXVIZConfig({DYNAMIC_STREAM_METADATA: true});
   result = parseStreamTimeSeries(testData, new Map());
-  t.is(result['/test/doubles'].__metadata.category, 'TIME_SERIES', 'metadata generated');
-  t.is(result['/test/doubles'].__metadata.scalar_type, 'FLOAT', 'metadata generated');
+  t.is(result.__metadata['/test/doubles'].category, 'TIME_SERIES', 'metadata generated');
+  t.is(result.__metadata['/test/doubles'].scalar_type, 'FLOAT', 'metadata generated');
+
+  t.end();
+});
+
+tape('parseStreamTimeSeries#diff_ts', t => {
+  resetXVIZConfigAndSettings();
+  setXVIZConfig({currentMajorVersion: 2});
+
+  const testData = [
+    {
+      timestamp: 1001,
+      streams: ['/test/doubles', '/test/doubles2'],
+      values: {
+        doubles: [20.32, 30.5]
+      }
+    },
+    {
+      timestamp: 1002,
+      streams: ['/test/doubles'],
+      values: {
+        doubles: [23.32]
+      }
+    }
+  ];
+
+  const expected = {
+    '/test/doubles': [
+      {
+        time: 1001,
+        variable: 20.32
+      },
+      {
+        time: 1002,
+        variable: 23.32
+      }
+    ],
+    '/test/doubles2': [
+      {
+        time: 1001,
+        variable: 30.5
+      }
+    ]
+  };
+
+  testData.forEach(d => schemaValidator.validate('core/timeseries_state', d));
+
+  const result = parseStreamTimeSeries(testData, new Map());
+  t.deepEquals(result, expected, 'time_series parsed properly');
+
+  t.end();
+});
+
+tape('parseStreamTimeSeries#many_objects', t => {
+  resetXVIZConfigAndSettings();
+  setXVIZConfig({currentMajorVersion: 2});
+
+  const testData = [
+    {
+      timestamp: 1001,
+      streams: ['/test/doubles'],
+      values: {
+        doubles: [20.32]
+      }
+    },
+    {
+      timestamp: 1001,
+      streams: ['/test/doubles'],
+      values: {
+        doubles: [23.32]
+      },
+      object_id: '1'
+    },
+    {
+      timestamp: 1002,
+      streams: ['/test/doubles'],
+      values: {
+        doubles: [24.32]
+      },
+      object_id: '1'
+    }
+  ];
+
+  const expected = {
+    '/test/doubles': [
+      {
+        time: 1001,
+        variable: 20.32
+      },
+      {
+        time: 1001,
+        variable: 23.32,
+        id: '1'
+      },
+      {
+        time: 1002,
+        variable: 24.32,
+        id: '1'
+      }
+    ]
+  };
+
+  testData.forEach(d => schemaValidator.validate('core/timeseries_state', d));
+
+  const result = parseStreamTimeSeries(testData, new Map());
+  t.deepEquals(result, expected, 'time_series parsed properly');
+
+  t.end();
+});
+
+tape('parseStreamTimeSeries#duplicate_ts', t => {
+  resetXVIZConfigAndSettings();
+  setXVIZConfig({currentMajorVersion: 2});
+
+  const testData = [
+    {
+      timestamp: 1001,
+      streams: ['/test/doubles'],
+      values: {
+        doubles: [20.32]
+      }
+    },
+    {
+      timestamp: 1001,
+      streams: ['/test/doubles'],
+      values: {
+        doubles: [24.32]
+      }
+    }
+  ];
+
+  const expected = {
+    '/test/doubles': [
+      {
+        time: 1001,
+        variable: 20.32
+      }
+    ]
+  };
+
+  testData.forEach(d => schemaValidator.validate('core/timeseries_state', d));
+
+  const result = parseStreamTimeSeries(testData, new Map());
+  t.deepEquals(result, expected, 'time_series parsed properly');
+
+  t.end();
+});
+
+tape('parseStreamTimeSeries#duplicate_ts_obj', t => {
+  resetXVIZConfigAndSettings();
+  setXVIZConfig({currentMajorVersion: 2});
+
+  const testData = [
+    {
+      timestamp: 1001,
+      streams: ['/test/doubles'],
+      values: {
+        doubles: [20.32]
+      },
+      object_id: '1'
+    },
+    {
+      timestamp: 1001,
+      streams: ['/test/doubles'],
+      values: {
+        doubles: [24.32]
+      },
+      object_id: '1'
+    }
+  ];
+
+  const expected = {
+    '/test/doubles': [
+      {
+        time: 1001,
+        variable: 20.32,
+        id: '1'
+      }
+    ]
+  };
+
+  testData.forEach(d => schemaValidator.validate('core/timeseries_state', d));
+
+  const result = parseStreamTimeSeries(testData, new Map());
+  t.deepEquals(result, expected, 'time_series parsed properly');
+
+  t.end();
+});
+
+tape('parseStreamTimeSeries#many_objects_diff_ts', t => {
+  resetXVIZConfigAndSettings();
+  setXVIZConfig({currentMajorVersion: 2});
+
+  const testData = [
+    {
+      timestamp: 1001,
+      streams: ['/test/doubles'],
+      values: {
+        doubles: [20.32]
+      },
+      object_id: '1'
+    },
+    {
+      timestamp: 1001,
+      streams: ['/test/doubles'],
+      values: {
+        doubles: [23.32]
+      },
+      object_id: '2'
+    },
+    {
+      timestamp: 1002,
+      streams: ['/test/doubles'],
+      values: {
+        doubles: [30.32]
+      },
+      object_id: '1'
+    },
+    {
+      timestamp: 1002,
+      streams: ['/test/doubles'],
+      values: {
+        doubles: [33.32]
+      },
+      object_id: '2'
+    }
+  ];
+
+  const expected = {
+    '/test/doubles': [
+      {
+        time: 1001,
+        variable: 20.32,
+        id: '1'
+      },
+      {
+        time: 1001,
+        variable: 23.32,
+        id: '2'
+      },
+      {
+        time: 1002,
+        variable: 30.32,
+        id: '1'
+      },
+      {
+        time: 1002,
+        variable: 33.32,
+        id: '2'
+      }
+    ]
+  };
+
+  testData.forEach(d => schemaValidator.validate('core/timeseries_state', d));
+
+  const result = parseStreamTimeSeries(testData, new Map());
+  t.deepEquals(result, expected, 'time_series parsed properly');
 
   t.end();
 });

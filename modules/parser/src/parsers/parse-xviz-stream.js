@@ -389,6 +389,18 @@ function getVariableData(valuesObject) {
   return null;
 }
 
+// A TimeSeries is a timestamp associated
+// with a parallel list of streams & values.
+// Further we can attach an object_id to the entry.
+//
+// The resulting dataset allows for any number of timestamp entries.
+// For a given timestamp entry it can have an object_id.
+//
+// This function returns a stream-indexed version of the input
+// data.
+//
+// The resulting stream is an array of entries
+// with the shape { stream: [{ time, variable, object_id }] }
 function parseStreamTimeSeriesV2(seriesArray, streamBlackList) {
   if (!Array.isArray(seriesArray)) {
     return {};
@@ -396,6 +408,8 @@ function parseStreamTimeSeriesV2(seriesArray, streamBlackList) {
   const {DYNAMIC_STREAM_METADATA} = getXVIZConfig();
 
   const timeSeriesStreams = {};
+  const dupTracker = {};
+
   seriesArray.forEach(timeSeriesEntry => {
     const {timestamp, streams, values, object_id} = timeSeriesEntry;
     const valueData = getVariableData(values);
@@ -408,25 +422,59 @@ function parseStreamTimeSeriesV2(seriesArray, streamBlackList) {
       const streamName = streams[entryIndex];
 
       if (!streamBlackList.has(streamName)) {
-        const entry = {time: timestamp, variable};
-        if (object_id) {
-          entry.id = object_id;
-        }
+        // A stream could have been present in multiple entries at
+        // - different timestamps
+        // - different object_id
+        // - both
+        // Validate for duplicate entries
+        const trackStream = dupTracker[streamName];
+        let dup = false;
+        if (trackStream) {
+          const trackObject = trackStream[object_id];
 
-        const tsStream = timeSeriesStreams[streamName];
-
-        if (tsStream) {
-          // a duplicate entry is seen, leave the first entry.
-          log.warn(`Unexpected time_series duplicate: ${streamName}`)();
+          if (trackObject) {
+            // verify unique timestamp
+            if (trackObject.has(timestamp)) {
+              dup = true;
+            } else {
+              trackObject.add(timestamp);
+            }
+          } else {
+            trackStream[object_id] = new Set([timestamp]);
+          }
         } else {
-          timeSeriesStreams[streamName] = entry;
+          // Add new stream tracker
+          dupTracker[streamName] = {
+            [object_id]: new Set([timestamp])
+          };
         }
 
-        if (DYNAMIC_STREAM_METADATA) {
-          entry.__metadata = {
-            category: 'TIME_SERIES',
-            scalar_type: valueData.type
-          };
+        if (!dup) {
+          const entry = {time: timestamp, variable};
+          if (object_id) {
+            entry.id = object_id;
+          }
+
+          const tsStream = timeSeriesStreams[streamName];
+          if (!tsStream) {
+            timeSeriesStreams[streamName] = [];
+          }
+          timeSeriesStreams[streamName].push(entry);
+
+          if (DYNAMIC_STREAM_METADATA) {
+            if (!timeSeriesStreams.__metadata) {
+              timeSeriesStreams.__metadata = {};
+            }
+            timeSeriesStreams.__metadata[streamName] = {
+              category: 'TIME_SERIES',
+              scalar_type: valueData.type
+            };
+          }
+        } else {
+          // a duplicate entry is seen, leave the first entry.
+          log.warn(
+            `Unexpected time_series duplicate ignored: ${streamName} ${timestamp} id: ${object_id}`
+          )();
         }
       }
     });

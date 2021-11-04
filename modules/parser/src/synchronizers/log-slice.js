@@ -39,6 +39,22 @@ function updateObjects(streamName, features) {
   }
 }
 
+function addObjectAttributesFromTimeSeries(streamName, entries) {
+  // Get last part of name or use full name
+  const mark = streamName.lastIndexOf('/');
+  let attribute = streamName;
+  if (mark !== -1) {
+    attribute = `${streamName.substring(mark + 1)}`;
+  }
+
+  for (const entry of entries) {
+    const xvizObject = XVIZObject.get(entry.id);
+    if (xvizObject) {
+      xvizObject._setAttribute(streamName, attribute, entry.variable);
+    }
+  }
+}
+
 // LOGSLICE CLASS
 
 // One time slice, one datum from each stream.
@@ -69,11 +85,14 @@ export default class LogSlice {
       ...params,
       ...getTransformsFromPose(vehiclePose),
       vehiclePose,
+      // from primitives
       features: this.features,
       lookAheads: this.lookAheads,
-      variables: this.variables,
       pointCloud: this.pointCloud,
       components: this.components,
+      // from variables
+      variables: this.variables,
+      // from this.initialize
       streams: this.streams,
       links: this.links
     };
@@ -101,6 +120,8 @@ export default class LogSlice {
           updateObjects(streamName, variables);
         }
       }
+
+      this.updateObjectsFromTimeSeries();
     }
 
     frame.objects = XVIZObject.getAllInCurrentFrame(); // Map of XVIZ ids in current slice
@@ -189,6 +210,20 @@ export default class LogSlice {
 
     if (variable !== undefined) {
       this.variables[streamName] = variable;
+    }
+  }
+
+  updateObjectsFromTimeSeries() {
+    const handledStreams = new Set([...Object.keys(this.features), ...Object.keys(this.variables)]);
+    const remainingStreams = new Set(
+      Object.keys(this.streams).filter(stream => !handledStreams.has(stream))
+    );
+    for (const streamName of remainingStreams) {
+      const stream = this.streams[streamName];
+      // Handle timeSeries entries
+      if (Array.isArray(stream)) {
+        addObjectAttributesFromTimeSeries(streamName, stream);
+      }
     }
   }
 

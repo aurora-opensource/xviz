@@ -485,3 +485,129 @@ test('XVIZTimeSeriesBuilder#multiple entry different id ts', t => {
   data.forEach(d => schemaValidator.validate('core/timeseries_state', d));
   t.end();
 });
+
+test('XVIZTimeSeriesBuilder#multiple entry same id diff ts', t => {
+  const builder = new XVIZTimeSeriesBuilder({validator});
+  builder
+    .stream('/test')
+    .timestamp(20)
+    .value(1)
+    .id('123');
+
+  builder
+    .stream('/test')
+    .timestamp(30)
+    .value(2)
+    .id('123');
+
+  const expected = [
+    {
+      timestamp: 20,
+      object_id: '123',
+      streams: ['/test'],
+      values: {
+        doubles: [1]
+      }
+    },
+    {
+      timestamp: 30,
+      object_id: '123',
+      streams: ['/test'],
+      values: {
+        doubles: [2]
+      }
+    }
+  ];
+  const data = builder.getData();
+
+  t.deepEqual(
+    data,
+    expected,
+    'XVIZTimeSeriesBuilder#multiple entry same id diff ts matches expected output'
+  );
+  data.forEach(d => schemaValidator.validate('core/timeseries_state', d));
+  t.end();
+});
+
+test('XVIZTimeSeriesBuilder#multiple entry same stream, ts throws', t => {
+  const builder = new XVIZTimeSeriesBuilder({validator});
+  t.throws(
+    () => {
+      builder
+        .stream('/test')
+        .timestamp(20)
+        .value(1);
+
+      builder
+        .stream('/test')
+        .timestamp(20)
+        .value(2);
+
+      builder.getData();
+    },
+    /is duplicate/,
+    'XVIZTimeSeriesBuilder throws when an entry with duplicate stream & ts is attempted'
+  );
+  builder._reset();
+
+  t.throws(
+    () => {
+      builder
+        .stream('/test')
+        .timestamp(20)
+        .value(1)
+        .id('1');
+
+      builder
+        .stream('/test')
+        .timestamp(20)
+        .value(2)
+        .id('1');
+
+      builder.getData();
+    },
+    /is duplicate/,
+    'XVIZTimeSeriesBuilder throws when an entry with duplicate stream, ts & id is attempted'
+  );
+
+  t.end();
+});
+
+test('XVIZTimeSeriesBuilder#return entries in time sorted order', t => {
+  const builder = new XVIZTimeSeriesBuilder({validator});
+  builder
+    .stream('/test')
+    .timestamp(40)
+    .value(1);
+
+  builder
+    .stream('/test')
+    .timestamp(20)
+    .value(2);
+
+  const expected = [
+    {
+      timestamp: 20,
+      streams: ['/test'],
+      values: {
+        doubles: [2]
+      }
+    },
+    {
+      timestamp: 40,
+      streams: ['/test'],
+      values: {
+        doubles: [1]
+      }
+    }
+  ];
+  const data = builder.getData();
+
+  t.deepEqual(
+    data,
+    expected,
+    'XVIZTimeSeriesBuilder#return entries in time sorted order matches expected output'
+  );
+  data.forEach(d => schemaValidator.validate('core/timeseries_state', d));
+  t.end();
+});

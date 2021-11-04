@@ -87,7 +87,12 @@ export default class XVIZTimeSeriesBuilder extends XVIZBaseBuilder {
     }
 
     const timeSeriesData = [];
-    for (const [timestamp, ids] of this._data) {
+
+    // Return the data in timestamp sort order, not insertion order
+    const dataEntries = Array.from(this._data.entries());
+    dataEntries.sort((l, r) => l[0] - r[0]);
+
+    for (const [timestamp, ids] of dataEntries) {
       for (const [id, fields] of ids) {
         for (const tsdata of fields.values()) {
           const entry = {
@@ -141,6 +146,13 @@ export default class XVIZTimeSeriesBuilder extends XVIZBaseBuilder {
       if (idEntry) {
         const fieldEntry = idEntry.get(fieldName);
         if (fieldEntry) {
+          // verify a duplicate ts & stream is present in current entry
+          if (fieldEntry.streams.includes(this._streamId)) {
+            this.validateError(
+              `TimeSeries entry is duplicate. Stream "${this._streamId}" at ${this._timestamp}.`
+            );
+          }
+
           // append entry to existing array
           fieldEntry.streams.push(this._streamId);
           fieldEntry.values[fieldName].push(this._value);

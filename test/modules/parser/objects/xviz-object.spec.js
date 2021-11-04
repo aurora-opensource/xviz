@@ -84,3 +84,21 @@ test('XVIZObject#_reset, _addFeature, isValid', t => {
 
   t.end();
 });
+
+test('XVIZObject#attributes', t => {
+  const object = new XVIZObject({id: 11, index: 0, timestamp: 1000});
+
+  object._setAttribute('/a', 'a', 5);
+  t.deepEquals(object.getAttributes(), {a: 5}, 'attribute is fetched correctly');
+
+  object._setAttribute('/b', 'b', 7);
+  t.deepEquals(object.getAttributes(), {a: 5, b: 7}, 'additional attribute is fetched correctly');
+
+  object._setAttribute('/b', 'b', 8);
+  t.deepEquals(object.getAttributes(), {a: 5, b: 8}, 'overwritten attribute is fetched correctly');
+
+  object._reset();
+  t.deepEquals(object.getAttributes(), {}, 'reset clears attributes');
+
+  t.end();
+});

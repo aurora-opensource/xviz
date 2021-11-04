@@ -22,6 +22,21 @@ let serialIndex = 0;
 
 /**
  * Contains metadata and state of each XVIZ object
+ *
+ * The data associated with an object is broken down as follows.
+ * - props
+ *   Properties that are added directly to an XVIZ entry.
+ *   This mutates the entry and is dependent on order of processing.
+ *   In general this should be avoided.
+ *
+ * - attributes
+ *   Associated data that lives solely in the XVIZObject accessible
+ *   upon lookup by ID.
+ *
+ * - state
+ *   This is reserved for the client application to add attribute
+ *   to an object w/o colliding with internal processes.
+ *   This state persists across frames.
  */
 export default class XVIZObject extends BaseObject {
   static setDefaultCollection(collection) {
@@ -41,6 +56,8 @@ export default class XVIZObject extends BaseObject {
     // Use Map here for the clear() method without creating a new object
     this._props = new Map();
     this._streams = new Map();
+    this._attributes = new Map();
+
     this._geometry = null;
   }
 
@@ -127,6 +144,11 @@ export default class XVIZObject extends BaseObject {
     return distance;
   }
 
+  // return object of  attributes and their values
+  getAttributes() {
+    return Object.fromEntries(this._attributes);
+  }
+
   getProp(name) {
     return this._props.get(name);
   }
@@ -140,6 +162,14 @@ export default class XVIZObject extends BaseObject {
   _observe(timestamp) {
     this.startTime = Math.min(this.startTime, timestamp);
     this.endTime = Math.max(this.endTime, timestamp);
+  }
+
+  // Track the stream this attribute came from and associated
+  // entry if present, else the data.
+  // Attributes are directly stored and accessible with getAttribute()
+  _setAttribute(streamName, attribute, data, entry) {
+    this._streams.set(streamName, entry || attribute);
+    this._attributes.set(attribute, data);
   }
 
   _addFeature(streamName, feature) {
@@ -186,6 +216,10 @@ export default class XVIZObject extends BaseObject {
     if (this._streams.size) {
       this._streams.clear();
     }
+    if (this._attributes.size) {
+      this._attributes.clear();
+    }
+
     // clear the cached position
     this._geometry = null;
   }
