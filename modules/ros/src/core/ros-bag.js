@@ -13,6 +13,8 @@
 // limitations under the License.
 /* global Buffer */
 /* eslint-disable camelcase */
+import lz4 from "lz4js";
+
 import {open, TimeUtil} from 'rosbag';
 import {quaternionToEuler} from '../common/quaternion';
 
@@ -66,7 +68,12 @@ export class ROSBag {
     this.bagContext.end_time = TimeUtil.toDate(bag.endTime).getTime() / 1e3;
 
     const frameIdToPoseMap = {};
-    await bag.readMessages({topics: [TF, TF_STATIC]}, ({topic, message}) => {
+    await bag.readMessages({
+      topics: [TF, TF_STATIC],
+      decompress: {
+        lz4: (buffer) => new Buffer(lz4.decompress(buffer)),
+      }
+    }, ({topic, message}) => {
       message.transforms.forEach(t => {
         frameIdToPoseMap[t.child_frame_id] = {
           ...t.transform.translation,
@@ -122,7 +129,10 @@ export class ROSBag {
     const frame = {};
 
     const options = {
-      topics: this.rosConfig.topics
+      topics: this.rosConfig.topics,
+      decompress: {
+        lz4: (buffer) => new Buffer(lz4.decompress(buffer)),
+      },
     };
 
     if (start) {
