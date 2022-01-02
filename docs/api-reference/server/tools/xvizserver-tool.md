@@ -44,6 +44,8 @@ There are built-in XVIZ scenarios the server supports, mainly for testing.
 - `/scenario-circle`
 - `/scenario-straight`
 - `/scenario-orbit`
+- `/scenario-transforms`
+- `/scenario-arm`
 
 Example
 

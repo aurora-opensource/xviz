@@ -14,14 +14,18 @@
 import {XVIZData} from '@xviz/io';
 import {ScenarioReader} from './scenario-reader';
 
+import ScenarioArm from './scenario-arm';
 import ScenarioCircle from './scenario-circle';
 import ScenarioStraight from './scenario-straight';
 import ScenarioOrbit from './scenario-orbit';
+import ScenarioTransforms from './scenario-transforms';
 
 const Scenarios = {
+  ...ScenarioArm,
   ...ScenarioCircle,
+  ...ScenarioOrbit,
   ...ScenarioStraight,
-  ...ScenarioOrbit
+  ...ScenarioTransforms
 };
 
 // Normalize all the possible query parameters
