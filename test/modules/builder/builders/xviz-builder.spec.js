@@ -46,6 +46,38 @@ test('XVIZBuilder#default-ctor', t => {
   /* eslint-enable no-unused-vars */
 });
 
+test('XVIZBuilder#no-pose', t => {
+  const builder = new XVIZBuilder();
+  builder.timestamp(1.0);
+
+  const pos = [4, 3, 0];
+  builder.primitive('/test/circle').circle(pos, 5);
+
+  const expected = {
+    update_type: 'SNAPSHOT',
+    updates: [
+      {
+        timestamp: 1.0,
+        primitives: {
+          '/test/circle': {
+            circles: [
+              {
+                center: pos,
+                radius: 5
+              }
+            ]
+          }
+        }
+      }
+    ]
+  };
+
+  const message = builder.getMessage();
+  t.deepEqual(message, expected, 'XVIZBuilder getMessage works w/o pose');
+  schemaValidator.validate('session/state_update', message);
+  t.end();
+});
+
 test('XVIZBuilder#single-pose', t => {
   const builder = new XVIZBuilder();
   setupPose(builder);

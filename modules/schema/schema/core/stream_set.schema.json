@@ -16,8 +16,7 @@
       },
       "additionalProperties": {
         "$ref": "https://xviz.org/schema/core/pose.json"
-      },
-      "required": [ "/vehicle_pose" ]
+      }
     },
     "primitives": {
       "type": "object",

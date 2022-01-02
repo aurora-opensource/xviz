@@ -50,6 +50,7 @@ export default class XVIZBuilder {
 
     // Current streamBuilder
     this._streamBuilder = null;
+    this._timestamp = null;
 
     // Construct different builders
     this._poseBuilder = new XVIZPoseBuilder({
@@ -84,6 +85,10 @@ export default class XVIZBuilder {
 
   persistent() {
     this.updateType = 'PERSISTENT';
+  }
+
+  timestamp(ts) {
+    this._timestamp = ts;
   }
 
   pose(streamId = PRIMARY_POSE_STREAM) {
@@ -135,11 +140,19 @@ export default class XVIZBuilder {
     }]
   }
    */
+  /* eslint-disable max-statements, complexity */
   getMessage() {
     const {poses} = this._poseBuilder.getData();
+    let ts = this._timestamp;
 
-    if (!poses || !poses[PRIMARY_POSE_STREAM]) {
-      this._validator.error(`Every message requires a ${PRIMARY_POSE_STREAM} stream`);
+    if (!ts && poses && poses[PRIMARY_POSE_STREAM]) {
+      ts = poses[PRIMARY_POSE_STREAM].timestamp;
+    }
+
+    if (!ts) {
+      this._validator.error(
+        `A message requires a timestamp. Ensure builder.timestamp() is called.`
+      );
     }
 
     const primitives = this._primitivesBuilder.getData();
@@ -150,9 +163,12 @@ export default class XVIZBuilder {
     const links = this._linkBuilder.getData();
 
     const data = {
-      timestamp: poses[PRIMARY_POSE_STREAM].timestamp,
-      poses
+      timestamp: ts
     };
+
+    if (poses) {
+      data.poses = poses;
+    }
 
     if (primitives) {
       data.primitives = primitives;
@@ -180,6 +196,7 @@ export default class XVIZBuilder {
 
     return message;
   }
+  /* eslint-enable max-statements, complexity */
 
   // DEPRECATED: change to using getMessage()
   getFrame() {
@@ -188,5 +205,6 @@ export default class XVIZBuilder {
 
   _reset() {
     this._streamBuilder = null;
+    this._timestamp = null;
   }
 }
