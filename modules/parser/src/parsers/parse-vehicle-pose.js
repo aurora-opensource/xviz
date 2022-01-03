@@ -54,7 +54,7 @@ export function getTransformsFromPose(vehiclePose) {
   // deck.gl needs a lon/lat position to target the camera
   const trackPosition = addMetersToLngLat(
     origin || [0, 0, 0],
-    vehicleRelativeTransform.transformVector([0, 0, 0])
+    vehicleRelativeTransform.transform([0, 0, 0])
   );
 
   return {
