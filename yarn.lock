@@ -1686,13 +1686,23 @@
     npmlog "^4.1.2"
     write-file-atomic "^2.3.0"
 
-"@loaders.gl/core@2.3.13", "@loaders.gl/core@^2.2.6", "@loaders.gl/core@^2.3.13":
+"@loaders.gl/core@2.3.13", "@loaders.gl/core@^2.2.6":
   version "2.3.13"
   resolved "https://registry.yarnpkg.com/@loaders.gl/core/-/core-2.3.13.tgz#093fe965cfab0a72c902a63d461282ae1ed55dc2"
   integrity sha512-Hjm8eJjS/OUnaHrOSgXtE+qDg5V4Do0jIpp2u0Dv3CMxPrtd2TpwkDfAyZWmmbZew9rzqPoAVMINejS/ItWUeg==
   dependencies:
     "@babel/runtime" "^7.3.1"
     "@loaders.gl/loader-utils" "2.3.13"
+
+"@loaders.gl/core@^3.1.4":
+  version "3.1.4"
+  resolved "https://registry.npmmirror.com/@loaders.gl/core/download/@loaders.gl/core-3.1.4.tgz#c2c986eb1e1f4fc50a289ed8e0f9eb02f0e7457f"
+  integrity sha512-v6wWsFQMkJdtbpN8tEy9pqClMuv7EEA9BYYG0rs6gXCXHotgv0d+YiHXVgTPygdSxvOLBiFf/tQsbdk9EbVMjw==
+  dependencies:
+    "@babel/runtime" "^7.3.1"
+    "@loaders.gl/loader-utils" "3.1.4"
+    "@loaders.gl/worker-utils" "3.1.4"
+    probe.gl "^3.4.0"
 
 "@loaders.gl/draco@2.3.13":
   version "2.3.13"
@@ -1713,20 +1723,36 @@
     "@loaders.gl/images" "2.3.13"
     "@loaders.gl/loader-utils" "2.3.13"
 
-"@loaders.gl/images@2.3.13", "@loaders.gl/images@^2.3.13":
+"@loaders.gl/images@2.3.13":
   version "2.3.13"
   resolved "https://registry.yarnpkg.com/@loaders.gl/images/-/images-2.3.13.tgz#3b827cf1e8d31c8f1adf85136c7fd53c08dbb0a8"
   integrity sha512-BBgLf17udhRnYwvsObAOM7jEeLBaeU3di1NyLhpTMa7WbG3jAnDlmy1BRue8wYfgVpWnmk18YubZtX6vCRrJnA==
   dependencies:
     "@loaders.gl/loader-utils" "2.3.13"
 
-"@loaders.gl/loader-utils@2.3.13", "@loaders.gl/loader-utils@^2.3.13":
+"@loaders.gl/images@^3.1.4":
+  version "3.1.4"
+  resolved "https://registry.npmmirror.com/@loaders.gl/images/download/@loaders.gl/images-3.1.4.tgz#82fe2386e65ece9cca977c47edfee2fb6fc60046"
+  integrity sha512-2xitqD+WZIqPn6OvvCEUzI7Y++8KMMzTrzt4qnb7Xtt/KMsk+LeGX8sVl1tAroABuViU0QaQuWS47n3GPJXdnQ==
+  dependencies:
+    "@loaders.gl/loader-utils" "3.1.4"
+
+"@loaders.gl/loader-utils@2.3.13":
   version "2.3.13"
   resolved "https://registry.yarnpkg.com/@loaders.gl/loader-utils/-/loader-utils-2.3.13.tgz#5cf6403b1c19b2fe5abacbd89e6252b8ca50db96"
   integrity sha512-vXzH5CWG8pWjUEb7hUr6CM4ERj4NVRpA60OxvVv/OaZZ7hNN63+9/tSUA5IXD9QArWPWrFBnKnvE+5gg4WNqTg==
   dependencies:
     "@babel/runtime" "^7.3.1"
     "@probe.gl/stats" "^3.3.0"
+
+"@loaders.gl/loader-utils@3.1.4", "@loaders.gl/loader-utils@^3.1.4":
+  version "3.1.4"
+  resolved "https://registry.npmmirror.com/@loaders.gl/loader-utils/download/@loaders.gl/loader-utils-3.1.4.tgz#66a1929ba6c60f065d28255c815101747f91619b"
+  integrity sha512-XLWgW8Z0CcFBGYev8wrlKgZot/TwXAsIvzDdoNqYboYQHvzNHzJLbGY1VBx2+rSSHfgTsypJIlh/mkRB9z4DJg==
+  dependencies:
+    "@babel/runtime" "^7.3.1"
+    "@loaders.gl/worker-utils" "3.1.4"
+    "@probe.gl/stats" "^3.5.0"
 
 "@loaders.gl/polyfills@^2.2.6":
   version "2.3.13"
@@ -1740,6 +1766,13 @@
     stream-to-async-iterator "^0.2.0"
     through "^2.3.8"
     web-streams-polyfill "^3.0.0"
+
+"@loaders.gl/worker-utils@3.1.4":
+  version "3.1.4"
+  resolved "https://registry.npmmirror.com/@loaders.gl/worker-utils/download/@loaders.gl/worker-utils-3.1.4.tgz#40fc721c1e2e7b4e4c2248d165ed55bce63fa4a7"
+  integrity sha512-U0ezUcYWfTgcqLdsD88ppJnjEF3e1SssJFlHlJ5BIwVgsYtn/AqxGB0Y61568jwqSzQr8bJgCIpdYRQPa+omYQ==
+  dependencies:
+    "@babel/runtime" "^7.3.1"
 
 "@math.gl/core@3.5.6":
   version "3.5.6"
@@ -1902,7 +1935,7 @@
     "@babel/runtime" "^7.0.0"
     "@probe.gl/env" "3.5.0"
 
-"@probe.gl/stats@3.5.0", "@probe.gl/stats@^3.3.0":
+"@probe.gl/stats@3.5.0", "@probe.gl/stats@^3.3.0", "@probe.gl/stats@^3.5.0":
   version "3.5.0"
   resolved "https://registry.yarnpkg.com/@probe.gl/stats/-/stats-3.5.0.tgz#774495772f06e898aae28c1d315c9edac07f3425"
   integrity sha512-IH2M+F3c8HR1DTroBARePUFG7wIewumtKA0UFqx51Z7S4hKrD60wFbpMmg0AcF4FvHAXMBoC+kYi1UKW9XbAOw==
@@ -9610,7 +9643,7 @@ pretty-error@^2.0.2:
     lodash "^4.17.20"
     renderkid "^2.0.4"
 
-probe.gl@^3.1.0:
+probe.gl@^3.1.0, probe.gl@^3.4.0:
   version "3.5.0"
   resolved "https://registry.yarnpkg.com/probe.gl/-/probe.gl-3.5.0.tgz#084c0ef3a233e1c055cd8a88efb67abb11eba483"
   integrity sha512-KWj8u0PNytr/rVwcQFcN7O8SK7n/ITOsUZ91l4fSX95oHhKvVCI7eadrzFUzFRlXkFfBWpMWZXFHITsHHHUctw==
@@ -11915,8 +11948,10 @@ watchpack@^1.7.4:
   resolved "https://registry.yarnpkg.com/watchpack/-/watchpack-1.7.5.tgz#1267e6c55e0b9b5be44c2023aed5437a2c26c453"
   integrity sha512-9P3MWk6SrKjHsGkLT2KHXdQ/9SNkyoJbabxnKOoJepsvJjJG8uYTR3yTPxPQvNDI3w4Nz1xnE0TLHK4RIVe/MQ==
   dependencies:
+    chokidar "^3.4.1"
     graceful-fs "^4.1.2"
     neo-async "^2.5.0"
+    watchpack-chokidar2 "^2.0.1"
   optionalDependencies:
     chokidar "^3.4.1"
     watchpack-chokidar2 "^2.0.1"

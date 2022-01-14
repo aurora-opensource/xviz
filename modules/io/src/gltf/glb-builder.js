@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 /* eslint-disable camelcase, max-statements */
-import {padTo4Bytes, copyToArray} from '@loaders.gl/loader-utils';
+import {padToNBytes, copyToArray} from '@loaders.gl/loader-utils';
 import {isImage} from '@loaders.gl/images';
 import {getAccessorTypeFromSize, getComponentTypeFromArray} from './gltf-utils/gltf-utils';
 import encodeGLBSync from './encode-glb';
@@ -132,7 +132,7 @@ export default class GLBBuilder {
 
     // We've now written the contents to the body, so update the total length
     // Every sub-chunk needs to be 4-byte aligned
-    this.byteLength += padTo4Bytes(byteLength);
+    this.byteLength += padToNBytes(byteLength, 4);
 
     // Add this buffer to the list of buffers to be written to the body.
     this.sourceBuffers.push(buffer);

@@ -14,7 +14,7 @@
 /* global TextDecoder */
 /* eslint-disable camelcase, max-statements */
 import '../common/text-encoding';
-import {padTo4Bytes, assert} from '@loaders.gl/loader-utils';
+import {padToNBytes, assert} from '@loaders.gl/loader-utils';
 
 const MAGIC_glTF = 0x676c5446; // glTF in Big-Endian ASCII
 
@@ -149,7 +149,7 @@ function parseGLBChunksSync(glb, dataView, byteOffset, options) {
       default:
     }
 
-    byteOffset += padTo4Bytes(chunkLength);
+    byteOffset += padToNBytes(chunkLength, 4);
   }
 
   return byteOffset;
