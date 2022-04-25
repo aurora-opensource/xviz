@@ -27,12 +27,23 @@ KITTI_PATH="${SCRIPT_DIR}"/../data/kitti
 GENERATED_KITTI_PATH="${SCRIPT_DIR}"/../data/generated/kitti
 
 
+if command -v wget &> /dev/null
+then
+  FETCH="wget -O"
+elif command -v curl &> /dev/null
+then
+  FETCH="curl -o"
+else
+  echo "Neither wget nor curl could not be found"
+  exit
+fi
+
 # Make kitti directories
 mkdir -p "${KITTI_PATH}" "${GENERATED_KITTI_PATH}"
 
 # Download files
 unpack_kitti_file() {
-  wget https://s3.eu-central-1.amazonaws.com/avg-kitti/raw_data/"$1"/"$2" && unzip "$2"  -d "$3" && rm "$2"
+  $FETCH "$2" https://s3.eu-central-1.amazonaws.com/avg-kitti/raw_data/"$1"/"$2" && unzip "$2"  -d "$3" && rm "$2"
 }
 
 subdircount=$(find ${KITTI_PATH} -maxdepth 1 -type d | wc -l)
@@ -50,7 +61,7 @@ fi
 
 unpack_kitti_calib_file() {
   local calib_file="${1}_calib.zip"
-  wget https://s3.eu-central-1.amazonaws.com/avg-kitti/raw_data/"$calib_file" && unzip "$calib_file"  -d "$2" && rm "$calib_file"
+  $FETCH "$calib_file" https://s3.eu-central-1.amazonaws.com/avg-kitti/raw_data/"$calib_file" && unzip "$calib_file"  -d "$2" && rm "$calib_file"
 }
 
 if [ ! -f "${KITTI_PATH}/${KITTI_DATE}/calib_imu_to_velo.txt" ]; then
