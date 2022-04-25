@@ -2,7 +2,7 @@
   "name": "@xviz/ros",
   "description": "ROS module for converting ROS data into XVIZ",
   "license": "Apache-2.0",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "repository": {
     "type": "git",
     "url": "https://github.com/uber/xviz.git"
@@ -14,8 +14,8 @@
     "dist"
   ],
   "dependencies": {
-    "@xviz/builder": "1.0.10",
-    "@xviz/io": "1.0.10",
+    "@xviz/builder": "1.0.11",
+    "@xviz/io": "1.0.11",
     "lodash": "^4.17.11",
     "math.gl": "^3.0.0",
     "rosbag": "^2.0.0",
