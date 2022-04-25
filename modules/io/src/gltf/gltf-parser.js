@@ -105,6 +105,8 @@ export class GLTFParser {
   getApplicationData(key) {
     if (this.json) {
       return this.json[key];
+    } else if (this.glbParser) {
+      return this.glbParser.getApplicationData(key);
     }
 
     return null;

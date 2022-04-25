@@ -14,7 +14,8 @@
 /* global TextDecoder */
 /* eslint-disable camelcase, max-statements */
 import '../common/text-encoding';
-import {padTo4Bytes, assert} from '@loaders.gl/loader-utils';
+import {assert} from '@loaders.gl/loader-utils';
+import {padTo4Bytes} from './memory-copy-utils';
 
 const MAGIC_glTF = 0x676c5446; // glTF in Big-Endian ASCII
 

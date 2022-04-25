@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 /* eslint-disable camelcase, max-statements */
-import {padTo4Bytes, copyToArray} from '@loaders.gl/loader-utils';
+import {copyToArray} from '@loaders.gl/loader-utils';
 import {isImage} from '@loaders.gl/images';
 import {getAccessorTypeFromSize, getComponentTypeFromArray} from './gltf-utils/gltf-utils';
+import {padTo4Bytes} from './memory-copy-utils';
 import encodeGLBSync from './encode-glb';
 import {packBinaryJson} from '../writers/xviz-pack-binary';
 
