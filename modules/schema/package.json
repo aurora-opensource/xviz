@@ -2,7 +2,7 @@
   "name": "@xviz/schema",
   "description": "XVIZ JSON schema",
   "license": "Apache-2.0",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "repository": {
     "type": "git",
     "url": "https://github.com/uber/xviz.git"
@@ -15,9 +15,9 @@
     "src"
   ],
   "dependencies": {
+    "@xviz/protobufjs": "6.8.8-p1",
     "ajv": "^6.5.2",
-    "is": "^3.2.1",
-    "@xviz/protobufjs": "6.8.8-p1"
+    "is": "^3.2.1"
   },
   "devDependencies": {
     "ajv-cli": "^3.0.0"
