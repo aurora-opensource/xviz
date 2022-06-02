@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {getProtoEnumTypes, protoEnumsToInts, enumToIntField} from '@xviz/schema';
-import {parse} from 'protobufjs';
+import {parse} from '@xviz/protobufjs';
 
 import test from 'tape-catch';
 

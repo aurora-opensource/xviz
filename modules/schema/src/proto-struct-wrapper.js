@@ -19,7 +19,7 @@
 // Code from, only changes are conversion to ES6 from typescript
 // https://github.com/dcodeIO/protobuf.js/issues/839#issuecomment-401279631
 
-import {wrappers} from 'protobufjs';
+import {wrappers} from '@xviz/protobufjs';
 import * as is from 'is';
 
 export class StructEncode {

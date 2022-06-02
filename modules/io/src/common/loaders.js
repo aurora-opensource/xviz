@@ -17,7 +17,7 @@ import {GLTFParser} from '../gltf/gltf-parser';
 import {XVIZ_FORMAT, XVIZ_GLTF_EXTENSION} from './constants';
 import {TextDecoder} from './text-encoding';
 import {MAGIC_PBE1, XVIZ_PROTOBUF_MESSAGE, XVIZ_PROTOBUF_TYPE} from './protobuf-support';
-import {Enum, Type, MapField} from 'protobufjs';
+import {Enum, Type, MapField} from '@xviz/protobufjs';
 
 // XVIZ Type constants
 const XVIZ_TYPE_PATTERN = /"type":\s*"(xviz\/\w*)"/;

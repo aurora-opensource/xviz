@@ -15,7 +15,7 @@
 /* eslint no-console: off */
 /* eslint-env node, browser */
 
-import {Root, Type} from 'protobufjs';
+import {Root, Type} from '@xviz/protobufjs';
 import {PROTO_DATA} from './data';
 
 export const EXTENSION_PROPERTY = '(xviz_json_schema)';
