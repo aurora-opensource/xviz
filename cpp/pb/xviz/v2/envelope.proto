@@ -1,0 +1,26 @@
+// --------------------------------------------------------
+// WARNING: XVIZ Protobuf files are unstable, do not use
+// --------------------------------------------------------
+
+syntax = "proto3";
+
+package xviz.v2;
+
+option csharp_namespace = "xviz.V2";
+option go_package = "v2pb";
+option java_multiple_files = true;
+option java_outer_classname = "EnvelopeProto";
+option java_package = "com.xviz.v2";
+option objc_class_prefix = "XVIZ";
+option php_namespace = "Xviz\\V2";
+
+import "google/protobuf/any.proto";
+
+message Envelope {
+  // Categorize the message, recommend pattern: "namespace/type"
+  // This allows for two levels of routing and filtering in an
+  // application.  And for subscription to just some messages.
+  string type = 1;
+
+  google.protobuf.Any data = 2;
+}
