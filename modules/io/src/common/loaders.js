@@ -39,7 +39,11 @@ export function getDataContainer(data) {
     return null;
   }
 
-  if (data instanceof Buffer || data instanceof ArrayBuffer || ArrayBuffer.isView(data)) {
+  if (
+    (typeof Buffer !== 'undefined' && data instanceof Buffer) ||
+    data instanceof ArrayBuffer ||
+    ArrayBuffer.isView(data)
+  ) {
     return 'binary';
   }
 
@@ -329,7 +333,7 @@ function isJSONStringTypeArray(arr) {
 
   // Buffer.slice() does not make a copy, but we need one since
   // we call reverse()
-  if (lastChars instanceof Buffer) {
+  if (typeof Buffer !== 'undefined' && lastChars instanceof Buffer) {
     lastChars = Buffer.from(lastChars);
   }
 
