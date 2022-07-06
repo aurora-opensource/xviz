@@ -100,20 +100,20 @@ export class XVIZData {
     let data = this._data;
     switch (this._dataFormat) {
       case XVIZ_FORMAT.BINARY_GLB:
-        if (data instanceof Buffer) {
+        if (typeof Buffer !== 'undefined' && data instanceof Buffer) {
           data = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
         }
         msg = parseBinaryXVIZ(data);
         break;
       case XVIZ_FORMAT.BINARY_PBE:
-        if (data instanceof Buffer) {
+        if (typeof Buffer !== 'undefined' && data instanceof Buffer) {
           data = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
         }
         msg = parseBinaryXVIZ(data, this._opts);
         break;
       case XVIZ_FORMAT.JSON_BUFFER:
         let jsonString = null;
-        if (data instanceof Buffer) {
+        if (typeof Buffer !== 'undefined' && data instanceof Buffer) {
           // Default to utf8 encoding
           jsonString = data.toString();
         } else if (data instanceof ArrayBuffer || ArrayBuffer.isView(data)) {
@@ -154,7 +154,7 @@ export class XVIZData {
     let data = this._data;
     switch (getDataContainer(data)) {
       case 'binary':
-        if (data instanceof Buffer) {
+        if (typeof Buffer !== 'undefined' && data instanceof Buffer) {
           data = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
         }
 
