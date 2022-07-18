@@ -115,7 +115,7 @@ export class XVIZBinaryWriter extends XVIZBaseWriter {
     const {startTime, endTime, messages} = this.messageTimings;
     const messageTimings = {};
 
-    if (startTime) {
+    if (Number.isFinite(startTime)) {
       messageTimings.startTime = startTime;
     }
 
@@ -164,7 +164,7 @@ export class XVIZBinaryWriter extends XVIZBaseWriter {
       // Metadata case
       if (log_info) {
         const {start_time, end_time} = log_info || {};
-        if (start_time) {
+        if (Number.isFinite(start_time)) {
           this.messageTimings.startTime = start_time;
         }
 
