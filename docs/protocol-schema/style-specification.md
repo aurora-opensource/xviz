@@ -175,18 +175,22 @@ Supported style properties by primitive types:
 
 ### polygon
 
-| Property                  | Description                                                                                                        | Type            | Default  | Per-stream | Per-object |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------ | --------------- | -------- | ---------- | ---------- |
-| `extruded`                | Whether to extrude the polygon                                                                                     | Bool            | `false`  | X          |            |
-| `height`                  | The extrusion of the polygon in meters. Only works if `extruded: true`                                             | Number          | `0`      | X          | X          |
-| `filled`                  | Whether to fill the polygon                                                                                        | Bool            | `true`   | X          |            |
-| `stroked`                 | Whether to draw outline around the polygon                                                                         | Bool            | `true`   | X          |            |
-| `fill_color`              | Fill color of the polygon                                                                                          | [Color](#color) | `'#fff'` | X          | X          |
-| `stroke_color`            | Stroke color of the outline                                                                                        | [Color](#color) | `'#000'` | X          | X          |
-| `stroke_width`            | Stroke width of the outline in meters. Only works if `extruded: false`                                             | Number          | `1`      | X          | X          |
-| `stroke_width_min_pixels` | The minimum pixels to draw the outline at. Prevents the lines from being too thin to see at a far-away zoom level. | Number          | (none)   | X          |            |
-| `stroke_width_max_pixels` | The maximum pixels to draw the outline at. Prevents the lines from being too thick at a close-up zoom level.       | Number          | (none)   | X          |            |
-| `opacity`                 | Opacity of the object                                                                                              | Number          | `1`      | X          |            |
+| Property                  | Description                                                                                                        | Type                         | Default  | Per-stream | Per-object |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------ | ---------------------------- | -------- | ---------- | ---------- |
+| `extruded`                | Whether to extrude the polygon                                                                                     | Bool                         | `false`  | X          |            |
+| `height`                  | The extrusion of the polygon in meters. Only works if `extruded: true`                                             | Number                       | `0`      | X          | X          |
+| `filled`                  | Whether to fill the polygon                                                                                        | Bool                         | `true`   | X          |            |
+| `stroked`                 | Whether to draw outline around the polygon                                                                         | Bool                         | `true`   | X          |            |
+| `fill_color`              | Fill color of the polygon                                                                                          | [Color](#color)              | `'#fff'` | X          | X          |
+| `stroke_color`            | Stroke color of the outline                                                                                        | [Color](#color)              | `'#000'` | X          | X          |
+| `stroke_width`            | Stroke width of the outline in meters. Only works if `extruded: false`                                             | Number                       | `1`      | X          | X          |
+| `stroke_width_min_pixels` | The minimum pixels to draw the outline at. Prevents the lines from being too thin to see at a far-away zoom level. | Number                       | (none)   | X          |            |
+| `stroke_width_max_pixels` | The maximum pixels to draw the outline at. Prevents the lines from being too thick at a close-up zoom level.       | Number                       | (none)   | X          |            |
+| `opacity`                 | Opacity of the object                                                                                              | Number                       | `1`      | X          |            |
+| `texture_id`              | Texture to be applied on the polygon                                                                               | String                       | (none)   | x          |            |
+| `texture_mode`            | To apply texture in either color mode or alpha mode                                                                | [TextureMode](#texture-mode) | 0        | x          |            |
+| `texture_scale`           | Scale of the texture                                                                                               | Number                       | 1        | x          | x          |
+| `texture_rotation`        | Counter-clockwise rotation of the texture in degrees                                                               | Number                       | 0        | x          | x          |
 
 ### polyline
 
@@ -238,6 +242,13 @@ How to color `point` primitives. Can be one of 3 values:
 - `DEFAULT` - use inline colors if provided, or `fill_colors` style otherwise
 - `ELEVATION` - color by elevation from the ground.
 - `DISTANCE_TO_VEHICLE` - color by distance to the vehicle.
+
+### Texture Mode
+
+How to apply texture to polygon. Can be one of 2 values:
+
+- `COLOR` - use all rgba channels from the texture
+- `ALPHA` - only use alpha channel from the texture
 
 ## Remarks
 

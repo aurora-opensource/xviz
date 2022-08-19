@@ -28,6 +28,18 @@
       "text_baseline": {
         "enum": ["TOP", "CENTER", "BOTTOM"]
       },
+      "texture_id" : {
+        "type": "string"
+      },
+      "texture_mode" : {
+        "enum": ["COLOR", "ALPHA"]
+      },
+      "texture_scale" : {
+        "type": "number"
+      },
+      "texture_rotation" : {
+        "type": "number"
+      },
       "height": {
         "type": "number"
       },
@@ -93,6 +105,10 @@
       {"required": ["text_rotation"]},
       {"required": ["text_anchor"]},
       {"required": ["text_baseline"]},
+      {"required": ["texture_id"]},
+      {"required": ["texture_mode"]},
+      {"required": ["texture_scale"]},
+      {"required": ["texture_rotation"]},
       {"required": ["radius_min_pixels"]},
       {"required": ["radius_max_pixels"]},
       {"required": ["stroke_width_min_pixels"]},

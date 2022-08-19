@@ -88,6 +88,11 @@ const PROPERTY_FORMATTERS = {
   text_anchor: String,
   text_baseline: String,
 
+  texture_id: String,
+  texture_mode: num,
+  texture_scale: getNumber,
+  texture_rotation: getNumber,
+
   radius: getNumber,
   radius_min_pixels: getNumber,
   radius_max_pixels: getNumber,
@@ -114,6 +119,11 @@ const DEFAULT_STYLES = {
   text_rotation: 0,
   text_anchor: 'MIDDLE',
   text_baseline: 'CENTER',
+
+  texture_id: '',
+  texture_mode: 0,
+  texture_scale: 1,
+  texture_rotation: 0,
 
   radius: 1,
   radius_pixels: 1,

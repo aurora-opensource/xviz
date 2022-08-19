@@ -60,6 +60,10 @@ message StyleStreamValue {
   string font_family = 20;
   PointColorMode point_color_mode = 21;
   repeated float point_color_domain = 22;
+  string texture_id = 23;
+  TextureMode texture_mode = 24;
+  float texture_scale = 25;
+  float texture_rotation = 26;
 }
 
 message Color {
@@ -85,4 +89,9 @@ enum PointColorMode {
   POINT_COLOR_MODE_INVALID = 0;
   ELEVATION = 1;
   DISTANCE_TO_VEHICLE = 2;
+}
+
+enum TextureMode {
+  COLOR = 0;
+  ALPHA = 1;
 }
