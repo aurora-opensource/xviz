@@ -1,6 +1,6 @@
 # XVIZ Concepts
 
-The description of the XVIZ protocol is based a number of concepts that are introduced here.
+The description of the XVIZ protocol is based on a number of concepts that are introduced here.
 
 ## Datum
 
