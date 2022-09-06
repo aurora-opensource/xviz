@@ -32,7 +32,7 @@ support for validation of any other language implementations.
 ## XVIZ Server
 
 XVIZ was designed with a focus on distributed systems and teams. This means taking into account data
-size and processing and well as optimizing for data transmission over network infrastructures.
+size and processing as well as optimizing for data transmission over network infrastructures.
 
 The XVIZ Server is a simple demonstration of how XVIZ data can be delivered to your application.
 Follow the [Quick Start](/docs/getting-started/xviz-server.md) to start sending XVIZ data to your
