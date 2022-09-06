@@ -1,6 +1,6 @@
 # XVIZ Concepts
 
-The description of the XVIZ protocol is based a number of concepts that are introduced here.
+The description of the XVIZ protocol is based on a number of concepts that are introduced here.
 
 ## Datum
 
@@ -45,7 +45,7 @@ visualized. It can be tagged and given special styling (color etc).
 
 ## Style
 
-XVIZ support a form of stylesheets, allowing object properties to be specified based stream and
+XVIZ supports a form of stylesheets, allowing object properties to be specified based on stream and
 class.
 
 ## Object
