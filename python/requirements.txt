@@ -1,5 +1,5 @@
-easydict
-protobuf
-numpy
-websockets
-pytest
+easydict==1.9
+protobuf==3.20.1
+numpy==1.23.2
+websockets==10.3
+pytest==7.1.3
