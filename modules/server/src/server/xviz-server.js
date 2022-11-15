@@ -23,9 +23,18 @@ function getRequestData(requestUrl) {
   }
 
   return {
-    path: req.pathname,
+    path: decodeUrl(req.pathname),
     params
   };
+}
+
+function decodeUrl(url) {
+  const decodedUrl = decodeURI(url)
+  if (decodedUrl[1] === '/') {
+    return decodedUrl.substring(1)
+  }
+
+  return decodedUrl
 }
 
 // TODO: Allow a client supplied server to be used
@@ -58,8 +67,8 @@ export class XVIZServer {
   }
 
   async handleSession(socket, request) {
-    this.log(`[> Connection] created: ${request.url}`);
-    const req = getRequestData(request.url);
+    const decodedUrl = decodeUrl(request.url)
+    const req = getRequestData(decodedUrl);
 
     for (const handler of this.handlers) {
       const session = await handler.newSession(socket, req);
