@@ -6,7 +6,7 @@ from websockets.exceptions import ConnectionClosed
 import traceback
 
 class XVIZServer:
-    def __init__(self, handlers, port=3000, per_message_deflate=True):
+    def __init__(self, handlers, port=3000, per_message_deflate=True, host="localhost"):
         '''
         :param handlers: single or list of handlers that acts as function and return a session object, or None if not supported
         '''
@@ -22,7 +22,7 @@ class XVIZServer:
 
         compression = "deflate" if per_message_deflate else None
         self._serve_options = dict(ws_handler=self.handle_session,
-            host="localhost", port=port, compression=compression)
+            host=host, port=port, compression=compression)
 
     async def handle_session(self, socket, request):
         '''
