@@ -68,10 +68,10 @@ export default class XVIZUIPrimitiveBuilder extends XVIZBaseBuilder {
     return this;
   }
 
-  row(id, values) {
+  row(id, values, parent = null) {
     this.validatePropSetOnce('_id');
 
-    const row = new XVIZTreeTableRowBuilder(id, values);
+    const row = new XVIZTreeTableRowBuilder(id, values, parent);
     this._rows.push(row);
     this._type = PRIMITIVE_TYPES.treetable;
 
