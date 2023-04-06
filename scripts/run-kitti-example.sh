@@ -26,18 +26,38 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 show_help() {
   echo " -h display help information"
   echo " -f force KITTI xviz conversion"
+  echo " -j generate frames in JSON format"
+  echo " -p pretty json output (require -j option)"
+  echo " -m messages limit for debugging purpose"
+  echo " -g generate only, no server start"
+  echo " -d run in debug mode (start-debug)"
 }
 
 # Handle options
 force_xviz_conversion=false
+jsonarg=""
+jsonprettyarg=""
+messagelimitarg=""
+startparam="start"
+generate_only=false
 
-while getopts "hf" opt; do
+while getopts "hfjpm:dg" opt; do
     case "$opt" in
     h|\?)
         show_help
         exit 0
         ;;
     f)  force_xviz_conversion=true
+        ;;
+    j)  jsonarg=" --json "
+        ;;
+    p)  jsonprettyarg=" --pretty-json "
+        ;;
+    m)  messagelimitarg=" --message-limit="${OPTARG}
+        ;;
+    d)  startparam="start-debug"
+        ;;
+    g)  generate_only=true
         ;;
     esac
 done
@@ -62,7 +82,11 @@ OUTPUT_DIR="${SCRIPT_DIR}/../data/generated/kitti/2011_09_26/2011_09_26_drive_00
 if [ "$force_xviz_conversion" = "true" ] || ([ ! -f "${OUTPUT_DIR}/1-frame.json" ] && [ ! -f "${OUTPUT_DIR}/1-frame.glb" ]) ; then
     echo "Generating default KITTI XVIZ data"
     mkdir -p "${OUTPUT_DIR}"
-    (cd "${SCRIPT_DIR}/../examples/converters/kitti" && yarn && yarn start -d ${INPUT_DIR} -o "${OUTPUT_DIR}")
+    (cd "${SCRIPT_DIR}/../examples/converters/kitti" && yarn && yarn ${startparam} -d ${INPUT_DIR} -o "${OUTPUT_DIR}" ${jsonarg} ${jsonprettyarg} ${messagelimitarg})
+fi
+
+if [ "$generate_only" = "true" ] ; then
+    exit 0;
 fi
 
 # Start server & web app

@@ -31,6 +31,7 @@ module.exports = async function main(args) {
     imageMaxWidth,
     imageMaxHeight,
     writeJson,
+    prettyJson,
     writeProtobuf
   } = args;
 
@@ -53,7 +54,7 @@ module.exports = async function main(args) {
   const sink = new FileSink(outputDir);
   let xvizWriter = null;
   if (writeJson) {
-    xvizWriter = new XVIZJSONWriter(sink);
+    xvizWriter = new XVIZJSONWriter(sink, {prettyJson});
   } else if (writeProtobuf) {
     xvizWriter = new XVIZProtobufWriter(sink);
   } else {

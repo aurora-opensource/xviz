@@ -26,12 +26,12 @@ export class XVIZJSONWriter extends XVIZBaseWriter {
   constructor(sink, options = {}) {
     super(sink);
 
-    const {envelope = true, precision = 10, asArrayBuffer = false} = options;
+    const {envelope = true, precision = 10, asArrayBuffer = false, prettyJson = 0} = options;
     this.messageTimings = {
       messages: new Map()
     };
     this.wroteMessageIndex = null;
-    this.options = {envelope, precision, asArrayBuffer};
+    this.options = {envelope, precision, asArrayBuffer, prettyJson};
   }
 
   // xvizMetadata is the object returned
@@ -44,7 +44,7 @@ export class XVIZJSONWriter extends XVIZBaseWriter {
       xvizMetadata = XVIZEnvelope.Metadata(xvizMetadata);
     }
 
-    const msg = JSON.stringify(xvizMetadata);
+    const msg = JSON.stringify(xvizMetadata, null, this.options.prettyJson ? 2 : 0);
     this.writeToSink('1-frame.json', msg);
   }
 
@@ -66,7 +66,7 @@ export class XVIZJSONWriter extends XVIZBaseWriter {
     };
 
     const jsonXVIZMessage = xvizConvertJson(xvizMessage);
-    const msg = JSON.stringify(jsonXVIZMessage, numberRounder);
+    const msg = JSON.stringify(jsonXVIZMessage, numberRounder, this.options.prettyJson ? 2 : 0);
     this.writeToSink(`${messageName(messageIndex)}.json`, msg);
   }
 
@@ -102,7 +102,7 @@ export class XVIZJSONWriter extends XVIZBaseWriter {
     });
     messageTimings.timing = timing;
 
-    const msg = JSON.stringify(messageTimings);
+    const msg = JSON.stringify(messageTimings, null, this.options.prettyJson ? 2 : 0);
     this.writeToSink('0-frame.json', msg);
     this.wroteMessageIndex = timing.length;
   }
