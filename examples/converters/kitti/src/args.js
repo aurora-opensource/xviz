@@ -34,6 +34,11 @@ parser.addArgument('--json', {
   help: 'Generate JSON XVIZ output instead of the GLB file format'
 });
 
+parser.addArgument('--pretty-json', {
+  action: 'storeTrue',
+  help: 'Generate pretty formatted JSON'
+});
+
 parser.addArgument('--protobuf', {
   action: 'storeTrue',
   help: 'Generate Protobuf XVIZ output instead of the GLB file file format'
@@ -81,6 +86,7 @@ module.exports = function getArgs() {
     imageMaxHeight: Number(args.image_max_height),
     messageLimit: Number(args.message_limit),
     writeJson: Number(args.json),
+    prettyJson: Number(args.pretty_json),
     writeProtobuf: Number(args.protobuf)
   };
 };
