@@ -22,7 +22,7 @@ class XVIZTreeTableRowBuilder:
 
 class XVIZUIPrimitiveBuilder(XVIZBaseBuilder):
     def __init__(self, metadata, logger=None):
-        super().__init__(CATEGORY.PRIMITIVE, metadata, logger)
+        super().__init__(CATEGORY.UI_PRIMITIVE, metadata, logger)
 
         self.reset()
         self._primitives = {}
