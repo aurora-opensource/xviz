@@ -73,9 +73,10 @@ PRIMITIVE_STYLE_MAP = dict([
 ])
 
 # Test whether the keys are correct
+StyleStreamValueFields = StyleStreamValue.DESCRIPTOR.fields_by_name.keys()
 for fields in PRIMITIVE_STYLE_MAP.values():
     for f in fields:
-        assert f in StyleStreamValue.__dict__
+        assert f in StyleStreamValueFields
 
 class XVIZBaseBuilder:
     """
